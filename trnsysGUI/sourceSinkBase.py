@@ -7,7 +7,7 @@ import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-import trnsysGUI.pumpsAndTaps._defaults as _defaults
+import trnsysGUI.pumpsAndTaps.defaults as _defaults
 
 
 class SourceSinkBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin):

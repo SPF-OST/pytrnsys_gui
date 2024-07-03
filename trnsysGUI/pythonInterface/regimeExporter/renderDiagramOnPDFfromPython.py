@@ -16,6 +16,7 @@ import trnsysGUI.pumpsAndTaps.pump as _pump
 import trnsysGUI.pythonInterface.regimeExporter.getDesiredRegimes as _gdr
 import trnsysGUI.TVentil as _tv
 import trnsysGUI.pumpsAndTaps._tapBase as _tb
+import trnsysGUI.sourceSinkBase as _ssb
 
 
 @_dc.dataclass
@@ -57,7 +58,7 @@ class RegimeExporter:
         pumpsAndValvesAndTaps = []
         blockItemsAndConnections = self.mainWindow.editor.trnsysObj
         for blockItem in blockItemsAndConnections:
-            if isinstance(blockItem, (_pump.Pump, _tv.TVentil, _tb.TapBase)):
+            if isinstance(blockItem, (_pump.Pump, _tv.TVentil, _tb.TapBase, _ssb.SourceSinkBase)):
                 if blockItem.displayName in pumpsAndValvesNames:
                     pumpsAndValvesAndTaps.append(blockItem)
 
@@ -96,7 +97,7 @@ class RegimeExporter:
             blockItemName = blockItem.displayName
             desiredValue = regimeRow[blockItemName]
 
-            if isinstance(blockItem, (_pump.Pump, _tb.TapBase)):
+            if isinstance(blockItem, (_pump.Pump, _tb.TapBase, _ssb.SourceSinkBase)):
                 blockItem.massFlowRateInKgPerH = desiredValue
 
             elif isinstance(blockItem, _tv.TVentil):

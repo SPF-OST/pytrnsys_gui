@@ -10,8 +10,7 @@ import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.names.rename as _rename
-
-from . import _defaults
+import trnsysGUI.pumpsAndTaps.defaults as _defaults
 from . import _dialog
 from . import serialization as _ser
 

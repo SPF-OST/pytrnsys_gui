@@ -15,36 +15,31 @@ def getPumpsAndValvesWithValuesFromJson(projectJson):
         jsonValues = json.load(openFile)
 
     data = {}
-    blocks = jsonValues["Blocks"]
-    undesiredBlocks = [".__BlockDct__", "IDs", "Strings"]
-    # blockItemsInJson = filter(lambda x: x not in undesiredBlocks, blocks)
-    # blockNamesInJson = list(filter(lambda block: "BlockName" in blocks[block], blockItemsInJson))
-    blockItemsInJson = [x for x in blocks if x not in undesiredBlocks]
-    blockNamesInJson = [x for x in blockItemsInJson if "BlockName" in blocks[x]]
+    blockItemsAndConnections = jsonValues["Blocks"].values()
+    blockItems = [bc for bc in blockItemsAndConnections if isinstance(bc, dict) and ".__BlockDict__" in bc]
 
-    # pumps = list(filter(lambda block: "Pump" in blocks[block]["BlockName"], blockNamesInJson))
-    pumps = [x for x in blockNamesInJson if blocks[x]["BlockName"] == "Pump"]
+    pumps = [b for b in blockItems if b["BlockName"] == "Pump"]
     for pump in pumps:
-        curPump = _se.PumpModel.from_dict(blocks[pump])
-        data[curPump.BlockDisplayName] = curPump.blockItemWithPrescribedMassFlow.massFlowRateInKgPerH
+        curBlockItem = _se.PumpModel.from_dict(pump)
+        data[curBlockItem.BlockDisplayName] = curBlockItem.blockItemWithPrescribedMassFlow.massFlowRateInKgPerH
 
-    # valves = list(filter(lambda block: "TVentil" in blocks[block]["BlockName"], blockNamesInJson))
-    valves = [x for x in blockNamesInJson if blocks[x]["BlockName"] == "TVentil"]
+    valves = [b for b in blockItems if b["BlockName"] == "TVentil"]
     for valve in valves:
         desiredValueName = "PositionForMassFlowSolver"
-        data = getData(blocks[valve], data, desiredValueName)
+        data = getData(valve, data, desiredValueName)
 
-    # taps = list(filter(lambda block: blocks[block]["BlockName"] in ("WTap_main", "WTap"), blockNamesInJson))
-    taps = [x for x in blockNamesInJson if blocks[x]["BlockName"] in ("WTap_main", "WTap")]
+    taps = [b for b in blockItems if b["BlockName"] in ("WTap_main", "WTap")]
     for tap in taps:
-        curTap = _se.TerminalWithPrescribedMassFlowModel.from_dict(blocks[tap])
-        data[curTap.BlockDisplayName] = curTap.blockItemWithPrescribedMassFlow.massFlowRateInKgPerH
+        curBlockItem = _se.TerminalWithPrescribedMassFlowModel.from_dict(tap)
+        data[curBlockItem.BlockDisplayName] = curBlockItem.blockItemWithPrescribedMassFlow.massFlowRateInKgPerH
 
-    sourceSinks = [x for x in blockNamesInJson if blocks[x]["BlockName"] in ("Sink", "Source", "SourceSink", "Geotherm", "Water")]
+    sourceSinks = [
+        b for b in blockItems if b["BlockName"] in ("Sink", "Source", "SourceSink", "Geotherm", "Water")
+    ]
     for sourceSink in sourceSinks:
-        """ This isn't in the json yet, so I am applying a default value directly at first. """
-        BlockDisplayName = blocks[sourceSink]["BlockDisplayName"]
-        data[BlockDisplayName] = 500.0
+        # This isn't in the json yet, so I am applying a default value directly at first.
+        blockDisplayName = sourceSink["BlockDisplayName"]
+        data[blockDisplayName] = 500.0
 
     componentsAndValues = _pd.DataFrame(data, index=["dummy_regime"])
     componentsAndValues.index.name = "regimeName"

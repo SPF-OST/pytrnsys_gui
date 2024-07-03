@@ -117,6 +117,35 @@ _EXPECTED_NAME2_PATH = pathFinder.expectedPdfPath
 _NEW_NAME2_PATH = pathFinder.newPdfPath
 _NEW_NAME2_PATH_2 = pathFinder.alternatePdfPath
 
+_PROJECT_NAME3 = "diagramWithSourceSinksForRegimes"
+pathFinder3 = PathFinder(
+    _PROJECT_NAME3, _BASE_FOLDER_FILE_PATH, _EXPECTED_FILES_PATH, _RESULTS_DIR_NAME, _RESULTS_DIR_NAME_2
+)
+_dataDir = pathFinder3.projectDir
+_resultsDir = pathFinder3.resultsDir
+
+_ensureDirExists(_resultsDir)
+
+pathFinder3.setFileEnding("_diagram")
+expectedDiagramPath = pathFinder3.expectedPdfPath
+newDiagramPath = pathFinder3.newPdfPath
+
+pathFinder3.setFileEnding("_direct")
+expectedName1Path = pathFinder3.expectedPdfPath
+newName1Path = pathFinder3.newPdfPath
+
+pathFinder3.setFileEnding("_charge")
+expectedName2Path = pathFinder3.expectedPdfPath
+newName2Path = pathFinder3.newPdfPath
+
+pathFinder3.setFileEnding("_discharge")
+expectedName3Path = pathFinder3.expectedPdfPath
+newName3Path = pathFinder3.newPdfPath
+
+pathFinder3.setFileEnding("_charge_while_direct")
+expectedName4Path = pathFinder3.expectedPdfPath
+newName4Path = pathFinder3.newPdfPath
+
 
 def _createMainWindow(projectFolder, projectName, qtbot):
     projectJsonFilePath = projectFolder / f"{projectName}.json"
@@ -228,5 +257,29 @@ class TestPrintRegimesAndCopyFiles:
         if errors:
             raise ExceptionGroup("multiple errors", errors)
 
+    def testUsingQtBotForRegimeWithSourceSinks(self, qtbot):
 
-# non-qtbot solution?
+        mainWindow = _createMainWindow(_dataDir, _PROJECT_NAME3, qtbot)
+        regimeExporter = _rdopfp.RegimeExporter(_PROJECT_NAME3, _dataDir, _resultsDir, _REGIMES_FILENAME, mainWindow)
+        regimeExporter.export()
+
+        filesToCompare = {
+            "new_file": [newDiagramPath, newName1Path, newName2Path, newName3Path, newName4Path],
+            "expected_file": [
+                expectedDiagramPath,
+                expectedName1Path,
+                expectedName2Path,
+                expectedName3Path,
+                expectedName4Path,
+            ],
+        }
+
+        errors = []
+        for i, newFile in enumerate(filesToCompare["new_file"]):
+            try:
+                self._fileExistsAndIsCorrect(newFile, filesToCompare["expected_file"][i])
+            except AssertionError as currentError:
+                errors.append(currentError)
+
+        if errors:
+            raise ExceptionGroup("multiple errors", errors)
