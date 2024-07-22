@@ -41,3 +41,15 @@ def testConvertXmlTmfStringToDdck() -> None:
     expectedDdckContent = expectedDdckFilePath.read_text(encoding="utf8")
 
     assert actualDdckContent == expectedDdckContent
+
+
+def testConvertXmlTmfWithoutHydraulicConnectionsStringToDdck() -> None:
+    xmlFilePath = _CONTAINING_DIR_PATH / "Type71-no-hydraulic-connections.xmltmf"
+    xmlFileContent = xmlFilePath.read_text(encoding="utf8")
+
+    actualDdckContent = _pc.convertXmlTmfStringToDdck(xmlFileContent)
+
+    expectedDdckFilePath = _CONTAINING_DIR_PATH / "Type71-no-hydraulic-connections.ddck"
+    expectedDdckContent = expectedDdckFilePath.read_text(encoding="utf8")
+
+    assert actualDdckContent == expectedDdckContent

@@ -1,0 +1,42 @@
+UNIT 1 TYPE 71
+PARAMETERS 11
+1.0 ! 1: Number in series [-] ([1,+Inf])
+2.0 ! 2: Collector area [m^2] ([0.0,+Inf])
+4.19 ! 3: Fluid specific heat [kJ/kg.K] ([0.0,+Inf])
+1.0 ! 4: Efficiency mode [-] ([1,3])
+50.0 ! 5: Flow rate at test conditions [kg/hr.m^2] ([0.0,+Inf])
+0.7 ! 6: Intercept efficiency [-] ([0.0,1.0])
+10.0 ! 7: Negative of first order efficiency coeficient [kJ/hr.m^2.K] ([0.0,+Inf])
+0.03 ! 8: Negative of second order efficiency coeficient [kJ/hr.m^2.K^2] ([0.0,+Inf])
+13.0 ! 9: Logical unit of file containing biaxial IAM data [-] ([10,100])
+7.0 ! 10: Number of longitudinal angles for which IAMs are provided [-] ([1,+Inf])
+7.0 ! 11: Number of transverse angles for which IAMs are provided [-] ([1,+Inf])
+INPUTS 10
+0,0 ! 1: Inlet temperature [C] ([-Inf,+Inf])
+0,0 ! 2: Inlet flowrate [kg/hr] ([0.0,+Inf])
+0,0 ! 3: Ambient temperature [C] ([-Inf,+Inf])
+0,0 ! 4: Incident radiation [kJ/hr.m^2] ([0.0,+Inf])
+0,0 ! 5: Incident diffuse radiation [kJ/hr.m^2] ([0.0,+Inf])
+0,0 ! 6: Solar incidence angle [degrees] ([-360,+360])
+0,0 ! 7: Solar zenith angle [degrees] ([-360,+360])
+0,0 ! 8: Solar azimuth angle [degrees] ([-360,+360])
+0,0 ! 9: Collector slope [degrees] ([-360,+360])
+0,0 ! 10: Collector azimuth [degrees] ([-360,+360])
+** initial values
+20.0 ! 1: Inlet temperature - initial value
+100.0 ! 2: Inlet flowrate - initial value
+10.0 ! 3: Ambient temperature - initial value
+0.0 ! 4: Incident radiation - initial value
+0.0 ! 5: Incident diffuse radiation - initial value
+0.0 ! 6: Solar incidence angle - initial value
+0.0 ! 7: Solar zenith angle - initial value
+0.0 ! 8: Solar azimuth angle - initial value
+45.0 ! 9: Collector slope - initial value
+0.0 ! 10: Collector azimuth - initial value
+
+! EQUATIONS 5
+! XXX = [1, 1] ! Outlet temperature [C] ([-Inf,+Inf])
+! XXX = [1, 2] ! Outlet flowrate [kg/hr] ([0.0,+Inf])
+! XXX = [1, 3] ! Useful energy gain [kJ/hr] ([0.0,+Inf])
+! XXX = [1, 4] ! Collector efficiency [-] ([-Inf,+Inf])
+! XXX = [1, 5] ! Incidence angle modifier - overall [-] ([-Inf,+Inf])

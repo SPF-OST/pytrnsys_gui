@@ -40,6 +40,7 @@ _Variable = _StringMapping
 
 @_dc.dataclass
 class _HydraulicConnectionsData:
+    name: str | None
     portName: str
     variableNamePrefix: str
     propertyName: str
@@ -54,20 +55,20 @@ class _HydraulicConnectionsData:
         return f"@{self.propertyName}({self.portName})"
 
     @staticmethod
-    def createForTemperature(portName: str) -> "_HydraulicConnectionsData":
-        return _HydraulicConnectionsData(portName, "T", "temp")
+    def createForTemperature(connectionName: str | None, portName: str) -> "_HydraulicConnectionsData":
+        return _HydraulicConnectionsData(connectionName, portName, "T", "temp")
 
     @staticmethod
-    def createForMassFlowRate(portName: str) -> "_HydraulicConnectionsData":
-        return _HydraulicConnectionsData(portName, "M", "mfr")
+    def createForMassFlowRate(connectionName: str | None, portName: str) -> "_HydraulicConnectionsData":
+        return _HydraulicConnectionsData(connectionName, portName, "M", "mfr")
 
     @staticmethod
-    def createForFluidHeatCapacity(portName: str) -> "_HydraulicConnectionsData":
-        return _HydraulicConnectionsData(portName, "Cp", "cp")
+    def createForFluidHeatCapacity(connectionName: str | None, portName: str) -> "_HydraulicConnectionsData":
+        return _HydraulicConnectionsData(connectionName, portName, "Cp", "cp")
 
     @staticmethod
-    def createForFluidDensity(portName: str) -> "_HydraulicConnectionsData":
-        return _HydraulicConnectionsData(portName, "Rho", "rho")
+    def createForFluidDensity(connectionName: str | None, portName: str) -> "_HydraulicConnectionsData":
+        return _HydraulicConnectionsData(connectionName, portName, "Rho", "rho")
 
 
 @_dc.dataclass
@@ -112,7 +113,10 @@ def convertXmlTmfStringToDdck(xmlTmfContent: str) -> str:
     proforma: _tp.Any = schema.to_dict(xmlTmfContent)
 
     variables = proforma["variables"]["variable"]
-    hydraulicConnections = proforma["hydraulicConnections"]["connection"]
+    hydraulicConnections = proforma["hydraulicConnections"]["connection"] if "hydraulicConnections" in proforma else None
+
+    if hydraulicConnections is None:
+        hydraulicConnections = []
 
     connectionsDataByOrder = _createHydraulicConnectionDataByOrder(hydraulicConnections)
 
@@ -130,14 +134,17 @@ def _createHydraulicConnectionDataByOrder(
 ) -> _tp.Mapping[int, _HydraulicConnectionsData]:
     hydraulicConnectionDataByOrder: dict[int, _HydraulicConnectionsData] = {}
     for hydraulicConnection in hydraulicConnections:
-        dataForInput = _getHydraulicConnectionDataByOrderForInput(hydraulicConnection["input"])
-        dataByOrderForOutput = _getHydraulicConnectionDataByOrderForOutput(hydraulicConnection["output"])
+        connectionName = hydraulicConnection.get("@name")
+        dataForInput = _getHydraulicConnectionDataByOrderForInput(connectionName, hydraulicConnection["input"])
+        dataByOrderForOutput = _getHydraulicConnectionDataByOrderForOutput(connectionName, hydraulicConnection["output"])
         hydraulicConnectionDataByOrder |= dataForInput | dataByOrderForOutput
 
     return hydraulicConnectionDataByOrder
 
 
-def _getHydraulicConnectionDataByOrderForInput(inputPort: _StringMapping) -> dict[int, _HydraulicConnectionsData]:
+def _getHydraulicConnectionDataByOrderForInput(
+    connectionName: str, inputPort: _StringMapping
+) -> dict[int, _HydraulicConnectionsData]:
     portName = inputPort["@name"]
     mfrOrder = _getOrder(inputPort["massFlowRate"])
     tempOrder = _getOrder(inputPort["temperature"])
@@ -149,27 +156,30 @@ def _getHydraulicConnectionDataByOrderForInput(inputPort: _StringMapping) -> dic
     heatCapacityOrder = _getOrder(heatCapacityReference) if heatCapacityReference else None
 
     hydraulicConnectionDataByOrder = {
-        mfrOrder: _HydraulicConnectionsData.createForMassFlowRate(portName),
-        tempOrder: _HydraulicConnectionsData.createForTemperature(portName),
+        mfrOrder: _HydraulicConnectionsData.createForMassFlowRate(connectionName, portName),
+        tempOrder: _HydraulicConnectionsData.createForTemperature(connectionName, portName),
     }
 
     if densityOrder:
-        hydraulicConnectionDataByOrder[densityOrder] = _HydraulicConnectionsData.createForFluidDensity(portName)
+        hydraulicConnectionDataByOrder[densityOrder] = _HydraulicConnectionsData.createForFluidDensity(
+            connectionName, portName
+        )
 
     if heatCapacityOrder:
         hydraulicConnectionDataByOrder[heatCapacityOrder] = _HydraulicConnectionsData.createForFluidHeatCapacity(
-            portName
+            connectionName, portName
         )
 
     return hydraulicConnectionDataByOrder
 
 
 def _getHydraulicConnectionDataByOrderForOutput(
+    connectionName: str,
     outputPort: _StringMapping,
 ) -> _tp.Mapping[int, _HydraulicConnectionsData]:
     portName = outputPort["@name"]
     tempOrder = _getOrder(outputPort["temperature"])
-    hydraulicConnectionData = _HydraulicConnectionsData.createForTemperature(portName)
+    hydraulicConnectionData = _HydraulicConnectionsData.createForTemperature(connectionName, portName)
 
     return {tempOrder: hydraulicConnectionData}
 

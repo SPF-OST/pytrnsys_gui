@@ -52,13 +52,14 @@
       <xs:element type="temperatureType" name="temperature" />
       <xs:element type="massFlowRateType" name="massFlowRate" />
       <xs:element type="fluidDensityType" name="fluidDensity" minOccurs="0" maxOccurs="1"/>
-      <xs:element type="fluidHeatCapacityType" name="fluidHeatCapacity" />
+      <xs:element type="fluidHeatCapacityType" name="fluidHeatCapacity" minOccurs="0" maxOccurs="1"/>
     </xs:sequence>
     <xs:attribute type="xs:string" name="name" />
   </xs:complexType>
   <xs:complexType name="outputPortType">
     <xs:sequence>
       <xs:element type="temperatureType" name="temperature" />
+      <xs:element type="temperatureType" name="reverseTemperature" minOccurs="0" maxOccurs="1"/>
     </xs:sequence>
     <xs:attribute type="xs:string" name="name" />
   </xs:complexType>
@@ -67,6 +68,7 @@
       <xs:element type="inputPortType" name="input" />
       <xs:element type="outputPortType" name="output" />
     </xs:sequence>
+    <xs:attribute type="xs:string" name="name" use="optional"/>
   </xs:complexType>
   <xs:complexType name="hydraulicConnectionsType">
     <xs:sequence maxOccurs="unbounded" minOccurs="1">
@@ -89,7 +91,7 @@
       <xs:element type="xs:string" name="keywords" />
       <xs:element type="xs:string" name="details" />
       <xs:element type="variablesType" name="variables" />
-      <xs:element type="hydraulicConnectionsType" name="hydraulicConnections" />
+      <xs:element type="hydraulicConnectionsType" name="hydraulicConnections" minOccurs="0" maxOccurs="1" />
     </xs:sequence>
   </xs:complexType>
 </xs:schema>
