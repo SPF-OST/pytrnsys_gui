@@ -71,61 +71,6 @@ class _HydraulicConnectionsData:
 
 
 @_dc.dataclass
-class _PortBase(_abc.ABC):
-    name: str
-
-    @_abc.abstractmethod
-    def getHydraulicConnectionsData(self, variable: _Variable) -> _HydraulicConnectionsData:
-        raise NotImplementedError()
-
-    @_abc.abstractmethod
-    def getVariableOrders(self) -> _tp.Sequence[int]:
-        raise NotImplementedError()
-
-
-@_dc.dataclass
-class _InputPort(_PortBase):
-    massFlowRate: _Variable
-    temperature: _Variable
-    fluidDensity: _tp.Optional[_Variable]
-    fluidHeatCapacity: _Variable
-
-    def getHydraulicConnectionsData(self, variable: _Variable) -> _HydraulicConnectionsData:
-        if variable is self.massFlowRate:
-            return _HydraulicConnectionsData.createForMassFlowRate(self.name)
-
-        if variable is self.temperature:
-            return _HydraulicConnectionsData.createForTemperature(self.name)
-
-        if variable is self.fluidDensity:
-            return _HydraulicConnectionsData.createForFluidDensity(self.name)
-
-        if variable is self.fluidHeatCapacity:
-            return _HydraulicConnectionsData.createForFluidHeatCapacity(self.name)
-
-        raise ValueError(f"Variable `{variable['name']}` is associated with port `{self.name}`.")
-
-    def getVariableOrders(self) -> _tp.Sequence[int]:
-        variables = [self.massFlowRate, self.temperature, self.fluidDensity, self.fluidHeatCapacity]
-        orders = [v["order"] for v in variables if v]
-        return orders
-
-
-@_dc.dataclass
-class _OutputPort(_PortBase):
-    temperature: _Variable
-
-    def getHydraulicConnectionsData(self, variable: _Variable) -> _HydraulicConnectionsData:
-        if variable is self.temperature:
-            return _HydraulicConnectionsData.createForTemperature(self.name)
-
-        raise ValueError(f"Variable `{variable['name']}` is associated with port `{self.name}`.")
-
-    def getVariableOrders(self) -> _tp.Sequence[int]:
-        return [(self.temperature["order"])]
-
-
-@_dc.dataclass
 class _ProcessedVariable:
     tmfName: str
     hydraulicConnectionsData: _tp.Optional[_HydraulicConnectionsData]
