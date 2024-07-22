@@ -1,10 +1,13 @@
-import abc as _abc
+import collections.abc as _cabc
 import dataclasses as _dc
 import pathlib as _pl
 import typing as _tp
 
 import jinja2 as _jj
 import xmlschema as _xml
+
+from . import models as _models
+from ._dialogs import connectionsDialog as _csd
 
 _CONTAINING_DIR_PATH = _pl.Path(__file__).parent
 _SCHEMA_FILE_PATH = _CONTAINING_DIR_PATH / "xmltmf.xsd"
@@ -116,7 +119,7 @@ def convertXmlTmfStringToDdck(xmlTmfContent: str) -> str:
     hydraulicConnections = proforma["hydraulicConnections"]["connection"] if "hydraulicConnections" in proforma else None
 
     if hydraulicConnections is None:
-        hydraulicConnections = []
+        hydraulicConnections = _csd.ConnectionsDialog.showDialogAndGetResults()
 
     connectionsDataByOrder = _createHydraulicConnectionDataByOrder(hydraulicConnections)
 
@@ -130,23 +133,26 @@ def convertXmlTmfStringToDdck(xmlTmfContent: str) -> str:
 
 
 def _createHydraulicConnectionDataByOrder(
-    hydraulicConnections: _tp.Sequence[_StringMapping],
+    hydraulicConnections: _cabc.Set[_models.Connection],
 ) -> _tp.Mapping[int, _HydraulicConnectionsData]:
     hydraulicConnectionDataByOrder: dict[int, _HydraulicConnectionsData] = {}
     for hydraulicConnection in hydraulicConnections:
-        connectionName = hydraulicConnection.get("@name")
-        dataForInput = _getHydraulicConnectionDataByOrderForInput(connectionName, hydraulicConnection["input"])
-        dataByOrderForOutput = _getHydraulicConnectionDataByOrderForOutput(connectionName, hydraulicConnection["output"])
-        hydraulicConnectionDataByOrder |= dataForInput | dataByOrderForOutput
+        dataByOrderForInput = _getHydraulicConnectionDataByOrderForInput(
+            hydraulicConnection.name, hydraulicConnection.inputPort
+        )
+        dataByOrderForOutput = _getHydraulicConnectionDataByOrderForOutput(
+            hydraulicConnection.name, hydraulicConnection.outputPort
+        )
+        hydraulicConnectionDataByOrder |= dataByOrderForInput | dataByOrderForOutput
 
     return hydraulicConnectionDataByOrder
 
 
 def _getHydraulicConnectionDataByOrderForInput(
-    connectionName: str, inputPort: _StringMapping
+    connectionName: str, inputPort: _models.InputPort
 ) -> dict[int, _HydraulicConnectionsData]:
-    portName = inputPort["@name"]
-    mfrOrder = _getOrder(inputPort["massFlowRate"])
+    portName = inputPort.name
+    mfrOrder = inputPort.massFlowRate.order
     tempOrder = _getOrder(inputPort["temperature"])
 
     densityVariableReference = inputPort.get("fluidDensity")

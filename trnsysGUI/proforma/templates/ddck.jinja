@@ -1,11 +1,13 @@
+{% set inputsWithHydraulicData = (parameters + inputs)|rejectattr("hydraulicConnectionsData", "none")|list -%}
+{% if inputsWithHydraulicData|length -%}
 ***********************************
 ** Inputs from hydraulic solver
 ***********************************
-{% set inputsWithHydraulicData = (parameters + inputs)|rejectattr("hydraulicConnectionsData", "none")|list -%}
 EQUATIONS {{inputsWithHydraulicData|length}}
-{% for input in inputsWithHydraulicData -%}
-    {{input.hydraulicConnectionsData.variableName}} = {{input.hydraulicConnectionsData.rhs}}
-{% endfor %}
+    {% for input in inputsWithHydraulicData -%}
+        {{input.hydraulicConnectionsData.variableName}} = {{input.hydraulicConnectionsData.rhs}}
+    {% endfor %}
+{% endif -%}
 UNIT 1 TYPE {{type}}
 PARAMETERS {{parameters|length}}
 {% for parameter in parameters -%}
@@ -28,19 +30,24 @@ INPUTS {{inputs|length}}
     {{input.defaultValue}} ! {{input.roleOrder}}: {{input.tmfName}} - initial value
 {% endfor %}
 {% set outputsWithHydraulicData = outputs|rejectattr("hydraulicConnectionsData", "none")|list -%}
-EQUATIONS {{outputsWithHydraulicData|length}} ! {{outputs|length}}
+{% if outputsWithHydraulicData|length -%}
+    EQUATIONS {{outputsWithHydraulicData|length}} ! {{outputs|length}}
+{% else -%}
+    ! EQUATIONS {{outputs|length}}
+{% endif -%}
 {% for output in outputs -%}
     {% if output.hydraulicConnectionsData -%}
         {{output.hydraulicConnectionsData.variableName}} = [1, {{output.roleOrder}}] ! {{output.tmfName}} [{{output.unit}}] ({{output.bounds}})
     {% else -%}
         ! XXX = [1, {{output.roleOrder}}] ! {{output.tmfName}} [{{output.unit}}] ({{output.bounds}})
     {% endif -%}
-{% endfor %}
+{% endfor -%}
+{% if outputsWithHydraulicData|length %}
 ***********************************
 ** Outputs to hydraulic solver
 ***********************************
-{% for output in outputs -%}
-    {% if output.hydraulicConnectionsData -%}
-        {{output.hydraulicConnectionsData.rhs}} = {{output.hydraulicConnectionsData.variableName}}
-    {% endif -%}
-{% endfor -%}
+    {% for outputWithHydraulicData in outputsWithHydraulicData -%}
+        {{outputWithHydraulicData.hydraulicConnectionsData.rhs}} = {{outputWithHydraulicData.hydraulicConnectionsData.variableName}}
+    {% endfor -%}
+{% endif -%}
+
