@@ -6,6 +6,8 @@ import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
+import trnsysGUI.proforma.convertXmlTmfToDdck as _pro
+import trnsysGUI.proforma.modelConnection as _mc
 import trnsysGUI.warningsAndErrors as _warn
 
 
@@ -56,7 +58,9 @@ class FileSystemTreeView(_qtw.QTreeView):
             return
 
         sourceFilePath = _pl.Path(sourceFilePathString)
-        targetFilePath = targetDirPath / sourceFilePath.name
+
+        targetFilePathStem = targetDirPath / sourceFilePath.stem
+        targetFilePath = targetFilePathStem.with_suffix(".ddck")
 
         if targetFilePath.is_dir():
             message = f"""\
@@ -73,7 +77,16 @@ importing or remove the directory."""
             if standardButton != _qtw.QMessageBox.StandardButton.Yes:  # pylint: disable=no-member
                 return
 
-        _su.copy(sourceFilePath, targetFilePath)
+        if sourceFilePath.suffix != ".xmltmf":
+            _su.copy(sourceFilePath, targetFilePath)
+        else:
+            sourceFileContent = sourceFilePath.read_text()
+            suggestedHydraulicConnections = {_mc.Connection(None, _mc.InputPort("In"), _mc.OutputPort("Out"))}
+            targetFileContent = _pro.convertXmlTmfStringToDdck(
+                sourceFileContent,
+                suggestedHydraulicConnections,
+            )
+            targetFilePath.write_text(targetFileContent)
 
     def _deleteCurrentFile(self) -> None:
         path = self._getCurrentPath()

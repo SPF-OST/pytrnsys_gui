@@ -6,9 +6,8 @@ import typing as _tp
 import jinja2 as _jj
 import xmlschema as _xml
 
-from . import modelConnection as _mc
 from . import createModelConnections as _cmcs
-from ._dialogs import convertDialog as _cd
+from . import modelConnection as _mc
 
 _CONTAINING_DIR_PATH = _pl.Path(__file__).parent
 _SCHEMA_FILE_PATH = _CONTAINING_DIR_PATH / "xmltmf.xsd"
@@ -39,7 +38,6 @@ def convertXmltmfToDdck(xmlTmfFilePath: _pl.Path, ddckFilePath: _pl.Path) -> Non
 
 
 _StringMapping = _tp.Mapping[str, _tp.Any]
-_Variable = _StringMapping
 
 
 @_dc.dataclass
