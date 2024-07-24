@@ -1,25 +1,30 @@
 import pathlib as _pl
 import pprint as _pp
 import pkgutil as _pu
+import typing as _tp
+import dataclasses as _dc
+
+import pytest as _pt
 
 import xmlschema as _xml
 
 import trnsysGUI.proforma.convertXmlTmfToDdck as _pc
 
-_CONTAINING_DIR_PATH = _pl.Path(__file__).parent
+_DATA_DIR_PATH = _pl.Path(__file__).parent / "data"
+_INPUT_DIR_PATH = _DATA_DIR_PATH / "input"
 
 
 def testValidateXmlTmf() -> None:
     schema = _getSchema()
 
-    xmlFilePath = _CONTAINING_DIR_PATH / "Type71.xmltmf"
+    xmlFilePath = _INPUT_DIR_PATH / "Type71.xmltmf"
     schema.validate(xmlFilePath)
 
 
 def testDecodeXmlTmf() -> None:
     schema = _getSchema()
 
-    xmlFilePath = _CONTAINING_DIR_PATH / "Type71.xmltmf"
+    xmlFilePath = _INPUT_DIR_PATH / "Type71.xmltmf"
     deserializedData = schema.to_dict(xmlFilePath)
     _pp.pprint(deserializedData, indent=4)
 
@@ -31,25 +36,37 @@ def _getSchema() -> _xml.XMLSchema11:
     return schema
 
 
-def testConvertXmlTmfStringToDdck() -> None:
-    xmlFilePath = _CONTAINING_DIR_PATH / "Type71.xmltmf"
-    xmlFileContent = xmlFilePath.read_text(encoding="utf8")
+@_dc.dataclass
+class TestCase:
+    inputFilePath: _pl.Path
+    actualOutputFilePath: _pl.Path
+    expectedOutputFilePath: _pl.Path
 
+    @property
+    def fileStem(self) -> str:
+        return self.inputFilePath.stem
+
+    @staticmethod
+    def createForStem(fileNameStem: str) -> "TestCase":
+        inputFilePath = (_INPUT_DIR_PATH / fileNameStem).with_suffix(".xmltmf")
+        actualOutputFilePath = (_DATA_DIR_PATH / "actual" / fileNameStem).with_suffix(".ddck")
+        expectedOutputFilePath = (_DATA_DIR_PATH / "expected" / fileNameStem).with_suffix(".ddck")
+        testCase = TestCase(inputFilePath, actualOutputFilePath, expectedOutputFilePath)
+        return testCase
+
+
+def _getTestCases() -> _tp.Iterable[TestCase]:
+    inputDirPath = _INPUT_DIR_PATH
+    for inputFilePath in inputDirPath.iterdir():
+        assert inputFilePath.is_file()
+
+        yield TestCase.createForStem(inputFilePath.stem)
+
+
+@_pt.mark.parametrize("testCase", [_pt.param(tc, id=tc.fileStem) for tc in _getTestCases()])
+def testConvertXmlTmfStringToDdck(testCase: TestCase) -> None:
+    xmlFileContent = testCase.inputFilePath.read_text(encoding="utf8")
     actualDdckContent = _pc.convertXmlTmfStringToDdck(xmlFileContent)
-
-    expectedDdckFilePath = _CONTAINING_DIR_PATH / "Type71.ddck"
-    expectedDdckContent = expectedDdckFilePath.read_text(encoding="utf8")
-
-    assert actualDdckContent == expectedDdckContent
-
-
-def testConvertXmlTmfWithoutHydraulicConnectionsStringToDdck() -> None:
-    xmlFilePath = _CONTAINING_DIR_PATH / "Type71-no-hydraulic-connections.xmltmf"
-    xmlFileContent = xmlFilePath.read_text(encoding="utf8")
-
-    actualDdckContent = _pc.convertXmlTmfStringToDdck(xmlFileContent)
-
-    expectedDdckFilePath = _CONTAINING_DIR_PATH / "Type71-no-hydraulic-connections.ddck"
-    expectedDdckContent = expectedDdckFilePath.read_text(encoding="utf8")
-
+    testCase.actualOutputFilePath.write_text(actualDdckContent)
+    expectedDdckContent = testCase.expectedOutputFilePath.read_text(encoding="utf8")
     assert actualDdckContent == expectedDdckContent

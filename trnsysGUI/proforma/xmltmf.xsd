@@ -3,7 +3,7 @@
   <xs:element name="TrnsysModel" type="TrnsysModelType" />
   <xs:complexType name="variableType">
     <xs:sequence>
-      <xs:element type="xs:byte" name="order" />
+      <xs:element type="xs:int" name="order" />
       <xs:element type="xs:string" name="name" />
       <xs:element type="xs:string" name="role" />
       <xs:element type="xs:string" name="dimension" />
@@ -22,9 +22,14 @@
       <xs:element type="variableType" name="variable" maxOccurs="unbounded" minOccurs="0" />
     </xs:sequence>
   </xs:complexType>
+  <xs:complexType name="keywordsType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="keyword" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
   <xs:complexType name="variableReferenceType">
     <xs:sequence>
-      <xs:element type="xs:byte" name="order" />
+      <xs:element type="xs:int" name="order" />
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="temperatureType">
@@ -86,9 +91,9 @@
       <xs:element type="xs:string" name="modifictionDate" />
       <xs:element type="xs:byte" name="mode" />
       <xs:element type="xs:byte" name="validation" />
-      <xs:element type="xs:byte" name="type" />
-      <xs:element type="xs:byte" name="maxInstance" />
-      <xs:element type="xs:string" name="keywords" />
+      <xs:element type="xs:int" name="type" />
+      <xs:element type="xs:int" name="maxInstance" />
+      <xs:element type="keywordsType" name="keywords" />
       <xs:element type="xs:string" name="details" />
       <xs:element type="variablesType" name="variables" />
       <xs:element type="hydraulicConnectionsType" name="hydraulicConnections" minOccurs="0" maxOccurs="1" />
