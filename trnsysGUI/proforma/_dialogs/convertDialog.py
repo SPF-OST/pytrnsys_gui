@@ -1,22 +1,19 @@
 import collections.abc as _cabc
 
 import PyQt5.QtWidgets as _qtw
-import PyQt5.QtCore as _qtc
 
 import trnsysGUI.common as _com
 import trnsysGUI.common.cancelled as _cancel
 import trnsysGUI.dialogs as _dlgs
+from .. import modelConnection as _mc
 
+_dlgs.assertThatLocalGeneratedUIModuleAndResourcesExist(__name__, moduleName="_UI_convert_generated")
 
-from .. import models as _models
-
-_dlgs.assertThatLocalGeneratedUIModuleAndResourcesExist(__name__)
-
-from . import _UI_connections_generated as _uigen  # type: ignore[import]  # pylint: disable=wrong-import-position
+from . import _UI_convert_generated as _uigen  # type: ignore[import]  # pylint: disable=wrong-import-position
 
 
 class _ConnectionListItem(_qtw.QListWidgetItem):
-    def __init__(self, connection: _models.Connection) -> None:
+    def __init__(self, connection: _mc.Connection) -> None:
         super().__init__()
 
         self.connection = connection
@@ -24,11 +21,11 @@ class _ConnectionListItem(_qtw.QListWidgetItem):
 
     @staticmethod
     def create() -> "_ConnectionListItem":
-        connection = _models.Connection.createEmpty()
+        connection = _mc.Connection.createEmpty()
         return _ConnectionListItem(connection)
 
 
-class ConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnections):
+class ConvertDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnections):
     def __init__(self) -> None:
         super().__init__()
         self.setupUi(self)
@@ -61,8 +58,8 @@ class ConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnections):
         return selectedItem
 
     @staticmethod
-    def showDialogAndGetResults() -> _cancel.MaybeCancelled[_cabc.Set[_models.Connection]]:
-        connectionsDialog = ConnectionsDialog()
+    def showDialogAndGetResults() -> _cancel.MaybeCancelled[_cabc.Set[_mc.Connection]]:
+        connectionsDialog = ConvertDialog()
         returnValue = connectionsDialog.exec()
 
         if returnValue == _qtw.QDialogButtonBox.StandardButton.Cancel:
