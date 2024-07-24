@@ -64,7 +64,7 @@ def _getTestCases() -> _tp.Iterable[TestCase]:
 
 
 @_pt.mark.parametrize("testCase", [_pt.param(tc, id=tc.fileStem) for tc in _getTestCases()])
-def testConvertXmlTmfStringToDdck(testCase: TestCase) -> None:
+def testConvertXmlTmfStringToDdck(testCase: TestCase, qtbot) -> None:
     xmlFileContent = testCase.inputFilePath.read_text(encoding="utf8")
     actualDdckContent = _pc.convertXmlTmfStringToDdck(xmlFileContent)
     testCase.actualOutputFilePath.write_text(actualDdckContent)

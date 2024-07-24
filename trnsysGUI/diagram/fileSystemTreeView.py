@@ -6,6 +6,7 @@ import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
+import trnsysGUI.common.cancelled as _cancel
 import trnsysGUI.proforma.convertXmlTmfToDdck as _pro
 import trnsysGUI.proforma.modelConnection as _mc
 import trnsysGUI.warningsAndErrors as _warn
@@ -59,8 +60,11 @@ class FileSystemTreeView(_qtw.QTreeView):
 
         sourceFilePath = _pl.Path(sourceFilePathString)
 
+        sourceSuffix = sourceFilePath.suffix
+        targetSuffix = ".ddck" if sourceSuffix == ".xmltml" else sourceSuffix
+
         targetFilePathStem = targetDirPath / sourceFilePath.stem
-        targetFilePath = targetFilePathStem.with_suffix(".ddck")
+        targetFilePath = targetFilePathStem.with_suffix(targetSuffix)
 
         if targetFilePath.is_dir():
             message = f"""\
@@ -77,15 +81,20 @@ importing or remove the directory."""
             if standardButton != _qtw.QMessageBox.StandardButton.Yes:  # pylint: disable=no-member
                 return
 
-        if sourceFilePath.suffix != ".xmltmf":
+        if sourceSuffix != ".xmltmf":
             _su.copy(sourceFilePath, targetFilePath)
         else:
             sourceFileContent = sourceFilePath.read_text()
             suggestedHydraulicConnections = {_mc.Connection(None, _mc.InputPort("In"), _mc.OutputPort("Out"))}
-            targetFileContent = _pro.convertXmlTmfStringToDdck(
+
+            maybeCancelled = _pro.convertXmlTmfStringToDdck(
                 sourceFileContent,
                 suggestedHydraulicConnections,
             )
+            if _cancel.isCancelled(maybeCancelled):
+                return
+            targetFileContent = maybeCancelled
+
             targetFilePath.write_text(targetFileContent)
 
     def _deleteCurrentFile(self) -> None:

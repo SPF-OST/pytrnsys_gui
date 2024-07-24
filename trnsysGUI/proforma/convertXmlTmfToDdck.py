@@ -6,8 +6,11 @@ import typing as _tp
 import jinja2 as _jj
 import xmlschema as _xml
 
+import trnsysGUI.common.cancelled as _cancel
+
 from . import createModelConnections as _cmcs
 from . import modelConnection as _mc
+from ._dialogs import editHydraulicConnectionsDialog as _ehcd
 
 _CONTAINING_DIR_PATH = _pl.Path(__file__).parent
 _SCHEMA_FILE_PATH = _CONTAINING_DIR_PATH / "xmltmf.xsd"
@@ -27,10 +30,14 @@ def _createDdckJinjaTemplate() -> _jj.Template:
 _JINJA_TEMPLATE = _createDdckJinjaTemplate()
 
 
-def convertXmltmfToDdck(xmlTmfFilePath: _pl.Path, ddckFilePath: _pl.Path) -> None:
+def convertXmltmfToDdck(xmlTmfFilePath: _pl.Path, ddckFilePath: _pl.Path) -> _cancel.MaybeCancelled[None]:
     xmlTmfContent = xmlTmfFilePath.read_text(encoding="utf8")
     try:
-        ddckContent = convertXmlTmfStringToDdck(xmlTmfContent)
+        maybeCancelled = convertXmlTmfStringToDdck(xmlTmfContent)
+        if _cancel.isCancelled(maybeCancelled):
+            return _cancel.CANCELLED
+
+        ddckContent = maybeCancelled
     except ValueError as exception:
         raise ValueError(f"Error parsing {xmlTmfFilePath}") from exception
 
@@ -110,7 +117,7 @@ def _createProcessedVariables(
 
 def convertXmlTmfStringToDdck(
     xmlTmfContent: str, suggestedHydraulicConnections: _cabc.Set[_mc.Connection] | None = None
-) -> str:
+) -> _cancel.MaybeCancelled[str]:
     schema = _xml.XMLSchema11(_SCHEMA_FILE_PATH)
 
     try:
@@ -129,6 +136,12 @@ def convertXmlTmfStringToDdck(
         hydraulicConnections = suggestedHydraulicConnections
     else:
         hydraulicConnections = []
+
+    if hydraulicConnections:
+        maybeCancelled = _ehcd.EditHydraulicConnectionsDialog.showDialogAndGetResults(hydraulicConnections)
+        if _cancel.isCancelled(maybeCancelled):
+            return _cancel.CANCELLED
+        hydraulicConnections = maybeCancelled
 
     connectionsDataByOrder = _createHydraulicConnectionDataByOrder(hydraulicConnections)
 

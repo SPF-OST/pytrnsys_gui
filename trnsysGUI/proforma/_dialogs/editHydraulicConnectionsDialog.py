@@ -1,4 +1,6 @@
 import collections.abc as _cabc
+import dataclasses as _dc
+import copy as _copy
 
 import PyQt5.QtWidgets as _qtw
 
@@ -26,6 +28,26 @@ class _ConnectionListItem(_qtw.QListWidgetItem):
 
 
 class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnections):
-    def __init__(self) -> None:
+    def __init__(self, suggestedHydraulicConnections: _cabc.Set[_mc.Connection]) -> None:
         super().__init__()
         self.setupUi(self)
+
+        self.hydraulicConnections = self._getDeepCopiesSortedByName(suggestedHydraulicConnections)
+
+    @staticmethod
+    def _getDeepCopiesSortedByName(suggestedHydraulicConnections):
+        hydraulicConnections = [_copy.deepcopy(c) for c in suggestedHydraulicConnections]
+
+        def getConnectionName(connection: _mc.Connection) -> str:
+            return connection.name
+
+        sortedHydraulicConnections = sorted(hydraulicConnections, key=getConnectionName)
+        return sortedHydraulicConnections
+
+    @staticmethod
+    def showDialogAndGetResults(
+        suggestedHydraulicConnections: _cabc.Set[_mc.Connection],
+    ) -> _cancel.MaybeCancelled[_cabc.Set[_mc.Connection]]:
+        dialog = EditHydraulicConnectionsDialog(suggestedHydraulicConnections)
+        dialog.exec()
+        return _cancel.CANCELLED
