@@ -7,10 +7,10 @@ import jinja2 as _jj
 import xmlschema as _xml
 
 import trnsysGUI.common.cancelled as _cancel
-
 from . import createModelConnections as _cmcs
-from . import modelConnection as _mc
+from . import models as _models
 from ._dialogs import editHydraulicConnectionsDialog as _ehcd
+from .models import VariablesByRole
 
 _CONTAINING_DIR_PATH = _pl.Path(__file__).parent
 _SCHEMA_FILE_PATH = _CONTAINING_DIR_PATH / "xmltmf.xsd"
@@ -85,38 +85,69 @@ class _HydraulicConnectionsData:
 
 
 @_dc.dataclass
-class _ProcessedVariable:
-    tmfName: str
-    hydraulicConnectionsData: _tp.Optional[_HydraulicConnectionsData]
-    roleOrder: int
-    unit: str
-    bounds: str
-    defaultValue: _tp.Union[float, int]
+class _VariableWithHydraulicConnectionsData(_models.Variable):
+    hydraulicConnectionsData: _HydraulicConnectionsData | None
+
+    @staticmethod
+    def fromVariable(
+        variable: _models.Variable, connectionsDataByOrder: _tp.Mapping[int, _HydraulicConnectionsData]
+    ) -> "_VariableWithHydraulicConnectionsData":
+        hydraulicConnectionsData = connectionsDataByOrder.get(variable.order)
+        variableWithData = _VariableWithHydraulicConnectionsData(
+            **vars(variable), hydraulicConnectionsData=hydraulicConnectionsData
+        )
+        return variableWithData
 
 
 def _createProcessedVariables(
-    role: str,
-    variables: _tp.Sequence[_StringMapping],
+    variables: _cabc.Sequence[_models.Variable],
     connectionsDataByOrder: _tp.Mapping[int, _HydraulicConnectionsData],
-) -> _tp.Sequence[_ProcessedVariable]:
-    variables = _getVariablesWithRole(role, variables)
-    sortedVariables = sorted(variables, key=lambda v: v["order"])
+) -> _cabc.Sequence[_VariableWithHydraulicConnectionsData]:
 
-    processedVariables = []
-    for roleOrder, variable in enumerate(sortedVariables, start=1):
-        order = variable["order"]
-        hydraulicConnectionsData = connectionsDataByOrder.get(order)
-        bounds = _getBounds(variable)
-        processedVariable = _ProcessedVariable(
-            variable["name"], hydraulicConnectionsData, roleOrder, variable["unit"], bounds, variable["default"]
-        )
-        processedVariables.append(processedVariable)
+    processedVariables = [
+        _VariableWithHydraulicConnectionsData.fromVariable(v, connectionsDataByOrder) for v in variables
+    ]
 
     return processedVariables
 
 
+def _createVariablesByRole(
+    serializedVariables: _cabc.Sequence[_StringMapping],
+) -> VariablesByRole:
+    def getOrder(serializedVariable: _StringMapping) -> int:
+        return serializedVariable["order"]
+
+    sortedSerializedVariables = sorted(serializedVariables, key=getOrder)
+
+    parameterVariables = _createVariablesForRole("parameter", sortedSerializedVariables)
+    inputVariables = _createVariablesForRole("input", sortedSerializedVariables)
+    outputVariables = _createVariablesForRole("output", sortedSerializedVariables)
+
+    return VariablesByRole(parameterVariables, inputVariables, outputVariables)
+
+
+_Role = _tp.Literal["parameter", "input", "output"]
+
+
+def _createVariablesForRole(
+    role: _Role, sortedSerializedVariables: _cabc.Sequence[_StringMapping]
+) -> _cabc.Sequence[_models.Variable]:
+    sortedSerializedVariablesForRole = _getSerializedVariablesWithRole(role, sortedSerializedVariables)
+
+    variables = []
+    for roleOrder, variable in enumerate(sortedSerializedVariablesForRole, start=1):
+        order = variable["order"]
+        bounds = _getBounds(variable)
+        variable = _models.Variable(
+            variable["name"], order, role, roleOrder, variable["unit"], bounds, variable["default"]
+        )
+        variables.append(variable)
+
+    return variables
+
+
 def convertXmlTmfStringToDdck(
-    xmlTmfContent: str, suggestedHydraulicConnections: _cabc.Set[_mc.Connection] | None = None
+    xmlTmfContent: str, suggestedHydraulicConnections: _cabc.Sequence[_models.Connection] | None = None
 ) -> _cancel.MaybeCancelled[str]:
     schema = _xml.XMLSchema11(_SCHEMA_FILE_PATH)
 
@@ -127,27 +158,32 @@ def convertXmlTmfStringToDdck(
 
     proforma: _tp.Any = schema.to_dict(xmlTmfContent)
 
-    variables = proforma["variables"]["variable"]
+    serializedVariables = proforma["variables"]["variable"]
+    variablesByRole = _createVariablesByRole(serializedVariables)
 
     if "hydraulicConnections" in proforma:
         serializedHydraulicConnections = proforma["hydraulicConnections"]["connection"]
-        hydraulicConnections = _cmcs.createModelConnectionsFromProforma(serializedHydraulicConnections, variables)
+        hydraulicConnections = _cmcs.createModelConnectionsFromProforma(
+            serializedHydraulicConnections, variablesByRole.allVariables
+        )
     elif suggestedHydraulicConnections is not None:
         hydraulicConnections = suggestedHydraulicConnections
     else:
         hydraulicConnections = []
 
     if hydraulicConnections:
-        maybeCancelled = _ehcd.EditHydraulicConnectionsDialog.showDialogAndGetResults(hydraulicConnections)
+        maybeCancelled = _ehcd.EditHydraulicConnectionsDialog.showDialogAndGetResults(
+            hydraulicConnections, variablesByRole
+        )
         if _cancel.isCancelled(maybeCancelled):
             return _cancel.CANCELLED
         hydraulicConnections = maybeCancelled
 
     connectionsDataByOrder = _createHydraulicConnectionDataByOrder(hydraulicConnections)
 
-    parameters = _createProcessedVariables("parameter", variables, connectionsDataByOrder)
-    inputs = _createProcessedVariables("input", variables, connectionsDataByOrder)
-    outputs = _createProcessedVariables("output", variables, connectionsDataByOrder)
+    parameters = _createProcessedVariables(variablesByRole.parameters, connectionsDataByOrder)
+    inputs = _createProcessedVariables(variablesByRole.inputs, connectionsDataByOrder)
+    outputs = _createProcessedVariables(variablesByRole.outputs, connectionsDataByOrder)
 
     ddckContent = _JINJA_TEMPLATE.render(type=proforma["type"], parameters=parameters, inputs=inputs, outputs=outputs)
 
@@ -155,7 +191,7 @@ def convertXmlTmfStringToDdck(
 
 
 def _createHydraulicConnectionDataByOrder(
-    hydraulicConnections: _cabc.Set[_mc.Connection],
+    hydraulicConnections: _cabc.Sequence[_models.Connection],
 ) -> _cabc.Mapping[int, _HydraulicConnectionsData]:
     hydraulicConnectionDataByOrder: dict[int, _HydraulicConnectionsData] = {}
     for hydraulicConnection in hydraulicConnections:
@@ -188,7 +224,7 @@ def _getHydraulicConnectionDataByOrderForFluid(connectionName, hydraulicConnecti
 
 
 def _getHydraulicConnectionDataByOrderForInput(
-    connectionName: str, inputPort: _mc.InputPort
+    connectionName: str, inputPort: _models.InputPort
 ) -> dict[int, _HydraulicConnectionsData]:
     portName = inputPort.name
     mfrOrder = inputPort.massFlowRate.order
@@ -204,7 +240,7 @@ def _getHydraulicConnectionDataByOrderForInput(
 
 def _getHydraulicConnectionDataByOrderForOutput(
     connectionName: str,
-    outputPort: _mc.OutputPort,
+    outputPort: _models.OutputPort,
 ) -> _tp.Mapping[int, _HydraulicConnectionsData]:
     portName = outputPort.name
     tempOrder = outputPort.temperature.order
@@ -226,7 +262,9 @@ def _getOrder(variableReference: _StringMapping) -> int:
     return variableReference["variableReference"]["order"]
 
 
-def _getVariablesWithRole(role: str, variables: _tp.Sequence[_StringMapping]) -> _tp.Sequence[_StringMapping]:
+def _getSerializedVariablesWithRole(
+    role: _Role, variables: _tp.Sequence[_StringMapping]
+) -> _tp.Sequence[_StringMapping]:
     return [v for v in variables if v["role"] == role]
 
 

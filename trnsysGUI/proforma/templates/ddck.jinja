@@ -12,15 +12,15 @@ UNIT 1 TYPE {{type}}
 PARAMETERS {{parameters|length}}
 {% for parameter in parameters -%}
     {% if parameter.hydraulicConnectionsData -%}
-        {{parameter.hydraulicConnectionsData.variableName}} ! {{parameter.roleOrder}}: {{parameter.tmfName}} [{{parameter.unit}}] ({{parameter.bounds}})
+        {{parameter.hydraulicConnectionsData.variableName}} ! {{parameter.info}}
     {% else -%}
-        {{parameter.defaultValue}} ! {{parameter.roleOrder}}: {{parameter.tmfName}} [{{parameter.unit}}] ({{parameter.bounds}})
+        {{parameter.defaultValue}} ! {{parameter.info}}
     {% endif -%}
 {% endfor -%}
 INPUTS {{inputs|length}}
 {% for input in inputs -%}
     {% if input.hydraulicConnectionsData -%}
-        {{input.hydraulicConnectionsData.variableName}} ! {{input.roleOrder}}: {{input.tmfName}} [{{input.unit}}] ({{input.bounds}})
+        {{input.hydraulicConnectionsData.variableName}} ! {{input.info}}
     {% else -%}
         0,0 ! {{input.roleOrder}}: {{input.tmfName}} [{{input.unit}}] ({{input.bounds}})
     {% endif -%}

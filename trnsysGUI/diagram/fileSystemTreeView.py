@@ -8,7 +8,7 @@ import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.common.cancelled as _cancel
 import trnsysGUI.proforma.convertXmlTmfToDdck as _pro
-import trnsysGUI.proforma.modelConnection as _mc
+import trnsysGUI.proforma.models as _models
 import trnsysGUI.warningsAndErrors as _warn
 
 
@@ -85,7 +85,9 @@ importing or remove the directory."""
             _su.copy(sourceFilePath, targetFilePath)
         else:
             sourceFileContent = sourceFilePath.read_text()
-            suggestedHydraulicConnections = {_mc.Connection(None, _mc.InputPort("In"), _mc.OutputPort("Out"))}
+            suggestedHydraulicConnections = {
+                _models.Connection(None, _models.InputPort("In"), _models.OutputPort("Out"))
+            }
 
             maybeCancelled = _pro.convertXmlTmfStringToDdck(
                 sourceFileContent,

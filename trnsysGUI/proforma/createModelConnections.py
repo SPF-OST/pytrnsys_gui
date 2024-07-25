@@ -6,22 +6,22 @@ import pytrnsys.utils.result as _res
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
-from . import modelConnection as _mc
+from . import models as _models
 
 
 def createModelConnectionsFromInternalPiping(
     internalPiping: _ip.InternalPiping,
-) -> _res.Result[_cabc.Set[_mc.Connection]]:
+) -> _res.Result[_cabc.Set[_models.Connection]]:
     connections = set()
     for node in internalPiping.nodes:
         if not isinstance(node, _mfn.Pipe):
             return _res.Error(f"`{node.name}` is a `{node.__name__}`, but only direct pipes are supported.")
         pipe = node
 
-        inputPort = _mc.InputPort(pipe.fromPort.name)
-        outputPort = _mc.OutputPort(pipe.toPort.name)
+        inputPort = _models.InputPort(pipe.fromPort.name)
+        outputPort = _models.OutputPort(pipe.toPort.name)
 
-        connection = _mc.Connection(pipe.name, inputPort, outputPort)
+        connection = _models.Connection(pipe.name, inputPort, outputPort)
 
         connections.add(connection)
 
@@ -29,36 +29,21 @@ def createModelConnectionsFromInternalPiping(
 
 
 _StringMapping = _tp.Mapping[str, _tp.Any]
-_SerializedVariable = _StringMapping
-
-
-def _createVariable(serializedVariable: _SerializedVariable) -> _mc.Variable:
-    variable = _mc.Variable(
-        serializedVariable["name"], serializedVariable.get("definition"), serializedVariable["order"]
-    )
-
-    return variable
-
-
-def _createVariablesByOrder(serializedVariables: _cabc.Set[_SerializedVariable]) -> _cabc.Mapping[int, _mc.Variable]:
-    variables = [_createVariable(s) for s in serializedVariables]
-    variablesByOrder = {v.order: v for v in variables}
-    return variablesByOrder
 
 
 def createModelConnectionsFromProforma(
-    serializedConnections: _cabc.Sequence[_StringMapping], serializedVariables: _cabc.Set[_StringMapping]
-) -> _res.Result[_cabc.Set[_mc.Connection]]:
-    variablesByOrder = _createVariablesByOrder(serializedVariables)
+    serializedConnections: _cabc.Sequence[_StringMapping], variables: _cabc.Sequence[_models.Variable]
+) -> _res.Result[_cabc.Sequence[_models.Connection]]:
+    variablesByOrder = {v.order: v for v in variables}
 
-    connections = {_createConnection(s, variablesByOrder) for s in serializedConnections}
+    connections = [_createConnection(s, variablesByOrder) for s in serializedConnections]
 
     return connections
 
 
 def _createConnection(
-    serializedConnection: _StringMapping, variablesByOrder: _cabc.Mapping[int, _mc.Variable]
-) -> _mc.Connection:
+    serializedConnection: _StringMapping, variablesByOrder: _cabc.Mapping[int, _models.Variable]
+) -> _models.Connection:
     serializedInputPort = serializedConnection["input"]
     inputPort = _createInputPort(serializedInputPort, variablesByOrder)
 
@@ -68,37 +53,37 @@ def _createConnection(
 
     fluidDensityVariable = _getOptionalVariable(serializedInputPort, "fluidDensity", variablesByOrder)
     fluidHeatCapacityVariable = _getOptionalVariable(serializedInputPort, "fluidHeatCapacity", variablesByOrder)
-    fluid = _mc.Fluid(fluidDensityVariable, fluidHeatCapacityVariable)
+    fluid = _models.Fluid(fluidDensityVariable, fluidHeatCapacityVariable)
 
-    connection = _mc.Connection(name, inputPort, outputPort, fluid)
+    connection = _models.Connection(name, inputPort, outputPort, fluid)
 
     return connection
 
 
 def _createInputPort(
-    serializedInputPort: _StringMapping, variablesByOrder: _cabc.Mapping[int, _mc.Variable]
-) -> _mc.InputPort:
+    serializedInputPort: _StringMapping, variablesByOrder: _cabc.Mapping[int, _models.Variable]
+) -> _models.InputPort:
     name = serializedInputPort["@name"]
     massFlowRateVariable = _getVariable(serializedInputPort, "massFlowRate", variablesByOrder)
     temperatureVariable = _getVariable(serializedInputPort, "temperature", variablesByOrder)
-    inputPort = _mc.InputPort(name, temperatureVariable, massFlowRateVariable)
+    inputPort = _models.InputPort(name, temperatureVariable, massFlowRateVariable)
     return inputPort
 
 
 def _createOutputPort(
-    serializedConnection: _StringMapping, variablesByOrder: _cabc.Mapping[int, _mc.Variable]
-) -> _mc.OutputPort:
+    serializedConnection: _StringMapping, variablesByOrder: _cabc.Mapping[int, _models.Variable]
+) -> _models.OutputPort:
     serializedOutputPort = serializedConnection["output"]
     name = serializedOutputPort["@name"]
     temperature = _getVariable(serializedOutputPort, "temperature", variablesByOrder)
     reverseTemperature = _getOptionalVariable(serializedOutputPort, "reverseTemperature", variablesByOrder)
-    outputPort = _mc.OutputPort(name, temperature, reverseTemperature)
+    outputPort = _models.OutputPort(name, temperature, reverseTemperature)
     return outputPort
 
 
 def _getVariable(
-    serializedPort: _StringMapping, variableName: str, variablesByOrder: _cabc.Mapping[int, _mc.Variable]
-) -> _mc.Variable:
+    serializedPort: _StringMapping, variableName: str, variablesByOrder: _cabc.Mapping[int, _models.Variable]
+) -> _models.Variable:
     variable = _getOptionalVariable(serializedPort, variableName, variablesByOrder)
     portName = serializedPort["@name"]
     assert variable, f"No associated `{variableName}` variable for port {portName}"
@@ -106,8 +91,8 @@ def _getVariable(
 
 
 def _getOptionalVariable(
-    serializedPort: _StringMapping, variableName: str, variablesByOrder: _cabc.Mapping[int, _mc.Variable]
-) -> _tp.Optional[_mc.Variable]:
+    serializedPort: _StringMapping, variableName: str, variablesByOrder: _cabc.Mapping[int, _models.Variable]
+) -> _tp.Optional[_models.Variable]:
     child = serializedPort.get(variableName)
     if not child:
         return None
