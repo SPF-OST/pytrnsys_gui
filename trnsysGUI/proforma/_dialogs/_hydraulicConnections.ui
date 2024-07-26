@@ -50,7 +50,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QTableView" name="connectionsTableView"/>
+         <widget class="QListWidget" name="connectionsListWidget"/>
         </item>
        </layout>
       </item>

@@ -8,6 +8,7 @@ import pytest as _pt
 
 import xmlschema as _xml
 
+import trnsysGUI.proforma.models as _models
 import trnsysGUI.proforma.convertXmlTmfToDdck as _pc
 
 _DATA_DIR_PATH = _pl.Path(__file__).parent / "data"
@@ -66,7 +67,11 @@ def _getTestCases() -> _tp.Iterable[TestCase]:
 @_pt.mark.parametrize("testCase", [_pt.param(tc, id=tc.fileStem) for tc in _getTestCases()])
 def testConvertXmlTmfStringToDdck(testCase: TestCase, qtbot) -> None:
     xmlFileContent = testCase.inputFilePath.read_text(encoding="utf8")
-    actualDdckContent = _pc.convertXmlTmfStringToDdck(xmlFileContent)
+    suggestedHydraulicConnections = [
+        _models.Connection("Evap", _models.InputPort("In"), _models.OutputPort("Out")),
+        _models.Connection("Cond", _models.InputPort("In"), _models.OutputPort("Out")),
+    ]
+    actualDdckContent = _pc.convertXmlTmfStringToDdck(xmlFileContent, suggestedHydraulicConnections)
     testCase.actualOutputFilePath.write_text(actualDdckContent)
     expectedDdckContent = testCase.expectedOutputFilePath.read_text(encoding="utf8")
     assert actualDdckContent == expectedDdckContent

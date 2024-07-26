@@ -39,9 +39,9 @@ class Fluid:
     density: Variable | None = None
     heatCapacity: Variable | None = None
 
-    @staticmethod
-    def empty() -> "Fluid":
-        return Fluid()
+    @property
+    def allVariables(self) -> _cabc.Sequence[Variable]:
+        return _removeUnsetAndNone(self.density, self.heatCapacity)
 
 
 @_dc.dataclass
@@ -49,7 +49,11 @@ class Connection:
     name: str | None
     inputPort: "InputPort"
     outputPort: "OutputPort"
-    fluid: "Fluid" = _dc.field(default_factory=Fluid.empty)
+    fluid: "Fluid" = _dc.field(default_factory=Fluid)
+
+    @property
+    def allVariables(self) -> _cabc.Sequence[Variable]:
+        return [*self.inputPort.allVariables, *self.outputPort.allVariables, *self.fluid.allVariables]
 
 
 @_dc.dataclass
@@ -58,12 +62,24 @@ class InputPort:
     temperature: "RequiredVariable" = UNSET
     massFlowRate: "RequiredVariable" = UNSET
 
+    @property
+    def allVariables(self) -> _cabc.Sequence[Variable]:
+        return _removeUnsetAndNone(self.temperature, self.massFlowRate)
+
 
 @_dc.dataclass
 class OutputPort:
     name: str
     temperature: "RequiredVariable" = UNSET
     reverseTemperature: Variable | None = None
+
+    @property
+    def allVariables(self) -> _cabc.Sequence[Variable]:
+        return _removeUnsetAndNone(self.temperature, self.reverseTemperature)
+
+
+def _removeUnsetAndNone(*variables: Variable) -> _cabc.Sequence[Variable]:
+    return [v for v in variables if isinstance(v, Variable)]
 
 
 @_dc.dataclass
