@@ -129,7 +129,6 @@ class Connection:
         summary = f"""\
 ** {connectionName}
 {subSummaries}
-
 """
         return summary
 

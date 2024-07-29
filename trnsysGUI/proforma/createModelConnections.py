@@ -11,8 +11,8 @@ from . import models as _models
 
 def createModelConnectionsFromInternalPiping(
     internalPiping: _ip.InternalPiping,
-) -> _res.Result[_cabc.Set[_models.Connection]]:
-    connections = set()
+) -> _res.Result[_cabc.Sequence[_models.Connection]]:
+    connections = []
     for node in internalPiping.nodes:
         if not isinstance(node, _mfn.Pipe):
             return _res.Error(f"`{node.name}` is a `{node.__class__.__name__}`, but only direct pipes are supported.")
@@ -23,7 +23,7 @@ def createModelConnectionsFromInternalPiping(
 
         connection = _models.Connection(pipe.name, inputPort, outputPort)
 
-        connections.add(connection)
+        connections.append(connection)
 
     return connections
 

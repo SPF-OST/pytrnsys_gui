@@ -182,7 +182,7 @@
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The inlet temperature at the nominal output when the direction of the mass flow is the reverse of the nominal direction. Not all types support reversing the mass flow. If your type doens't support it, you can leave this field empty.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The inlet temperature at the nominal output when the direction of the mass flow is the reverse of the nominal direction. Not all types support reversing the mass flow. If your type doesn't support it, you can leave this field empty.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="styleSheet">
                  <string notr="true">image: url(:/tango-icons/status/tango-icon-theme-0.8.90/scalable/status/dialog-information.svg);</string>

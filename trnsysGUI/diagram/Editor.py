@@ -1,6 +1,7 @@
 # pylint: skip-file
 # type: ignore
 
+import collections.abc as _cabc
 import json
 import math as _math
 import os
@@ -60,7 +61,7 @@ from . import _sizes
 from . import fileSystemTreeView as _fst
 
 
-class Editor(_qtw.QWidget):
+class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
     def __init__(self, parent, projectFolder, jsonPath, loadValue, logger):
         super().__init__(parent)
 
@@ -100,7 +101,7 @@ class Editor(_qtw.QWidget):
         self.pathLayout.addWidget(self.projectPathLabel)
         self.pathLayout.addWidget(self.PPL)
 
-        treeView = _fst.FileSystemTreeView(_pl.Path(self.projectFolder))
+        treeView = _fst.FileSystemTreeView(_pl.Path(self.projectFolder), self)
 
         self.fileBrowserLayout.addLayout(self.pathLayout)
         self.fileBrowserLayout.addWidget(treeView)
@@ -178,9 +179,7 @@ class Editor(_qtw.QWidget):
         libraryBrowserAndContextInfoSplitter = _qtw.QSplitter(_qtc.Qt.Orientation.Vertical)
         libraryBrowserAndContextInfoSplitter.addWidget(libraryBrowserView)
         libraryBrowserAndContextInfoSplitter.addWidget(self.contextInfoList)
-        _sizes.setRelativeSizes(
-            libraryBrowserAndContextInfoSplitter, [libraryBrowserView, self.contextInfoList], [3, 1]
-        )
+        _sizes.setRelativeSizes(libraryBrowserAndContextInfoSplitter, [libraryBrowserView, self.contextInfoList], [3, 1])
 
         self._consoleWidget = _con.QtConsoleWidget()
 
@@ -1008,3 +1007,7 @@ Tcw=1
     def _updateGradientsInHydraulicLoop(hydraulicLoop: _hlm.HydraulicLoop) -> None:
         for connection in hydraulicLoop.connections:
             connection.updateSegmentGradients()
+
+    @_tp.override
+    def getInternalPipings(self) -> _cabc.Sequence[_ip.HasInternalPiping]:
+        return [o for o in self.trnsysObj if isinstance(o, _ip.HasInternalPiping)]

@@ -200,7 +200,7 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
         self._reloadSummaryText()
 
     def _reloadSummaryText(self) -> None:
-        overallSummary = "\n\n".join(c.getSummary() for c in self.hydraulicConnections)
+        overallSummary = "\n".join(s for c in self.hydraulicConnections if (s := c.getSummary()))
         self.summaryTextEdit.setPlainText(overallSummary)
 
     def _resetOkButton(self) -> None:

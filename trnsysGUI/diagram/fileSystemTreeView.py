@@ -8,15 +8,19 @@ import PyQt5.QtWidgets as _qtw
 
 import pytrnsys.utils.result as _res
 
+import trnsysGUI.internalPiping as _ip
 import trnsysGUI.common.cancelled as _cancel
 import trnsysGUI.proforma.convertXmlTmfToDdck as _pro
-import trnsysGUI.proforma.models as _models
+import trnsysGUI.proforma.createModelConnections as _pcmc
+import trnsysGUI.proforma.dialogs.convertDialog as _pcd
 import trnsysGUI.warningsAndErrors as _warn
 
 
 class FileSystemTreeView(_qtw.QTreeView):
-    def __init__(self, rootDirPath: _pl.Path) -> None:
+    def __init__(self, rootDirPath: _pl.Path, hasInternalPipingsProvider: _ip.HasInternalPipingsProvider) -> None:
         super().__init__(parent=None)
+
+        self._hasInternalPipingsProvider = hasInternalPipingsProvider
 
         rootFolder = str(rootDirPath)
 
@@ -89,14 +93,24 @@ importing or remove the directory."""
 
         self._convertAndLoadProformaFileIntoFolder(sourceFilePath, targetFilePath)
 
-    @staticmethod
-    def _convertAndLoadProformaFileIntoFolder(sourceFilePath: _pl.Path, targetFilePath: _pl.Path) -> None:
-        suggestedHydraulicConnections = [_models.Connection(None, _models.InputPort("In"), _models.OutputPort("Out"))]
+    def _convertAndLoadProformaFileIntoFolder(self, sourceFilePath: _pl.Path, targetFilePath: _pl.Path) -> None:
+        hasInternalPipings = self._hasInternalPipingsProvider.getInternalPipings()
+
+        maybeCancelled = _pcd.ConvertDialog.showDialogAndGetResults(hasInternalPipings, targetFilePath)
+        if _cancel.isCancelled(maybeCancelled):
+            return
+        dialogResult = _cancel.value(maybeCancelled)
+
+        result = _pcmc.createModelConnectionsFromInternalPiping(dialogResult.internalPiping)
+        if _res.isError(result):
+            _warn.showMessageBox(_res.error(result).message)
+            return
+        suggestedHydraulicConnections = _res.value(result)
 
         maybeCancelled = _pro.convertXmltmfToDdck(
             sourceFilePath,
             suggestedHydraulicConnections,
-            targetFilePath,
+            dialogResult.outputFilePath,
         )
         if _cancel.isCancelled(maybeCancelled):
             return

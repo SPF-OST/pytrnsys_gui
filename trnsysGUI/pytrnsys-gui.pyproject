@@ -1,3 +1,3 @@
 {
-    "files": ["hydraulicLoops/_dialogs/split/_dialog.ui","pumpsAndTaps/_dialog.ui","resources/resources.qrc","hydraulicLoops/_dialogs/merge/_dialog.ui","dialogs/connections/_doublePipe.ui","hydraulicLoops/_dialogs/edit/_dialog.ui", "proforma/_dialogs/_convert.ui", "proforma/_dialogs/_hydraulicConnections.ui"]
+    "files": ["hydraulicLoops/_dialogs/split/_dialog.ui","pumpsAndTaps/_dialog.ui","resources/resources.qrc","hydraulicLoops/_dialogs/merge/_dialog.ui","dialogs/connections/_doublePipe.ui","hydraulicLoops/_dialogs/edit/_dialog.ui", "proforma/dialogs/_convert.ui", "proforma/dialogs/_hydraulicConnections.ui"]
 }

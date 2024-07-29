@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import dataclasses as _dc
 import typing as _tp
+import collections.abc as _cabc
 
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
@@ -39,9 +40,7 @@ class InternalPiping:
         return modelPortItems[0]
 
     def getModelPortItems(self, graphicalPortItem: _pi.PortItemBase) -> _tp.Sequence[_mfn.PortItem]:
-        modelPortItems = [
-            mpi for mpi, gpi in self.modelPortItemsToGraphicalPortItem.items() if gpi == graphicalPortItem
-        ]
+        modelPortItems = [mpi for mpi, gpi in self.modelPortItemsToGraphicalPortItem.items() if gpi == graphicalPortItem]
         return modelPortItems
 
     def getNode(
@@ -82,4 +81,9 @@ class HasInternalPiping:
         return True
 
     def getInternalPiping(self) -> InternalPiping:
+        raise NotImplementedError()
+
+
+class HasInternalPipingsProvider:
+    def getInternalPipings(self) -> _cabc.Sequence[HasInternalPiping]:
         raise NotImplementedError()

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>HydraulicConnections</class>
- <widget class="QDialog" name="HydraulicConnections">
+ <class>Convert</class>
+ <widget class="QDialog" name="Convert">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -19,7 +19,7 @@
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Note: You can hover overd disabled buttons to get more information.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Note: You can hover over disabled buttons to get more information.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -56,7 +56,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="comboBox"/>
+      <widget class="QComboBox" name="componentComboBox"/>
      </item>
      <item>
       <spacer name="horizontalSpacer">
@@ -92,7 +92,7 @@
         <number>0</number>
        </property>
        <item row="0" column="0">
-        <widget class="QLineEdit" name="ddckFileNameLineEdit"/>
+        <widget class="QLineEdit" name="outputFilePathLineEdit"/>
        </item>
        <item row="0" column="1">
         <widget class="QPushButton" name="pushButton">
