@@ -7,6 +7,8 @@ import typing as _tp
 import pytest as _pt
 import xmlschema as _xml
 
+import pytrnsys.utils.result as _res
+
 import trnsysGUI.proforma.convertXmlTmfToDdck as _pc
 import trnsysGUI.proforma.dialogs.editHydraulicConnectionsDialog as _ehcd
 
@@ -77,9 +79,16 @@ def testConvertXmlTmfStringToDdck(testCase: TestCase, monkeypatch) -> None:
         returnConnectionsUnmodified,
     )
 
-    actualDdckContent = _pc.convertXmlTmfStringToDdck(xmlFileContent)
-    assert isinstance(actualDdckContent, str)
+    result = _pc.convertXmlTmfStringToDdck(xmlFileContent, suggestedHydraulicConnections=None)
 
-    testCase.actualOutputFilePath.write_text(actualDdckContent)
-    expectedDdckContent = testCase.expectedOutputFilePath.read_text(encoding="utf8")
-    assert actualDdckContent == expectedDdckContent
+    if testCase.expectedOutputFilePath.is_file():
+        assert isinstance(result, str)
+        actualDdckContent = _res.value(result)
+
+        testCase.actualOutputFilePath.write_text(result)
+        expectedDdckContent = testCase.expectedOutputFilePath.read_text(encoding="utf8")
+        assert actualDdckContent == expectedDdckContent
+    else:
+        assert isinstance(result, _res.Error)
+        print(result.message)
+        assert not testCase.actualOutputFilePath.is_file()

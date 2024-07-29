@@ -4,7 +4,8 @@ import pathlib as _pl
 import typing as _tp
 
 import jinja2 as _jj
-import xmlschema as _xml
+import xmlschema as _xs
+import xml.etree.ElementTree as _etree
 
 import pytrnsys.utils.result as _res
 
@@ -32,16 +33,19 @@ def _createDdckJinjaTemplate() -> _jj.Template:
 _JINJA_TEMPLATE = _createDdckJinjaTemplate()
 
 
-def convertXmltmfToDdck(xmlTmfFilePath: _pl.Path, ddckFilePath: _pl.Path) -> _cancel.MaybeCancelled[None]:
+def convertXmltmfToDdck(
+    xmlTmfFilePath: _pl.Path,
+    suggestedHydraulicConnections: _cabc.Sequence[_models.Connection] | None,
+    ddckFilePath: _pl.Path,
+) -> _cancel.MaybeCancelled[_res.Result[None]]:
     xmlTmfContent = xmlTmfFilePath.read_text(encoding="utf8")
-    try:
-        maybeCancelled = convertXmlTmfStringToDdck(xmlTmfContent)
-        if _cancel.isCancelled(maybeCancelled):
-            return _cancel.CANCELLED
-
-        ddckContent = maybeCancelled
-    except ValueError as exception:
-        raise ValueError(f"Error parsing {xmlTmfFilePath}") from exception
+    maybeCancelled = convertXmlTmfStringToDdck(xmlTmfContent, suggestedHydraulicConnections)
+    if _cancel.isCancelled(maybeCancelled):
+        return _cancel.CANCELLED
+    result = _cancel.value(maybeCancelled)
+    if _res.isError(result):
+        return _res.error(result).withContext(f"Converting proforma `{xmlTmfFilePath}`")
+    ddckContent = _res.value(result)
 
     assert isinstance(ddckContent, str)
     ddckFilePath.write_text(ddckContent, encoding="utf8")
@@ -159,14 +163,14 @@ def _createVariablesForRole(
 
 
 def convertXmlTmfStringToDdck(
-    xmlTmfContent: str, suggestedHydraulicConnections: _cabc.Sequence[_models.Connection] | None = None
+    xmlTmfContent: str, suggestedHydraulicConnections: _cabc.Sequence[_models.Connection] | None
 ) -> _cancel.MaybeCancelled[_res.Result[str]]:
-    schema = _xml.XMLSchema11(_SCHEMA_FILE_PATH)
+    schema = _xs.XMLSchema11(_SCHEMA_FILE_PATH)
 
     try:
         schema.validate(xmlTmfContent)
-    except _xml.XMLSchemaValidationError as validationError:
-        raise ValueError("Failed to validate schema.") from validationError
+    except (_etree.ParseError, _xs.XMLSchemaException) as error:
+        return _res.Error(f"Error reading or validating the proforma file: {error}")
 
     proforma: _tp.Any = schema.to_dict(xmlTmfContent)
 
@@ -263,8 +267,6 @@ def _getHydraulicConnectionDataByOrderForOutput(
     connectionName: str | None,
     outputPort: _models.OutputPort,
 ) -> dict[int, _HydraulicConnectionsData]:
-    outputPort.ensureAllRequiredVariablesAreSet()
-
     portName = outputPort.name
     tempOrder = outputPort.temperatureSet.order
     revTempOrder = outputPort.reverseTemperature.order if outputPort.reverseTemperature else None

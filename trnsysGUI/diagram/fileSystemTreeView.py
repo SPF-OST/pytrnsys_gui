@@ -83,20 +83,20 @@ importing or remove the directory."""
             if standardButton != _qtw.QMessageBox.StandardButton.Yes:  # pylint: disable=no-member
                 return
 
-            if sourceSuffix != ".xmltmf":
-                _su.copy(sourceFilePath, targetFilePath)
-                return
+        if sourceSuffix != ".xmltmf":
+            _su.copy(sourceFilePath, targetFilePath)
+            return
 
-            self._convertAndLoadProformaFileIntoFolder(sourceFilePath, targetFilePath)
+        self._convertAndLoadProformaFileIntoFolder(sourceFilePath, targetFilePath)
 
     @staticmethod
     def _convertAndLoadProformaFileIntoFolder(sourceFilePath: _pl.Path, targetFilePath: _pl.Path) -> None:
-        sourceFileContent = sourceFilePath.read_text()
         suggestedHydraulicConnections = [_models.Connection(None, _models.InputPort("In"), _models.OutputPort("Out"))]
 
-        maybeCancelled = _pro.convertXmlTmfStringToDdck(
-            sourceFileContent,
+        maybeCancelled = _pro.convertXmltmfToDdck(
+            sourceFilePath,
             suggestedHydraulicConnections,
+            targetFilePath,
         )
         if _cancel.isCancelled(maybeCancelled):
             return
@@ -104,10 +104,6 @@ importing or remove the directory."""
         if _res.isError(result):
             _warn.showMessageBox(_res.error(result).message)
             return
-        targetFileContent = _res.value(result)
-
-        assert isinstance(targetFileContent, str)
-        targetFilePath.write_text(targetFileContent)
 
     def _deleteCurrentFile(self) -> None:
         path = self._getCurrentPath()

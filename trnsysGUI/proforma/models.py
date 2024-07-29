@@ -199,10 +199,6 @@ class OutputPort:
     def areAnyRequiredVariablesUnset(self):
         return self.temperature == UNSET
 
-    def ensureAllRequiredVariablesAreSet(self) -> None:
-        if not self.areAnyRequiredVariablesUnset:
-            raise ValueError("Not all required variables are set", self)
-
     def getSummary(self, connectionName: str | None) -> str:
         qualifiedPortName = _getQualifiedPortName(connectionName, self.name)
         summary = _joinNonEmptyStringsWithNewLines(
