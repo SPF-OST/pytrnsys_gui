@@ -96,16 +96,16 @@ importing or remove the directory."""
     def _convertAndLoadProformaFileIntoFolder(self, sourceFilePath: _pl.Path, targetFilePath: _pl.Path) -> None:
         hasInternalPipings = self._hasInternalPipingsProvider.getInternalPipings()
 
-        maybeCancelled = _pcd.ConvertDialog.showDialogAndGetResults(hasInternalPipings, targetFilePath)
-        if _cancel.isCancelled(maybeCancelled):
+        dialogMaybeCancelled = _pcd.ConvertDialog.showDialogAndGetResults(hasInternalPipings, targetFilePath)
+        if _cancel.isCancelled(dialogMaybeCancelled):
             return
-        dialogResult = _cancel.value(maybeCancelled)
+        dialogResult = _cancel.value(dialogMaybeCancelled)
 
-        result = _pcmc.createModelConnectionsFromInternalPiping(dialogResult.internalPiping)
-        if _res.isError(result):
-            _warn.showMessageBox(_res.error(result).message)
+        createConnectionsResult = _pcmc.createModelConnectionsFromInternalPiping(dialogResult.internalPiping)
+        if _res.isError(createConnectionsResult):
+            _warn.showMessageBox(_res.error(createConnectionsResult).message)
             return
-        suggestedHydraulicConnections = _res.value(result)
+        suggestedHydraulicConnections = _res.value(createConnectionsResult)
 
         maybeCancelled = _pro.convertXmltmfToDdck(
             sourceFilePath,

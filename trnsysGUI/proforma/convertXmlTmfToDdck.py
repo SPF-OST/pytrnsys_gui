@@ -2,16 +2,14 @@ import collections.abc as _cabc
 import dataclasses as _dc
 import pathlib as _pl
 import typing as _tp
+import xml.etree.ElementTree as _etree
 
 import jinja2 as _jj
 import xmlschema as _xs
-import xml.etree.ElementTree as _etree
 
 import pytrnsys.utils.result as _res
-
 import trnsysGUI.common.cancelled as _cancel
 import trnsysGUI.proforma.dialogs.editHydraulicConnectionsDialog as _ehcd
-
 from . import createModelConnections as _cmcs
 from . import models as _models
 
