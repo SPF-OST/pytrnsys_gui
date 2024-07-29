@@ -7,9 +7,10 @@ import jinja2 as _jj
 import xmlschema as _xml
 
 import trnsysGUI.common.cancelled as _cancel
+import trnsysGUI.proforma.dialogs.editHydraulicConnectionsDialog as _ehcd
+
 from . import createModelConnections as _cmcs
 from . import models as _models
-from ._dialogs import editHydraulicConnectionsDialog as _ehcd
 
 _CONTAINING_DIR_PATH = _pl.Path(__file__).parent
 _SCHEMA_FILE_PATH = _CONTAINING_DIR_PATH / "xmltmf.xsd"

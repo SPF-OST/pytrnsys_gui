@@ -1,15 +1,14 @@
-import pathlib as _pl
-import pprint as _pp
-import pkgutil as _pu
-import typing as _tp
 import dataclasses as _dc
+import pathlib as _pl
+import pkgutil as _pu
+import pprint as _pp
+import typing as _tp
 
 import pytest as _pt
-
 import xmlschema as _xml
 
-import trnsysGUI.proforma.models as _models
 import trnsysGUI.proforma.convertXmlTmfToDdck as _pc
+import trnsysGUI.proforma.dialogs.editHydraulicConnectionsDialog as _ehcd
 
 _DATA_DIR_PATH = _pl.Path(__file__).parent / "data"
 _INPUT_DIR_PATH = _DATA_DIR_PATH / "input"
@@ -65,8 +64,18 @@ def _getTestCases() -> _tp.Iterable[TestCase]:
 
 
 @_pt.mark.parametrize("testCase", [_pt.param(tc, id=tc.fileStem) for tc in _getTestCases()])
-def testConvertXmlTmfStringToDdck(testCase: TestCase, qtbot) -> None:
+def testConvertXmlTmfStringToDdck(testCase: TestCase, qtbot, monkeypatch) -> None:
     xmlFileContent = testCase.inputFilePath.read_text(encoding="utf8")
+
+    def returnConnectionsUnmodified(connections, _):
+        return connections
+
+    monkeypatch.setattr(
+        _ehcd.EditHydraulicConnectionsDialog,
+        _ehcd.EditHydraulicConnectionsDialog.showDialogAndGetResults.__name__,
+        returnConnectionsUnmodified,
+    )
+
     actualDdckContent = _pc.convertXmlTmfStringToDdck(xmlFileContent)
     testCase.actualOutputFilePath.write_text(actualDdckContent)
     expectedDdckContent = testCase.expectedOutputFilePath.read_text(encoding="utf8")
