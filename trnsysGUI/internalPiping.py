@@ -17,6 +17,11 @@ class InternalPiping:
     def __post_init__(self):
         if not all(mpi in self.modelPortItemsToGraphicalPortItem for n in self.nodes for mpi in n.getPortItems()):
             raise ValueError("Error a port item of a node was not contained in `modelPortItemsToGraphicalPortItem`.")
+        
+        uniqueNodeNames = {n.name for n in self.nodes}
+        if not len(uniqueNodeNames) == len(self.nodes):
+            raise ValueError("Node names must be unique within one component.")
+        
 
     def getModelPortItem(
         self, graphicalPortItem: _pi.PortItemBase, portItemType: _mfn.PortItemType  # type: ignore[name-defined]
