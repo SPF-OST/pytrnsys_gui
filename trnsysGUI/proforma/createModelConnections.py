@@ -15,7 +15,7 @@ def createModelConnectionsFromInternalPiping(
     connections = set()
     for node in internalPiping.nodes:
         if not isinstance(node, _mfn.Pipe):
-            return _res.Error(f"`{node.name}` is a `{node.__name__}`, but only direct pipes are supported.")
+            return _res.Error(f"`{node.name}` is a `{node.__class__.__name__}`, but only direct pipes are supported.")
         pipe = node
 
         inputPort = _models.InputPort(pipe.fromPort.name)

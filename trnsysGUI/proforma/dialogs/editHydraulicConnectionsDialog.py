@@ -41,9 +41,7 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
         self.setupUi(self)
 
         self._variablesByRole = variablesByRole
-        self.hydraulicConnections: _cancel.MaybeCancelled[_cabc.Sequence[_models.Connection]] = (
-            self._getDeepCopiesSortedByName(suggestedHydraulicConnections)
-        )
+        self.hydraulicConnections = self._getDeepCopiesSortedByName(suggestedHydraulicConnections)
 
         self._onActivatedCallbacks = list[_OnActivatedCallBack]()
 
@@ -56,28 +54,21 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
         self._reloadConnections()
 
     def _configureButtonBox(self) -> None:
-        okButton = self.okCancelButtonBox.button(_qtw.QDialogButtonBox.StandardButton.Ok)
-        okButton.clicked.connect(self.close)
-
-        cancelButton = self.okCancelButtonBox.button(_qtw.QDialogButtonBox.StandardButton.Cancel)
-        cancelButton.clicked.connect(self._onCancelClicked)
-
-    def _onCancelClicked(self) -> None:
-        self.hydraulicConnections = _cancel.CANCELLED
-        self.close()
+        self.okCancelButtonBox.accepted.connect(self.accept)
+        self.okCancelButtonBox.rejected.connect(self.reject)
 
     @staticmethod
     def _getDeepCopiesSortedByName(suggestedHydraulicConnections):
         hydraulicConnections = [_copy.deepcopy(c) for c in suggestedHydraulicConnections]
 
         def getConnectionName(connection: _models.Connection) -> str:
-            return connection.name
+            return connection.name or ""
 
         sortedHydraulicConnections = sorted(hydraulicConnections, key=getConnectionName)
         return sortedHydraulicConnections
 
     def _configureHydraulicConnections(self):
-        self.connectionsListWidget.setSelectionMode(_qtw.QAbstractItemView.SelectionMode.SingleSelection)
+        self.connectionsListWidget.setSelectionMode(_qtw.QAbstractItemView.SingleSelection)
 
         for hydraulicConnection in self.hydraulicConnections:
             name = hydraulicConnection.name if hydraulicConnection.name else self._DEFAULT_CONNECTION_LABEL
@@ -130,7 +121,10 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
 
     @staticmethod
     def _addOptions(
-        comboBox: _qtw.QComboBox, variables: _cabc.Sequence[_models.Variable], withUnset: bool = True, clear: bool = True
+        comboBox: _qtw.QComboBox,
+        variables: _cabc.Sequence[_models.Variable],
+        withUnset: bool = True,
+        clear: bool = True,
     ) -> None:
         if clear:
             comboBox.clear()
@@ -170,18 +164,18 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
 
         if comboBox == self.fluidDensityComboBox:
             return selectedConnection.fluid.density or _models.UNSET
-        elif comboBox == self.fluidHeatCapacityComboBox:
+        if comboBox == self.fluidHeatCapacityComboBox:
             return selectedConnection.fluid.heatCapacity or _models.UNSET
-        elif comboBox == self.massFlowRateComboBox:
+        if comboBox == self.massFlowRateComboBox:
             return selectedConnection.inputPort.massFlowRate
-        elif comboBox == self.inputTempComboBox:
+        if comboBox == self.inputTempComboBox:
             return selectedConnection.inputPort.temperature
-        elif comboBox == self.outputTempComboBox:
+        if comboBox == self.outputTempComboBox:
             return selectedConnection.outputPort.temperature
-        elif comboBox == self.outputRevTempComboBox:
+        if comboBox == self.outputRevTempComboBox:
             return selectedConnection.outputPort.reverseTemperature or _models.UNSET
-        else:
-            raise AssertionError("Unknown combo box.")
+
+        raise AssertionError("Unknown combo box.")
 
     def _getSelectedConnection(self) -> _models.Connection:
         selectedItems = self.connectionsListWidget.selectedItems()
@@ -210,7 +204,7 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
         self.summaryTextEdit.setPlainText(overallSummary)
 
     def _resetOkButton(self) -> None:
-        okButton = self.okCancelButtonBox.button(_qtw.QDialogButtonBox.StandardButton.Ok)
+        okButton = self.okCancelButtonBox.button(_qtw.QDialogButtonBox.Ok)
         areAnyRequiredVariablesUnset = self._areAnyRequiredVariablesUnset()
         isEnabled = not areAnyRequiredVariablesUnset
         okButton.setEnabled(isEnabled)
@@ -271,7 +265,11 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
         variablesByRole: _models.VariablesByRole,
     ) -> _cancel.MaybeCancelled[_cabc.Sequence[_models.Connection]]:
         dialog = EditHydraulicConnectionsDialog(suggestedHydraulicConnections, variablesByRole)
-        dialog.exec()
+        returnValue = dialog.exec()
+
+        if returnValue == _qtw.QDialog.Rejected:
+            return _cancel.CANCELLED
+
         return dialog.hydraulicConnections
 
 

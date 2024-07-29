@@ -55,7 +55,7 @@ def _getSummaryLine(
     variable: Variable | None | Unset,
     direction: _tp.Literal["input", "output"],
 ) -> str:
-    if not variable or variable == UNSET:
+    if not isinstance(variable, Variable):
         return ""
 
     computedVariable = f"@{variableStringConstants.propertyName}({qualifiedPortName})"
@@ -142,6 +142,13 @@ def _getQualifiedPortName(connectionName: str | None, portName: str) -> str:
     return qualifiedPortName
 
 
+def _getSetVariable(variable: Variable | Unset) -> Variable:
+    if not isinstance(variable, Variable):
+        raise ValueError("Required variable not set.")
+
+    return variable
+
+
 @_dc.dataclass
 class InputPort:
     name: str
@@ -149,12 +156,20 @@ class InputPort:
     massFlowRate: "RequiredVariable" = UNSET
 
     @property
+    def temperatureSet(self) -> Variable:
+        return _getSetVariable(self.temperature)
+
+    @property
+    def massFlowRateSet(self) -> "Variable":
+        return _getSetVariable(self.massFlowRate)
+
+    @property
     def allVariables(self) -> _cabc.Sequence[Variable]:
         return _removeUnsetAndNone(self.temperature, self.massFlowRate)
 
     @property
     def areAnyRequiredVariablesUnset(self) -> bool:
-        return self.temperature == UNSET or self.massFlowRate == UNSET
+        return UNSET in (self.temperature, self.massFlowRate)
 
     def getSummary(self, connectionName: str | None) -> str:
         qualifiedPortName = _getQualifiedPortName(connectionName, self.name)
@@ -173,12 +188,20 @@ class OutputPort:
     reverseTemperature: Variable | None = None
 
     @property
+    def temperatureSet(self) -> Variable:
+        return _getSetVariable(self.temperature)
+
+    @property
     def allVariables(self) -> _cabc.Sequence[Variable]:
         return _removeUnsetAndNone(self.temperature, self.reverseTemperature)
 
     @property
     def areAnyRequiredVariablesUnset(self):
         return self.temperature == UNSET
+
+    def ensureAllRequiredVariablesAreSet(self) -> None:
+        if not self.areAnyRequiredVariablesUnset:
+            raise ValueError("Not all required variables are set", self)
 
     def getSummary(self, connectionName: str | None) -> str:
         qualifiedPortName = _getQualifiedPortName(connectionName, self.name)
@@ -192,7 +215,7 @@ class OutputPort:
         return summary
 
 
-def _removeUnsetAndNone(*variables: Variable) -> _cabc.Sequence[Variable]:
+def _removeUnsetAndNone(*variables: Variable | Unset | None) -> _cabc.Sequence[Variable]:
     return [v for v in variables if isinstance(v, Variable)]
 
 

@@ -6,6 +6,8 @@ import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
+import pytrnsys.utils.result as _res
+
 import trnsysGUI.common.cancelled as _cancel
 import trnsysGUI.proforma.convertXmlTmfToDdck as _pro
 import trnsysGUI.proforma.models as _models
@@ -81,23 +83,31 @@ importing or remove the directory."""
             if standardButton != _qtw.QMessageBox.StandardButton.Yes:  # pylint: disable=no-member
                 return
 
-        if sourceSuffix != ".xmltmf":
-            _su.copy(sourceFilePath, targetFilePath)
-        else:
-            sourceFileContent = sourceFilePath.read_text()
-            suggestedHydraulicConnections = {
-                _models.Connection(None, _models.InputPort("In"), _models.OutputPort("Out"))
-            }
-
-            maybeCancelled = _pro.convertXmlTmfStringToDdck(
-                sourceFileContent,
-                suggestedHydraulicConnections,
-            )
-            if _cancel.isCancelled(maybeCancelled):
+            if sourceSuffix != ".xmltmf":
+                _su.copy(sourceFilePath, targetFilePath)
                 return
-            targetFileContent = maybeCancelled
 
-            targetFilePath.write_text(targetFileContent)
+            self._convertAndLoadProformaFileIntoFolder(sourceFilePath, targetFilePath)
+
+    @staticmethod
+    def _convertAndLoadProformaFileIntoFolder(sourceFilePath: _pl.Path, targetFilePath: _pl.Path) -> None:
+        sourceFileContent = sourceFilePath.read_text()
+        suggestedHydraulicConnections = [_models.Connection(None, _models.InputPort("In"), _models.OutputPort("Out"))]
+
+        maybeCancelled = _pro.convertXmlTmfStringToDdck(
+            sourceFileContent,
+            suggestedHydraulicConnections,
+        )
+        if _cancel.isCancelled(maybeCancelled):
+            return
+        result = _cancel.value(maybeCancelled)
+        if _res.isError(result):
+            _warn.showMessageBox(_res.error(result).message)
+            return
+        targetFileContent = _res.value(result)
+
+        assert isinstance(targetFileContent, str)
+        targetFilePath.write_text(targetFileContent)
 
     def _deleteCurrentFile(self) -> None:
         path = self._getCurrentPath()

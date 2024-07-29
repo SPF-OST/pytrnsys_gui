@@ -31,6 +31,7 @@ def testDecodeXmlTmf() -> None:
 
 def _getSchema() -> _xml.XMLSchema11:
     data = _pu.get_data(_pc.__name__, "xmltmf.xsd")
+    assert data
     string = data.decode("UTF8")
     schema = _xml.XMLSchema11(string)
     return schema
@@ -64,7 +65,7 @@ def _getTestCases() -> _tp.Iterable[TestCase]:
 
 
 @_pt.mark.parametrize("testCase", [_pt.param(tc, id=tc.fileStem) for tc in _getTestCases()])
-def testConvertXmlTmfStringToDdck(testCase: TestCase, qtbot, monkeypatch) -> None:
+def testConvertXmlTmfStringToDdck(testCase: TestCase, monkeypatch) -> None:
     xmlFileContent = testCase.inputFilePath.read_text(encoding="utf8")
 
     def returnConnectionsUnmodified(connections, _):
@@ -77,6 +78,8 @@ def testConvertXmlTmfStringToDdck(testCase: TestCase, qtbot, monkeypatch) -> Non
     )
 
     actualDdckContent = _pc.convertXmlTmfStringToDdck(xmlFileContent)
+    assert isinstance(actualDdckContent, str)
+
     testCase.actualOutputFilePath.write_text(actualDdckContent)
     expectedDdckContent = testCase.expectedOutputFilePath.read_text(encoding="utf8")
     assert actualDdckContent == expectedDdckContent

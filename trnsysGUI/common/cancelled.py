@@ -10,7 +10,7 @@ _T = _tp.TypeVar("_T")
 MaybeCancelled: _tp.TypeAlias = _T | Cancelled
 
 
-def isCancelled(maybeCancelled: MaybeCancelled[_T]) -> bool:
+def isCancelled(maybeCancelled: MaybeCancelled[_T]) -> _tp.TypeGuard[Cancelled]:
     if maybeCancelled == CANCELLED:
         return True
 
