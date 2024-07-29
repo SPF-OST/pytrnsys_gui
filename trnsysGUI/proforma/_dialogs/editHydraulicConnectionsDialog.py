@@ -47,14 +47,18 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
 
         self._onActivatedCallbacks = list[_OnActivatedCallBack]()
 
-        self._configureCancelButton()
+        self.summaryTextEdit.setReadOnly(True)
+
+        self._configureButtonBox()
         self._configureHydraulicConnections()
         self._configureComboBoxes()
-        self.summaryTextEdit.setReadOnly(True)
 
         self._reloadConnections()
 
-    def _configureCancelButton(self) -> None:
+    def _configureButtonBox(self) -> None:
+        okButton = self.okCancelButtonBox.button(_qtw.QDialogButtonBox.StandardButton.Ok)
+        okButton.clicked.connect(self.close)
+
         cancelButton = self.okCancelButtonBox.button(_qtw.QDialogButtonBox.StandardButton.Cancel)
         cancelButton.clicked.connect(self._onCancelClicked)
 
@@ -269,4 +273,4 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
     ) -> _cancel.MaybeCancelled[_cabc.Sequence[_models.Connection]]:
         dialog = EditHydraulicConnectionsDialog(suggestedHydraulicConnections, variablesByRole)
         dialog.exec()
-        return _cancel.CANCELLED
+        return dialog.hydraulicConnections

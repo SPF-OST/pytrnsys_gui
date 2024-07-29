@@ -67,11 +67,7 @@ def _getTestCases() -> _tp.Iterable[TestCase]:
 @_pt.mark.parametrize("testCase", [_pt.param(tc, id=tc.fileStem) for tc in _getTestCases()])
 def testConvertXmlTmfStringToDdck(testCase: TestCase, qtbot) -> None:
     xmlFileContent = testCase.inputFilePath.read_text(encoding="utf8")
-    suggestedHydraulicConnections = [
-        _models.Connection("Evap", _models.InputPort("In"), _models.OutputPort("Out")),
-        _models.Connection("Cond", _models.InputPort("In"), _models.OutputPort("Out")),
-    ]
-    actualDdckContent = _pc.convertXmlTmfStringToDdck(xmlFileContent, suggestedHydraulicConnections)
+    actualDdckContent = _pc.convertXmlTmfStringToDdck(xmlFileContent)
     testCase.actualOutputFilePath.write_text(actualDdckContent)
     expectedDdckContent = testCase.expectedOutputFilePath.read_text(encoding="utf8")
     assert actualDdckContent == expectedDdckContent

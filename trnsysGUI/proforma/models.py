@@ -42,11 +42,11 @@ class VariableStringConstants:
 
 
 class AllVariableStringConstants:
-    TEMPERATURE = VariableStringConstants("@temp", "T")
-    MASS_FLOW_RATE = VariableStringConstants("@mfr", "M")
-    REVERSE_TEMPERATURE = VariableStringConstants("@revtemp", None)
-    DENSITY = VariableStringConstants("@rho", "Rho")
-    HEAT_CAPACITY = VariableStringConstants("@cp", "Cp")
+    TEMPERATURE = VariableStringConstants("temp", "T")
+    MASS_FLOW_RATE = VariableStringConstants("mfr", "M")
+    REVERSE_TEMPERATURE = VariableStringConstants("revtemp", None)
+    DENSITY = VariableStringConstants("rho", "Rho")
+    HEAT_CAPACITY = VariableStringConstants("cp", "Cp")
 
 
 def _getSummaryLine(
@@ -58,7 +58,7 @@ def _getSummaryLine(
     if not variable or variable == UNSET:
         return ""
 
-    computedVariable = f"{variableStringConstants.propertyName}({qualifiedPortName})"
+    computedVariable = f"@{variableStringConstants.propertyName}({qualifiedPortName})"
     summaryLine = (
         f'"{variable.tmfName}" = {computedVariable}'
         if direction == "input"
