@@ -160,26 +160,26 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
         self, comboBox: _qtw.QComboBox, variables: _cabc.Sequence[_models.Variable]
     ) -> _cabc.Sequence[_models.Variable]:
         selectedVariableForComboBox = self._getVariableCorrespondingToComboBox(comboBox)
-        otherUnselectedVariables = [
+        selectedOrOtherUnselectedVariables = [
             v for v in variables if v == selectedVariableForComboBox or v not in self._selectedVariables
         ]
-        return otherUnselectedVariables
+        return selectedOrOtherUnselectedVariables
 
     def _getVariableCorrespondingToComboBox(self, comboBox: _qtw.QComboBox) -> _models.Variable | _models.Unset:
         selectedConnection = self._getSelectedConnection()
 
         if comboBox == self.fluidDensityComboBox:
-            return selectedConnection.fluid.density
+            return selectedConnection.fluid.density or _models.UNSET
         elif comboBox == self.fluidHeatCapacityComboBox:
-            return selectedConnection.fluid.heatCapacity
+            return selectedConnection.fluid.heatCapacity or _models.UNSET
         elif comboBox == self.massFlowRateComboBox:
-            return selectedConnection.inputPort.massFlowRate or _models.Unset
+            return selectedConnection.inputPort.massFlowRate
         elif comboBox == self.inputTempComboBox:
-            return selectedConnection.inputPort.temperature or _models.Unset
+            return selectedConnection.inputPort.temperature
         elif comboBox == self.outputTempComboBox:
-            return selectedConnection.outputPort.temperature or _models.Unset
+            return selectedConnection.outputPort.temperature
         elif comboBox == self.outputRevTempComboBox:
-            return selectedConnection.outputPort.reverseTemperature
+            return selectedConnection.outputPort.reverseTemperature or _models.UNSET
         else:
             raise AssertionError("Unknown combo box.")
 
@@ -230,8 +230,7 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
 
         for comboBox in self._comboBoxes:
             data = self._getVariableCorrespondingToComboBox(comboBox)
-            index = comboBox.findData(data)
-            comboBox.setCurrentIndex(index)
+            _setSelected(comboBox, data)
 
     @property
     def _comboBoxes(self) -> _cabc.Sequence[_qtw.QComboBox]:
@@ -274,3 +273,14 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
         dialog = EditHydraulicConnectionsDialog(suggestedHydraulicConnections, variablesByRole)
         dialog.exec()
         return dialog.hydraulicConnections
+
+
+def _setSelected(comboBox: _qtw.QComboBox, data: _models.Variable | _models.Unset) -> None:
+    # Cannot use `QComboBox.findData` as `findData` works by reference, but we want by value
+    for index in range(comboBox.count()):
+        rowData = comboBox.itemData(index)
+        if rowData == data:
+            comboBox.setCurrentIndex(index)
+            return
+
+    raise AssertionError(f"{data} not a member of combo box.")

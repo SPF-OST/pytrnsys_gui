@@ -125,8 +125,9 @@ class Connection:
         if not subSummaries:
             return ""
 
+        connectionName = self.name if self.name else "Default connection"
         summary = f"""\
-** {self.name}
+** {connectionName}
 {subSummaries}
 
 """
