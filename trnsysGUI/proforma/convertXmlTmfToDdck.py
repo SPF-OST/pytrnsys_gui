@@ -10,7 +10,6 @@ import trnsysGUI.common.cancelled as _cancel
 from . import createModelConnections as _cmcs
 from . import models as _models
 from ._dialogs import editHydraulicConnectionsDialog as _ehcd
-from .models import VariablesByRole
 
 _CONTAINING_DIR_PATH = _pl.Path(__file__).parent
 _SCHEMA_FILE_PATH = _CONTAINING_DIR_PATH / "xmltmf.xsd"
@@ -51,37 +50,38 @@ _StringMapping = _tp.Mapping[str, _tp.Any]
 class _HydraulicConnectionsData:
     name: str | None
     portName: str
-    propertyName: str
-    variableNamePrefix: str | None
+    stringConstants: _models.VariableStringConstants
 
     @property
     def variableName(self) -> str:
         capitalizedPortName = self.portName.capitalize()
-        return f":{self.variableNamePrefix}{capitalizedPortName}"
+        return f":{self.stringConstants.variableNamePrefix}{capitalizedPortName}"
 
     @property
     def rhs(self) -> str:
-        return f"@{self.propertyName}({self.portName})"
+        return f"@{self.stringConstants.propertyName}({self.portName})"
 
     @staticmethod
     def createForTemperature(connectionName: str | None, portName: str) -> "_HydraulicConnectionsData":
-        return _HydraulicConnectionsData(connectionName, portName, "temp", "T")
+        return _HydraulicConnectionsData(connectionName, portName, _models.AllVariableStringConstants.TEMPERATURE)
 
     @staticmethod
     def createForReverseTemperature(connectionName: str | None, portName: str):
-        return _HydraulicConnectionsData(connectionName, portName, "revtemp", None)
+        return _HydraulicConnectionsData(
+            connectionName, portName, _models.AllVariableStringConstants.REVERSE_TEMPERATURE
+        )
 
     @staticmethod
     def createForMassFlowRate(connectionName: str | None, portName: str) -> "_HydraulicConnectionsData":
-        return _HydraulicConnectionsData(connectionName, portName, "mfr", "M")
+        return _HydraulicConnectionsData(connectionName, portName, _models.AllVariableStringConstants.MASS_FLOW_RATE)
 
     @staticmethod
     def createForFluidHeatCapacity(connectionName: str | None, portName: str) -> "_HydraulicConnectionsData":
-        return _HydraulicConnectionsData(connectionName, portName, "cp", "Cp")
+        return _HydraulicConnectionsData(connectionName, portName, _models.AllVariableStringConstants.HEAT_CAPACITY)
 
     @staticmethod
     def createForFluidDensity(connectionName: str | None, portName: str) -> "_HydraulicConnectionsData":
-        return _HydraulicConnectionsData(connectionName, portName, "rho", "Rho")
+        return _HydraulicConnectionsData(connectionName, portName, _models.AllVariableStringConstants.DENSITY)
 
 
 @_dc.dataclass
@@ -113,7 +113,7 @@ def _createProcessedVariables(
 
 def _createVariablesByRole(
     serializedVariables: _cabc.Sequence[_StringMapping],
-) -> VariablesByRole:
+) -> _models.VariablesByRole:
     def getOrder(serializedVariable: _StringMapping) -> int:
         return serializedVariable["order"]
 
@@ -123,7 +123,7 @@ def _createVariablesByRole(
     inputVariables = _createVariablesForRole("input", sortedSerializedVariables)
     outputVariables = _createVariablesForRole("output", sortedSerializedVariables)
 
-    return VariablesByRole(parameterVariables, inputVariables, outputVariables)
+    return _models.VariablesByRole(parameterVariables, inputVariables, outputVariables)
 
 
 _Role = _tp.Literal["parameter", "input", "output"]

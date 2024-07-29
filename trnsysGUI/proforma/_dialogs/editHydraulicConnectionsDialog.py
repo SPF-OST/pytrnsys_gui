@@ -41,13 +41,26 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
         self.setupUi(self)
 
         self._variablesByRole = variablesByRole
-        self.hydraulicConnections = self._getDeepCopiesSortedByName(suggestedHydraulicConnections)
+        self.hydraulicConnections: _cancel.MaybeCancelled[_cabc.Sequence[_models.Connection]] = (
+            self._getDeepCopiesSortedByName(suggestedHydraulicConnections)
+        )
 
         self._onActivatedCallbacks = list[_OnActivatedCallBack]()
 
+        self._configureCancelButton()
         self._configureHydraulicConnections()
-
         self._configureComboBoxes()
+        self.summaryTextEdit.setReadOnly(True)
+
+        self._reloadConnections()
+
+    def _configureCancelButton(self) -> None:
+        cancelButton = self.okCancelButtonBox.button(_qtw.QDialogButtonBox.StandardButton.Cancel)
+        cancelButton.clicked.connect(self._onCancelClicked)
+
+    def _onCancelClicked(self) -> None:
+        self.hydraulicConnections = _cancel.CANCELLED
+        self.close()
 
     @staticmethod
     def _getDeepCopiesSortedByName(suggestedHydraulicConnections):
@@ -178,12 +191,35 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
             onActivatedCallback = _OnActivatedCallBack.createAndConnect(self, comboBox)
             self._onActivatedCallbacks.append(onActivatedCallback)
 
-        self._reconfigureComboBoxOptions()
-
     def onComboBoxActivated(self, comboBox: _qtw.QComboBox, newIndex: int) -> None:
         data = comboBox.itemData(newIndex)
         self._setVariableCorrespondingToComboBox(comboBox, data)
+        self._reloadConnections()
+
+    def _reloadConnections(self) -> None:
+        self._resetOkButton()
         self._reloadSelectedComboBoxItems()
+        self._reloadSummaryText()
+
+    def _reloadSummaryText(self) -> None:
+        overallSummary = "\n\n".join(c.getSummary() for c in self.hydraulicConnections)
+        self.summaryTextEdit.setPlainText(overallSummary)
+
+    def _resetOkButton(self) -> None:
+        okButton = self.okCancelButtonBox.button(_qtw.QDialogButtonBox.StandardButton.Ok)
+        areAnyRequiredVariablesUnset = self._areAnyRequiredVariablesUnset()
+        isEnabled = not areAnyRequiredVariablesUnset
+        okButton.setEnabled(isEnabled)
+        toolTip = (
+            "Please specify the required properties (in bold) for all connections."
+            if areAnyRequiredVariablesUnset
+            else ""
+        )
+        okButton.setToolTip(toolTip)
+
+    def _areAnyRequiredVariablesUnset(self) -> bool:
+        areAnyRequiredVariablesUnset = any(c.areAnyRequiredVariablesUnset for c in self.hydraulicConnections)
+        return areAnyRequiredVariablesUnset
 
     def _reloadSelectedComboBoxItems(self) -> None:
         self._reconfigureComboBoxOptions()
