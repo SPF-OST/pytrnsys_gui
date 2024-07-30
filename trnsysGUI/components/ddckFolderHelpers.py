@@ -33,7 +33,7 @@ def moveComponentDdckFolderIfNecessary(
 
 
 def hasComponentDdckFolder(blockItem: _bi.BlockItem) -> bool:
-    hasDdckFolder = blockItem.hasDdckPlaceHolders() if isinstance(blockItem, _ip.HasInternalPiping) else False
+    hasDdckFolder = blockItem.hasDdckDirectory() if isinstance(blockItem, _ip.HasInternalPiping) else False
     return hasDdckFolder
 
 

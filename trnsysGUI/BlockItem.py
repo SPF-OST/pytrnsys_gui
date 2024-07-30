@@ -1,6 +1,5 @@
 # pylint: disable=invalid-name
 
-import pathlib as _pl
 import typing as _tp
 
 import PyQt5.QtCore as _qtc
@@ -12,7 +11,6 @@ import trnsysGUI.blockItemModel as _bim
 import trnsysGUI.idGenerator as _id
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
-import trnsysGUI.loadDdckFile as _ld
 import trnsysGUI.moveCommand as _mc
 
 
@@ -32,9 +30,6 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
             raise ValueError("Display name cannot be empty.")
 
         self.displayName = displayName
-
-        self._ddckFileLoader = _ld.DdckFileLoader(editor)
-        self._projectDirPath = _pl.Path(editor.projectFolder)
 
         self.inputs: list[_pib.PortItemBase] = []
         self.outputs: list[_pib.PortItemBase] = []
@@ -120,9 +115,6 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
         deleteBlockAction = menu.addAction("Delete this Block")
         deleteBlockAction.triggered.connect(self.deleteBlockCom)
 
-        loadDdckAction = menu.addAction("Load ddck file...")
-        loadDdckAction.triggered.connect(self._onLoadDdckActionTriggered)
-
         self._addChildContextMenuActions(menu)
 
         menu.exec_(event.screenPos())
@@ -153,10 +145,6 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
     # Transform related
     def changeSize(self):
         self._positionLabel()
-
-    def _onLoadDdckActionTriggered(self) -> None:
-        targetDirPath = self._projectDirPath / "ddck" / self.displayName
-        self._ddckFileLoader.loadDdckFile(targetDirPath)
 
     def _positionLabel(self):
         width, _ = self._getCappedWidthAndHeight()

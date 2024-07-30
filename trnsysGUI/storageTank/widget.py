@@ -73,6 +73,11 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
     def hasDdckPlaceHolders(cls) -> bool:
         return False
 
+    @classmethod
+    @_tp.override
+    def hasDdckDirectory(cls) -> bool:
+        return True
+
     @property
     def leftDirectPortPairsPortItems(self):
         return self._getDirectPortPairPortItems(_sd.Side.LEFT)
@@ -118,7 +123,9 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
             inputPort.id = portIds.inputId
             outputPort.id = portIds.outputId
 
-        directPortPair = DirectPortPair(trnsysId, inputPort, outputPort, relativeInputHeight, relativeOutputHeight, side)
+        directPortPair = DirectPortPair(
+            trnsysId, inputPort, outputPort, relativeInputHeight, relativeOutputHeight, side
+        )
 
         self.directPortPairs.append(directPortPair)
 
@@ -338,7 +345,7 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
 
     # Misc
     def _addChildContextMenuActions(self, contextMenu: _qtw.QMenu) -> None:
-        exportDdckAction = menu.addAction("Export ddck")
+        exportDdckAction = contextMenu.addAction("Export ddck")
         exportDdckAction.triggered.connect(self.exportDck)
 
     def mouseDoubleClickEvent(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:
@@ -410,6 +417,15 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
 
         projectDirPath = _pl.Path(self.editor.projectFolder)
         ddckDirPath = _dfh.getComponentDdckDirPath(self.displayName, projectDirPath)
+
+        if not ddckDirPath.is_dir():
+            _qtw.QMessageBox.information(
+                None,
+                "Component ddck directory doesn't exist",
+                f"The component ddck directory `{ddckDirPath}` does not exist. The ddck file will not be exported. "
+                f"Please create the directory and try again.",
+            )
+            return
 
         tool.createDDck(str(ddckDirPath), self.displayName, typeFile="ddck")
 

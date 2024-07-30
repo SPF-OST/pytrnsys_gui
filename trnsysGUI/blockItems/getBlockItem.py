@@ -141,7 +141,7 @@ def _addOrCreateAndAddDisplayName(
     if not displayName:
         createNamingHelper = _cname.CreateNamingHelper(namesManager)
         checkDdckFolder = (
-            blockItemClass.hasDdckPlaceHolders() if issubclass(blockItemClass, _ip.HasInternalPiping) else False
+            blockItemClass.hasDdckDirectory() if issubclass(blockItemClass, _ip.HasInternalPiping) else False
         )
         displayName = createNamingHelper.generateName(
             baseDisplayName, checkDdckFolder, firstGeneratedNameHasNumber=False

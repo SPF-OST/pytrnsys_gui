@@ -52,7 +52,7 @@ class DeleteBlockCommand(_qtw.QUndoCommand):
         _dfh.maybeDeleteNonEmptyComponentDdckFolder(self._blockItem, _pl.Path(self._editor.projectFolder))
 
     def undo(self):
-        checkDdckFolder = self._blockItem.hasDdckPlaceHolders()
+        checkDdckFolder = self._blockItem.hasDdckDirectory()
         oldName = self._blockItem.displayName
         generatedNamePrefix = self._blockItem.name
 
