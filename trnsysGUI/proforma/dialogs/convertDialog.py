@@ -29,21 +29,21 @@ class ConvertDialog(_qtw.QDialog, _uigen.Ui_Convert):
             raise ValueError("Must have at least one internal piping.")
 
         self.outputFilePathLineEdit.setText(str(outputFilePath))
+        self.outputFilePathLineEdit.textChanged.connect(self._onOutputFilePathLineEditTextChanged)
 
-        self._configureComponentcomponentComboBox(hasInternalPipings)
+        self._configureComponentComboBox(hasInternalPipings)
 
         componentName = outputFilePath.parent.name
-        currentIndex = self.componentComboBox.findText(componentName, _qtc.Qt.MatchContains)
-        currentIndex = max(0, currentIndex)
-        self.componentComboBox.setCurrentIndex(currentIndex)
-        currentInternalPiping = self.componentComboBox.currentData()
+        currentInternalPiping = self._setAndGetCurrentInternalPiping(componentName)
 
         self.dialogResult = DialogResult(currentInternalPiping, outputFilePath)
+
+        self.chooseOutputFilePathPushButton.pressed.connect(self._onChooseOutputFilePathPushButtonPressed)
 
         self.okCancelButtonBox.accepted.connect(self.accept)
         self.okCancelButtonBox.rejected.connect(self.reject)
 
-    def _configureComponentcomponentComboBox(self, hasInternalPipings: _cabc.Sequence[_ip.HasInternalPiping]) -> None:
+    def _configureComponentComboBox(self, hasInternalPipings: _cabc.Sequence[_ip.HasInternalPiping]) -> None:
         def getDisplayName(hip: _ip.HasInternalPiping) -> str:
             return hip.getDisplayName()
 
@@ -53,11 +53,28 @@ class ConvertDialog(_qtw.QDialog, _uigen.Ui_Convert):
             internalPiping = hasInternalPiping.getInternalPiping()
 
             self.componentComboBox.addItem(displayName, internalPiping)
-        self.componentComboBox.activated.connect(self._onActivated)
 
-    def _onActivated(self, newIndex: int) -> None:
-        newData = self.componentComboBox.itemData(newIndex)
-        self.dialogResult.internalPiping = newData
+    def _setAndGetCurrentInternalPiping(self, componentName: str) -> _ip.InternalPiping:
+        currentIndex = self.componentComboBox.findText(componentName, _qtc.Qt.MatchContains)
+        currentIndex = max(0, currentIndex)
+        self.componentComboBox.setCurrentIndex(currentIndex)
+        currentInternalPiping = self.componentComboBox.currentData()
+        return currentInternalPiping
+
+    def _onOutputFilePathLineEditTextChanged(self, newText: str) -> None:
+        self.dialogResult.outputFilePath = _pl.Path(newText)
+
+    def _onChooseOutputFilePathPushButtonPressed(self) -> None:
+        currentOutputFilePathString = self.outputFilePathLineEdit.text()
+
+        newOutputFilePathString, _ = _qtw.QFileDialog.getSaveFileName(
+            None, "Select ouput file path...", currentOutputFilePathString
+        )
+
+        if not newOutputFilePathString:
+            return
+
+        self.outputFilePathLineEdit.setText(newOutputFilePathString)
 
     @staticmethod
     def showDialogAndGetResults(

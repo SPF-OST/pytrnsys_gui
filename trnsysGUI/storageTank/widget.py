@@ -118,9 +118,7 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
             inputPort.id = portIds.inputId
             outputPort.id = portIds.outputId
 
-        directPortPair = DirectPortPair(
-            trnsysId, inputPort, outputPort, relativeInputHeight, relativeOutputHeight, side
-        )
+        directPortPair = DirectPortPair(trnsysId, inputPort, outputPort, relativeInputHeight, relativeOutputHeight, side)
 
         self.directPortPairs.append(directPortPair)
 
@@ -339,27 +337,9 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
         return sequence[0]
 
     # Misc
-    def contextMenuEvent(self, event):
-        menu = _qtw.QMenu()
-
-        rotateRightIcon = _img.ROTATE_TO_RIGHT_PNG.icon()
-        rotateRightAction = menu.addAction(rotateRightIcon, "Rotate Block clockwise")
-        rotateRightAction.triggered.connect(self.rotateBlockCW)
-
-        rotateLeftIcon = _img.ROTATE_LEFT_PNG.icon()
-        rotateLeftIcon = menu.addAction(rotateLeftIcon, "Rotate Block counter-clockwise")
-        rotateLeftIcon.triggered.connect(self.rotateBlockCCW)
-
-        resetRotationAction = menu.addAction("Reset Rotation")
-        resetRotationAction.triggered.connect(self.resetRotation)
-
-        deleteBlockAction = menu.addAction("Delete this Block")
-        deleteBlockAction.triggered.connect(self.deleteBlockCom)
-
+    def _addChildContextMenuActions(self, contextMenu: _qtw.QMenu) -> None:
         exportDdckAction = menu.addAction("Export ddck")
         exportDdckAction.triggered.connect(self.exportDck)
-
-        menu.exec(event.screenPos())
 
     def mouseDoubleClickEvent(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:
         renameHelper = _rename.RenameHelper(self.editor.namesManager)
