@@ -7,8 +7,8 @@ import typing as _tp
 import pytest as _pt
 import xmlschema as _xml
 
+import pytrnsys.ddck.replaceTokens.defaultVisibility as _dv
 import pytrnsys.utils.result as _res
-
 import trnsysGUI.proforma.convertXmlTmfToDdck as _pc
 import trnsysGUI.proforma.dialogs.editHydraulicConnectionsDialog as _ehcd
 
@@ -70,13 +70,14 @@ def _getTestCases() -> _tp.Iterable[TestCase]:
 def testConvertXmlTmfStringToDdck(testCase: TestCase, monkeypatch) -> None:
     xmlFileContent = testCase.inputFilePath.read_text(encoding="utf8")
 
-    def returnConnectionsUnmodified(connections, _):
-        return connections
+    def returnConnectionsUnmodifiedWithGlobalDefaultVisibility(connections, _):
+        dialogResult = _ehcd.DialogResult(connections, _dv.DefaultVisibility.GLOBAL)
+        return dialogResult
 
     monkeypatch.setattr(
         _ehcd.EditHydraulicConnectionsDialog,
         _ehcd.EditHydraulicConnectionsDialog.showDialogAndGetResults.__name__,
-        returnConnectionsUnmodified,
+        returnConnectionsUnmodifiedWithGlobalDefaultVisibility,
     )
 
     fileName = testCase.inputFilePath.with_suffix(".ddck").name

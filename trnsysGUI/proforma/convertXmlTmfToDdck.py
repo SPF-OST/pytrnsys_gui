@@ -1,17 +1,19 @@
 import collections.abc as _cabc
 import dataclasses as _dc
 import pathlib as _pl
-import typing as _tp
-import xml.etree.ElementTree as _etree
 import re as _re
 import textwrap as _tw
+import typing as _tp
+import xml.etree.ElementTree as _etree
 
 import jinja2 as _jj
 import xmlschema as _xs
 
+import pytrnsys.ddck.replaceTokens.defaultVisibility as _dv
 import pytrnsys.utils.result as _res
 import trnsysGUI.common.cancelled as _cancel
 import trnsysGUI.proforma.dialogs.editHydraulicConnectionsDialog as _ehcd
+
 from . import createModelConnections as _cmcs
 from . import models as _models
 
@@ -67,7 +69,7 @@ class _HydraulicConnectionsData:
     @property
     def variableName(self) -> str:
         capitalizedPortName = self.portName.capitalize()
-        return f":{self.stringConstants.variableNamePrefix}{capitalizedPortName}"
+        return f"{self.stringConstants.variableNamePrefix}{capitalizedPortName}"
 
     @property
     def rhs(self) -> str:
@@ -190,22 +192,37 @@ def convertXmlTmfStringToDdck(
     else:
         hydraulicConnections = []
 
+    defaultVisibility = _dv.DefaultVisibility.LOCAL
+
     if hydraulicConnections:
         maybeCancelled = _ehcd.EditHydraulicConnectionsDialog.showDialogAndGetResults(
             hydraulicConnections, variablesByRole
         )
         if _cancel.isCancelled(maybeCancelled):
             return _cancel.CANCELLED
-        hydraulicConnections = _cancel.value(maybeCancelled)
+        dialogResult = _cancel.value(maybeCancelled)
+
+        hydraulicConnections = dialogResult.hydraulicConnections
+        defaultVisibility = dialogResult.defaultVisibility
 
     otherJinjaVariables = {
         "fileName": fileName,
         "type": proforma["type"],
         "description": _makeMultilineComment(proforma["object"]),
         "details": _makeMultilineComment(proforma["details"]),
+        "visibilityModifier": _getVisibilityModifier(defaultVisibility),
     }
 
     return _convertXmlTmfStringToDdck(hydraulicConnections, variablesByRole, otherJinjaVariables)
+
+
+def _getVisibilityModifier(defaultVisibility: _dv.DefaultVisibility) -> str:
+    if defaultVisibility == _dv.DefaultVisibility.LOCAL:
+        return ""
+    if defaultVisibility == _dv.DefaultVisibility.GLOBAL:
+        return ":"
+
+    _tp.assert_never(defaultVisibility)
 
 
 def _makeMultilineComment(text: str) -> str:

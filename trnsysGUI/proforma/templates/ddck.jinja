@@ -19,7 +19,7 @@
 {% if inputsWithHydraulicData|length %}
 EQUATIONS {{inputsWithHydraulicData|length}}
     {% for input in inputsWithHydraulicData %}
-{{input.hydraulicConnectionsData.variableName}} = {{input.hydraulicConnectionsData.rhs}}
+{{visibilityModifier}}{{input.hydraulicConnectionsData.variableName}} = {{input.hydraulicConnectionsData.rhs}}
     {% endfor %}
 {% endif %}
 
@@ -30,7 +30,7 @@ EQUATIONS {{inputsWithHydraulicData|length}}
 {% if outputsWithHydraulicData|length %}
 EQUATIONS {{outputsWithHydraulicData|length}}
     {% for outputWithHydraulicData in outputsWithHydraulicData %}
-{{outputWithHydraulicData.hydraulicConnectionsData.rhs}} = {{outputWithHydraulicData.hydraulicConnectionsData.variableName}}
+{{outputWithHydraulicData.hydraulicConnectionsData.rhs}} = {{visibilityModifier}}{{outputWithHydraulicData.hydraulicConnectionsData.variableName}}
     {% endfor %}
 {% endif %}
 
@@ -61,7 +61,7 @@ UNIT 1 TYPE {{type}}
 PARAMETERS {{parameters|length}}
 {% for parameter in parameters %}
     {% if parameter.hydraulicConnectionsData %}
-{{parameter.hydraulicConnectionsData.variableName}} ! {{parameter.info}}
+{{visibilityModifier}}{{parameter.hydraulicConnectionsData.variableName}} ! {{parameter.info}}
     {% else %}
 {{parameter.defaultValue}} ! {{parameter.info}}
     {% endif %}
@@ -69,7 +69,7 @@ PARAMETERS {{parameters|length}}
 INPUTS {{inputs|length}}
 {% for input in inputs %}
     {% if input.hydraulicConnectionsData %}
-{{input.hydraulicConnectionsData.variableName}} ! {{input.info}}
+{{visibilityModifier}}{{input.hydraulicConnectionsData.variableName}} ! {{input.info}}
     {% else %}
 0,0 ! {{input.roleOrder}}: {{input.tmfName}} [{{input.unit}}] ({{input.bounds}})
     {% endif %}
@@ -86,9 +86,9 @@ EQUATIONS {{outputsWithHydraulicData|length}} ! {{outputs|length}}
 {% endif %}
 {% for output in outputs %}
     {% if output.hydraulicConnectionsData %}
-{{output.hydraulicConnectionsData.variableName}} = [1, {{output.roleOrder}}] ! {{output.tmfName}} [{{output.unit}}] ({{output.bounds}})
+{{visibilityModifier}}{{output.hydraulicConnectionsData.variableName}} = [1, {{output.roleOrder}}] ! {{output.tmfName}} [{{output.unit}}] ({{output.bounds}})
     {% else %}
-! XXX = [1, {{output.roleOrder}}] ! {{output.tmfName}} [{{output.unit}}] ({{output.bounds}})
+! {{visibilityModifier}}XXX = [1, {{output.roleOrder}}] ! {{output.tmfName}} [{{output.unit}}] ({{output.bounds}})
     {% endif %}
 {% endfor %}
 

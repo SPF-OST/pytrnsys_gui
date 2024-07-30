@@ -1,9 +1,11 @@
 import collections.abc as _cabc
 import copy as _copy
+import dataclasses as _dc
 
 import PyQt5.QtCore as _qtc
 import PyQt5.QtWidgets as _qtw
 
+import pytrnsys.ddck.replaceTokens.defaultVisibility as _dv
 import trnsysGUI.common as _com
 import trnsysGUI.common.cancelled as _cancel
 import trnsysGUI.dialogs as _dlgs
@@ -26,7 +28,13 @@ class _OnActivatedCallBack:
         return callback
 
     def onActivated(self, newIndex: int) -> None:
-        self._dialog.onComboBoxActivated(self._comboBox, newIndex)
+        self._dialog.onVariableComboBoxActivated(self._comboBox, newIndex)
+
+
+@_dc.dataclass
+class DialogResult:
+    hydraulicConnections: _cabc.Sequence[_models.Connection]
+    defaultVisibility: _dv.DefaultVisibility
 
 
 class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnections):
@@ -49,7 +57,9 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
 
         self._configureButtonBox()
         self._configureHydraulicConnections()
-        self._configureComboBoxes()
+        self._configureVariableComboBoxes()
+
+        self._configureDefaultVisibilityGroupBox()
 
         self._reloadConnections()
 
@@ -184,15 +194,19 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
         assert isinstance(selectedConnection, _models.Connection)
         return selectedConnection
 
-    def _configureComboBoxes(self) -> None:
-        for comboBox in self._comboBoxes:
-            onActivatedCallback = _OnActivatedCallBack.createAndConnect(self, comboBox)
+    def _configureVariableComboBoxes(self) -> None:
+        for variableComboBox in self._variableComboBoxes:
+            onActivatedCallback = _OnActivatedCallBack.createAndConnect(self, variableComboBox)
             self._onActivatedCallbacks.append(onActivatedCallback)
 
-    def onComboBoxActivated(self, comboBox: _qtw.QComboBox, newIndex: int) -> None:
+    def onVariableComboBoxActivated(self, comboBox: _qtw.QComboBox, newIndex: int) -> None:
         data = comboBox.itemData(newIndex)
         self._setVariableCorrespondingToComboBox(comboBox, data)
         self._reloadConnections()
+
+    def _configureDefaultVisibilityGroupBox(self) -> None:
+        for defaultVisibility in _dv.DefaultVisibility:
+            self.defaultVisibilityComboBox.addItem(defaultVisibility.name.capitalize(), defaultVisibility)
 
     def _reloadConnections(self) -> None:
         self._resetOkButton()
@@ -222,12 +236,12 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
     def _reloadSelectedComboBoxItems(self) -> None:
         self._reconfigureComboBoxOptions()
 
-        for comboBox in self._comboBoxes:
+        for comboBox in self._variableComboBoxes:
             data = self._getVariableCorrespondingToComboBox(comboBox)
             _setSelected(comboBox, data)
 
     @property
-    def _comboBoxes(self) -> _cabc.Sequence[_qtw.QComboBox]:
+    def _variableComboBoxes(self) -> _cabc.Sequence[_qtw.QComboBox]:
         return [
             self.fluidDensityComboBox,
             self.fluidHeatCapacityComboBox,
@@ -263,14 +277,22 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
     def showDialogAndGetResults(
         suggestedHydraulicConnections: _cabc.Sequence[_models.Connection],
         variablesByRole: _models.VariablesByRole,
-    ) -> _cancel.MaybeCancelled[_cabc.Sequence[_models.Connection]]:
+    ) -> _cancel.MaybeCancelled[DialogResult]:
         dialog = EditHydraulicConnectionsDialog(suggestedHydraulicConnections, variablesByRole)
         returnValue = dialog.exec()
 
         if returnValue == _qtw.QDialog.Rejected:
             return _cancel.CANCELLED
 
-        return dialog.hydraulicConnections
+        defaultVisibility = (
+            dialog.defaultVisibilityComboBox.currentData()
+            if dialog.advancedOptionsGroupBox.isChecked()
+            else _dv.DefaultVisibility.LOCAL
+        )
+
+        dialogResult = DialogResult(dialog.hydraulicConnections, defaultVisibility)
+
+        return dialogResult
 
 
 def _setSelected(comboBox: _qtw.QComboBox, data: _models.Variable | _models.Unset) -> None:

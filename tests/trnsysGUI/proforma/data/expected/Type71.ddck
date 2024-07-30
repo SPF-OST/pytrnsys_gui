@@ -100,10 +100,10 @@ INPUTS 10
 
 EQUATIONS 1 ! 5
 :TOut = [1, 1] ! Outlet temperature [C] ([-Inf,+Inf])
-! XXX = [1, 2] ! Outlet flowrate [kg/hr] ([0.0,+Inf])
-! XXX = [1, 3] ! Useful energy gain [kJ/hr] ([0.0,+Inf])
-! XXX = [1, 4] ! Collector efficiency [-] ([-Inf,+Inf])
-! XXX = [1, 5] ! Incidence angle modifier - overall [-] ([-Inf,+Inf])
+! :XXX = [1, 2] ! Outlet flowrate [kg/hr] ([0.0,+Inf])
+! :XXX = [1, 3] ! Useful energy gain [kJ/hr] ([0.0,+Inf])
+! :XXX = [1, 4] ! Collector efficiency [-] ([-Inf,+Inf])
+! :XXX = [1, 5] ! Incidence angle modifier - overall [-] ([-Inf,+Inf])
 
 ***********************************
 ** Monthly printer
