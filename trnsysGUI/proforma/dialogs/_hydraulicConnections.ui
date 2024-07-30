@@ -233,18 +233,7 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QComboBox" name="defaultVisibilityComboBox">
-           <item>
-            <property name="text">
-             <string>Local</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Global</string>
-            </property>
-           </item>
-          </widget>
+          <widget class="QComboBox" name="defaultVisibilityComboBox"/>
          </item>
         </layout>
        </widget>
