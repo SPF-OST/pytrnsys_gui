@@ -13,7 +13,7 @@ class Variable:
     roleOrder: int
     unit: str
     bounds: str
-    defaultValue: _tp.Union[float, int]
+    defaultValue: float | int
 
     def getInfo(self, withRole: bool) -> str:
         roleOrEmpty = f"{self.role.capitalize()} " if withRole else ""
@@ -32,7 +32,7 @@ class Unset:
 
 UNSET = Unset()
 
-RequiredVariable = _tp.Union[Variable, Unset]
+RequiredVariable = Variable | Unset
 
 
 @_dc.dataclass
