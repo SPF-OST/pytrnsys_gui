@@ -5,7 +5,6 @@ import PyQt5.QtWidgets as _qtw
 import pytrnsys.utils.result as _res
 import trnsysGUI.BlockItem as _bi
 import trnsysGUI.components.ddckFolderHelpers as _dfh
-import trnsysGUI.internalPiping as _ip
 import trnsysGUI.names.rename as _rename
 import trnsysGUI.warningsAndErrors as _werrors
 
@@ -26,9 +25,7 @@ class ChangeNameDialogBase(_qtw.QDialog):
         newName = self._displayNameLineEdit.text()
         oldName = self._blockItem.displayName
 
-        hasDdckFolder = (
-            self._blockItem.hasDdckPlaceHolders() if isinstance(self._blockItem, _ip.HasInternalPiping) else False
-        )
+        hasDdckFolder = _dfh.hasComponentDdckFolder(self._blockItem)
         result = self._renameHelper.canRename(oldName, newName, hasDdckFolder)
 
         if _res.isError(result):

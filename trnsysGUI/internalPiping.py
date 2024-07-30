@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import dataclasses as _dc
 import typing as _tp
+import collections.abc as _cabc
 
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
@@ -14,9 +15,13 @@ class InternalPiping:
     nodes: _tp.Sequence[_mfn.Node]
     modelPortItemsToGraphicalPortItem: _tp.Mapping[_mfn.PortItem, _pi.PortItemBase]  # type: ignore[name-defined]
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if not all(mpi in self.modelPortItemsToGraphicalPortItem for n in self.nodes for mpi in n.getPortItems()):
             raise ValueError("Error a port item of a node was not contained in `modelPortItemsToGraphicalPortItem`.")
+
+        uniqueNodeNames = {n.name for n in self.nodes}
+        if len(uniqueNodeNames) != len(self.nodes):
+            raise ValueError("Node names must be unique within one component.")
 
     def getModelPortItem(
         self, graphicalPortItem: _pi.PortItemBase, portItemType: _mfn.PortItemType  # type: ignore[name-defined]
@@ -74,8 +79,17 @@ class HasInternalPiping:
         return True
 
     @classmethod
-    def shallRenameOutputTemperaturesInHydraulicFile(cls):
+    def hasDdckDirectory(cls) -> bool:
+        return cls.hasDdckPlaceHolders()
+
+    @classmethod
+    def shallRenameOutputTemperaturesInHydraulicFile(cls) -> bool:
         return True
 
     def getInternalPiping(self) -> InternalPiping:
+        raise NotImplementedError()
+
+
+class HasInternalPipingsProvider:
+    def getInternalPipings(self) -> _cabc.Sequence[HasInternalPiping]:
         raise NotImplementedError()

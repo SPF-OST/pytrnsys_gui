@@ -103,21 +103,24 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
     def contextMenuEvent(self, event):
         menu = _qtw.QMenu()
 
-        rr = _img.ROTATE_TO_RIGHT_PNG.icon()
-        a2 = menu.addAction(rr, "Rotate Block clockwise")
-        a2.triggered.connect(self.rotateBlockCW)
+        rotateCwAction = menu.addAction(_img.ROTATE_TO_RIGHT_PNG.icon(), "Rotate Block clockwise")
+        rotateCwAction.triggered.connect(self.rotateBlockCW)
 
-        ll = _img.ROTATE_LEFT_PNG.icon()
-        a3 = menu.addAction(ll, "Rotate Block counter-clockwise")
-        a3.triggered.connect(self.rotateBlockCCW)
+        rotateCcwAction = menu.addAction(_img.ROTATE_LEFT_PNG.icon(), "Rotate Block counter-clockwise")
+        rotateCcwAction.triggered.connect(self.rotateBlockCCW)
 
-        a4 = menu.addAction("Reset Rotation")
-        a4.triggered.connect(self.resetRotation)
+        resetRotationAction = menu.addAction("Reset Rotation")
+        resetRotationAction.triggered.connect(self.resetRotation)
 
-        c1 = menu.addAction("Delete this Block")
-        c1.triggered.connect(self.deleteBlockCom)
+        deleteBlockAction = menu.addAction("Delete this Block")
+        deleteBlockAction.triggered.connect(self.deleteBlockCom)
+
+        self._addChildContextMenuActions(menu)
 
         menu.exec_(event.screenPos())
+
+    def _addChildContextMenuActions(self, contextMenu: _qtw.QMenu) -> None:
+        pass
 
     def mouseDoubleClickEvent(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:  # pylint: disable=unused-argument
         self.editor.showBlockDlg(self)

@@ -21,3 +21,5 @@ packaging
 
 pydantic
 pyyaml
+
+xmlschema

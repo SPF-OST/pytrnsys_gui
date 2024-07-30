@@ -1,0 +1,102 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="TrnsysModel" type="TrnsysModelType" />
+  <xs:complexType name="variableType">
+    <xs:sequence>
+      <xs:element type="xs:int" name="order" />
+      <xs:element type="xs:string" name="name" />
+      <xs:element type="xs:string" name="role" />
+      <xs:element type="xs:string" name="dimension" />
+      <xs:element type="xs:string" name="unit" />
+      <xs:element type="xs:string" name="type" />
+      <xs:element type="xs:string" name="min" />
+      <xs:element type="xs:string" name="max" />
+      <xs:element type="xs:string" name="boundaries" />
+      <xs:element type="xs:float" name="default" />
+      <xs:element type="xs:string" name="symbol" />
+      <xs:element type="xs:string" name="definition" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="variablesType">
+    <xs:sequence>
+      <xs:element type="variableType" name="variable" maxOccurs="unbounded" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="keywordsType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="keyword" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="variableReferenceType">
+    <xs:sequence>
+      <xs:element type="xs:int" name="order" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="temperatureType">
+    <xs:sequence>
+      <xs:element type="variableReferenceType" name="variableReference" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="massFlowRateType">
+    <xs:sequence>
+      <xs:element type="variableReferenceType" name="variableReference" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="fluidDensityType">
+    <xs:sequence>
+      <xs:element type="variableReferenceType" name="variableReference" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="fluidHeatCapacityType">
+    <xs:sequence>
+      <xs:element type="variableReferenceType" name="variableReference" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="inputPortType">
+    <xs:sequence>
+      <xs:element type="temperatureType" name="temperature" />
+      <xs:element type="massFlowRateType" name="massFlowRate" />
+      <xs:element type="fluidDensityType" name="fluidDensity" minOccurs="0" maxOccurs="1"/>
+      <xs:element type="fluidHeatCapacityType" name="fluidHeatCapacity" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="name" />
+  </xs:complexType>
+  <xs:complexType name="outputPortType">
+    <xs:sequence>
+      <xs:element type="temperatureType" name="temperature" />
+      <xs:element type="temperatureType" name="reverseTemperature" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="name" />
+  </xs:complexType>
+  <xs:complexType name="connectionType">
+    <xs:sequence>
+      <xs:element type="inputPortType" name="input" />
+      <xs:element type="outputPortType" name="output" />
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="name" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="hydraulicConnectionsType">
+    <xs:sequence maxOccurs="unbounded" minOccurs="1">
+      <xs:element type="connectionType" name="connection" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TrnsysModelType">
+    <xs:openContent mode="interleave">
+      <xs:any namespace="##any" processContents="skip" />
+    </xs:openContent>
+    <xs:sequence>
+      <xs:element type="xs:string" name="object" />
+      <xs:element type="xs:string" name="organization" />
+      <xs:element type="xs:string" name="creationDate" />
+      <xs:element type="xs:string" name="modifictionDate" />
+      <xs:element type="xs:byte" name="mode" />
+      <xs:element type="xs:byte" name="validation" />
+      <xs:element type="xs:int" name="type" />
+      <xs:element type="xs:int" name="maxInstance" />
+      <xs:element type="keywordsType" name="keywords" />
+      <xs:element type="xs:string" name="details" />
+      <xs:element type="variablesType" name="variables" />
+      <xs:element type="hydraulicConnectionsType" name="hydraulicConnections" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

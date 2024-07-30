@@ -73,6 +73,11 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
     def hasDdckPlaceHolders(cls) -> bool:
         return False
 
+    @classmethod
+    @_tp.override
+    def hasDdckDirectory(cls) -> bool:
+        return True
+
     @property
     def leftDirectPortPairsPortItems(self):
         return self._getDirectPortPairPortItems(_sd.Side.LEFT)
@@ -339,27 +344,9 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
         return sequence[0]
 
     # Misc
-    def contextMenuEvent(self, event):
-        menu = _qtw.QMenu()
-
-        rotateRightIcon = _img.ROTATE_TO_RIGHT_PNG.icon()
-        rotateRightAction = menu.addAction(rotateRightIcon, "Rotate Block clockwise")
-        rotateRightAction.triggered.connect(self.rotateBlockCW)
-
-        rotateLeftIcon = _img.ROTATE_LEFT_PNG.icon()
-        rotateLeftIcon = menu.addAction(rotateLeftIcon, "Rotate Block counter-clockwise")
-        rotateLeftIcon.triggered.connect(self.rotateBlockCCW)
-
-        resetRotationAction = menu.addAction("Reset Rotation")
-        resetRotationAction.triggered.connect(self.resetRotation)
-
-        deleteBlockAction = menu.addAction("Delete this Block")
-        deleteBlockAction.triggered.connect(self.deleteBlockCom)
-
-        exportDdckAction = menu.addAction("Export ddck")
+    def _addChildContextMenuActions(self, contextMenu: _qtw.QMenu) -> None:
+        exportDdckAction = contextMenu.addAction("Export ddck")
         exportDdckAction.triggered.connect(self.exportDck)
-
-        menu.exec(event.screenPos())
 
     def mouseDoubleClickEvent(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:
         renameHelper = _rename.RenameHelper(self.editor.namesManager)
@@ -430,6 +417,15 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
 
         projectDirPath = _pl.Path(self.editor.projectFolder)
         ddckDirPath = _dfh.getComponentDdckDirPath(self.displayName, projectDirPath)
+
+        if not ddckDirPath.is_dir():
+            _qtw.QMessageBox.information(
+                None,
+                "Component ddck directory doesn't exist",
+                f"The component ddck directory `{ddckDirPath}` does not exist. The ddck file will not be exported. "
+                f"Please create the directory and try again.",
+            )
+            return
 
         tool.createDDck(str(ddckDirPath), self.displayName, typeFile="ddck")
 

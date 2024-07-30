@@ -1,17 +1,20 @@
 import os as _os
 import pathlib as _pl
-import shutil as _su
 
 import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
+import trnsysGUI.internalPiping as _ip
+import trnsysGUI.loadDdckFile as _ld
 import trnsysGUI.warningsAndErrors as _warn
 
 
 class FileSystemTreeView(_qtw.QTreeView):
-    def __init__(self, rootDirPath: _pl.Path) -> None:
+    def __init__(self, rootDirPath: _pl.Path, hasInternalPipingsProvider: _ip.HasInternalPipingsProvider) -> None:
         super().__init__(parent=None)
+
+        self._ddckLoader = _ld.DdckFileLoader(hasInternalPipingsProvider)
 
         rootFolder = str(rootDirPath)
 
@@ -50,30 +53,7 @@ class FileSystemTreeView(_qtw.QTreeView):
     def _loadFileIntoFolder(self) -> None:
         currentPath = self._getCurrentPath()
         targetDirPath = currentPath if currentPath.is_dir() else currentPath.parent
-
-        sourceFilePathString = _qtw.QFileDialog.getOpenFileName(self, "Load file")[0]
-        if not sourceFilePathString:
-            return
-
-        sourceFilePath = _pl.Path(sourceFilePathString)
-        targetFilePath = targetDirPath / sourceFilePath.name
-
-        if targetFilePath.is_dir():
-            message = f"""\
-A directory of the name `{targetFilePath.name}` already exists. Please change the name of the file before
-importing or remove the directory."""
-            _warn.showMessageBox(message, _warn.Title.WARNING)
-            return
-
-        if targetFilePath.is_file():
-            message = f"""\
-            A file of the name `{targetFilePath.name}` already exists. Do you want to overwrite it?"""
-
-            standardButton = _qtw.QMessageBox.question(None, "Overwrite file?", message)
-            if standardButton != _qtw.QMessageBox.StandardButton.Yes:  # pylint: disable=no-member
-                return
-
-        _su.copy(sourceFilePath, targetFilePath)
+        self._ddckLoader.loadDdckFile(targetDirPath)
 
     def _deleteCurrentFile(self) -> None:
         path = self._getCurrentPath()

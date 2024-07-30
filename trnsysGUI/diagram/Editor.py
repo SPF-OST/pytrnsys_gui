@@ -1,6 +1,7 @@
 # pylint: skip-file
 # type: ignore
 
+import collections.abc as _cabc
 import json
 import math as _math
 import os
@@ -60,7 +61,7 @@ from . import _sizes
 from . import fileSystemTreeView as _fst
 
 
-class Editor(_qtw.QWidget):
+class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
     def __init__(self, parent, projectFolder, jsonPath, loadValue, logger):
         super().__init__(parent)
 
@@ -100,7 +101,7 @@ class Editor(_qtw.QWidget):
         self.pathLayout.addWidget(self.projectPathLabel)
         self.pathLayout.addWidget(self.PPL)
 
-        treeView = _fst.FileSystemTreeView(_pl.Path(self.projectFolder))
+        treeView = _fst.FileSystemTreeView(_pl.Path(self.projectFolder), self)
 
         self.fileBrowserLayout.addLayout(self.pathLayout)
         self.fileBrowserLayout.addWidget(treeView)
@@ -857,45 +858,6 @@ Tcw=1
 
         self.diagramName = newName
         self.parent().currentFile = newName
-        # fromPath = self.projectFolder
-        # destPath = os.path.dirname(__file__)
-        # destPath = os.path.join(destPath, 'default')
-        # destPath = os.path.join(destPath, newName)
-        # os.rename(fromPath, destPath)
-
-        # print("Path is now: " + str(self.saveAsPath))
-        # print("Diagram name is: " + self.diagramName)
-
-    def saveAtClose(self):
-        self.logger.info("saveaspath is " + str(self.saveAsPath))
-
-        # closeDialog = closeDlg()
-        # if closeDialog.closeBool:
-        filepath = _pl.Path(_pl.Path(__file__).resolve().parent.joinpath("recent"))
-        self.encodeDiagram(str(filepath.joinpath(self.diagramName + ".json")))
-
-    # Mode related
-    def setAlignMode(self, b):
-        self.alignMode = True
-
-    def setMoveDirectPorts(self, b):
-        """
-        Sets the bool moveDirectPorts. When mouse released in diagramScene, moveDirectPorts is set to False again
-        Parameters
-        ----------
-        b : bool
-
-        Returns
-        -------
-
-        """
-        self.moveDirectPorts = b
-
-    def setSnapGrid(self, b):
-        self.snapGrid = b
-
-    def setSnapSize(self, s):
-        self.snapSize = s
 
     def setConnLabelVis(self, isVisible: bool) -> None:
         for c in self.trnsysObj:
@@ -1008,3 +970,7 @@ Tcw=1
     def _updateGradientsInHydraulicLoop(hydraulicLoop: _hlm.HydraulicLoop) -> None:
         for connection in hydraulicLoop.connections:
             connection.updateSegmentGradients()
+
+    @_tp.override
+    def getInternalPipings(self) -> _cabc.Sequence[_ip.HasInternalPiping]:
+        return [o for o in self.trnsysObj if isinstance(o, _ip.HasInternalPiping)]
