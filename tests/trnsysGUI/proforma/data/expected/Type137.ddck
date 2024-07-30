@@ -1,3 +1,51 @@
+*******************************
+** BEGIN Type137.ddck
+*******************************
+
+***************************************************************************
+** Description: 
+** 4-Pipe Fan Coil: Heating and Cooling
+***************************************************************************
+
+***************************************************************************
+** Details: 
+** This component models a fan coil where the air is heated or cooled as it passes across coils containing hot and cold
+** liquid flow streams. This model relies on user-provided external data files which contain the performance of the
+** coils as a function of the entering air and fluid conditions. Refer to the sample data files which accompany this
+** model for the format of these external files.
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+***********************************
+** outputs to other ddck
+***********************************
+
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+******************************************************************************************
+
+
+***********************************
+** Dependencies with other ddck
+***********************************
+
+
+***********************************
+** Begin CONSTANTS
+***********************************
+
+
+***********************************
+** Begin TYPE
+***********************************
 UNIT 1 TYPE 137
 PARAMETERS 20
 2.0 ! 1: Humidity Mode [-] ([2,2])
@@ -39,23 +87,23 @@ INPUTS 17
 0,0 ! 16: Fan Control Signal [-] ([0.,1.])
 0,0 ! 17: Fraction of Outside Air [-] ([0.,1.])
 ** initial values
-10.0 ! 1: Cooling Fluid Inlet Temperature - initial value
-0.0 ! 2: Cooling Fluid Flow Rate - initial value
-10.0 ! 3: Heating Fluid Inlet Temperature - initial value
-0.0 ! 4: Heating Fluid Flow Rate - initial value
-20.0 ! 5: Return Air Temperature - initial value
-0.002 ! 6: Return Air Humidity Ratio - initial value
-50.0 ! 7: Return Air % Relative Humidity - initial value
-1.0 ! 8: Return Air Pressure - initial value
-0.0 ! 9: Air-Side Pressure Rise: Fan - initial value
-0.0 ! 10: Air-Side Pressure Drop: Coils - initial value
-20.0 ! 11: Fresh Air Temperature - initial value
-0.002 ! 12: Fresh Air Humidity Ratio - initial value
-50.0 ! 13: Fresh Air % Relative Humidity - initial value
-0.0 ! 14: Heating Control Signal - initial value
-0.0 ! 15: Cooling Control Signal - initial value
-0.0 ! 16: Fan Control Signal - initial value
-0.0 ! 17: Fraction of Outside Air - initial value
+10.0 ! 1: Cooling Fluid Inlet Temperature  initial value
+0.0 ! 2: Cooling Fluid Flow Rate  initial value
+10.0 ! 3: Heating Fluid Inlet Temperature  initial value
+0.0 ! 4: Heating Fluid Flow Rate  initial value
+20.0 ! 5: Return Air Temperature  initial value
+0.002 ! 6: Return Air Humidity Ratio  initial value
+50.0 ! 7: Return Air % Relative Humidity  initial value
+1.0 ! 8: Return Air Pressure  initial value
+0.0 ! 9: Air-Side Pressure Rise: Fan  initial value
+0.0 ! 10: Air-Side Pressure Drop: Coils  initial value
+20.0 ! 11: Fresh Air Temperature  initial value
+0.002 ! 12: Fresh Air Humidity Ratio  initial value
+50.0 ! 13: Fresh Air % Relative Humidity  initial value
+0.0 ! 14: Heating Control Signal  initial value
+0.0 ! 15: Cooling Control Signal  initial value
+0.0 ! 16: Fan Control Signal  initial value
+0.0 ! 17: Fraction of Outside Air  initial value
 
 ! EQUATIONS 18
 ! XXX = [1, 1] ! Cooling Fluid Outlet Temperature [C] ([-Inf,+Inf])
@@ -76,3 +124,18 @@ INPUTS 17
 ! XXX = [1, 16] ! Condensate Temperature [C] ([-Inf,+Inf])
 ! XXX = [1, 17] ! Condensate Flow Rate [kg/hr] ([0.0,+Inf])
 ! XXX = [1, 18] ! Conditioning Energy Rate [kJ/hr] ([-Inf,+Inf])
+
+***********************************
+** Monthly printer
+***********************************
+
+
+***********************************
+** Hourly printer
+***********************************
+
+
+***********************************
+** Online Plotter
+***********************************
+

@@ -3,6 +3,8 @@ import dataclasses as _dc
 import pathlib as _pl
 import typing as _tp
 import xml.etree.ElementTree as _etree
+import re as _re
+import textwrap as _tw
 
 import jinja2 as _jj
 import xmlschema as _xs
@@ -22,6 +24,8 @@ def _createDdckJinjaTemplate() -> _jj.Template:
         loader=_jj.PackageLoader(__name__),
         autoescape=_jj.select_autoescape(),
         lstrip_blocks=True,
+        trim_blocks=True,
+        keep_trailing_newline=True,
         undefined=_jj.StrictUndefined,
     )
     template = environment.get_template("ddck.jinja")
@@ -37,7 +41,7 @@ def convertXmltmfToDdck(
     ddckFilePath: _pl.Path,
 ) -> _cancel.MaybeCancelled[_res.Result[None]]:
     xmlTmfContent = xmlTmfFilePath.read_text(encoding="utf8")
-    maybeCancelled = convertXmlTmfStringToDdck(xmlTmfContent, suggestedHydraulicConnections)
+    maybeCancelled = convertXmlTmfStringToDdck(xmlTmfContent, suggestedHydraulicConnections, ddckFilePath.name)
     if _cancel.isCancelled(maybeCancelled):
         return _cancel.CANCELLED
     result = _cancel.value(maybeCancelled)
@@ -161,7 +165,7 @@ def _createVariablesForRole(
 
 
 def convertXmlTmfStringToDdck(
-    xmlTmfContent: str, suggestedHydraulicConnections: _cabc.Sequence[_models.Connection] | None
+    xmlTmfContent: str, suggestedHydraulicConnections: _cabc.Sequence[_models.Connection] | None, fileName: str
 ) -> _cancel.MaybeCancelled[_res.Result[str]]:
     schema = _xs.XMLSchema11(_SCHEMA_FILE_PATH)
 
@@ -194,19 +198,35 @@ def convertXmlTmfStringToDdck(
             return _cancel.CANCELLED
         hydraulicConnections = _cancel.value(maybeCancelled)
 
-    trnsysType = proforma["type"]
+    otherJinjaVariables = {
+        "fileName": fileName,
+        "type": proforma["type"],
+        "description": _makeMultilineComment(proforma["object"]),
+        "details": _makeMultilineComment(proforma["details"]),
+    }
 
-    return _convertXmlTmfStringToDdck(trnsysType, hydraulicConnections, variablesByRole)
+    return _convertXmlTmfStringToDdck(hydraulicConnections, variablesByRole, otherJinjaVariables)
+
+
+def _makeMultilineComment(text: str) -> str:
+    textWithCollapsedWhitespace = _re.sub(r"\s+", " ", text.strip(), count=0, flags=_re.MULTILINE)
+    linePrefix = "** "
+    maxWidth = 120 - len(linePrefix)
+    wrappedLines = _tw.wrap(textWithCollapsedWhitespace, maxWidth)
+    newText = "\n".join(f"** {l}" for l in wrappedLines)
+    return newText
 
 
 def _convertXmlTmfStringToDdck(
-    trnsysType: int, hydraulicConnections: _cabc.Sequence[_models.Connection], variablesByRole: _models.VariablesByRole
+    hydraulicConnections: _cabc.Sequence[_models.Connection],
+    variablesByRole: _models.VariablesByRole,
+    otherJinjaVariables: _cabc.Mapping[str, _tp.Any],
 ) -> str:
     connectionsDataByOrder = _createHydraulicConnectionDataByOrder(hydraulicConnections)
     parameters = _createProcessedVariables(variablesByRole.parameters, connectionsDataByOrder)
     inputs = _createProcessedVariables(variablesByRole.inputs, connectionsDataByOrder)
     outputs = _createProcessedVariables(variablesByRole.outputs, connectionsDataByOrder)
-    ddckContent = _JINJA_TEMPLATE.render(type=trnsysType, parameters=parameters, inputs=inputs, outputs=outputs)
+    ddckContent = _JINJA_TEMPLATE.render(parameters=parameters, inputs=inputs, outputs=outputs, **otherJinjaVariables)
     return ddckContent
 
 

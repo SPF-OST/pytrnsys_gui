@@ -1,53 +1,108 @@
-{% set inputsWithHydraulicData = (parameters + inputs)|rejectattr("hydraulicConnectionsData", "none")|list -%}
-{% if inputsWithHydraulicData|length -%}
+*******************************
+** BEGIN {{fileName}}
+*******************************
+
+***************************************************************************
+** Description: 
+{{description}}
+***************************************************************************
+
+***************************************************************************
+** Details: 
+{{details}}
+***************************************************************************
+
 ***********************************
-** Inputs from hydraulic solver
+** inputs from hydraulic solver
 ***********************************
+{% set inputsWithHydraulicData = (parameters + inputs)|rejectattr("hydraulicConnectionsData", "none")|list %}
+{% if inputsWithHydraulicData|length %}
 EQUATIONS {{inputsWithHydraulicData|length}}
-    {% for input in inputsWithHydraulicData -%}
-        {{input.hydraulicConnectionsData.variableName}} = {{input.hydraulicConnectionsData.rhs}}
+    {% for input in inputsWithHydraulicData %}
+{{input.hydraulicConnectionsData.variableName}} = {{input.hydraulicConnectionsData.rhs}}
     {% endfor %}
-{% endif -%}
+{% endif %}
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+{% set outputsWithHydraulicData = outputs|rejectattr("hydraulicConnectionsData", "none")|list %}
+{% if outputsWithHydraulicData|length %}
+EQUATIONS {{outputsWithHydraulicData|length}}
+    {% for outputWithHydraulicData in outputsWithHydraulicData %}
+{{outputWithHydraulicData.hydraulicConnectionsData.rhs}} = {{outputWithHydraulicData.hydraulicConnectionsData.variableName}}
+    {% endfor %}
+{% endif %}
+
+***********************************
+** outputs to other ddck
+***********************************
+
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+******************************************************************************************
+
+
+***********************************
+** Dependencies with other ddck
+***********************************
+
+
+***********************************
+** Begin CONSTANTS
+***********************************
+
+
+***********************************
+** Begin TYPE
+***********************************
 UNIT 1 TYPE {{type}}
 PARAMETERS {{parameters|length}}
-{% for parameter in parameters -%}
-    {% if parameter.hydraulicConnectionsData -%}
-        {{parameter.hydraulicConnectionsData.variableName}} ! {{parameter.info}}
-    {% else -%}
-        {{parameter.defaultValue}} ! {{parameter.info}}
-    {% endif -%}
-{% endfor -%}
-INPUTS {{inputs|length}}
-{% for input in inputs -%}
-    {% if input.hydraulicConnectionsData -%}
-        {{input.hydraulicConnectionsData.variableName}} ! {{input.info}}
-    {% else -%}
-        0,0 ! {{input.roleOrder}}: {{input.tmfName}} [{{input.unit}}] ({{input.bounds}})
-    {% endif -%}
-{% endfor -%}
-** initial values
-{% for input in inputs -%}
-    {{input.defaultValue}} ! {{input.roleOrder}}: {{input.tmfName}} - initial value
+{% for parameter in parameters %}
+    {% if parameter.hydraulicConnectionsData %}
+{{parameter.hydraulicConnectionsData.variableName}} ! {{parameter.info}}
+    {% else %}
+{{parameter.defaultValue}} ! {{parameter.info}}
+    {% endif %}
 {% endfor %}
-{% set outputsWithHydraulicData = outputs|rejectattr("hydraulicConnectionsData", "none")|list -%}
-{% if outputsWithHydraulicData|length -%}
-    EQUATIONS {{outputsWithHydraulicData|length}} ! {{outputs|length}}
-{% else -%}
-    ! EQUATIONS {{outputs|length}}
-{% endif -%}
-{% for output in outputs -%}
-    {% if output.hydraulicConnectionsData -%}
-        {{output.hydraulicConnectionsData.variableName}} = [1, {{output.roleOrder}}] ! {{output.tmfName}} [{{output.unit}}] ({{output.bounds}})
-    {% else -%}
-        ! XXX = [1, {{output.roleOrder}}] ! {{output.tmfName}} [{{output.unit}}] ({{output.bounds}})
-    {% endif -%}
-{% endfor -%}
+INPUTS {{inputs|length}}
+{% for input in inputs %}
+    {% if input.hydraulicConnectionsData %}
+{{input.hydraulicConnectionsData.variableName}} ! {{input.info}}
+    {% else %}
+0,0 ! {{input.roleOrder}}: {{input.tmfName}} [{{input.unit}}] ({{input.bounds}})
+    {% endif %}
+{% endfor %}
+** initial values
+{% for input in inputs %}
+{{input.defaultValue}} ! {{input.roleOrder}}: {{input.tmfName}}  initial value
+{% endfor %}
+
 {% if outputsWithHydraulicData|length %}
+EQUATIONS {{outputsWithHydraulicData|length}} ! {{outputs|length}}
+{% else %}
+! EQUATIONS {{outputs|length}}
+{% endif %}
+{% for output in outputs %}
+    {% if output.hydraulicConnectionsData %}
+{{output.hydraulicConnectionsData.variableName}} = [1, {{output.roleOrder}}] ! {{output.tmfName}} [{{output.unit}}] ({{output.bounds}})
+    {% else %}
+! XXX = [1, {{output.roleOrder}}] ! {{output.tmfName}} [{{output.unit}}] ({{output.bounds}})
+    {% endif %}
+{% endfor %}
+
 ***********************************
-** Outputs to hydraulic solver
+** Monthly printer
 ***********************************
-    {% for outputWithHydraulicData in outputsWithHydraulicData -%}
-        {{outputWithHydraulicData.hydraulicConnectionsData.rhs}} = {{outputWithHydraulicData.hydraulicConnectionsData.variableName}}
-    {% endfor -%}
-{% endif -%}
+
+
+***********************************
+** Hourly printer
+***********************************
+
+
+***********************************
+** Online Plotter
+***********************************
 

@@ -1,3 +1,61 @@
+*******************************
+** BEGIN Type71-no-hydraulic-connections.ddck
+*******************************
+
+***************************************************************************
+** Description: 
+** Solar Collector; Evacuated Tube
+***************************************************************************
+
+***************************************************************************
+** Details: 
+** Because the Solar Ratings and Certification Commission (SRCC) defines the efficiency of an evacuated tube collector
+** bank using the same equations as those for a flat plat, the main difference (from a modeling point of view) between
+** an evacuated tube collector and a flat plate collector is in the treatment of incidence angle modifiers (IAMs). Type
+** 71 is therefore based on the Type 1 code with the major difference being that Type 71 reads a text file containing a
+** list of transverse and longitudinal IAMs. This component models the thermal performance of a variety of an evacuated
+** tube collector types using theory. The total collector array may consist of collectors connected in series and in
+** parallel. The thermal performance of the total collector array is determined by the number of modules in series and
+** the characteristics of each module. The user must provide results from standard tests of efficiency versus a ratio of
+** fluid temperature minus ambient temperature to radiation (DT/IT). The fluid temperature may be an inlet, average, or
+** outlet temperature. The model assumes that the efficiency vs. DT/IT curve can be modeled as a quadratic equation.
+** (Changed from version 13 where efficiency vs. DT/IT was assumed linear.) Corrections are applied to the slope,
+** intercept, and curvature parameters to account for identical collectors in series, and flow rates other than those at
+** test conditions. The effects of off-normal solar incidence are modeled by the provision of a bi-axial incidence angle
+** modifier data file.
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+***********************************
+** outputs to other ddck
+***********************************
+
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+******************************************************************************************
+
+
+***********************************
+** Dependencies with other ddck
+***********************************
+
+
+***********************************
+** Begin CONSTANTS
+***********************************
+
+
+***********************************
+** Begin TYPE
+***********************************
 UNIT 1 TYPE 71
 PARAMETERS 11
 1.0 ! 1: Number in series [-] ([1,+Inf])
@@ -23,16 +81,16 @@ INPUTS 10
 0,0 ! 9: Collector slope [degrees] ([-360,+360])
 0,0 ! 10: Collector azimuth [degrees] ([-360,+360])
 ** initial values
-20.0 ! 1: Inlet temperature - initial value
-100.0 ! 2: Inlet flowrate - initial value
-10.0 ! 3: Ambient temperature - initial value
-0.0 ! 4: Incident radiation - initial value
-0.0 ! 5: Incident diffuse radiation - initial value
-0.0 ! 6: Solar incidence angle - initial value
-0.0 ! 7: Solar zenith angle - initial value
-0.0 ! 8: Solar azimuth angle - initial value
-45.0 ! 9: Collector slope - initial value
-0.0 ! 10: Collector azimuth - initial value
+20.0 ! 1: Inlet temperature  initial value
+100.0 ! 2: Inlet flowrate  initial value
+10.0 ! 3: Ambient temperature  initial value
+0.0 ! 4: Incident radiation  initial value
+0.0 ! 5: Incident diffuse radiation  initial value
+0.0 ! 6: Solar incidence angle  initial value
+0.0 ! 7: Solar zenith angle  initial value
+0.0 ! 8: Solar azimuth angle  initial value
+45.0 ! 9: Collector slope  initial value
+0.0 ! 10: Collector azimuth  initial value
 
 ! EQUATIONS 5
 ! XXX = [1, 1] ! Outlet temperature [C] ([-Inf,+Inf])
@@ -40,3 +98,18 @@ INPUTS 10
 ! XXX = [1, 3] ! Useful energy gain [kJ/hr] ([0.0,+Inf])
 ! XXX = [1, 4] ! Collector efficiency [-] ([-Inf,+Inf])
 ! XXX = [1, 5] ! Incidence angle modifier - overall [-] ([-Inf,+Inf])
+
+***********************************
+** Monthly printer
+***********************************
+
+
+***********************************
+** Hourly printer
+***********************************
+
+
+***********************************
+** Online Plotter
+***********************************
+

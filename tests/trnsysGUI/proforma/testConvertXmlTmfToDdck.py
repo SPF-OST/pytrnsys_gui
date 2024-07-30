@@ -79,7 +79,8 @@ def testConvertXmlTmfStringToDdck(testCase: TestCase, monkeypatch) -> None:
         returnConnectionsUnmodified,
     )
 
-    result = _pc.convertXmlTmfStringToDdck(xmlFileContent, suggestedHydraulicConnections=None)
+    fileName = testCase.inputFilePath.with_suffix(".ddck").name
+    result = _pc.convertXmlTmfStringToDdck(xmlFileContent, suggestedHydraulicConnections=None, fileName=fileName)
 
     if testCase.expectedOutputFilePath.is_file():
         assert isinstance(result, str)
