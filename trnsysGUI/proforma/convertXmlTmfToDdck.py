@@ -216,7 +216,9 @@ def convertXmlTmfStringToDdck(
     return _convertXmlTmfStringToDdck(hydraulicConnections, variablesByRole, otherJinjaVariables)
 
 
-def _getVisibilityModifier(defaultVisibility: _dv.DefaultVisibility) -> str:
+def _getVisibilityModifier(  # pylint: disable=inconsistent-return-statements
+    defaultVisibility: _dv.DefaultVisibility,
+) -> str:
     if defaultVisibility == _dv.DefaultVisibility.LOCAL:
         return ""
     if defaultVisibility == _dv.DefaultVisibility.GLOBAL:
