@@ -5,7 +5,6 @@ import shutil as _su
 import PyQt5.QtWidgets as _qtw
 
 import pytrnsys.utils.result as _res
-
 import trnsysGUI.common.cancelled as _cancel
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.proforma.convertXmlTmfToDdck as _pro
@@ -49,7 +48,7 @@ class DdckFileLoader:
             if standardButton != _qtw.QMessageBox.StandardButton.Yes:  # pylint: disable=no-member
                 return
 
-        if isSourceProformaFile:
+        if not isSourceProformaFile:
             _su.copy(sourceFilePath, targetFilePath)
             return
 
