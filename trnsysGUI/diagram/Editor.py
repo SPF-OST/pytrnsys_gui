@@ -858,45 +858,6 @@ Tcw=1
 
         self.diagramName = newName
         self.parent().currentFile = newName
-        # fromPath = self.projectFolder
-        # destPath = os.path.dirname(__file__)
-        # destPath = os.path.join(destPath, 'default')
-        # destPath = os.path.join(destPath, newName)
-        # os.rename(fromPath, destPath)
-
-        # print("Path is now: " + str(self.saveAsPath))
-        # print("Diagram name is: " + self.diagramName)
-
-    def saveAtClose(self):
-        self.logger.info("saveaspath is " + str(self.saveAsPath))
-
-        # closeDialog = closeDlg()
-        # if closeDialog.closeBool:
-        filepath = _pl.Path(_pl.Path(__file__).resolve().parent.joinpath("recent"))
-        self.encodeDiagram(str(filepath.joinpath(self.diagramName + ".json")))
-
-    # Mode related
-    def setAlignMode(self, b):
-        self.alignMode = True
-
-    def setMoveDirectPorts(self, b):
-        """
-        Sets the bool moveDirectPorts. When mouse released in diagramScene, moveDirectPorts is set to False again
-        Parameters
-        ----------
-        b : bool
-
-        Returns
-        -------
-
-        """
-        self.moveDirectPorts = b
-
-    def setSnapGrid(self, b):
-        self.snapGrid = b
-
-    def setSnapSize(self, s):
-        self.snapSize = s
 
     def setConnLabelVis(self, isVisible: bool) -> None:
         for c in self.trnsysObj:
