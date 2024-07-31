@@ -4,6 +4,8 @@ import collections.abc as _cabc
 import dataclasses as _dc
 import typing as _tp
 
+import trnsysGUI.placeHolderNames as _phn
+
 
 @_dc.dataclass
 class Variable:
@@ -36,22 +38,49 @@ RequiredVariable = Variable | Unset
 
 
 @_dc.dataclass
-class VariableStringConstants:
+class VariableNameBuilder:
     propertyName: str
     variableNamePrefix: str | None
+    usePortInVariableName: bool
+
+    def getVariableName(self, connectionName: str | None, portName: str) -> str:
+        if self.usePortInVariableName:
+            qualifiedPortName = _phn.getQualifiedPortName(connectionName, portName)
+            return f"{self.variableNamePrefix}{qualifiedPortName}"
+
+        portNamePart = portName.capitalize()
+
+        return f"{self.variableNamePrefix}{portNamePart}"
+
+    def getRhs(self, connectionName: str | None, portName: str) -> str:
+        qualifiedPortName = _phn.getQualifiedPortName(connectionName, portName)
+        return f"@{self.propertyName}({qualifiedPortName})"
+
+    @staticmethod
+    def _getConnectionNamePart(connectionName: str | None, shallCapitalize: bool) -> str:
+        connectionNamePart = connectionName or ""
+
+        if shallCapitalize:
+            connectionNamePart = connectionNamePart.capitalize()
+
+        return connectionNamePart
+
+    def _getPortNamePart(self, portName: str) -> str:
+        capitalizedPortNameOrEmpty = portName.capitalize() if self.usePortInVariableName else ""
+        return capitalizedPortNameOrEmpty
 
 
 class AllVariableStringConstants:
-    TEMPERATURE = VariableStringConstants("temp", "T")
-    MASS_FLOW_RATE = VariableStringConstants("mfr", "M")
-    REVERSE_TEMPERATURE = VariableStringConstants("revtemp", None)
-    DENSITY = VariableStringConstants("rho", "Rho")
-    HEAT_CAPACITY = VariableStringConstants("cp", "Cp")
+    TEMPERATURE = VariableNameBuilder("temp", "T", usePortInVariableName=True)
+    MASS_FLOW_RATE = VariableNameBuilder("mfr", "M", usePortInVariableName=False)
+    REVERSE_TEMPERATURE = VariableNameBuilder("revtemp", None, usePortInVariableName=True)
+    DENSITY = VariableNameBuilder("rho", "Rho", usePortInVariableName=False)
+    HEAT_CAPACITY = VariableNameBuilder("cp", "Cp", usePortInVariableName=False)
 
 
 def _getSummaryLine(
     qualifiedPortName: str,
-    variableStringConstants: VariableStringConstants,
+    variableStringConstants: VariableNameBuilder,
     variable: Variable | None | Unset,
     direction: _tp.Literal["input", "output"],
 ) -> str:

@@ -18,18 +18,18 @@
 ** inputs from hydraulic solver
 ***********************************
 EQUATIONS 5
-CpIn = @cp(In)
-TIn = @temp(In)
-MIn = @mfr(In)
-TIn = @temp(In)
-MIn = @mfr(In)
+CpIn = @cp(ColdIn)
+THotIn = @temp(HotIn)
+MIn = @mfr(HotIn)
+TColdIn = @temp(ColdIn)
+MIn = @mfr(ColdIn)
 
 ***********************************
 ** outputs to hydraulic solver
 ***********************************
 EQUATIONS 2
-@temp(Out) = TOut
-@temp(Out) = TOut
+@temp(HotOut) = THotOut
+@temp(ColdOut) = TColdOut
 
 ***********************************
 ** outputs to other ddck
@@ -61,9 +61,9 @@ PARAMETERS 4
 CpIn ! 3: Specific heat of load side fluid [kJ/kg.K] ([0,+Inf])
 0.0 ! 4: Not used [-] ([0,+Inf])
 INPUTS 5
-TIn ! 1: Source side inlet temperature [C] ([-Inf,+Inf])
+THotIn ! 1: Source side inlet temperature [C] ([-Inf,+Inf])
 MIn ! 2: Source side flow rate [kg/hr] ([0,+Inf])
-TIn ! 3: Load side inlet temperature [C] ([-Inf,+Inf])
+TColdIn ! 3: Load side inlet temperature [C] ([-Inf,+Inf])
 MIn ! 4: Load side flow rate [kg/hr] ([0,+Inf])
 0,0 ! 5: Overall heat transfer coefficient of exchanger [kJ/hr.K] ([0,+Inf])
 ** initial values
@@ -74,9 +74,9 @@ MIn ! 4: Load side flow rate [kg/hr] ([0,+Inf])
 10.0 ! 5: Overall heat transfer coefficient of exchanger  initial value
 
 EQUATIONS 2 ! 6
-TOut = [1, 1] ! Source side outlet temperature [C] ([-Inf,+Inf])
+THotOut = [1, 1] ! Source side outlet temperature [C] ([-Inf,+Inf])
 ! XXX = [1, 2] ! Source side flow rate [kg/hr] ([-Inf,+Inf])
-TOut = [1, 3] ! Load side outlet temperature [C] ([-Inf,+Inf])
+TColdOut = [1, 3] ! Load side outlet temperature [C] ([-Inf,+Inf])
 ! XXX = [1, 4] ! Load side flow rate [kg/hr] ([-Inf,+Inf])
 ! XXX = [1, 5] ! Heat transfer rate [kJ/hr] ([-Inf,+Inf])
 ! XXX = [1, 6] ! Effectiveness [-] ([-Inf,+Inf])

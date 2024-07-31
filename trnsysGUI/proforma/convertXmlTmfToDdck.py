@@ -64,16 +64,15 @@ _StringMapping = _tp.Mapping[str, _tp.Any]
 class _HydraulicConnectionsData:
     name: str | None
     portName: str
-    stringConstants: _models.VariableStringConstants
+    variableNameBuilder: _models.VariableNameBuilder
 
     @property
     def variableName(self) -> str:
-        capitalizedPortName = self.portName.capitalize()
-        return f"{self.stringConstants.variableNamePrefix}{capitalizedPortName}"
+        return self.variableNameBuilder.getVariableName(self.name, self.portName)
 
     @property
     def rhs(self) -> str:
-        return f"@{self.stringConstants.propertyName}({self.portName})"
+        return self.variableNameBuilder.getRhs(self.name, self.portName)
 
     @staticmethod
     def createForTemperature(connectionName: str | None, portName: str) -> "_HydraulicConnectionsData":
