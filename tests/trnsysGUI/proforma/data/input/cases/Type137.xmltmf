@@ -1,2 +1,878 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<TrnsysModel><object>4-Pipe Fan Coil: Heating and Cooling</object><author>Tim McDowell</author><organization>Thermal Energy System Specialists</organization><editor>TPM</editor><creationDate>v18</creationDate><modifictionDate>June 2015</modifictionDate><mode>4</mode><validation>34</validation><icon>.\Studio\Proformas\HVAC\Fan Coil\Type137.bmp</icon><type>137</type><maxInstance>9999</maxInstance><keywords><keyword>Fan Coil</keyword><keyword>4-Pipe Fan Coil</keyword></keywords><details>This component models a fan coil where the air is heated or cooled as it passes across coils containing hot and cold liquid flow streams. This model relies on user-provided external data files which contain the performance of the coils as a function of the entering air and fluid conditions.  Refer to the sample data files which accompany this model for the format of these external files.</details><comment>Performance Map 4-Pipe Fan Coil</comment><variablesComment>4-Pipe Fan Coil</variablesComment><variables><variable><!--parameter-1--><order>1</order><name>Humidity Mode</name><role>parameter</role><dimension>Dimensionless</dimension><unit>-</unit><type>integer</type><min>2</min><max>2</max><boundaries>[ ; ]</boundaries><default>2</default><symbol>SN</symbol><definition>This parameter indicates whether the inputs for absolute humidity ratio (this parameter = 1) or percent relative humidity (this parameter = 2) should be used to set the inlet air conditions.</definition></variable><variable><!--parameter-2--><order>2</order><name>Cooling Fluid Specific Heat</name><role>parameter</role><dimension>Specific Heat</dimension><unit>kJ/kg.K</unit><type>real</type><min>0.0</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>4.190</default><symbol>SN</symbol><definition>The specific heat of the liquid stream flowing through the fan coil cooling coils.</definition></variable><variable><!--parameter-3--><order>3</order><name>Heating Fluid Specific Heat</name><role>parameter</role><dimension>Specific Heat</dimension><unit>kJ/kg.K</unit><type>real</type><min>0.0</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>4.190</default><symbol>SN</symbol><definition>The specific heat of the liquid stream flowing through the fan coil heating coils.</definition></variable><variable><!--parameter-4--><order>4</order><name>Rated Volumetric Air Flow Rate</name><role>parameter</role><dimension>Volumetric Flow Rate</dimension><unit>l/s</unit><type>real</type><min>0.</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>943.89</default><symbol>SN</symbol><definition>The volumetric flow rate of air through the device at its rated conditions.</definition></variable><variable><!--parameter-5--><order>5</order><name>Rated Fan Power</name><role>parameter</role><dimension>Power</dimension><unit>kJ/hr</unit><type>real</type><min>0.</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>564.0</default><symbol>SN</symbol><definition>The fan power draw at its rated conditions.</definition></variable><variable><!--parameter-6--><order>6</order><name>Logical Unit - Cooling Performance</name><role>parameter</role><dimension>Dimensionless</dimension><unit>-</unit><type>integer</type><min>10</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>10</default><symbol>SN</symbol><definition>The logical unit which wil be assigned to the external data file containing the total and sensible cooling load ratios as a function of the entering liquid temperature, entering liquid flow rate, the entering air dry bulb temperature, the entering air wet bulb temperature, and air flow rate.  Logical units must be unique integers in each TRNSYS simulation.</definition></variable><variable><!--parameter-7--><order>7</order><name>Number of Drybulb Temperatures - Cooling</name><role>parameter</role><dimension>Dimensionless</dimension><unit>-</unit><type>integer</type><min>1</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>7</default><symbol>SN</symbol><definition>The number of air drybulb temperatures for which cooling coil performance data will be provided in the user-provided external data file.</definition></variable><variable><!--parameter-8--><order>8</order><name>Number of Wetbulb Temperatures - Cooling</name><role>parameter</role><dimension>Dimensionless</dimension><unit>-</unit><type>integer</type><min>1</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>7</default><symbol>SN</symbol><definition>The number of air wetbulb temperatures for which cooling coil performance data will be provided in the user-provided external data file.</definition></variable><variable><!--parameter-9--><order>9</order><name>Number of Air Flows - Cooling</name><role>parameter</role><dimension>Dimensionless</dimension><unit>-</unit><type>integer</type><min>1</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>6</default><symbol>SN</symbol><definition>The number of normalized air flow rates for which cooling coil performance data will be provided in the user-provided external data file.</definition></variable><variable><!--parameter-10--><order>10</order><name>Number of Liquid Temperatures - Cooling</name><role>parameter</role><dimension>Dimensionless</dimension><unit>-</unit><type>integer</type><min>1</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>8</default><symbol>SN</symbol><definition>The number of liquid (water typically) temperatures for which cooling coil performance data will be provided in the user-provided external data file.</definition></variable><variable><!--parameter-11--><order>11</order><name>Number of Liquid Flow Rates - Cooling</name><role>parameter</role><dimension>Dimensionless</dimension><unit>-</unit><type>integer</type><min>1</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>2</default><symbol>SN</symbol><definition>The number of normalized liquid flow rates for which cooling coil performance data will be provided in the user-provided external data file.</definition></variable><variable><!--parameter-12--><order>12</order><name>Logical Unit - Heating Performance</name><role>parameter</role><dimension>Dimensionless</dimension><unit>-</unit><type>integer</type><min>10</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>11</default><symbol>SN</symbol><definition>The logical unit which wil be assigned to the external data file containing the heating performance data as a function of the air inlet temperature and flow rate and the liquid entering temperature and flow rate.  Logical units must be unique integers in each TRNSYS simulation.</definition></variable><variable><!--parameter-13--><order>13</order><name>Number of Air Temperatures - Heating</name><role>parameter</role><dimension>Dimensionless</dimension><unit>-</unit><type>integer</type><min>1</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>7</default><symbol>SN</symbol><definition>The number of air drybulb temperatures for which heating coil performance data will be provided in the user-provided external data file.</definition></variable><variable><!--parameter-14--><order>14</order><name>Number of Air Flows - Heating</name><role>parameter</role><dimension>Dimensionless</dimension><unit>-</unit><type>integer</type><min>1</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>6</default><symbol>SN</symbol><definition>The number of normalized air flow rates for which heating coil performance data will be provided in the user-provided external data file.</definition></variable><variable><!--parameter-15--><order>15</order><name>Number of Liquid Temperatures - Heating</name><role>parameter</role><dimension>Dimensionless</dimension><unit>-</unit><type>integer</type><min>1</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>11</default><symbol>SN</symbol><definition>The number of liquid (water typically) temperatures for which heating coil performance data will be provided in the user-provided external data file.</definition></variable><variable><!--parameter-16--><order>16</order><name>Number of Liquid Flow Rates - Heating</name><role>parameter</role><dimension>Dimensionless</dimension><unit>-</unit><type>integer</type><min>1</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>2</default><symbol>SN</symbol><definition>The number of normalized liquid flow rates for which heating coil performance data will be provided in the user-provided external data file.</definition></variable><variable><!--parameter-17--><order>17</order><name>Logical Unit - Fan Corrections</name><role>parameter</role><dimension>Dimensionless</dimension><unit>-</unit><type>integer</type><min>10</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>12</default><symbol>SN</symbol><definition>The logical unit which wil be assigned to the external data file containing the fraction of fan full-load power as a function of the normalized fan speed.</definition></variable><variable><!--input-1--><order>18</order><name>Cooling Fluid Inlet Temperature</name><role>input</role><dimension>Temperature</dimension><unit>C</unit><type>real</type><min>-Inf</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>10.0</default><symbol>SN</symbol><definition>The temperature of the liquid stream fluid flowing into the fan coil unit's cooling coils.</definition></variable><variable><!--input-2--><order>19</order><name>Cooling Fluid Flow Rate</name><role>input</role><dimension>Flow Rate</dimension><unit>kg/hr</unit><type>real</type><min>0.0</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>0.0</default><symbol>SN</symbol><definition>The flow rate of the cooling liquid stream fluid flowing into the fan coil unit's cooling coils.</definition></variable><variable><!--input-3--><order>20</order><name>Heating Fluid Inlet Temperature</name><role>input</role><dimension>Temperature</dimension><unit>C</unit><type>real</type><min>-Inf</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>10.0</default><symbol>SN</symbol><definition>The temperature of the liquid stream fluid flowing into the fan coil unit's heating coils.</definition></variable><variable><!--input-4--><order>21</order><name>Heating Fluid Flow Rate</name><role>input</role><dimension>Flow Rate</dimension><unit>kg/hr</unit><type>real</type><min>0.0</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>0.0</default><symbol>SN</symbol><definition>The flow rate of the heating liquid stream fluid flowing into the fan coil unit's heating coils.</definition></variable><variable><!--input-5--><order>22</order><name>Return Air Temperature</name><role>input</role><dimension>Temperature</dimension><unit>C</unit><type>real</type><min>-Inf</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>20.0</default><symbol>SN</symbol><definition>The drybulb temperature of the return air entering the fan coil.  This return air gets mixed with a user-specified fraction of outside air.</definition></variable><variable><!--input-6--><order>23</order><name>Return Air Humidity Ratio</name><role>input</role><dimension>Dimensionless</dimension><unit>-</unit><type>real</type><min>0.</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>0.002</default><symbol>SN</symbol><definition>The absolute humidity ratio of the return air entering the fan coil.  This return air gets mixed with a user-specified fraction of outside air.</definition></variable><variable><!--input-7--><order>24</order><name>Return Air % Relative Humidity</name><role>input</role><dimension>Percentage</dimension><unit>% (base 100)</unit><type>real</type><min>0</min><max>100</max><boundaries>[ ; ]</boundaries><default>50.0</default><symbol>SN</symbol><definition>The percent relative humidity of the return air entering the fan coil.  This return air gets mixed with a user-specified fraction of outside air.</definition></variable><variable><!--input-8--><order>25</order><name>Return Air Pressure</name><role>input</role><dimension>Pressure</dimension><unit>atm</unit><type>real</type><min>0.0</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>1.0</default><symbol>SN</symbol><definition>The absolute pressure of the air streams entering the fan coil.</definition></variable><variable><!--input-9--><order>26</order><name>Air-Side Pressure Rise: Fan</name><role>input</role><dimension>Pressure</dimension><unit>atm</unit><type>real</type><min>0.0</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>0.0</default><symbol>SN</symbol><definition>The pressure rise of the air stream as it flows across the fan.</definition></variable><variable><!--output-1--><order>27</order><name>Cooling Fluid Outlet Temperature</name><role>output</role><dimension>Temperature</dimension><unit>C</unit><type>real</type><min>-Inf</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>0</default><symbol>SN</symbol><definition>The temperature of the liquid stream exiting the fan coil unit's cooling coils.</definition></variable><variable><!--output-2--><order>28</order><name>Outlet Cooling Fluid Flow Rate</name><role>output</role><dimension>Flow Rate</dimension><unit>kg/hr</unit><type>real</type><min>0.0</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>0</default><symbol>SN</symbol><definition>The flow rate of the liquid stream exiting the fan coil unit's cooling coils.</definition></variable><variable><!--output-3--><order>29</order><name>Heating Fluid Outlet Temperature</name><role>output</role><dimension>Temperature</dimension><unit>C</unit><type>real</type><min>-Inf</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>0</default><symbol>SN</symbol><definition>The temperature of the liquid stream exiting the fan coil unit's heating coils.</definition></variable><variable><!--output-4--><order>30</order><name>Outlet Heating Fluid Flow Rate</name><role>output</role><dimension>Flow Rate</dimension><unit>kg/hr</unit><type>real</type><min>0.0</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>0</default><symbol>SN</symbol><definition>The flow rate of the liquid stream exiting the fan coil unit's heating coils.</definition></variable><variable><!--output-5--><order>31</order><name>Outlet Air Temperature</name><role>output</role><dimension>Temperature</dimension><unit>C</unit><type>real</type><min>-Inf</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>0</default><symbol>SN</symbol><definition>The drybulb temperature of the air exiting the fan coil.</definition></variable><variable><!--output-6--><order>32</order><name>Outlet Air Humidity Ratio</name><role>output</role><dimension>Dimensionless</dimension><unit>-</unit><type>real</type><min>-Inf</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>0</default><symbol>SN</symbol><definition>The absolute humidity ratio of the air exiting the fan coil.</definition></variable><variable><!--output-7--><order>33</order><name>Outlet Air % Relative Humidity</name><role>output</role><dimension>Percentage</dimension><unit>% (base 100)</unit><type>real</type><min>-Inf</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>0</default><symbol>SN</symbol><definition>The percent relative humidity of the air exiting the fan coil.</definition></variable><variable><!--output-8--><order>34</order><name>Outlet Air Flow Rate</name><role>output</role><dimension>Flow Rate</dimension><unit>kg/hr</unit><type>real</type><min>-Inf</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>0</default><symbol>SN</symbol><definition>The flow rate of dry air exiting the fan coil.</definition></variable><variable><!--output-9--><order>35</order><name>Outlet Air Pressure</name><role>output</role><dimension>Pressure</dimension><unit>atm</unit><type>real</type><min>-Inf</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>0</default><symbol>SN</symbol><definition>The absolute pressure of the air exiting the fan coil.</definition></variable><variable><!--output-10--><order>36</order><name>Total Cooling Rate</name><role>output</role><dimension>Power</dimension><unit>kJ/hr</unit><type>real</type><min>-Inf</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>0</default><symbol>SN</symbol><definition>The rate at which energy is removed from the air stream (sensible plus latent) across the cooling coil.</definition></variable><variable><!--output-11--><order>37</order><name>Sensible Cooling Rate</name><role>output</role><dimension>Power</dimension><unit>kJ/hr</unit><type>real</type><min>-Inf</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>0</default><symbol>SN</symbol><definition>The rate at which sensible energy is removed from the air stream across the cooling coil.</definition></variable><variable><!--output-12--><order>38</order><name>Total Heating Rate</name><role>output</role><dimension>Power</dimension><unit>kJ/hr</unit><type>real</type><min>-Inf</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>0</default><symbol>SN</symbol><definition>The rate at which energy is added to the air stream across the heating coil.</definition></variable><variable><!--output-13--><order>39</order><name>Fan Power</name><role>output</role><dimension>Power</dimension><unit>kJ/hr</unit><type>real</type><min>-Inf</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>0</default><symbol>SN</symbol><definition>The rate at which the fan consumes energy.</definition></variable><variable><!--output-14--><order>40</order><name>Fan Heat to Air Stream</name><role>output</role><dimension>Power</dimension><unit>kJ/hr</unit><type>real</type><min>-Inf</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>0</default><symbol>SN</symbol><definition>The rate at which energy is added to the air stream by the fan.</definition></variable><variable><!--output-15--><order>41</order><name>Fan Heat to Ambient</name><role>output</role><dimension>Power</dimension><unit>kJ/hr</unit><type>real</type><min>-Inf</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>0</default><symbol>SN</symbol><definition>The rate at which energy is rejected to the ambient by the fan.</definition></variable><variable><!--output-16--><order>42</order><name>Condensate Temperature</name><role>output</role><dimension>Temperature</dimension><unit>C</unit><type>real</type><min>-Inf</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>20.0</default><symbol>SN</symbol><definition>The temperature of the condensed water from the air stream leaving the fan coil.</definition></variable><variable><!--output-17--><order>43</order><name>Condensate Flow Rate</name><role>output</role><dimension>Flow Rate</dimension><unit>kg/hr</unit><type>real</type><min>0.0</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>0</default><symbol>SN</symbol><definition>The rate at which condensed water from the air stream exits the fan coil.</definition></variable><variable><!--parameter-18--><order>44</order><name>Number of Fan Speeds</name><role>parameter</role><dimension>Dimensionless</dimension><unit>-</unit><type>integer</type><min>1</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>11</default><symbol>SN</symbol><definition>The number of normalized fan speeds for which fan performance data will be provided in the user-provided external data file.</definition></variable><variable><!--parameter-19--><order>45</order><name>Efficiency of Fan Motor</name><role>parameter</role><dimension>Dimensionless</dimension><unit>-</unit><type>real</type><min>0.</min><max>1.</max><boundaries>[ ; ]</boundaries><default>0.9</default><symbol>SN</symbol><definition>The efficiency of the fan motor.</definition></variable><variable><!--parameter-20--><order>46</order><name>Fraction of Fan Heat to Air</name><role>parameter</role><dimension>Dimensionless</dimension><unit>-</unit><type>real</type><min>0.</min><max>1.</max><boundaries>[ ; ]</boundaries><default>1.</default><symbol>SN</symbol><definition>The fraction of the fan power/heat that ends up in the air stream.  Values are typically zero for fans motors mounted outside of the air stream and 1 for fan motors mounted within the air stream.</definition></variable><variable><!--input-10--><order>47</order><name>Air-Side Pressure Drop: Coils</name><role>input</role><dimension>Pressure</dimension><unit>atm</unit><type>real</type><min>0.0</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>0.0</default><symbol>SN</symbol><definition>The pressure drop of the air stream as it passes across the coils.</definition></variable><variable><!--input-11--><order>48</order><name>Fresh Air Temperature</name><role>input</role><dimension>Temperature</dimension><unit>C</unit><type>real</type><min>-Inf</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>20.0</default><symbol>SN</symbol><definition>The drybulb temperature of the ambient air entering the fan coil for mixing with the return air.</definition></variable><variable><!--input-12--><order>49</order><name>Fresh Air Humidity Ratio</name><role>input</role><dimension>Dimensionless</dimension><unit>-</unit><type>real</type><min>0.</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>0.002</default><symbol>SN</symbol><definition>The absolute humidity ratio of the ambient air entering the fan coil for mixing with the return air.</definition></variable><variable><!--input-13--><order>50</order><name>Fresh Air % Relative Humidity</name><role>input</role><dimension>Percentage</dimension><unit>% (base 100)</unit><type>real</type><min>0</min><max>100</max><boundaries>[ ; ]</boundaries><default>50.0</default><symbol>SN</symbol><definition>The percent relative humidity of the ambient air entering the fan coil for mixing with the return air.</definition></variable><variable><!--input-14--><order>51</order><name>Heating Control Signal</name><role>input</role><dimension>Dimensionless</dimension><unit>-</unit><type>real</type><min>0.</min><max>1.</max><boundaries>[ ; ]</boundaries><default>0.</default><symbol>SN</symbol><definition>The control signal for heating operation: 0 = Off and 1 = On.</definition></variable><variable><!--input-15--><order>52</order><name>Cooling Control Signal</name><role>input</role><dimension>Dimensionless</dimension><unit>-</unit><type>real</type><min>0.</min><max>1.</max><boundaries>[ ; ]</boundaries><default>0.</default><symbol>SN</symbol><definition>The control signal for cooling operation: 0 = Off and 1 = On.</definition></variable><variable><!--input-16--><order>53</order><name>Fan Control Signal</name><role>input</role><dimension>Dimensionless</dimension><unit>-</unit><type>real</type><min>0.</min><max>1.</max><boundaries>[ ; ]</boundaries><default>0.</default><symbol>SN</symbol><definition>The control signal for fan operation: 0 = Off, 1 = Full On, Values between 0 and 1 set the fraction of rated fan speed.</definition></variable><variable><!--input-17--><order>54</order><name>Fraction of Outside Air</name><role>input</role><dimension>Dimensionless</dimension><unit>-</unit><type>real</type><min>0.</min><max>1.</max><boundaries>[ ; ]</boundaries><default>0.</default><symbol>SN</symbol><definition>The control signal for outside air mixing: 0 = No outside air and 100% return air and 1 = 100% outside air and no return air.  Values between 0 and 1 set the fraction of outside air.</definition></variable><variable><!--output-18--><order>55</order><name>Conditioning Energy Rate</name><role>output</role><dimension>Power</dimension><unit>kJ/hr</unit><type>real</type><min>-Inf</min><max>+Inf</max><boundaries>[ ; ]</boundaries><default>0</default><symbol>SN</symbol><definition>The rate at which energy is transferred to the air stream by the coils; positive implies energy added to the air stream (heating).  This term does not include energy added by the fan or energy associated with the condensate draining from the unit but is strictly a measure of the coil heat transfer.</definition></variable></variables><cycles/><externalFiles><externalFile><question>Which external file contains the cooling performance data?</question><answer>.\Examples\Sample Catalog Files\FanCoil_Cooling.dat</answer><answers><answer>.\Tess Models\SampleCatalogData\4-Pipe Performance Map Fan Coil\Normalized_FanCoil_Cooling.dat</answer></answers><parameter>Logical Unit - Cooling Performance</parameter><designate>no</designate></externalFile><externalFile><question>Which external file contains the heating performance data?</question><answer>.\Examples\Sample Catalog Files\FanCoil_Heating.dat</answer><answers><answer>.\Tess Models\SampleCatalogData\4-Pipe Performance Map Fan Coil\Normalized_FanCoil_Heating.dat</answer></answers><parameter>Logical Unit - Heating Performance</parameter><designate>no</designate></externalFile><externalFile><question>Which external file contains the fan performance data?</question><answer>.\Examples\Sample Catalog Files\FC_FanLawPerformance.dat</answer><answers><answer>.\Tess Models\SampleCatalogData\4-Pipe Performance Map Fan Coil\FanLawPerformance.dat</answer></answers><parameter>Logical Unit - Fan Corrections</parameter><designate>no</designate></externalFile></externalFiles><source>.\SourceCode\Types\Type137.f90</source></TrnsysModel>
+<TrnsysModel>
+    <object>4-Pipe Fan Coil: Heating and Cooling</object>
+    <author>Tim McDowell</author>
+    <organization>Thermal Energy System Specialists</organization>
+    <editor>TPM</editor>
+    <creationDate>v18</creationDate>
+    <modifictionDate>June 2015</modifictionDate>
+    <mode>4</mode>
+    <validation>34</validation>
+    <icon>.\Studio\Proformas\HVAC\Fan Coil\Type137.bmp</icon>
+    <type>137</type>
+    <maxInstance>9999</maxInstance>
+    <keywords>
+        <keyword>Fan Coil</keyword>
+        <keyword>4-Pipe Fan Coil</keyword>
+    </keywords>
+    <details>This component models a fan coil where the air is heated or cooled as it passes across
+        coils containing hot and cold liquid flow streams. This model relies on user-provided
+        external data files which contain the performance of the coils as a function of the entering
+        air and fluid conditions. Refer to the sample data files which accompany this model for the
+        format of these external files.</details>
+    <comment>Performance Map 4-Pipe Fan Coil</comment>
+    <variablesComment>4-Pipe Fan Coil</variablesComment>
+    <variables>
+        <variable><!--parameter-1-->
+            <order>1</order>
+            <name>Humidity Mode</name>
+            <role>parameter</role>
+            <dimension>Dimensionless</dimension>
+            <unit>-</unit>
+            <type>integer</type>
+            <min>2</min>
+            <max>2</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>2</default>
+            <symbol>SN</symbol>
+            <definition>This parameter indicates whether the inputs for absolute humidity ratio
+                (this parameter = 1) or percent relative humidity (this parameter = 2) should be
+                used to set the inlet air conditions.</definition>
+        </variable>
+        <variable><!--parameter-2-->
+            <order>2</order>
+            <name>Cooling Fluid Specific Heat</name>
+            <role>parameter</role>
+            <dimension>Specific Heat</dimension>
+            <unit>kJ/kg.K</unit>
+            <type>real</type>
+            <min>0.0</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>4.190</default>
+            <symbol>SN</symbol>
+            <definition>The specific heat of the liquid stream flowing through the fan coil cooling
+                coils.</definition>
+        </variable>
+        <variable><!--parameter-3-->
+            <order>3</order>
+            <name>Heating Fluid Specific Heat</name>
+            <role>parameter</role>
+            <dimension>Specific Heat</dimension>
+            <unit>kJ/kg.K</unit>
+            <type>real</type>
+            <min>0.0</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>4.190</default>
+            <symbol>SN</symbol>
+            <definition>The specific heat of the liquid stream flowing through the fan coil heating
+                coils.</definition>
+        </variable>
+        <variable><!--parameter-4-->
+            <order>4</order>
+            <name>Rated Volumetric Air Flow Rate</name>
+            <role>parameter</role>
+            <dimension>Volumetric Flow Rate</dimension>
+            <unit>l/s</unit>
+            <type>real</type>
+            <min>0.</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>943.89</default>
+            <symbol>SN</symbol>
+            <definition>The volumetric flow rate of air through the device at its rated conditions.</definition>
+        </variable>
+        <variable><!--parameter-5-->
+            <order>5</order>
+            <name>Rated Fan Power</name>
+            <role>parameter</role>
+            <dimension>Power</dimension>
+            <unit>kJ/hr</unit>
+            <type>real</type>
+            <min>0.</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>564.0</default>
+            <symbol>SN</symbol>
+            <definition>The fan power draw at its rated conditions.</definition>
+        </variable>
+        <variable><!--parameter-6-->
+            <order>6</order>
+            <name>Logical Unit - Cooling Performance</name>
+            <role>parameter</role>
+            <dimension>Dimensionless</dimension>
+            <unit>-</unit>
+            <type>integer</type>
+            <min>10</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>10</default>
+            <symbol>SN</symbol>
+            <definition>The logical unit which wil be assigned to the external data file containing
+                the total and sensible cooling load ratios as a function of the entering liquid
+                temperature, entering liquid flow rate, the entering air dry bulb temperature, the
+                entering air wet bulb temperature, and air flow rate. Logical units must be unique
+                integers in each TRNSYS simulation.</definition>
+        </variable>
+        <variable><!--parameter-7-->
+            <order>7</order>
+            <name>Number of Drybulb Temperatures - Cooling</name>
+            <role>parameter</role>
+            <dimension>Dimensionless</dimension>
+            <unit>-</unit>
+            <type>integer</type>
+            <min>1</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>7</default>
+            <symbol>SN</symbol>
+            <definition>The number of air drybulb temperatures for which cooling coil performance
+                data will be provided in the user-provided external data file.</definition>
+        </variable>
+        <variable><!--parameter-8-->
+            <order>8</order>
+            <name>Number of Wetbulb Temperatures - Cooling</name>
+            <role>parameter</role>
+            <dimension>Dimensionless</dimension>
+            <unit>-</unit>
+            <type>integer</type>
+            <min>1</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>7</default>
+            <symbol>SN</symbol>
+            <definition>The number of air wetbulb temperatures for which cooling coil performance
+                data will be provided in the user-provided external data file.</definition>
+        </variable>
+        <variable><!--parameter-9-->
+            <order>9</order>
+            <name>Number of Air Flows - Cooling</name>
+            <role>parameter</role>
+            <dimension>Dimensionless</dimension>
+            <unit>-</unit>
+            <type>integer</type>
+            <min>1</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>6</default>
+            <symbol>SN</symbol>
+            <definition>The number of normalized air flow rates for which cooling coil performance
+                data will be provided in the user-provided external data file.</definition>
+        </variable>
+        <variable><!--parameter-10-->
+            <order>10</order>
+            <name>Number of Liquid Temperatures - Cooling</name>
+            <role>parameter</role>
+            <dimension>Dimensionless</dimension>
+            <unit>-</unit>
+            <type>integer</type>
+            <min>1</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>8</default>
+            <symbol>SN</symbol>
+            <definition>The number of liquid (water typically) temperatures for which cooling coil
+                performance data will be provided in the user-provided external data file.</definition>
+        </variable>
+        <variable><!--parameter-11-->
+            <order>11</order>
+            <name>Number of Liquid Flow Rates - Cooling</name>
+            <role>parameter</role>
+            <dimension>Dimensionless</dimension>
+            <unit>-</unit>
+            <type>integer</type>
+            <min>1</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>2</default>
+            <symbol>SN</symbol>
+            <definition>The number of normalized liquid flow rates for which cooling coil
+                performance data will be provided in the user-provided external data file.</definition>
+        </variable>
+        <variable><!--parameter-12-->
+            <order>12</order>
+            <name>Logical Unit - Heating Performance</name>
+            <role>parameter</role>
+            <dimension>Dimensionless</dimension>
+            <unit>-</unit>
+            <type>integer</type>
+            <min>10</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>11</default>
+            <symbol>SN</symbol>
+            <definition>The logical unit which wil be assigned to the external data file containing
+                the heating performance data as a function of the air inlet temperature and flow
+                rate and the liquid entering temperature and flow rate. Logical units must be unique
+                integers in each TRNSYS simulation.</definition>
+        </variable>
+        <variable><!--parameter-13-->
+            <order>13</order>
+            <name>Number of Air Temperatures - Heating</name>
+            <role>parameter</role>
+            <dimension>Dimensionless</dimension>
+            <unit>-</unit>
+            <type>integer</type>
+            <min>1</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>7</default>
+            <symbol>SN</symbol>
+            <definition>The number of air drybulb temperatures for which heating coil performance
+                data will be provided in the user-provided external data file.</definition>
+        </variable>
+        <variable><!--parameter-14-->
+            <order>14</order>
+            <name>Number of Air Flows - Heating</name>
+            <role>parameter</role>
+            <dimension>Dimensionless</dimension>
+            <unit>-</unit>
+            <type>integer</type>
+            <min>1</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>6</default>
+            <symbol>SN</symbol>
+            <definition>The number of normalized air flow rates for which heating coil performance
+                data will be provided in the user-provided external data file.</definition>
+        </variable>
+        <variable><!--parameter-15-->
+            <order>15</order>
+            <name>Number of Liquid Temperatures - Heating</name>
+            <role>parameter</role>
+            <dimension>Dimensionless</dimension>
+            <unit>-</unit>
+            <type>integer</type>
+            <min>1</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>11</default>
+            <symbol>SN</symbol>
+            <definition>The number of liquid (water typically) temperatures for which heating coil
+                performance data will be provided in the user-provided external data file.</definition>
+        </variable>
+        <variable><!--parameter-16-->
+            <order>16</order>
+            <name>Number of Liquid Flow Rates - Heating</name>
+            <role>parameter</role>
+            <dimension>Dimensionless</dimension>
+            <unit>-</unit>
+            <type>integer</type>
+            <min>1</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>2</default>
+            <symbol>SN</symbol>
+            <definition>The number of normalized liquid flow rates for which heating coil
+                performance data will be provided in the user-provided external data file.</definition>
+        </variable>
+        <variable><!--parameter-17-->
+            <order>17</order>
+            <name>Logical Unit - Fan Corrections</name>
+            <role>parameter</role>
+            <dimension>Dimensionless</dimension>
+            <unit>-</unit>
+            <type>integer</type>
+            <min>10</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>12</default>
+            <symbol>SN</symbol>
+            <definition>The logical unit which wil be assigned to the external data file containing
+                the fraction of fan full-load power as a function of the normalized fan speed.</definition>
+        </variable>
+        <variable><!--input-1-->
+            <order>18</order>
+            <name>Cooling Fluid Inlet Temperature</name>
+            <role>input</role>
+            <dimension>Temperature</dimension>
+            <unit>C</unit>
+            <type>real</type>
+            <min>-Inf</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>10.0</default>
+            <symbol>SN</symbol>
+            <definition>The temperature of the liquid stream fluid flowing into the fan coil unit's
+                cooling coils.</definition>
+        </variable>
+        <variable><!--input-2-->
+            <order>19</order>
+            <name>Cooling Fluid Flow Rate</name>
+            <role>input</role>
+            <dimension>Flow Rate</dimension>
+            <unit>kg/hr</unit>
+            <type>real</type>
+            <min>0.0</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0.0</default>
+            <symbol>SN</symbol>
+            <definition>The flow rate of the cooling liquid stream fluid flowing into the fan coil
+                unit's cooling coils.</definition>
+        </variable>
+        <variable><!--input-3-->
+            <order>20</order>
+            <name>Heating Fluid Inlet Temperature</name>
+            <role>input</role>
+            <dimension>Temperature</dimension>
+            <unit>C</unit>
+            <type>real</type>
+            <min>-Inf</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>10.0</default>
+            <symbol>SN</symbol>
+            <definition>The temperature of the liquid stream fluid flowing into the fan coil unit's
+                heating coils.</definition>
+        </variable>
+        <variable><!--input-4-->
+            <order>21</order>
+            <name>Heating Fluid Flow Rate</name>
+            <role>input</role>
+            <dimension>Flow Rate</dimension>
+            <unit>kg/hr</unit>
+            <type>real</type>
+            <min>0.0</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0.0</default>
+            <symbol>SN</symbol>
+            <definition>The flow rate of the heating liquid stream fluid flowing into the fan coil
+                unit's heating coils.</definition>
+        </variable>
+        <variable><!--input-5-->
+            <order>22</order>
+            <name>Return Air Temperature</name>
+            <role>input</role>
+            <dimension>Temperature</dimension>
+            <unit>C</unit>
+            <type>real</type>
+            <min>-Inf</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>20.0</default>
+            <symbol>SN</symbol>
+            <definition>The drybulb temperature of the return air entering the fan coil. This return
+                air gets mixed with a user-specified fraction of outside air.</definition>
+        </variable>
+        <variable><!--input-6-->
+            <order>23</order>
+            <name>Return Air Humidity Ratio</name>
+            <role>input</role>
+            <dimension>Dimensionless</dimension>
+            <unit>-</unit>
+            <type>real</type>
+            <min>0.</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0.002</default>
+            <symbol>SN</symbol>
+            <definition>The absolute humidity ratio of the return air entering the fan coil. This
+                return air gets mixed with a user-specified fraction of outside air.</definition>
+        </variable>
+        <variable><!--input-7-->
+            <order>24</order>
+            <name>Return Air % Relative Humidity</name>
+            <role>input</role>
+            <dimension>Percentage</dimension>
+            <unit>% (base 100)</unit>
+            <type>real</type>
+            <min>0</min>
+            <max>100</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>50.0</default>
+            <symbol>SN</symbol>
+            <definition>The percent relative humidity of the return air entering the fan coil. This
+                return air gets mixed with a user-specified fraction of outside air.</definition>
+        </variable>
+        <variable><!--input-8-->
+            <order>25</order>
+            <name>Return Air Pressure</name>
+            <role>input</role>
+            <dimension>Pressure</dimension>
+            <unit>atm</unit>
+            <type>real</type>
+            <min>0.0</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>1.0</default>
+            <symbol>SN</symbol>
+            <definition>The absolute pressure of the air streams entering the fan coil.</definition>
+        </variable>
+        <variable><!--input-9-->
+            <order>26</order>
+            <name>Air-Side Pressure Rise: Fan</name>
+            <role>input</role>
+            <dimension>Pressure</dimension>
+            <unit>atm</unit>
+            <type>real</type>
+            <min>0.0</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0.0</default>
+            <symbol>SN</symbol>
+            <definition>The pressure rise of the air stream as it flows across the fan.</definition>
+        </variable>
+        <variable><!--output-1-->
+            <order>27</order>
+            <name>Cooling Fluid Outlet Temperature</name>
+            <role>output</role>
+            <dimension>Temperature</dimension>
+            <unit>C</unit>
+            <type>real</type>
+            <min>-Inf</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0</default>
+            <symbol>SN</symbol>
+            <definition>The temperature of the liquid stream exiting the fan coil unit's cooling
+                coils.</definition>
+        </variable>
+        <variable><!--output-2-->
+            <order>28</order>
+            <name>Outlet Cooling Fluid Flow Rate</name>
+            <role>output</role>
+            <dimension>Flow Rate</dimension>
+            <unit>kg/hr</unit>
+            <type>real</type>
+            <min>0.0</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0</default>
+            <symbol>SN</symbol>
+            <definition>The flow rate of the liquid stream exiting the fan coil unit's cooling
+                coils.</definition>
+        </variable>
+        <variable><!--output-3-->
+            <order>29</order>
+            <name>Heating Fluid Outlet Temperature</name>
+            <role>output</role>
+            <dimension>Temperature</dimension>
+            <unit>C</unit>
+            <type>real</type>
+            <min>-Inf</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0</default>
+            <symbol>SN</symbol>
+            <definition>The temperature of the liquid stream exiting the fan coil unit's heating
+                coils.</definition>
+        </variable>
+        <variable><!--output-4-->
+            <order>30</order>
+            <name>Outlet Heating Fluid Flow Rate</name>
+            <role>output</role>
+            <dimension>Flow Rate</dimension>
+            <unit>kg/hr</unit>
+            <type>real</type>
+            <min>0.0</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0</default>
+            <symbol>SN</symbol>
+            <definition>The flow rate of the liquid stream exiting the fan coil unit's heating
+                coils.</definition>
+        </variable>
+        <variable><!--output-5-->
+            <order>31</order>
+            <name>Outlet Air Temperature</name>
+            <role>output</role>
+            <dimension>Temperature</dimension>
+            <unit>C</unit>
+            <type>real</type>
+            <min>-Inf</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0</default>
+            <symbol>SN</symbol>
+            <definition>The drybulb temperature of the air exiting the fan coil.</definition>
+        </variable>
+        <variable><!--output-6-->
+            <order>32</order>
+            <name>Outlet Air Humidity Ratio</name>
+            <role>output</role>
+            <dimension>Dimensionless</dimension>
+            <unit>-</unit>
+            <type>real</type>
+            <min>-Inf</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0</default>
+            <symbol>SN</symbol>
+            <definition>The absolute humidity ratio of the air exiting the fan coil.</definition>
+        </variable>
+        <variable><!--output-7-->
+            <order>33</order>
+            <name>Outlet Air % Relative Humidity</name>
+            <role>output</role>
+            <dimension>Percentage</dimension>
+            <unit>% (base 100)</unit>
+            <type>real</type>
+            <min>-Inf</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0</default>
+            <symbol>SN</symbol>
+            <definition>The percent relative humidity of the air exiting the fan coil.</definition>
+        </variable>
+        <variable><!--output-8-->
+            <order>34</order>
+            <name>Outlet Air Flow Rate</name>
+            <role>output</role>
+            <dimension>Flow Rate</dimension>
+            <unit>kg/hr</unit>
+            <type>real</type>
+            <min>-Inf</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0</default>
+            <symbol>SN</symbol>
+            <definition>The flow rate of dry air exiting the fan coil.</definition>
+        </variable>
+        <variable><!--output-9-->
+            <order>35</order>
+            <name>Outlet Air Pressure</name>
+            <role>output</role>
+            <dimension>Pressure</dimension>
+            <unit>atm</unit>
+            <type>real</type>
+            <min>-Inf</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0</default>
+            <symbol>SN</symbol>
+            <definition>The absolute pressure of the air exiting the fan coil.</definition>
+        </variable>
+        <variable><!--output-10-->
+            <order>36</order>
+            <name>Total Cooling Rate</name>
+            <role>output</role>
+            <dimension>Power</dimension>
+            <unit>kJ/hr</unit>
+            <type>real</type>
+            <min>-Inf</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0</default>
+            <symbol>SN</symbol>
+            <definition>The rate at which energy is removed from the air stream (sensible plus
+                latent) across the cooling coil.</definition>
+        </variable>
+        <variable><!--output-11-->
+            <order>37</order>
+            <name>Sensible Cooling Rate</name>
+            <role>output</role>
+            <dimension>Power</dimension>
+            <unit>kJ/hr</unit>
+            <type>real</type>
+            <min>-Inf</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0</default>
+            <symbol>SN</symbol>
+            <definition>The rate at which sensible energy is removed from the air stream across the
+                cooling coil.</definition>
+        </variable>
+        <variable><!--output-12-->
+            <order>38</order>
+            <name>Total Heating Rate</name>
+            <role>output</role>
+            <dimension>Power</dimension>
+            <unit>kJ/hr</unit>
+            <type>real</type>
+            <min>-Inf</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0</default>
+            <symbol>SN</symbol>
+            <definition>The rate at which energy is added to the air stream across the heating coil.</definition>
+        </variable>
+        <variable><!--output-13-->
+            <order>39</order>
+            <name>Fan Power</name>
+            <role>output</role>
+            <dimension>Power</dimension>
+            <unit>kJ/hr</unit>
+            <type>real</type>
+            <min>-Inf</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0</default>
+            <symbol>SN</symbol>
+            <definition>The rate at which the fan consumes energy.</definition>
+        </variable>
+        <variable><!--output-14-->
+            <order>40</order>
+            <name>Fan Heat to Air Stream</name>
+            <role>output</role>
+            <dimension>Power</dimension>
+            <unit>kJ/hr</unit>
+            <type>real</type>
+            <min>-Inf</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0</default>
+            <symbol>SN</symbol>
+            <definition>The rate at which energy is added to the air stream by the fan.</definition>
+        </variable>
+        <variable><!--output-15-->
+            <order>41</order>
+            <name>Fan Heat to Ambient</name>
+            <role>output</role>
+            <dimension>Power</dimension>
+            <unit>kJ/hr</unit>
+            <type>real</type>
+            <min>-Inf</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0</default>
+            <symbol>SN</symbol>
+            <definition>The rate at which energy is rejected to the ambient by the fan.</definition>
+        </variable>
+        <variable><!--output-16-->
+            <order>42</order>
+            <name>Condensate Temperature</name>
+            <role>output</role>
+            <dimension>Temperature</dimension>
+            <unit>C</unit>
+            <type>real</type>
+            <min>-Inf</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>20.0</default>
+            <symbol>SN</symbol>
+            <definition>The temperature of the condensed water from the air stream leaving the fan
+                coil.</definition>
+        </variable>
+        <variable><!--output-17-->
+            <order>43</order>
+            <name>Condensate Flow Rate</name>
+            <role>output</role>
+            <dimension>Flow Rate</dimension>
+            <unit>kg/hr</unit>
+            <type>real</type>
+            <min>0.0</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0</default>
+            <symbol>SN</symbol>
+            <definition>The rate at which condensed water from the air stream exits the fan coil.</definition>
+        </variable>
+        <variable><!--parameter-18-->
+            <order>44</order>
+            <name>Number of Fan Speeds</name>
+            <role>parameter</role>
+            <dimension>Dimensionless</dimension>
+            <unit>-</unit>
+            <type>integer</type>
+            <min>1</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>11</default>
+            <symbol>SN</symbol>
+            <definition>The number of normalized fan speeds for which fan performance data will be
+                provided in the user-provided external data file.</definition>
+        </variable>
+        <variable><!--parameter-19-->
+            <order>45</order>
+            <name>Efficiency of Fan Motor</name>
+            <role>parameter</role>
+            <dimension>Dimensionless</dimension>
+            <unit>-</unit>
+            <type>real</type>
+            <min>0.</min>
+            <max>1.</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0.9</default>
+            <symbol>SN</symbol>
+            <definition>The efficiency of the fan motor.</definition>
+        </variable>
+        <variable><!--parameter-20-->
+            <order>46</order>
+            <name>Fraction of Fan Heat to Air</name>
+            <role>parameter</role>
+            <dimension>Dimensionless</dimension>
+            <unit>-</unit>
+            <type>real</type>
+            <min>0.</min>
+            <max>1.</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>1.</default>
+            <symbol>SN</symbol>
+            <definition>The fraction of the fan power/heat that ends up in the air stream. Values
+                are typically zero for fans motors mounted outside of the air stream and 1 for fan
+                motors mounted within the air stream.</definition>
+        </variable>
+        <variable><!--input-10-->
+            <order>47</order>
+            <name>Air-Side Pressure Drop: Coils</name>
+            <role>input</role>
+            <dimension>Pressure</dimension>
+            <unit>atm</unit>
+            <type>real</type>
+            <min>0.0</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0.0</default>
+            <symbol>SN</symbol>
+            <definition>The pressure drop of the air stream as it passes across the coils.</definition>
+        </variable>
+        <variable><!--input-11-->
+            <order>48</order>
+            <name>Fresh Air Temperature</name>
+            <role>input</role>
+            <dimension>Temperature</dimension>
+            <unit>C</unit>
+            <type>real</type>
+            <min>-Inf</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>20.0</default>
+            <symbol>SN</symbol>
+            <definition>The drybulb temperature of the ambient air entering the fan coil for mixing
+                with the return air.</definition>
+        </variable>
+        <variable><!--input-12-->
+            <order>49</order>
+            <name>Fresh Air Humidity Ratio</name>
+            <role>input</role>
+            <dimension>Dimensionless</dimension>
+            <unit>-</unit>
+            <type>real</type>
+            <min>0.</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0.002</default>
+            <symbol>SN</symbol>
+            <definition>The absolute humidity ratio of the ambient air entering the fan coil for
+                mixing with the return air.</definition>
+        </variable>
+        <variable><!--input-13-->
+            <order>50</order>
+            <name>Fresh Air % Relative Humidity</name>
+            <role>input</role>
+            <dimension>Percentage</dimension>
+            <unit>% (base 100)</unit>
+            <type>real</type>
+            <min>0</min>
+            <max>100</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>50.0</default>
+            <symbol>SN</symbol>
+            <definition>The percent relative humidity of the ambient air entering the fan coil for
+                mixing with the return air.</definition>
+        </variable>
+        <variable><!--input-14-->
+            <order>51</order>
+            <name>Heating Control Signal</name>
+            <role>input</role>
+            <dimension>Dimensionless</dimension>
+            <unit>-</unit>
+            <type>real</type>
+            <min>0.</min>
+            <max>1.</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0.</default>
+            <symbol>SN</symbol>
+            <definition>The control signal for heating operation: 0 = Off and 1 = On.</definition>
+        </variable>
+        <variable><!--input-15-->
+            <order>52</order>
+            <name>Cooling Control Signal</name>
+            <role>input</role>
+            <dimension>Dimensionless</dimension>
+            <unit>-</unit>
+            <type>real</type>
+            <min>0.</min>
+            <max>1.</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0.</default>
+            <symbol>SN</symbol>
+            <definition>The control signal for cooling operation: 0 = Off and 1 = On.</definition>
+        </variable>
+        <variable><!--input-16-->
+            <order>53</order>
+            <name>Fan Control Signal</name>
+            <role>input</role>
+            <dimension>Dimensionless</dimension>
+            <unit>-</unit>
+            <type>real</type>
+            <min>0.</min>
+            <max>1.</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0.</default>
+            <symbol>SN</symbol>
+            <definition>The control signal for fan operation: 0 = Off, 1 = Full On, Values between 0
+                and 1 set the fraction of rated fan speed.</definition>
+        </variable>
+        <variable><!--input-17-->
+            <order>54</order>
+            <name>Fraction of Outside Air</name>
+            <role>input</role>
+            <dimension>Dimensionless</dimension>
+            <unit>-</unit>
+            <type>real</type>
+            <min>0.</min>
+            <max>1.</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0.</default>
+            <symbol>SN</symbol>
+            <definition>The control signal for outside air mixing: 0 = No outside air and 100%
+                return air and 1 = 100% outside air and no return air. Values between 0 and 1 set
+                the fraction of outside air.</definition>
+        </variable>
+        <variable><!--output-18-->
+            <order>55</order>
+            <name>Conditioning Energy Rate</name>
+            <role>output</role>
+            <dimension>Power</dimension>
+            <unit>kJ/hr</unit>
+            <type>real</type>
+            <min>-Inf</min>
+            <max>+Inf</max>
+            <boundaries>[ ; ]</boundaries>
+            <default>0</default>
+            <symbol>SN</symbol>
+            <definition>The rate at which energy is transferred to the air stream by the coils;
+                positive implies energy added to the air stream (heating). This term does not
+                include energy added by the fan or energy associated with the condensate draining
+                from the unit but is strictly a measure of the coil heat transfer.</definition>
+        </variable>
+    </variables>
+    <cycles />
+    <externalFiles>
+        <externalFile>
+            <question>Which external file contains the cooling performance data?</question>
+            <answer>.\Examples\Sample Catalog Files\FanCoil_Cooling.dat</answer>
+            <answers>
+                <answer>.\Tess Models\SampleCatalogData\4-Pipe Performance Map Fan
+                    Coil\Normalized_FanCoil_Cooling.dat</answer>
+            </answers>
+            <parameter>Logical Unit - Cooling Performance</parameter>
+            <designate>no</designate>
+        </externalFile>
+        <externalFile>
+            <question>Which external file contains the heating performance data?</question>
+            <answer>.\Examples\Sample Catalog Files\FanCoil_Heating.dat</answer>
+            <answers>
+                <answer>.\Tess Models\SampleCatalogData\4-Pipe Performance Map Fan
+                    Coil\Normalized_FanCoil_Heating.dat</answer>
+            </answers>
+            <parameter>Logical Unit - Heating Performance</parameter>
+            <designate>no</designate>
+        </externalFile>
+        <externalFile>
+            <question>Which external file contains the fan performance data?</question>
+            <answer>.\Examples\Sample Catalog Files\FC_FanLawPerformance.dat</answer>
+            <answers>
+                <answer>.\Tess Models\SampleCatalogData\4-Pipe Performance Map Fan
+                    Coil\FanLawPerformance.dat</answer>
+            </answers>
+            <parameter>Logical Unit - Fan Corrections</parameter>
+            <designate>no</designate>
+        </externalFile>
+    </externalFiles>
+    <source>.\SourceCode\Types\Type137.f90</source>
+</TrnsysModel>

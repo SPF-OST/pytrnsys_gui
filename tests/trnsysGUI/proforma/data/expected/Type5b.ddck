@@ -2,27 +2,28 @@
 ** BEGIN Type5b.ddck
 *******************************
 
-***************************************************************************
+************************************************************************************************************************
 ** Description: 
 ** Heat Exchanger: Counter Flow
-***************************************************************************
+************************************************************************************************************************
 
-***************************************************************************
+************************************************************************************************************************
 ** Details: 
 ** A zero capacitance sensible heat exchanger is modeled in various configurations. In this instance, a counter flow
 ** heat exchanger is modeled. Given the hot and cold side inlet temperatures and flow rates, the effectiveness is
 ** calculated for a given fixed value of the overall heat transfer coefficient.
-***************************************************************************
+************************************************************************************************************************
 
 ***********************************
 ** inputs from hydraulic solver
 ***********************************
-EQUATIONS 5
-CpIn = @cp(ColdIn)
+EQUATIONS 6
+CpHot = @cp(HotIn)
+CpCold = @cp(ColdIn)
 THotIn = @temp(HotIn)
-MIn = @mfr(HotIn)
+MHot = @mfr(HotIn)
 TColdIn = @temp(ColdIn)
-MIn = @mfr(ColdIn)
+MCold = @mfr(ColdIn)
 
 ***********************************
 ** outputs to hydraulic solver
@@ -56,16 +57,52 @@ EQUATIONS 2
 ***********************************
 UNIT 1 TYPE 5
 PARAMETERS 4
+** The general heat exchanger model may operate in various configuration modes. Setting this parameter to 2 indicates a
+** counter flow arrangement. Do not change this parameter.
 2.0 ! 1: Counter flow mode [-] ([2,2])
-4.19 ! 2: Specific heat of source side fluid [kJ/kg.K] ([0,+Inf])
-CpIn ! 3: Specific heat of load side fluid [kJ/kg.K] ([0,+Inf])
+
+** The specific heat of the fluid flowing through the source side of the counter flow heat exchanger. NOTE: "source" and
+** "load" are merely convenient designations; energy will be transfered from the source side to the load side if the
+** source side is hotter than the load side. It will be transfered from the load side to the source side if the load
+** side is hotter than the source side.
+CpHot ! 2: Specific heat of source side fluid [kJ/kg.K] ([0,+Inf])
+
+** The specific heat of the fluid flowing through the load side of the counter flow heat exchanger. NOTE: "source" and
+** "load" are merely convenient designations; energy will be transfered from the source side to the load side if the
+** source side is hotter than the load side. It will be transfered from the load side to the source side if the load
+** side is hotter than the source side.
+CpCold ! 3: Specific heat of load side fluid [kJ/kg.K] ([0,+Inf])
+
 0.0 ! 4: Not used [-] ([0,+Inf])
+
 INPUTS 5
+** The temperature of the fluid flowing into the source side of the counter flow heat exchanger. NOTE: "source" and
+** "load" are merely convenient designations; energy will be transfered from the source side to the load side if the
+** source side is hotter than the load side. It will be transfered from the load side to the source side if the load
+** side is hotter than the source side.
 THotIn ! 1: Source side inlet temperature [C] ([-Inf,+Inf])
-MIn ! 2: Source side flow rate [kg/hr] ([0,+Inf])
+
+** The flow rate of the fluid flowing through the source side of the counter flow heat exchanger. NOTE: "source" and
+** "load" are merely convenient designations; energy will be transfered from the source side to the load side if the
+** source side is hotter than the load side. It will be transfered from the load side to the source side if the load
+** side is hotter than the source side.
+MHot ! 2: Source side flow rate [kg/hr] ([0,+Inf])
+
+** The temperature of the fluid flowing into the load side of the counter flow heat exchanger. NOTE: "source" and "load"
+** are merely convenient designations; energy will be transfered from the source side to the load side if the source
+** side is hotter than the load side. It will be transfered from the load side to the source side if the load side is
+** hotter than the source side.
 TColdIn ! 3: Load side inlet temperature [C] ([-Inf,+Inf])
-MIn ! 4: Load side flow rate [kg/hr] ([0,+Inf])
+
+** The flow rate of the fluid flowing through the load side of the counter flow heat exchanger. NOTE: "source" and
+** "load" are merely convenient designations; energy will be transfered from the source side to the load side if the
+** source side is hotter than the load side. It will be transfered from the load side to the source side if the load
+** side is hotter than the source side.
+MCold ! 4: Load side flow rate [kg/hr] ([0,+Inf])
+
+** Overall heat transfer coefficient of the counter flow heat exchanger.
 0,0 ! 5: Overall heat transfer coefficient of exchanger [kJ/hr.K] ([0,+Inf])
+
 ** initial values
 20.0 ! 1: Source side inlet temperature  initial value
 100.0 ! 2: Source side flow rate  initial value
@@ -74,12 +111,36 @@ MIn ! 4: Load side flow rate [kg/hr] ([0,+Inf])
 10.0 ! 5: Overall heat transfer coefficient of exchanger  initial value
 
 EQUATIONS 2 ! 6
+** The temperature of the fluid leaving the source side of the counter flow heat exchanger. NOTE: "source" and "load"
+** are merely convenient designations; energy will be transfered from the source side to the load side if the source
+** side is hotter than the load side. It will be transfered from the load side to the source side if the load side is
+** hotter than the source side.
 THotOut = [1, 1] ! Source side outlet temperature [C] ([-Inf,+Inf])
+
+** The flow rate of fluid exiting the source side of the counter flow heat exchanger. NOTE: "source" and "load" are
+** merely convenient designations; energy will be transfered from the source side to the load side if the source side is
+** hotter than the load side. It will be transfered from the load side to the source side if the load side is hotter
+** than the source side.
 ! XXX = [1, 2] ! Source side flow rate [kg/hr] ([-Inf,+Inf])
+
+** The temperature of the fluid leaving the load side of the counter flow heat exchanger. NOTE: "source" and "load" are
+** merely convenient designations; energy will be transfered from the source side to the load side if the source side is
+** hotter than the load side. It will be transfered from the load side to the source side if the load side is hotter
+** than the source side.
 TColdOut = [1, 3] ! Load side outlet temperature [C] ([-Inf,+Inf])
+
+** The flow rate of fluid exiting the load side of the counter flow heat exchanger. NOTE: "source" and "load" are merely
+** convenient designations; energy will be transfered from the source side to the load side if the source side is hotter
+** than the load side. It will be transfered from the load side to the source side if the load side is hotter than the
+** source side.
 ! XXX = [1, 4] ! Load side flow rate [kg/hr] ([-Inf,+Inf])
+
+** The total heat transfer rate between the fluids in the counter flow heat exchanger.
 ! XXX = [1, 5] ! Heat transfer rate [kJ/hr] ([-Inf,+Inf])
+
+** The effectiveness of the counter flow heat exchanger.
 ! XXX = [1, 6] ! Effectiveness [-] ([-Inf,+Inf])
+
 
 ***********************************
 ** Monthly printer

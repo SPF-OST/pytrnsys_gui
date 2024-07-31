@@ -149,17 +149,20 @@ def _createVariablesForRole(
 
     variables = []
     for roleOrder, serializedVariable in enumerate(sortedSerializedVariablesForRole, start=1):
-        order = serializedVariable["order"]
+        definition = serializedVariable.get("definition")
         bounds = _getBounds(serializedVariable)
+
         variable = _models.Variable(
             serializedVariable["name"],
-            order,
+            definition,
+            serializedVariable["order"],
             role,
             roleOrder,
             serializedVariable["unit"],
             bounds,
             serializedVariable["default"],
         )
+
         variables.append(variable)
 
     return variables
@@ -207,8 +210,8 @@ def convertXmlTmfStringToDdck(
     otherJinjaVariables = {
         "fileName": fileName,
         "type": proforma["type"],
-        "description": _makeMultilineComment(proforma["object"]),
-        "details": _makeMultilineComment(proforma["details"]),
+        "description": proforma["object"],
+        "details": proforma["details"],
         "visibilityModifier": _getVisibilityModifier(defaultVisibility),
     }
 
@@ -226,10 +229,10 @@ def _getVisibilityModifier(  # pylint: disable=inconsistent-return-statements
     _tp.assert_never(defaultVisibility)
 
 
-def _makeMultilineComment(text: str) -> str:
+def _makeMultilineComment(text: str, width: int = 120) -> str:
     textWithCollapsedWhitespace = _re.sub(r"\s+", " ", text.strip(), count=0, flags=_re.MULTILINE)
     linePrefix = "** "
-    maxWidth = 120 - len(linePrefix)
+    maxWidth = width - len(linePrefix)
     wrappedLines = _tw.wrap(textWithCollapsedWhitespace, maxWidth)
     newText = "\n".join(f"** {l}" for l in wrappedLines)
     return newText
@@ -244,7 +247,13 @@ def _convertXmlTmfStringToDdck(
     parameters = _createProcessedVariables(variablesByRole.parameters, connectionsDataByOrder)
     inputs = _createProcessedVariables(variablesByRole.inputs, connectionsDataByOrder)
     outputs = _createProcessedVariables(variablesByRole.outputs, connectionsDataByOrder)
-    ddckContent = _JINJA_TEMPLATE.render(parameters=parameters, inputs=inputs, outputs=outputs, **otherJinjaVariables)
+    ddckContent = _JINJA_TEMPLATE.render(
+        parameters=parameters,
+        inputs=inputs,
+        outputs=outputs,
+        multilineComment=_makeMultilineComment,
+        **otherJinjaVariables,
+    )
     return ddckContent
 
 

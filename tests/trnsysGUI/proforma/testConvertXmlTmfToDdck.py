@@ -120,7 +120,13 @@ def testConvertXmlTmfStringToDdckTwoConnections(monkeypatch, qtbot) -> None:
             inputPort=_models.InputPort(
                 name="In",
                 temperature=_models.Variable(
-                    tmfName="Load side " "inlet " "temperature",
+                    tmfName="Load side inlet temperature",
+                    definition="""The temperature of the fluid flowing into the load side of the
+                            counter flow heat exchanger. NOTE: "source" and "load" are merely
+                            convenient designations; energy will be transfered from the source side
+                            to the load side if the source side is hotter than the load side. It
+                            will be transfered from the load side to the source side if the load
+                            side is hotter than the source side.""",
                     order=9,
                     role="input",
                     roleOrder=3,
@@ -129,7 +135,13 @@ def testConvertXmlTmfStringToDdckTwoConnections(monkeypatch, qtbot) -> None:
                     defaultValue=20.0,
                 ),
                 massFlowRate=_models.Variable(
-                    tmfName="Load side " "flow rate",
+                    tmfName="Load side flow rate",
+                    definition="""The flow rate of the fluid flowing through the load side of the
+                            counter flow heat exchanger. NOTE: "source" and "load" are merely
+                            convenient designations; energy will be transfered from the source side
+                            to the load side if the source side is hotter than the load side. It
+                            will be transfered from the load side to the source side if the load
+                            side is hotter than the source side.""",
                     order=10,
                     role="input",
                     roleOrder=4,
@@ -141,7 +153,13 @@ def testConvertXmlTmfStringToDdckTwoConnections(monkeypatch, qtbot) -> None:
             outputPort=_models.OutputPort(
                 name="Out",
                 temperature=_models.Variable(
-                    tmfName="Load side " "outlet " "temperature",
+                    tmfName="Load side outlet temperature",
+                    definition="""The temperature of the fluid leaving the load side of the counter
+                            flow heat exchanger. NOTE: "source" and "load" are merely convenient
+                            designations; energy will be transfered from the source side to the load
+                            side if the source side is hotter than the load side. It will be
+                            transfered from the load side to the source side if the load side is
+                            hotter than the source side.""",
                     order=3,
                     role="output",
                     roleOrder=3,
@@ -154,7 +172,13 @@ def testConvertXmlTmfStringToDdckTwoConnections(monkeypatch, qtbot) -> None:
             fluid=_models.Fluid(
                 density=None,
                 heatCapacity=_models.Variable(
-                    tmfName="Specific heat of " "load side fluid",
+                    tmfName="Specific heat of load side fluid",
+                    definition="""The specific heat of the fluid flowing through the load side of the
+                            counter flow heat exchanger. NOTE: "source" and "load" are merely
+                            convenient designations; energy will be transfered from the source side
+                            to the load side if the source side is hotter than the load side. It
+                            will be transfered from the load side to the source side if the load
+                            side is hotter than the source side.""",
                     order=14,
                     role="parameter",
                     roleOrder=3,
@@ -169,7 +193,13 @@ def testConvertXmlTmfStringToDdckTwoConnections(monkeypatch, qtbot) -> None:
             inputPort=_models.InputPort(
                 name="In",
                 temperature=_models.Variable(
-                    tmfName="Source side " "inlet " "temperature",
+                    tmfName="Source side inlet temperature",
+                    definition="""The temperature of the fluid flowing into the source side of the
+                            counter flow heat exchanger. NOTE: "source" and "load" are merely
+                            convenient designations; energy will be transfered from the source side
+                            to the load side if the source side is hotter than the load side. It
+                            will be transfered from the load side to the source side if the load
+                            side is hotter than the source side.""",
                     order=7,
                     role="input",
                     roleOrder=1,
@@ -178,7 +208,13 @@ def testConvertXmlTmfStringToDdckTwoConnections(monkeypatch, qtbot) -> None:
                     defaultValue=20.0,
                 ),
                 massFlowRate=_models.Variable(
-                    tmfName="Source side " "flow rate",
+                    tmfName="Source side flow rate",
+                    definition="""The flow rate of the fluid flowing through the source side of the
+                            counter flow heat exchanger. NOTE: "source" and "load" are merely
+                            convenient designations; energy will be transfered from the source side
+                            to the load side if the source side is hotter than the load side. It
+                            will be transfered from the load side to the source side if the load
+                            side is hotter than the source side.""",
                     order=8,
                     role="input",
                     roleOrder=2,
@@ -190,7 +226,13 @@ def testConvertXmlTmfStringToDdckTwoConnections(monkeypatch, qtbot) -> None:
             outputPort=_models.OutputPort(
                 name="Out",
                 temperature=_models.Variable(
-                    tmfName="Source side " "outlet " "temperature",
+                    tmfName="Source side outlet temperature",
+                    definition="""The temperature of the fluid leaving the source side of the counter
+                            flow heat exchanger. NOTE: "source" and "load" are merely convenient
+                            designations; energy will be transfered from the source side to the load
+                            side if the source side is hotter than the load side. It will be
+                            transfered from the load side to the source side if the load side is
+                            hotter than the source side.""",
                     order=1,
                     role="output",
                     roleOrder=1,
@@ -200,7 +242,24 @@ def testConvertXmlTmfStringToDdckTwoConnections(monkeypatch, qtbot) -> None:
                 ),
                 reverseTemperature=None,
             ),
-            fluid=_models.Fluid(density=None, heatCapacity=None),
+            fluid=_models.Fluid(
+                density=None,
+                heatCapacity=_models.Variable(
+                    tmfName="Specific heat of source side fluid",
+                    definition="""The specific heat of the fluid flowing through the source side of
+                            the counter flow heat exchanger. NOTE: "source" and "load" are merely
+                            convenient designations; energy will be transfered from the source side
+                            to the load side if the source side is hotter than the load side. It
+                            will be transfered from the load side to the source side if the load
+                            side is hotter than the source side.""",
+                    order=13,
+                    role="parameter",
+                    roleOrder=2,
+                    unit="kJ/kg.K",
+                    bounds="[0,+Inf]",
+                    defaultValue=4.19,
+                ),
+            ),
         ),
     ]
 

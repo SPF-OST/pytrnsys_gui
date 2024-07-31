@@ -2,12 +2,12 @@
 ** BEGIN Type71.ddck
 *******************************
 
-***************************************************************************
+************************************************************************************************************************
 ** Description: 
 ** Solar Collector; Evacuated Tube
-***************************************************************************
+************************************************************************************************************************
 
-***************************************************************************
+************************************************************************************************************************
 ** Details: 
 ** Because the Solar Ratings and Certification Commission (SRCC) defines the efficiency of an evacuated tube collector
 ** bank using the same equations as those for a flat plat, the main difference (from a modeling point of view) between
@@ -23,15 +23,15 @@
 ** intercept, and curvature parameters to account for identical collectors in series, and flow rates other than those at
 ** test conditions. The effects of off-normal solar incidence are modeled by the provision of a bi-axial incidence angle
 ** modifier data file.
-***************************************************************************
+************************************************************************************************************************
 
 ***********************************
 ** inputs from hydraulic solver
 ***********************************
 EQUATIONS 3
-:CpIn = @cp(In)
+:Cp = @cp(In)
 :TIn = @temp(In)
-:MIn = @mfr(In)
+:M = @mfr(In)
 
 ***********************************
 ** outputs to hydraulic solver
@@ -64,28 +64,90 @@ EQUATIONS 1
 ***********************************
 UNIT 1 TYPE 71
 PARAMETERS 11
+** The solar collector model can simulate an array of identical solar collectors hooked up in series. This parameter is
+** used to specify how many collectors are hooked up in a series arrangement where the output of the first collector is
+** the inlet to the second collector. NOTE: increasing this value does not change the array area. Total array area is
+** set by parameter 2
 1.0 ! 1: Number in series [-] ([1,+Inf])
+
+** The total area of the solar collector array consistent with the supplied efficiency parameters (typically gross area
+** and not net area).
 2.0 ! 2: Collector area [m^2] ([0.0,+Inf])
-:CpIn ! 3: Fluid specific heat [kJ/kg.K] ([0.0,+Inf])
+
+** The specific heat of the fluid flowing through the solar collector array.
+:Cp ! 3: Fluid specific heat [kJ/kg.K] ([0.0,+Inf])
+
+** The collector efficiency equation can be written as a function of the inlet, average or outlet temperature. Specify 1
+** if the collector efficiency parameters are given as a function of the inlet temperature Specify 2 for a function of
+** the collector average temperature Specify 3 for a function of the collector outlet temperature
 1.0 ! 4: Efficiency mode [-] ([1,3])
+
+** Collector Flow rate per unit area for efficiency test conditions
 50.0 ! 5: Flow rate at test conditions [kg/hr.m^2] ([0.0,+Inf])
+
+** This parameter is the y intercept of the collector efficiency curve versus the temperature difference / radiation
+** ratio In equation form, this parameter is a0 in the following eq: Eff = a0 - a1 * (Tc-Tamb)/Rad. - a2 * (Tc-Tamb)^2 /
+** Rad. where Tc is the collector inlet, average or outlet temperature according to parameter 4
 0.7 ! 6: Intercept efficiency [-] ([0.0,1.0])
+
+** This parameter is the slope of the collector efficiency curve versus the temperature difference / radiation ratio In
+** equation form, this parameter is a1 in the following eq: Eff. = a0 - a1 * (Tc-Tamb)/Rad. - a2 * (Tc-Tamb)^2 /Rad.
+** Where Tc is the collector inlet, average or outlet temperature according to parameter 4
 10.0 ! 7: Negative of first order efficiency coeficient [kJ/hr.m^2.K] ([0.0,+Inf])
+
+** This parameter is the curvature of the efficiency curve versus the temperature difference / radiation ratio In
+** equation form, this parameter is a2 in the following eq: Eff. = a0 - a1 * (Tc-Tamb) /Rad.- a2 * (Tc-Tamb)^2/Rad where
+** Tc is the collector inlet, average or outlet temperature according to parameter 4
 0.03 ! 8: Negative of second order efficiency coeficient [kJ/hr.m^2.K^2] ([0.0,+Inf])
+
+** FORTRAN Logical unit for file containing biaxial IAM data Make sure that each logical unit specified in an assembly
+** is unique
 13.0 ! 9: Logical unit of file containing biaxial IAM data [-] ([10,100])
+
+** Number of data points for the IAM (longitudinal direction)
 7.0 ! 10: Number of longitudinal angles for which IAMs are provided [-] ([1,+Inf])
+
+** Number of data points for the IAM (transverse direction)
 7.0 ! 11: Number of transverse angles for which IAMs are provided [-] ([1,+Inf])
+
 INPUTS 10
+** The temperature of the fluid entering the the solar collector.
 :TIn ! 1: Inlet temperature [C] ([-Inf,+Inf])
-:MIn ! 2: Inlet flowrate [kg/hr] ([0.0,+Inf])
+
+** The flow rate of the fluid entering the solar collector.
+:M ! 2: Inlet flowrate [kg/hr] ([0.0,+Inf])
+
+** The temperature of the environment in which the solar collector is located. This temperature will be used for loss
+** calculations.
 0,0 ! 3: Ambient temperature [C] ([-Inf,+Inf])
+
+** The total (beam + diffuse) radiation incident on the plane of the solar collector per unit area. This input is
+** commonly hooked up to the TYPE 16 "total radiation on surface 1" output.
 0,0 ! 4: Incident radiation [kJ/hr.m^2] ([0.0,+Inf])
+
+** The incident diffuse solar radiation in the plane of the collector, per unit area
 0,0 ! 5: Incident diffuse radiation [kJ/hr.m^2] ([0.0,+Inf])
+
+** Incidence angle of beam radiation on the collector's surface
 0,0 ! 6: Solar incidence angle [degrees] ([-360,+360])
+
+** The solar zenith angle is the angle between the vertical and the line of sight of the sun
 0,0 ! 7: Solar zenith angle [degrees] ([-360,+360])
+
+** The solar azimuth angle is the angle between the local meridian and the projection of the line of sight of the sun
+** onto the horizontal plane
 0,0 ! 8: Solar azimuth angle [degrees] ([-360,+360])
+
+** The slope of the collector is the angle between the collector surface and the horizontal 0= horizontal, 90= vertical
+** The angle is positive when facing towards the collector surface azimuth As a general rule, the performance of the
+** collector is somewhat optimiszed when the sollector slope is set to the latitude
 0,0 ! 9: Collector slope [degrees] ([-360,+360])
+
+** The collector surface azimuth is the angle between the local meridian and the projection of the normal to the surface
+** onto the horizontal plane 0 = facing the equator 90 = facing West 180 = facing North in northern hemisphere, South in
+** Southern hemisphere 270 = facing East
 0,0 ! 10: Collector azimuth [degrees] ([-360,+360])
+
 ** initial values
 20.0 ! 1: Inlet temperature  initial value
 100.0 ! 2: Inlet flowrate  initial value
@@ -99,11 +161,19 @@ INPUTS 10
 0.0 ! 10: Collector azimuth  initial value
 
 EQUATIONS 1 ! 5
+** The temperature of the fluid exiting the solar collector array.
 :TOut = [1, 1] ! Outlet temperature [C] ([-Inf,+Inf])
+
+** The flowrate of the fluid exiting the solar collecor array. In this model: mdot,in = mdot,out
 ! :XXX = [1, 2] ! Outlet flowrate [kg/hr] ([0.0,+Inf])
+
+** The rate of useful energy gain by the solar collector fluid: Qu = mdot * Cp * (Tout - Tin)
 ! :XXX = [1, 3] ! Useful energy gain [kJ/hr] ([0.0,+Inf])
+
 ! :XXX = [1, 4] ! Collector efficiency [-] ([-Inf,+Inf])
+
 ! :XXX = [1, 5] ! Incidence angle modifier - overall [-] ([-Inf,+Inf])
+
 
 ***********************************
 ** Monthly printer

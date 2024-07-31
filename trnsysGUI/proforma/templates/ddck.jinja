@@ -2,15 +2,15 @@
 ** BEGIN {{fileName}}
 *******************************
 
-***************************************************************************
+{{"*" * 120}}
 ** Description: 
-{{description}}
-***************************************************************************
+{{multilineComment(description, 120)}}
+{{"*" * 120}}
 
-***************************************************************************
+{{"*" * 120}}
 ** Details: 
-{{details}}
-***************************************************************************
+{{multilineComment(details, 120)}}
+{{"*" * 120}}
 
 ***********************************
 ** inputs from hydraulic solver
@@ -60,19 +60,27 @@ EQUATIONS {{outputsWithHydraulicData|length}}
 UNIT 1 TYPE {{type}}
 PARAMETERS {{parameters|length}}
 {% for parameter in parameters %}
+    {% if parameter.definition %}
+{{multilineComment(parameter.definition)}}
+    {% endif %}
     {% if parameter.hydraulicConnectionsData %}
 {{visibilityModifier}}{{parameter.hydraulicConnectionsData.variableName}} ! {{parameter.info}}
     {% else %}
 {{parameter.defaultValue}} ! {{parameter.info}}
     {% endif %}
+
 {% endfor %}
 INPUTS {{inputs|length}}
 {% for input in inputs %}
+    {% if input.definition %}
+{{multilineComment(input.definition)}}
+    {% endif %}
     {% if input.hydraulicConnectionsData %}
 {{visibilityModifier}}{{input.hydraulicConnectionsData.variableName}} ! {{input.info}}
     {% else %}
 0,0 ! {{input.roleOrder}}: {{input.tmfName}} [{{input.unit}}] ({{input.bounds}})
     {% endif %}
+
 {% endfor %}
 ** initial values
 {% for input in inputs %}
@@ -85,11 +93,15 @@ EQUATIONS {{outputsWithHydraulicData|length}} ! {{outputs|length}}
 ! EQUATIONS {{outputs|length}}
 {% endif %}
 {% for output in outputs %}
+    {% if output.definition %}
+{{multilineComment(output.definition)}}
+    {% endif %}
     {% if output.hydraulicConnectionsData %}
 {{visibilityModifier}}{{output.hydraulicConnectionsData.variableName}} = [1, {{output.roleOrder}}] ! {{output.tmfName}} [{{output.unit}}] ({{output.bounds}})
     {% else %}
 ! {{visibilityModifier}}XXX = [1, {{output.roleOrder}}] ! {{output.tmfName}} [{{output.unit}}] ({{output.bounds}})
     {% endif %}
+
 {% endfor %}
 
 ***********************************

@@ -10,6 +10,7 @@ import trnsysGUI.placeHolderNames as _phn
 @_dc.dataclass
 class Variable:
     tmfName: str
+    definition: str
     order: int
     role: str
     roleOrder: int
@@ -48,9 +49,9 @@ class VariableNameBuilder:
             qualifiedPortName = _phn.getQualifiedPortName(connectionName, portName)
             return f"{self.variableNamePrefix}{qualifiedPortName}"
 
-        portNamePart = portName.capitalize()
+        connectionNameOrEmpty = connectionName or ""
 
-        return f"{self.variableNamePrefix}{portNamePart}"
+        return f"{self.variableNamePrefix}{connectionNameOrEmpty}"
 
     def getRhs(self, connectionName: str | None, portName: str) -> str:
         qualifiedPortName = _phn.getQualifiedPortName(connectionName, portName)
