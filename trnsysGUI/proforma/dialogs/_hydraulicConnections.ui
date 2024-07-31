@@ -76,7 +76,11 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QComboBox" name="fluidDensityComboBox"/>
+               <widget class="QComboBox" name="fluidDensityComboBox">
+                <property name="editable">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
               <item row="1" column="0">
                <widget class="QLabel" name="label_5">
@@ -86,7 +90,11 @@
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QComboBox" name="fluidHeatCapacityComboBox"/>
+               <widget class="QComboBox" name="fluidHeatCapacityComboBox">
+                <property name="editable">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
@@ -110,7 +118,14 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QComboBox" name="inputTempComboBox"/>
+               <widget class="QComboBox" name="inputTempComboBox">
+                <property name="editable">
+                 <bool>true</bool>
+                </property>
+                <property name="insertPolicy">
+                 <enum>QComboBox::NoInsert</enum>
+                </property>
+               </widget>
               </item>
               <item row="1" column="0">
                <widget class="QLabel" name="label_10">
@@ -125,7 +140,11 @@
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QComboBox" name="massFlowRateComboBox"/>
+               <widget class="QComboBox" name="massFlowRateComboBox">
+                <property name="editable">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
@@ -144,10 +163,18 @@
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QComboBox" name="outputRevTempComboBox"/>
+               <widget class="QComboBox" name="outputRevTempComboBox">
+                <property name="editable">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QComboBox" name="outputTempComboBox"/>
+               <widget class="QComboBox" name="outputTempComboBox">
+                <property name="editable">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
               <item row="0" column="0">
                <widget class="QLabel" name="label_11">

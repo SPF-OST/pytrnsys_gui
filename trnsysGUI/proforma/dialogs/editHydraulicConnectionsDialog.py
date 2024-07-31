@@ -3,8 +3,8 @@ import copy as _copy
 import dataclasses as _dc
 import textwrap as _tw
 
-import PyQt5.QtCore as _qtc
-import PyQt5.QtWidgets as _qtw
+from PyQt5 import QtCore as _qtc
+from PyQt5 import QtWidgets as _qtw
 
 import pytrnsys.ddck.replaceTokens.defaultVisibility as _dv
 import trnsysGUI.common as _com
@@ -17,19 +17,33 @@ _dlgs.assertThatLocalGeneratedUIModuleAndResourcesExist(__name__, moduleName="_U
 from . import _UI_hydraulicConnections_generated as _uigen  # type: ignore[import]  # pylint: disable=wrong-import-position
 
 
-class _OnActivatedCallBack:
-    def __init__(self, dialog: "EditHydraulicConnectionsDialog", comboBox: _qtw.QComboBox) -> None:
+class _Callbacks:
+    def __init__(
+        self,
+        dialog: "EditHydraulicConnectionsDialog",
+        comboBox: _qtw.QComboBox,
+        proxyModel: _qtc.QSortFilterProxyModel,
+    ) -> None:
         self._dialog = dialog
         self._comboBox = comboBox
+        self._proxyModel = proxyModel
 
     @staticmethod
-    def createAndConnect(dialog: "EditHydraulicConnectionsDialog", comboBox: _qtw.QComboBox) -> "_OnActivatedCallBack":
-        callback = _OnActivatedCallBack(dialog, comboBox)
+    def createAndConnect(
+        dialog: "EditHydraulicConnectionsDialog",
+        comboBox: _qtw.QComboBox,
+        proxyModel: _qtc.QSortFilterProxyModel,
+    ) -> "_Callbacks":
+        callback = _Callbacks(dialog, comboBox, proxyModel)
         comboBox.activated.connect(callback.onActivated)
+        comboBox.lineEdit().textEdited.connect(callback.onLineEditTextEdited)
         return callback
 
     def onActivated(self, newIndex: int) -> None:
         self._dialog.onVariableComboBoxActivated(self._comboBox, newIndex)
+
+    def onLineEditTextEdited(self, newText) -> None:
+        self._proxyModel.setFilterWildcard(f"*{newText}*")
 
 
 @_dc.dataclass
@@ -52,7 +66,7 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
         self._variablesByRole = variablesByRole
         self.hydraulicConnections = self._getDeepCopiesSortedByName(suggestedHydraulicConnections)
 
-        self._onActivatedCallbacks = list[_OnActivatedCallBack]()
+        self._callbacks = list[_Callbacks]()
 
         self.summaryTextEdit.setReadOnly(True)
 
@@ -180,8 +194,20 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
 
     def _configureVariableComboBoxes(self) -> None:
         for variableComboBox in self._variableComboBoxes:
-            onActivatedCallback = _OnActivatedCallBack.createAndConnect(self, variableComboBox)
-            self._onActivatedCallbacks.append(onActivatedCallback)
+            sortFilterProxyModel = self._createSortFilterProxyModelAndAddToCompleter(variableComboBox)
+
+            onActivatedCallback = _Callbacks.createAndConnect(self, variableComboBox, sortFilterProxyModel)
+            self._callbacks.append(onActivatedCallback)
+
+    @staticmethod
+    def _createSortFilterProxyModelAndAddToCompleter(variableComboBox: _qtw.QComboBox) -> _qtc.QSortFilterProxyModel:
+        sortFilterProxyModel = _qtc.QSortFilterProxyModel()
+        sortFilterProxyModel.setSourceModel(variableComboBox.model())
+        sortFilterProxyModel.setFilterCaseSensitivity(_qtc.Qt.CaseInsensitive)
+        completer = variableComboBox.completer()
+        completer.setCompletionMode(_qtw.QCompleter.UnfilteredPopupCompletion)
+        completer.setModel(sortFilterProxyModel)
+        return sortFilterProxyModel
 
     def onVariableComboBoxActivated(self, comboBox: _qtw.QComboBox, newIndex: int) -> None:
         data = comboBox.itemData(newIndex)
@@ -315,6 +341,9 @@ def _setSelected(comboBox: _qtw.QComboBox, data: _models.Variable | _models.Unse
         rowData = comboBox.itemData(index)
         if rowData == data:
             comboBox.setCurrentIndex(index)
+            if isinstance(data, _models.Variable):
+                lineEdit = comboBox.lineEdit()
+                lineEdit.setToolTip(data.definition)
             return
 
     raise AssertionError(f"{data} not a member of combo box.")
