@@ -2,6 +2,7 @@ import collections.abc as _cabc
 import copy as _copy
 import dataclasses as _dc
 import textwrap as _tw
+import re as _re
 
 from PyQt5 import QtCore as _qtc
 from PyQt5 import QtWidgets as _qtw
@@ -42,8 +43,9 @@ class _Callbacks:
     def onActivated(self, newIndex: int) -> None:
         self._dialog.onVariableComboBoxActivated(self._comboBox, newIndex)
 
-    def onLineEditTextEdited(self, newText) -> None:
-        self._proxyModel.setFilterWildcard(f"*{newText}*")
+    def onLineEditTextEdited(self, newText: str) -> None:
+        newTextWithWildcardsForWhitespace = _re.sub(r"\s+", "*", newText)
+        self._proxyModel.setFilterWildcard(f"*{newTextWithWildcardsForWhitespace}*")
 
 
 @_dc.dataclass

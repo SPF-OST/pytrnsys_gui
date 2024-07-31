@@ -19,7 +19,7 @@
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Note: Fields in &lt;span style=&quot; font-weight:700;&quot;&gt;bold&lt;/span&gt; are required. You can hover over light bulbs (&lt;img src=&quot;:/tango-icons/status/tango-icon-theme-0.8.90/scalable/status/dialog-information.svg&quot; height=&quot;20&quot;/&gt;), drop down entries and disabled buttons to get more information.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Note: Fields in &lt;span style=&quot; font-weight:700;&quot;&gt;bold&lt;/span&gt; are required. You can hover over light bulbs (&lt;img src=&quot;:/tango-icons/status/tango-icon-theme-0.8.90/scalable/status/dialog-information.svg&quot; height=&quot;20&quot;/&gt;), drop down entries and disabled buttons to get more information. Drop downs can be searched by typing into them.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
