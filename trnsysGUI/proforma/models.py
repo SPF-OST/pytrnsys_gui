@@ -8,9 +8,9 @@ import trnsysGUI.placeHolderNames as _phn
 
 
 @_dc.dataclass
-class Variable:
+class Variable:  # pylint: disable=too-many-instance-attributes
     tmfName: str
-    definition: str
+    definition: str | None
     order: int
     role: str
     roleOrder: int

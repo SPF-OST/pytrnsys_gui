@@ -9,6 +9,8 @@ import xmlschema as _xml
 
 import pytrnsys.ddck.replaceTokens.defaultVisibility as _dv
 import pytrnsys.utils.result as _res
+
+import trnsysGUI.common.cancelled as _cancel
 import trnsysGUI.proforma.convertXmlTmfToDdck as _pc
 import trnsysGUI.proforma.models as _models
 import trnsysGUI.proforma.dialogs.editHydraulicConnectionsDialog as _ehcd
@@ -97,7 +99,7 @@ def testConvertXmlTmfStringToDdck(testCase: TestCase, monkeypatch) -> None:
         assert not testCase.actualOutputFilePath.is_file()
 
 
-def testConvertXmlTmfStringToDdckTwoConnections(monkeypatch, qtbot) -> None:
+def testConvertXmlTmfStringToDdckTwoConnections(monkeypatch) -> None:
     xmlFilePath = _INPUT_DIR_PATH / "Type5b.xmltmf"
 
     xmlFileContent = xmlFilePath.read_text(encoding="utf8")
@@ -279,11 +281,17 @@ def testConvertXmlTmfStringToDdckTwoConnections(monkeypatch, qtbot) -> None:
         ),
     ]
 
-    result = _pc.convertXmlTmfStringToDdck(xmlFileContent, suggestedHydraulicConnections, fileName=outputFileName)
+    maybeCancelled = _pc.convertXmlTmfStringToDdck(
+        xmlFileContent, suggestedHydraulicConnections, fileName=outputFileName
+    )
+
+    assert not _cancel.isCancelled(maybeCancelled)
+    result = maybeCancelled
 
     assert not _res.isError(result)
-
     actualContent = _res.value(result)
+
+    assert isinstance(actualContent, str)
 
     actualFilePath = _DATA_DIR_PATH / "actual" / outputFileName
     actualFilePath.write_text(actualContent)
