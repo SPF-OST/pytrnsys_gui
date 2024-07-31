@@ -1,6 +1,7 @@
 import collections.abc as _cabc
 import copy as _copy
 import dataclasses as _dc
+import textwrap as _tw
 
 import PyQt5.QtCore as _qtc
 import PyQt5.QtWidgets as _qtw
@@ -117,34 +118,17 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
         self._addParametersAndInputOptions(self.fluidHeatCapacityComboBox)
 
     def _addParametersAndInputOptions(self, comboBox: _qtw.QComboBox) -> None:
-        self._addOptions(comboBox, self._getParameters(comboBox))
+        _addOptions(comboBox, self._getParameters(comboBox))
         comboBox.addItem("-----", _models.UNSET)
-        self._addOptions(comboBox, self._getInputs(comboBox), withUnset=False, clear=False)
+        _addOptions(comboBox, self._getInputs(comboBox), withUnset=False, clear=False)
 
     def _reconfigureInputs(self) -> None:
-        self._addOptions(self.massFlowRateComboBox, self._getInputs(self.massFlowRateComboBox))
-        self._addOptions(self.inputTempComboBox, self._getInputs(self.inputTempComboBox))
+        _addOptions(self.massFlowRateComboBox, self._getInputs(self.massFlowRateComboBox))
+        _addOptions(self.inputTempComboBox, self._getInputs(self.inputTempComboBox))
 
     def _reconfigureOutputs(self) -> None:
-        self._addOptions(self.outputTempComboBox, self._getOutputs(self.outputTempComboBox))
-        self._addOptions(self.outputRevTempComboBox, self._getInputs(self.outputRevTempComboBox))
-
-    @staticmethod
-    def _addOptions(
-        comboBox: _qtw.QComboBox,
-        variables: _cabc.Sequence[_models.Variable],
-        withUnset: bool = True,
-        clear: bool = True,
-    ) -> None:
-        if clear:
-            comboBox.clear()
-
-        if withUnset:
-            comboBox.addItem("", _models.UNSET)
-
-        for variable in variables:
-            text = variable.getInfo(withRole=True)
-            comboBox.addItem(text, variable)
+        _addOptions(self.outputTempComboBox, self._getOutputs(self.outputTempComboBox))
+        _addOptions(self.outputRevTempComboBox, self._getInputs(self.outputRevTempComboBox))
 
     @property
     def _selectedVariables(self) -> _cabc.Sequence[_models.Variable]:
@@ -293,6 +277,36 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
         dialogResult = DialogResult(dialog.hydraulicConnections, defaultVisibility)
 
         return dialogResult
+
+
+def _addOptions(
+    comboBox: _qtw.QComboBox,
+    variables: _cabc.Sequence[_models.Variable],
+    withUnset: bool = True,
+    clear: bool = True,
+) -> None:
+    if clear:
+        comboBox.clear()
+
+    if withUnset:
+        comboBox.addItem("", _models.UNSET)
+
+    for variable in variables:
+        text = variable.getInfo(withRole=True)
+        comboBox.addItem(text, variable)
+
+        _maybeAddToolTipToLatestEntry(variable, comboBox)
+
+
+def _maybeAddToolTipToLatestEntry(variable: _models.Variable, comboBox: _qtw.QComboBox) -> None:
+    if not variable.definition:
+        return
+
+    wrappedLines = _tw.wrap(variable.definition, width=60)
+    toolTipText = "\n".join(wrappedLines)
+
+    index = comboBox.count() - 1
+    comboBox.setItemData(index, toolTipText, _qtc.Qt.ToolTipRole)
 
 
 def _setSelected(comboBox: _qtw.QComboBox, data: _models.Variable | _models.Unset) -> None:

@@ -149,7 +149,7 @@ def _createVariablesForRole(
 
     variables = []
     for roleOrder, serializedVariable in enumerate(sortedSerializedVariablesForRole, start=1):
-        definition = serializedVariable.get("definition")
+        definition = _getDefinition(serializedVariable)
         bounds = _getBounds(serializedVariable)
 
         variable = _models.Variable(
@@ -230,12 +230,17 @@ def _getVisibilityModifier(  # pylint: disable=inconsistent-return-statements
 
 
 def _makeMultilineComment(text: str, width: int = 120) -> str:
-    textWithCollapsedWhitespace = _re.sub(r"\s+", " ", text.strip(), count=0, flags=_re.MULTILINE)
+    textWithCollapsedWhitespace = _collapseWhitespace(text)
     linePrefix = "** "
     maxWidth = width - len(linePrefix)
     wrappedLines = _tw.wrap(textWithCollapsedWhitespace, maxWidth)
     newText = "\n".join(f"** {l}" for l in wrappedLines)
     return newText
+
+
+def _collapseWhitespace(text: str) -> str:
+    textWithCollapsedWhitespace = _re.sub(r"\s+", " ", text.strip(), count=0, flags=_re.MULTILINE)
+    return textWithCollapsedWhitespace
 
 
 def _convertXmlTmfStringToDdck(
@@ -336,6 +341,14 @@ def _getSerializedVariablesWithRole(
     role: _Role, variables: _tp.Sequence[_StringMapping]
 ) -> _tp.Sequence[_StringMapping]:
     return [v for v in variables if v["role"] == role]
+
+
+def _getDefinition(variable: _StringMapping) -> str | None:
+    definition = variable.get("definition")
+    if not definition:
+        return None
+
+    return _collapseWhitespace(definition)
 
 
 def _getBounds(variable: _StringMapping) -> str:
