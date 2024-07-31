@@ -1,0 +1,97 @@
+*******************************
+** BEGIN Type5b.ddck
+*******************************
+
+***************************************************************************
+** Description: 
+** Heat Exchanger: Counter Flow
+***************************************************************************
+
+***************************************************************************
+** Details: 
+** A zero capacitance sensible heat exchanger is modeled in various configurations. In this instance, a counter flow
+** heat exchanger is modeled. Given the hot and cold side inlet temperatures and flow rates, the effectiveness is
+** calculated for a given fixed value of the overall heat transfer coefficient.
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+EQUATIONS 5
+CpIn = @cp(In)
+TIn = @temp(In)
+MIn = @mfr(In)
+TIn = @temp(In)
+MIn = @mfr(In)
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+EQUATIONS 2
+@temp(Out) = TOut
+@temp(Out) = TOut
+
+***********************************
+** outputs to other ddck
+***********************************
+
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+******************************************************************************************
+
+
+***********************************
+** Dependencies with other ddck
+***********************************
+
+
+***********************************
+** Begin CONSTANTS
+***********************************
+
+
+***********************************
+** Begin TYPE
+***********************************
+UNIT 1 TYPE 5
+PARAMETERS 4
+2.0 ! 1: Counter flow mode [-] ([2,2])
+4.19 ! 2: Specific heat of source side fluid [kJ/kg.K] ([0,+Inf])
+CpIn ! 3: Specific heat of load side fluid [kJ/kg.K] ([0,+Inf])
+0.0 ! 4: Not used [-] ([0,+Inf])
+INPUTS 5
+TIn ! 1: Source side inlet temperature [C] ([-Inf,+Inf])
+MIn ! 2: Source side flow rate [kg/hr] ([0,+Inf])
+TIn ! 3: Load side inlet temperature [C] ([-Inf,+Inf])
+MIn ! 4: Load side flow rate [kg/hr] ([0,+Inf])
+0,0 ! 5: Overall heat transfer coefficient of exchanger [kJ/hr.K] ([0,+Inf])
+** initial values
+20.0 ! 1: Source side inlet temperature  initial value
+100.0 ! 2: Source side flow rate  initial value
+20.0 ! 3: Load side inlet temperature  initial value
+100.0 ! 4: Load side flow rate  initial value
+10.0 ! 5: Overall heat transfer coefficient of exchanger  initial value
+
+EQUATIONS 2 ! 6
+TOut = [1, 1] ! Source side outlet temperature [C] ([-Inf,+Inf])
+! XXX = [1, 2] ! Source side flow rate [kg/hr] ([-Inf,+Inf])
+TOut = [1, 3] ! Load side outlet temperature [C] ([-Inf,+Inf])
+! XXX = [1, 4] ! Load side flow rate [kg/hr] ([-Inf,+Inf])
+! XXX = [1, 5] ! Heat transfer rate [kJ/hr] ([-Inf,+Inf])
+! XXX = [1, 6] ! Effectiveness [-] ([-Inf,+Inf])
+
+***********************************
+** Monthly printer
+***********************************
+
+
+***********************************
+** Hourly printer
+***********************************
+
+
+***********************************
+** Online Plotter
+***********************************
+

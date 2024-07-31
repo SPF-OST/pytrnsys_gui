@@ -3,12 +3,12 @@
 
 import logging
 import os
-import typing as _tp
 
 import pytrnsys.rsim.getConfigMixin as _rcm
 import pytrnsys.trnsys_util.buildTrnsysDeck as _btd
 import pytrnsys.trnsys_util.readConfigTrnsys as _rc
 import pytrnsys.utils.result as _res
+import pytrnsys.utils.warnings as _warn
 
 logger = logging.getLogger("root")
 
@@ -51,7 +51,7 @@ class buildDck(_rcm.GetConfigMixin):
 
         self.variablesOutput = []
 
-    def buildTrnsysDeck(self) -> _res.Result[_tp.Optional[str]]:
+    def buildTrnsysDeck(self) -> _res.Result[_warn.ValueWithWarnings[str | None]]:
         """
         It builds a TRNSYS Deck from a listDdck with pathDdck using the BuildingTrnsysDeck Class.
         it reads the Deck list and writes a deck file. Afterwards it checks that the deck looks fine
@@ -73,7 +73,7 @@ class buildDck(_rcm.GetConfigMixin):
         deck = _btd.BuildTrnsysDeck(
             self.path,
             self.nameBase,
-            self._ddckFilePathWithComponentNames,
+            self._includedDdckFiles,
             self._defaultVisibility,
             self._ddckPlaceHolderValuesJsonPath,
         )
@@ -86,11 +86,13 @@ class buildDck(_rcm.GetConfigMixin):
 
         if _res.isError(result):
             return _res.error(result)
+        warnings = _res.value(result)
 
         deck.overwriteForcedByUser = self.overwriteForcedByUser
         deck.writeDeck(addedLines=deckExplanation)
         if deck.abortedByUser:
-            return
+            return warnings.withValue(None)
+        
         self.overwriteForcedByUser = deck.overwriteForcedByUser
 
         result = deck.checkTrnsysDeck(deck.nameDeck, check=self.inputs["checkDeck"])
@@ -106,7 +108,7 @@ class buildDck(_rcm.GetConfigMixin):
 
         deck.analyseDck()
 
-        return deck.nameDeck
+        return warnings.withValue(deck.nameDeck)
 
     def _readConfig(self, path, name, parseFileCreated=False) -> _res.Result[None]:
         """
