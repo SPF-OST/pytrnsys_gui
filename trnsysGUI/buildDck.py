@@ -92,7 +92,7 @@ class buildDck(_rcm.GetConfigMixin):
         deck.writeDeck(addedLines=deckExplanation)
         if deck.abortedByUser:
             return warnings.withValue(None)
-        
+
         self.overwriteForcedByUser = deck.overwriteForcedByUser
 
         result = deck.checkTrnsysDeck(deck.nameDeck, check=self.inputs["checkDeck"])

@@ -68,7 +68,9 @@ def _getPlaceHoldersForNode(
     for modelPortItem in node.getPortItems():
         qualifiedPortName = _phn.getQualifiedPortName(node.name, modelPortItem.name)
 
-        placeholdersForPort = _getPlaceholdersForPort(hydraulicLoops, componentName, internalPiping, node, modelPortItem)
+        placeholdersForPort = _getPlaceholdersForPort(
+            hydraulicLoops, componentName, internalPiping, node, modelPortItem
+        )
 
         placeHoldersForNode[qualifiedPortName] = placeholdersForPort
 
