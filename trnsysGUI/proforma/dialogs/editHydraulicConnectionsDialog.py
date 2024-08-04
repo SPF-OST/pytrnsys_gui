@@ -1,9 +1,11 @@
 import collections.abc as _cabc
 import copy as _copy
 import dataclasses as _dc
+import textwrap as _tw
+import re as _re
 
-import PyQt5.QtCore as _qtc
-import PyQt5.QtWidgets as _qtw
+from PyQt5 import QtCore as _qtc
+from PyQt5 import QtWidgets as _qtw
 
 import pytrnsys.ddck.replaceTokens.defaultVisibility as _dv
 import trnsysGUI.common as _com
@@ -16,19 +18,34 @@ _dlgs.assertThatLocalGeneratedUIModuleAndResourcesExist(__name__, moduleName="_U
 from . import _UI_hydraulicConnections_generated as _uigen  # type: ignore[import]  # pylint: disable=wrong-import-position
 
 
-class _OnActivatedCallBack:
-    def __init__(self, dialog: "EditHydraulicConnectionsDialog", comboBox: _qtw.QComboBox) -> None:
+class _Callbacks:
+    def __init__(
+        self,
+        dialog: "EditHydraulicConnectionsDialog",
+        comboBox: _qtw.QComboBox,
+        proxyModel: _qtc.QSortFilterProxyModel,
+    ) -> None:
         self._dialog = dialog
         self._comboBox = comboBox
+        self._proxyModel = proxyModel
 
     @staticmethod
-    def createAndConnect(dialog: "EditHydraulicConnectionsDialog", comboBox: _qtw.QComboBox) -> "_OnActivatedCallBack":
-        callback = _OnActivatedCallBack(dialog, comboBox)
+    def createAndConnect(
+        dialog: "EditHydraulicConnectionsDialog",
+        comboBox: _qtw.QComboBox,
+        proxyModel: _qtc.QSortFilterProxyModel,
+    ) -> "_Callbacks":
+        callback = _Callbacks(dialog, comboBox, proxyModel)
         comboBox.activated.connect(callback.onActivated)
+        comboBox.lineEdit().textEdited.connect(callback.onLineEditTextEdited)
         return callback
 
     def onActivated(self, newIndex: int) -> None:
         self._dialog.onVariableComboBoxActivated(self._comboBox, newIndex)
+
+    def onLineEditTextEdited(self, newText: str) -> None:
+        newTextWithWildcardsForWhitespace = _re.sub(r"\s+", "*", newText)
+        self._proxyModel.setFilterWildcard(f"*{newTextWithWildcardsForWhitespace}*")
 
 
 @_dc.dataclass
@@ -51,7 +68,7 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
         self._variablesByRole = variablesByRole
         self.hydraulicConnections = self._getDeepCopiesSortedByName(suggestedHydraulicConnections)
 
-        self._onActivatedCallbacks = list[_OnActivatedCallBack]()
+        self._callbacks = list[_Callbacks]()
 
         self.summaryTextEdit.setReadOnly(True)
 
@@ -117,34 +134,17 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
         self._addParametersAndInputOptions(self.fluidHeatCapacityComboBox)
 
     def _addParametersAndInputOptions(self, comboBox: _qtw.QComboBox) -> None:
-        self._addOptions(comboBox, self._getParameters(comboBox))
+        _addOptions(comboBox, self._getParameters(comboBox))
         comboBox.addItem("-----", _models.UNSET)
-        self._addOptions(comboBox, self._getInputs(comboBox), withUnset=False, clear=False)
+        _addOptions(comboBox, self._getInputs(comboBox), withUnset=False, clear=False)
 
     def _reconfigureInputs(self) -> None:
-        self._addOptions(self.massFlowRateComboBox, self._getInputs(self.massFlowRateComboBox))
-        self._addOptions(self.inputTempComboBox, self._getInputs(self.inputTempComboBox))
+        _addOptions(self.massFlowRateComboBox, self._getInputs(self.massFlowRateComboBox))
+        _addOptions(self.inputTempComboBox, self._getInputs(self.inputTempComboBox))
 
     def _reconfigureOutputs(self) -> None:
-        self._addOptions(self.outputTempComboBox, self._getOutputs(self.outputTempComboBox))
-        self._addOptions(self.outputRevTempComboBox, self._getInputs(self.outputRevTempComboBox))
-
-    @staticmethod
-    def _addOptions(
-        comboBox: _qtw.QComboBox,
-        variables: _cabc.Sequence[_models.Variable],
-        withUnset: bool = True,
-        clear: bool = True,
-    ) -> None:
-        if clear:
-            comboBox.clear()
-
-        if withUnset:
-            comboBox.addItem("", _models.UNSET)
-
-        for variable in variables:
-            text = variable.getInfo(withRole=True)
-            comboBox.addItem(text, variable)
+        _addOptions(self.outputTempComboBox, self._getOutputs(self.outputTempComboBox))
+        _addOptions(self.outputRevTempComboBox, self._getInputs(self.outputRevTempComboBox))
 
     @property
     def _selectedVariables(self) -> _cabc.Sequence[_models.Variable]:
@@ -196,8 +196,20 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
 
     def _configureVariableComboBoxes(self) -> None:
         for variableComboBox in self._variableComboBoxes:
-            onActivatedCallback = _OnActivatedCallBack.createAndConnect(self, variableComboBox)
-            self._onActivatedCallbacks.append(onActivatedCallback)
+            sortFilterProxyModel = self._createSortFilterProxyModelAndAddToCompleter(variableComboBox)
+
+            onActivatedCallback = _Callbacks.createAndConnect(self, variableComboBox, sortFilterProxyModel)
+            self._callbacks.append(onActivatedCallback)
+
+    @staticmethod
+    def _createSortFilterProxyModelAndAddToCompleter(variableComboBox: _qtw.QComboBox) -> _qtc.QSortFilterProxyModel:
+        sortFilterProxyModel = _qtc.QSortFilterProxyModel()
+        sortFilterProxyModel.setSourceModel(variableComboBox.model())
+        sortFilterProxyModel.setFilterCaseSensitivity(_qtc.Qt.CaseInsensitive)
+        completer = variableComboBox.completer()
+        completer.setCompletionMode(_qtw.QCompleter.UnfilteredPopupCompletion)
+        completer.setModel(sortFilterProxyModel)
+        return sortFilterProxyModel
 
     def onVariableComboBoxActivated(self, comboBox: _qtw.QComboBox, newIndex: int) -> None:
         data = comboBox.itemData(newIndex)
@@ -295,12 +307,45 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
         return dialogResult
 
 
+def _addOptions(
+    comboBox: _qtw.QComboBox,
+    variables: _cabc.Sequence[_models.Variable],
+    withUnset: bool = True,
+    clear: bool = True,
+) -> None:
+    if clear:
+        comboBox.clear()
+
+    if withUnset:
+        comboBox.addItem("", _models.UNSET)
+
+    for variable in variables:
+        text = variable.getInfo(withRole=True)
+        comboBox.addItem(text, variable)
+
+        _maybeAddToolTipToLatestEntry(variable, comboBox)
+
+
+def _maybeAddToolTipToLatestEntry(variable: _models.Variable, comboBox: _qtw.QComboBox) -> None:
+    if not variable.definition:
+        return
+
+    wrappedLines = _tw.wrap(variable.definition, width=60)
+    toolTipText = "\n".join(wrappedLines)
+
+    index = comboBox.count() - 1
+    comboBox.setItemData(index, toolTipText, _qtc.Qt.ToolTipRole)
+
+
 def _setSelected(comboBox: _qtw.QComboBox, data: _models.Variable | _models.Unset) -> None:
     # Cannot use `QComboBox.findData` as `findData` works by reference, but we want by value
     for index in range(comboBox.count()):
         rowData = comboBox.itemData(index)
         if rowData == data:
             comboBox.setCurrentIndex(index)
+            if isinstance(data, _models.Variable) and (definition := data.definition):
+                lineEdit = comboBox.lineEdit()
+                lineEdit.setToolTip(definition)
             return
 
     raise AssertionError(f"{data} not a member of combo box.")

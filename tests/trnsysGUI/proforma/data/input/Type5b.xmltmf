@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TrnsysModel>
+       <object>Heat Exchanger: Counter Flow</object>
+       <author>Contributors are listed in manuals</author>
+       <organization>Solar Energy Laboratory, University of Wisconsin - Madison</organization>
+       <editor>CMR</editor>
+       <creationDate>TRNSYS v7.5</creationDate>
+       <modifictionDate>May 2011</modifictionDate>
+       <mode>1</mode>
+       <validation>16</validation>
+       <icon>.\Studio\Icon\Type5b.bmp</icon>
+       <type>5</type>
+       <maxInstance>9999</maxInstance>
+       <keywords />
+       <details>A zero capacitance sensible heat exchanger is modeled in various configurations. In
+              this instance, a counter flow heat exchanger is modeled. Given the hot and cold side
+              inlet temperatures and flow rates, the effectiveness is calculated for a given fixed
+              value of the overall heat transfer coefficient.</details>
+       <variables>
+              <variable><!--output-1-->
+                     <order>1</order>
+                     <name>Source side outlet temperature</name>
+                     <role>output</role>
+                     <dimension>Temperature</dimension>
+                     <unit>C</unit>
+                     <type>real</type>
+                     <min>-Inf</min>
+                     <max>+Inf</max>
+                     <boundaries>[ ; ]</boundaries>
+                     <default>0</default>
+                     <symbol>SN</symbol>
+                     <definition>The temperature of the fluid leaving the source side of the counter
+                            flow heat exchanger. NOTE: "source" and "load" are merely convenient
+                            designations; energy will be transfered from the source side to the load
+                            side if the source side is hotter than the load side. It will be
+                            transfered from the load side to the source side if the load side is
+                            hotter than the source side.</definition>
+              </variable>
+              <variable><!--output-2-->
+                     <order>2</order>
+                     <name>Source side flow rate</name>
+                     <role>output</role>
+                     <dimension>Flow Rate</dimension>
+                     <unit>kg/hr</unit>
+                     <type>real</type>
+                     <min>-Inf</min>
+                     <max>+Inf</max>
+                     <boundaries>[ ; ]</boundaries>
+                     <default>0</default>
+                     <symbol>SN</symbol>
+                     <definition>The flow rate of fluid exiting the source side of the counter flow
+                            heat exchanger. NOTE: "source" and "load" are merely convenient
+                            designations; energy will be transfered from the source side to the load
+                            side if the source side is hotter than the load side. It will be
+                            transfered from the load side to the source side if the load side is
+                            hotter than the source side.</definition>
+              </variable>
+              <variable><!--output-3-->
+                     <order>3</order>
+                     <name>Load side outlet temperature</name>
+                     <role>output</role>
+                     <dimension>Temperature</dimension>
+                     <unit>C</unit>
+                     <type>real</type>
+                     <min>-Inf</min>
+                     <max>+Inf</max>
+                     <boundaries>[ ; ]</boundaries>
+                     <default>0</default>
+                     <symbol>SN</symbol>
+                     <definition>The temperature of the fluid leaving the load side of the counter
+                            flow heat exchanger. NOTE: "source" and "load" are merely convenient
+                            designations; energy will be transfered from the source side to the load
+                            side if the source side is hotter than the load side. It will be
+                            transfered from the load side to the source side if the load side is
+                            hotter than the source side.</definition>
+              </variable>
+              <variable><!--output-4-->
+                     <order>4</order>
+                     <name>Load side flow rate</name>
+                     <role>output</role>
+                     <dimension>Flow Rate</dimension>
+                     <unit>kg/hr</unit>
+                     <type>real</type>
+                     <min>-Inf</min>
+                     <max>+Inf</max>
+                     <boundaries>[ ; ]</boundaries>
+                     <default>0</default>
+                     <symbol>SN</symbol>
+                     <definition>The flow rate of fluid exiting the load side of the counter flow
+                            heat exchanger. NOTE: "source" and "load" are merely convenient
+                            designations; energy will be transfered from the source side to the load
+                            side if the source side is hotter than the load side. It will be
+                            transfered from the load side to the source side if the load side is
+                            hotter than the source side.</definition>
+              </variable>
+              <variable><!--output-5-->
+                     <order>5</order>
+                     <name>Heat transfer rate</name>
+                     <role>output</role>
+                     <dimension>Power</dimension>
+                     <unit>kJ/hr</unit>
+                     <type>real</type>
+                     <min>-Inf</min>
+                     <max>+Inf</max>
+                     <boundaries>[ ; ]</boundaries>
+                     <default>0</default>
+                     <symbol>SN</symbol>
+                     <definition>The total heat transfer rate between the fluids in the counter flow
+                            heat exchanger.</definition>
+              </variable>
+              <variable><!--output-6-->
+                     <order>6</order>
+                     <name>Effectiveness</name>
+                     <role>output</role>
+                     <dimension>Dimensionless</dimension>
+                     <unit>-</unit>
+                     <type>real</type>
+                     <min>-Inf</min>
+                     <max>+Inf</max>
+                     <boundaries>[ ; ]</boundaries>
+                     <default>0</default>
+                     <symbol>SN</symbol>
+                     <definition>The effectiveness of the counter flow heat exchanger.</definition>
+              </variable>
+              <variable><!--input-1-->
+                     <order>7</order>
+                     <name>Source side inlet temperature</name>
+                     <role>input</role>
+                     <dimension>Temperature</dimension>
+                     <unit>C</unit>
+                     <type>real</type>
+                     <min>-Inf</min>
+                     <max>+Inf</max>
+                     <boundaries>[ ; ]</boundaries>
+                     <default>20.0</default>
+                     <symbol>SN</symbol>
+                     <definition>The temperature of the fluid flowing into the source side of the
+                            counter flow heat exchanger. NOTE: "source" and "load" are merely
+                            convenient designations; energy will be transfered from the source side
+                            to the load side if the source side is hotter than the load side. It
+                            will be transfered from the load side to the source side if the load
+                            side is hotter than the source side.</definition>
+              </variable>
+              <variable><!--input-2-->
+                     <order>8</order>
+                     <name>Source side flow rate</name>
+                     <role>input</role>
+                     <dimension>Flow Rate</dimension>
+                     <unit>kg/hr</unit>
+                     <type>real</type>
+                     <min>0</min>
+                     <max>+Inf</max>
+                     <boundaries>[ ; ]</boundaries>
+                     <default>100.0</default>
+                     <symbol>SN</symbol>
+                     <definition>The flow rate of the fluid flowing through the source side of the
+                            counter flow heat exchanger. NOTE: "source" and "load" are merely
+                            convenient designations; energy will be transfered from the source side
+                            to the load side if the source side is hotter than the load side. It
+                            will be transfered from the load side to the source side if the load
+                            side is hotter than the source side.</definition>
+              </variable>
+              <variable><!--input-3-->
+                     <order>9</order>
+                     <name>Load side inlet temperature</name>
+                     <role>input</role>
+                     <dimension>Temperature</dimension>
+                     <unit>C</unit>
+                     <type>real</type>
+                     <min>-Inf</min>
+                     <max>+Inf</max>
+                     <boundaries>[ ; ]</boundaries>
+                     <default>20.0</default>
+                     <symbol>SN</symbol>
+                     <definition>The temperature of the fluid flowing into the load side of the
+                            counter flow heat exchanger. NOTE: "source" and "load" are merely
+                            convenient designations; energy will be transfered from the source side
+                            to the load side if the source side is hotter than the load side. It
+                            will be transfered from the load side to the source side if the load
+                            side is hotter than the source side.</definition>
+              </variable>
+              <variable><!--input-4-->
+                     <order>10</order>
+                     <name>Load side flow rate</name>
+                     <role>input</role>
+                     <dimension>Flow Rate</dimension>
+                     <unit>kg/hr</unit>
+                     <type>real</type>
+                     <min>0</min>
+                     <max>+Inf</max>
+                     <boundaries>[ ; ]</boundaries>
+                     <default>100.0</default>
+                     <symbol>SN</symbol>
+                     <definition>The flow rate of the fluid flowing through the load side of the
+                            counter flow heat exchanger. NOTE: "source" and "load" are merely
+                            convenient designations; energy will be transfered from the source side
+                            to the load side if the source side is hotter than the load side. It
+                            will be transfered from the load side to the source side if the load
+                            side is hotter than the source side.</definition>
+              </variable>
+              <variable><!--parameter-1-->
+                     <order>11</order>
+                     <name>Counter flow mode</name>
+                     <role>parameter</role>
+                     <dimension>Dimensionless</dimension>
+                     <unit>-</unit>
+                     <type>integer</type>
+                     <min>2</min>
+                     <max>2</max>
+                     <boundaries>[ ; ]</boundaries>
+                     <default>2</default>
+                     <symbol>SN</symbol>
+                     <definition>The general heat exchanger model may operate in various
+                            configuration modes. Setting this parameter to 2 indicates a counter
+                            flow arrangement.
+                            Do not change this parameter.</definition>
+              </variable>
+              <variable><!--input-5-->
+                     <order>12</order>
+                     <name>Overall heat transfer coefficient of exchanger</name>
+                     <role>input</role>
+                     <dimension>Overall Loss Coefficient</dimension>
+                     <unit>kJ/hr.K</unit>
+                     <type>real</type>
+                     <min>0</min>
+                     <max>+Inf</max>
+                     <boundaries>[ ; ]</boundaries>
+                     <default>10.0</default>
+                     <symbol>SN</symbol>
+                     <definition>Overall heat transfer coefficient of the counter flow heat
+                            exchanger.</definition>
+              </variable>
+              <variable><!--parameter-2-->
+                     <order>13</order>
+                     <name>Specific heat of source side fluid</name>
+                     <role>parameter</role>
+                     <dimension>Specific Heat</dimension>
+                     <unit>kJ/kg.K</unit>
+                     <type>real</type>
+                     <min>0</min>
+                     <max>+Inf</max>
+                     <boundaries>[ ; ]</boundaries>
+                     <default>4.19</default>
+                     <symbol>SN</symbol>
+                     <definition>The specific heat of the fluid flowing through the source side of
+                            the counter flow heat exchanger. NOTE: "source" and "load" are merely
+                            convenient designations; energy will be transfered from the source side
+                            to the load side if the source side is hotter than the load side. It
+                            will be transfered from the load side to the source side if the load
+                            side is hotter than the source side.</definition>
+              </variable>
+              <variable><!--parameter-3-->
+                     <order>14</order>
+                     <name>Specific heat of load side fluid</name>
+                     <role>parameter</role>
+                     <dimension>Specific Heat</dimension>
+                     <unit>kJ/kg.K</unit>
+                     <type>real</type>
+                     <min>0</min>
+                     <max>+Inf</max>
+                     <boundaries>[ ; ]</boundaries>
+                     <default>4.19</default>
+                     <symbol>SN</symbol>
+                     <definition>The specific heat of the fluid flowing through the load side of the
+                            counter flow heat exchanger. NOTE: "source" and "load" are merely
+                            convenient designations; energy will be transfered from the source side
+                            to the load side if the source side is hotter than the load side. It
+                            will be transfered from the load side to the source side if the load
+                            side is hotter than the source side.</definition>
+              </variable>
+              <variable><!--parameter-4-->
+                     <order>15</order>
+                     <name>Not used</name>
+                     <role>parameter</role>
+                     <dimension>Dimensionless</dimension>
+                     <unit>-</unit>
+                     <type>integer</type>
+                     <min>0</min>
+                     <max>+Inf</max>
+                     <boundaries>[ ; ]</boundaries>
+                     <default>0</default>
+                     <symbol>SN</symbol>
+              </variable>
+       </variables>
+       <cycles />
+       <source>.\SourceCode\Types\Type5.f90</source>
+</TrnsysModel>

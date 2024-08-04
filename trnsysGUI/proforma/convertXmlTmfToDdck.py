@@ -5,6 +5,7 @@ import re as _re
 import textwrap as _tw
 import typing as _tp
 import xml.etree.ElementTree as _etree
+import shutil as _su
 
 import jinja2 as _jj
 import xmlschema as _xs
@@ -42,6 +43,10 @@ def convertXmltmfToDdck(
     suggestedHydraulicConnections: _cabc.Sequence[_models.Connection] | None,
     ddckFilePath: _pl.Path,
 ) -> _cancel.MaybeCancelled[_res.Result[None]]:
+
+    containingDir = ddckFilePath.parent
+    containingDir.mkdir(parents=True, exist_ok=True)
+
     xmlTmfContent = xmlTmfFilePath.read_text(encoding="utf8")
     maybeCancelled = convertXmlTmfStringToDdck(xmlTmfContent, suggestedHydraulicConnections, ddckFilePath.name)
     if _cancel.isCancelled(maybeCancelled):
@@ -64,16 +69,15 @@ _StringMapping = _tp.Mapping[str, _tp.Any]
 class _HydraulicConnectionsData:
     name: str | None
     portName: str
-    stringConstants: _models.VariableStringConstants
+    variableNameBuilder: _models.VariableNameBuilder
 
     @property
     def variableName(self) -> str:
-        capitalizedPortName = self.portName.capitalize()
-        return f"{self.stringConstants.variableNamePrefix}{capitalizedPortName}"
+        return self.variableNameBuilder.getVariableName(self.name, self.portName)
 
     @property
     def rhs(self) -> str:
-        return f"@{self.stringConstants.propertyName}({self.portName})"
+        return self.variableNameBuilder.getRhs(self.name, self.portName)
 
     @staticmethod
     def createForTemperature(connectionName: str | None, portName: str) -> "_HydraulicConnectionsData":
@@ -150,17 +154,20 @@ def _createVariablesForRole(
 
     variables = []
     for roleOrder, serializedVariable in enumerate(sortedSerializedVariablesForRole, start=1):
-        order = serializedVariable["order"]
+        definition = _getDefinition(serializedVariable)
         bounds = _getBounds(serializedVariable)
+
         variable = _models.Variable(
             serializedVariable["name"],
-            order,
+            definition,
+            serializedVariable["order"],
             role,
             roleOrder,
             serializedVariable["unit"],
             bounds,
             serializedVariable["default"],
         )
+
         variables.append(variable)
 
     return variables
@@ -208,8 +215,8 @@ def convertXmlTmfStringToDdck(
     otherJinjaVariables = {
         "fileName": fileName,
         "type": proforma["type"],
-        "description": _makeMultilineComment(proforma["object"]),
-        "details": _makeMultilineComment(proforma["details"]),
+        "description": proforma["object"],
+        "details": proforma["details"],
         "visibilityModifier": _getVisibilityModifier(defaultVisibility),
     }
 
@@ -227,13 +234,18 @@ def _getVisibilityModifier(  # pylint: disable=inconsistent-return-statements
     _tp.assert_never(defaultVisibility)
 
 
-def _makeMultilineComment(text: str) -> str:
-    textWithCollapsedWhitespace = _re.sub(r"\s+", " ", text.strip(), count=0, flags=_re.MULTILINE)
+def _makeMultilineComment(text: str, width: int = 120) -> str:
+    textWithCollapsedWhitespace = _collapseWhitespace(text)
     linePrefix = "** "
-    maxWidth = 120 - len(linePrefix)
+    maxWidth = width - len(linePrefix)
     wrappedLines = _tw.wrap(textWithCollapsedWhitespace, maxWidth)
     newText = "\n".join(f"** {l}" for l in wrappedLines)
     return newText
+
+
+def _collapseWhitespace(text: str) -> str:
+    textWithCollapsedWhitespace = _re.sub(r"\s+", " ", text.strip(), count=0, flags=_re.MULTILINE)
+    return textWithCollapsedWhitespace
 
 
 def _convertXmlTmfStringToDdck(
@@ -245,7 +257,13 @@ def _convertXmlTmfStringToDdck(
     parameters = _createProcessedVariables(variablesByRole.parameters, connectionsDataByOrder)
     inputs = _createProcessedVariables(variablesByRole.inputs, connectionsDataByOrder)
     outputs = _createProcessedVariables(variablesByRole.outputs, connectionsDataByOrder)
-    ddckContent = _JINJA_TEMPLATE.render(parameters=parameters, inputs=inputs, outputs=outputs, **otherJinjaVariables)
+    ddckContent = _JINJA_TEMPLATE.render(
+        parameters=parameters,
+        inputs=inputs,
+        outputs=outputs,
+        multilineComment=_makeMultilineComment,
+        **otherJinjaVariables,
+    )
     return ddckContent
 
 
@@ -328,6 +346,14 @@ def _getSerializedVariablesWithRole(
     role: _Role, variables: _tp.Sequence[_StringMapping]
 ) -> _tp.Sequence[_StringMapping]:
     return [v for v in variables if v["role"] == role]
+
+
+def _getDefinition(variable: _StringMapping) -> str | None:
+    definition = variable.get("definition")
+    if not definition:
+        return None
+
+    return _collapseWhitespace(definition)
 
 
 def _getBounds(variable: _StringMapping) -> str:

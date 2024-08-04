@@ -19,7 +19,7 @@
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Note: Fields in &lt;span style=&quot; font-weight:700;&quot;&gt;bold&lt;/span&gt; are required. You can hover over light bulbs (&lt;img src=&quot;:/tango-icons/status/tango-icon-theme-0.8.90/scalable/status/dialog-information.svg&quot; height=&quot;20&quot; widht=&quot;20&quot;/&gt;) and disabled buttons to get more information.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Note: Fields in &lt;span style=&quot; font-weight:700;&quot;&gt;bold&lt;/span&gt; are required. You can hover over light bulbs (&lt;img src=&quot;:/tango-icons/status/tango-icon-theme-0.8.90/scalable/status/dialog-information.svg&quot; height=&quot;20&quot;/&gt;), drop down entries and disabled buttons to get more information. Drop downs can be searched by typing into them.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -76,7 +76,11 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QComboBox" name="fluidDensityComboBox"/>
+               <widget class="QComboBox" name="fluidDensityComboBox">
+                <property name="editable">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
               <item row="1" column="0">
                <widget class="QLabel" name="label_5">
@@ -86,7 +90,11 @@
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QComboBox" name="fluidHeatCapacityComboBox"/>
+               <widget class="QComboBox" name="fluidHeatCapacityComboBox">
+                <property name="editable">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
@@ -105,12 +113,19 @@
                  </font>
                 </property>
                 <property name="text">
-                 <string>Mass flow rate</string>
+                 <string>Temperature</string>
                 </property>
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QComboBox" name="massFlowRateComboBox"/>
+               <widget class="QComboBox" name="inputTempComboBox">
+                <property name="editable">
+                 <bool>true</bool>
+                </property>
+                <property name="insertPolicy">
+                 <enum>QComboBox::NoInsert</enum>
+                </property>
+               </widget>
               </item>
               <item row="1" column="0">
                <widget class="QLabel" name="label_10">
@@ -120,12 +135,16 @@
                  </font>
                 </property>
                 <property name="text">
-                 <string>Temperature</string>
+                 <string>Mass flow rate</string>
                 </property>
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QComboBox" name="inputTempComboBox"/>
+               <widget class="QComboBox" name="massFlowRateComboBox">
+                <property name="editable">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
@@ -144,10 +163,18 @@
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QComboBox" name="outputRevTempComboBox"/>
+               <widget class="QComboBox" name="outputRevTempComboBox">
+                <property name="editable">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QComboBox" name="outputTempComboBox"/>
+               <widget class="QComboBox" name="outputTempComboBox">
+                <property name="editable">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
               <item row="0" column="0">
                <widget class="QLabel" name="label_11">

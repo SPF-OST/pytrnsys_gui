@@ -1,8 +1,6 @@
-import pathlib as _pl
 import typing as _tp
 
 import pytrnsys.utils.warnings as _warn
-import trnsysGUI.BlockItem as _bi
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.connection.singlePipeConnection as _spc
@@ -12,7 +10,7 @@ import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.temperatures as _temps
-
+import trnsysGUI.placeHolderNames as _phn
 
 PlaceHolders = _tp.NewType("PlaceHolders", _tp.Mapping[str, str])
 PlaceHoldersByQualifiedPortName = _tp.NewType("PlaceHoldersByQualifiedPortName", _tp.Mapping[str, PlaceHolders])
@@ -68,8 +66,7 @@ def _getPlaceHoldersForNode(
 ) -> PlaceHoldersByQualifiedPortName:
     placeHoldersForNode = {}
     for modelPortItem in node.getPortItems():
-        nodeNameOrEmpty = node.name or ""
-        qualifiedPortName = f"{nodeNameOrEmpty}{modelPortItem.name}"
+        qualifiedPortName = _phn.getQualifiedPortName(node.name, modelPortItem.name)
 
         placeholdersForPort = _getPlaceholdersForPort(
             hydraulicLoops, componentName, internalPiping, node, modelPortItem

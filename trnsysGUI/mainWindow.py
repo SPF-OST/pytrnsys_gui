@@ -13,6 +13,7 @@ import PyQt5.QtWidgets as _qtw
 
 import pytrnsys.utils.log as _ulog
 import pytrnsys.utils.result as _res
+import pytrnsys.utils.warnings as _warn
 import trnsysGUI.loggingCallback as _lgcb
 import trnsysGUI.menus.projectMenu.exportPlaceholders as _eph
 from trnsysGUI import buildDck as buildDck
@@ -491,6 +492,12 @@ class MainWindow(_qtw.QMainWindow):
         if _res.isError(result):
             errorMessage = f"The deck file could not be generated: {result.message}"
             _werrors.showMessageBox(errorMessage)
+            return
+        warnings: _warn.ValueWithWarnings[str | None] = _res.value(result)
+
+        if warnings.hasWarnings():
+            warningMessage = warnings.toWarningMessage()
+            _werrors.showMessageBox(warningMessage, _werrors.Title.WARNING)
 
     def toggleAlignMode(self):
         self.logger.info("Toggling alignMode")
