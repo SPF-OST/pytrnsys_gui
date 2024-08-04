@@ -343,9 +343,9 @@ def _setSelected(comboBox: _qtw.QComboBox, data: _models.Variable | _models.Unse
         rowData = comboBox.itemData(index)
         if rowData == data:
             comboBox.setCurrentIndex(index)
-            if isinstance(data, _models.Variable):
+            if isinstance(data, _models.Variable) and (definition := data.definition):
                 lineEdit = comboBox.lineEdit()
-                lineEdit.setToolTip(data.definition)
+                lineEdit.setToolTip(definition)
             return
 
     raise AssertionError(f"{data} not a member of combo box.")
