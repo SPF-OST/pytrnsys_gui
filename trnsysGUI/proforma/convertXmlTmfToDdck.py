@@ -5,6 +5,7 @@ import re as _re
 import textwrap as _tw
 import typing as _tp
 import xml.etree.ElementTree as _etree
+import shutil as _su
 
 import jinja2 as _jj
 import xmlschema as _xs
@@ -42,6 +43,10 @@ def convertXmltmfToDdck(
     suggestedHydraulicConnections: _cabc.Sequence[_models.Connection] | None,
     ddckFilePath: _pl.Path,
 ) -> _cancel.MaybeCancelled[_res.Result[None]]:
+
+    containingDir = ddckFilePath.parent
+    containingDir.mkdir(parents=True, exist_ok=True)
+
     xmlTmfContent = xmlTmfFilePath.read_text(encoding="utf8")
     maybeCancelled = convertXmlTmfStringToDdck(xmlTmfContent, suggestedHydraulicConnections, ddckFilePath.name)
     if _cancel.isCancelled(maybeCancelled):

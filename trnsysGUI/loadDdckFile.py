@@ -18,9 +18,6 @@ class DdckFileLoader:
     hasInternalPipingsProvider: _ip.HasInternalPipingsProvider
 
     def loadDdckFile(self, targetDirPath: _pl.Path) -> None:
-        if not targetDirPath.is_dir():
-            raise ValueError("Not a directory.", targetDirPath)
-
         sourceFilePathString, _ = _qtw.QFileDialog.getOpenFileName(None, "Load file")
         if not sourceFilePathString:
             return
@@ -47,6 +44,21 @@ class DdckFileLoader:
             standardButton = _qtw.QMessageBox.question(None, "Overwrite file?", message)
             if standardButton != _qtw.QMessageBox.StandardButton.Yes:  # pylint: disable=no-member
                 return
+
+        targetContainingDirPath = targetFilePath.parent
+        if not targetContainingDirPath.exists():
+            message = f"The target parent directory `{targetContainingDirPath}` doesn't exist. Should it be created?"
+            standardButton = _qtw.QMessageBox.question(
+                None,
+                message,
+                "Create directory?",
+                _qtw.QMessageBox.Ok | _qtw.QMessageBox.Cancel,
+            )
+
+            if standardButton != _qtw.QMessageBox.Ok:
+                return
+
+        targetContainingDirPath.mkdir(parents=True, exist_ok=True)
 
         if not isSourceProformaFile:
             _su.copy(sourceFilePath, targetFilePath)
