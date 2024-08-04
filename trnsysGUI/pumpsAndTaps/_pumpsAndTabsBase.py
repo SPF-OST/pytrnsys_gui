@@ -1,3 +1,4 @@
+import pathlib as _pl
 import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
@@ -6,6 +7,7 @@ import trnsysGUI.blockItemGraphicItemMixins as _gimx
 import trnsysGUI.blockItemHasInternalPiping as _bip
 import trnsysGUI.common as _com
 import trnsysGUI.common.cancelled as _cancel
+import trnsysGUI.components.ddckFolderHelpers as _dfh
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.names as _mnames
@@ -20,6 +22,7 @@ class PumpsAndTabsBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphi
         super().__init__(trnsysType, editor, displayName)
 
         self._renameHelper = _rename.RenameHelper(editor.namesManager)
+        self._projectDirPath = _pl.Path(editor.projectFolder)
 
         self.w = 40
         self.h = 40
@@ -81,9 +84,13 @@ class PumpsAndTabsBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphi
 
         newDialogModel = _cancel.value(maybeCancelled)
 
-        self._renameHelper.rename(dialogModel.name, newDialogModel.name)
+        oldName = dialogModel.name
+        newName = newDialogModel.name
 
-        self.setDisplayName(newDialogModel.name)
+        self._renameHelper.rename(oldName, newName)
+        _dfh.moveComponentDdckFolderIfNecessary(self, newName, oldName, self._projectDirPath)
+        self.setDisplayName(newName)
+
         self.updateFlipStateH(newDialogModel.isHorizontallyFlipped)
         self.updateFlipStateV(newDialogModel.isVerticallyFlipped)
         self.massFlowRateInKgPerH = newDialogModel.massFlowRateKgPerH

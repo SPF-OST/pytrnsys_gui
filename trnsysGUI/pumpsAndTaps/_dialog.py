@@ -4,11 +4,10 @@ import PyQt5.QtCore as _qtc
 import PyQt5.QtWidgets as _qtw
 
 import pytrnsys.utils.result as _res
-
 import trnsysGUI.common.cancelled as _cancel
 import trnsysGUI.dialogs as _dlgs
-import trnsysGUI.warningsAndErrors as _werrors
 import trnsysGUI.names.rename as _rename
+import trnsysGUI.warningsAndErrors as _werrors
 
 _dlgs.assertThatLocalGeneratedUIModuleAndResourcesExist(__name__)
 
