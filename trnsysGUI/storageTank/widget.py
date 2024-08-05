@@ -123,9 +123,7 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
             inputPort.id = portIds.inputId
             outputPort.id = portIds.outputId
 
-        directPortPair = DirectPortPair(
-            trnsysId, inputPort, outputPort, relativeInputHeight, relativeOutputHeight, side
-        )
+        directPortPair = DirectPortPair(trnsysId, inputPort, outputPort, relativeInputHeight, relativeOutputHeight, side)
 
         self.directPortPairs.append(directPortPair)
 
@@ -345,6 +343,8 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
 
     # Misc
     def _addChildContextMenuActions(self, contextMenu: _qtw.QMenu) -> None:
+        super()._addChildContextMenuActions(contextMenu)
+
         exportDdckAction = contextMenu.addAction("Export ddck")
         exportDdckAction.triggered.connect(self.exportDck)
 

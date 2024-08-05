@@ -96,31 +96,15 @@ class GenericBlock(_biip.BlockItemHasInternalPiping, _bmx.RasterImageBlockItemMi
     def pickImage(self):
         return _pl.Path(_qtw.QFileDialog.getOpenFileName(self.editor, filter="*.png *.svg")[0])
 
-    def contextMenuEvent(self, event):
-        menu = _qtw.QMenu()
+    def _addChildContextMenuActions(self, contextMenu: _qtw.QMenu) -> None:
+        super()._addChildContextMenuActions(contextMenu)
 
-        rr = _img.ROTATE_TO_RIGHT_PNG.icon()
-        a2 = menu.addAction(rr, "Rotate Block clockwise")
-        a2.triggered.connect(self.rotateBlockCW)
-
-        ll = _img.ROTATE_LEFT_PNG.icon()
-        a3 = menu.addAction(ll, "Rotate Block counter-clockwise")
-        a3.triggered.connect(self.rotateBlockCCW)
-
-        a4 = menu.addAction("Reset Rotation")
-        a4.triggered.connect(self.resetRotation)
-
-        c1 = menu.addAction("Delete this Block")
-        c1.triggered.connect(self.deleteBlock)
-
-        c3 = menu.addAction("Set image")
-        c3.triggered.connect(self.changeImage)
+        setImageAction = contextMenu.addAction("Set image")
+        setImageAction.triggered.connect(self.changeImage)
 
         if not self.isSet:
-            c4 = menu.addAction("Add port")
-            c4.triggered.connect(self.addPortDlg)
-
-        menu.exec_(event.screenPos())
+            addPortAction = contextMenu.addAction("Add port")
+            addPortAction.triggered.connect(self.addPortDlg)
 
     def encode(self):
         _, dct = super().encode()

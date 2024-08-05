@@ -18,7 +18,7 @@ class BlockItemHasInternalPiping(_bi.BlockItem, _ip.HasInternalPiping):
 
     @_tp.override
     def _addChildContextMenuActions(self, contextMenu: _qtw.QMenu) -> None:
-        if self.hasDdckDirectory():
+        if self.hasDdckPlaceHolders():
             loadDdckAction = contextMenu.addAction("Load ddck file...")
             loadDdckAction.triggered.connect(self._onLoadDdckActionTriggered)
 
