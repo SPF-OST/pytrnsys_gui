@@ -345,6 +345,8 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
 
     # Misc
     def _addChildContextMenuActions(self, contextMenu: _qtw.QMenu) -> None:
+        super()._addChildContextMenuActions(contextMenu)
+
         exportDdckAction = contextMenu.addAction("Export ddck")
         exportDdckAction.triggered.connect(self.exportDck)
 
