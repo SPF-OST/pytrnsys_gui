@@ -85,10 +85,10 @@ mfrTolSwitchThreshold
 9 6 0 0        !4 : HP
 2 3 0 0        !5 : Tes_Col
 1 4 0 0        !6 : PiTes_HP
-8 9 0 1        !7 : Pump109
+8 9 0 8        !7 : Pump109
 1 7 0 0        !8 : PiTes_Pump109
 7 4 0 0        !9 : PiPump109_HP
-11 12 0 1      !10 : Pump114
+11 12 0 8      !10 : Pump114
 3 10 0 0       !11 : PiCol_Pump114
 10 2 0 0       !12 : PiPump114_Tes
 INPUTS 12! for Type 9351

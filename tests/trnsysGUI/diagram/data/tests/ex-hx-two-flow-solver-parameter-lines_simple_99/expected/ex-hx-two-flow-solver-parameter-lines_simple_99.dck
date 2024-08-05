@@ -85,10 +85,10 @@ mfrTolSwitchThreshold
 5 12 0 0       !4 : Col
 2 4 0 0        !5 : Hx_Col
 3 1 0 0        !6 : PiExHx_Tes
-8 9 0 1        !7 : Pump88
+8 9 0 8        !7 : Pump88
 1 7 0 0        !8 : PiTes_Pump88
 7 3 0 0        !9 : PiPump88_ExHx
-12 11 0 1      !10 : Pump93
+12 11 0 8      !10 : Pump93
 10 2 0 0       !11 : PiPump93_ExHx
 10 4 0 0       !12 : PiPump93_Col
 INPUTS 12! for Type 9351

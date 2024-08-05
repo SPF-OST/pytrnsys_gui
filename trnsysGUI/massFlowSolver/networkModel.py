@@ -20,7 +20,7 @@ import typing as _tp
 
 class NodeType(_enum.IntEnum):
     PIPE = 0
-    PUMP = 1
+    PUMP = 8
     TEE_PIECE = 2
     DIVERTER = 3
     TERMINAL_WITH_PRESCRIBED_FLOW = 4
