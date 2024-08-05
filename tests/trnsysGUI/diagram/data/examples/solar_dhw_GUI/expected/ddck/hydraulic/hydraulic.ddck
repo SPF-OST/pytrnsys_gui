@@ -37,7 +37,7 @@ mfrTolSwitchThreshold
 10 11 0 0      !2 : DhwDpR1_99
 10 14 9 2      !3 : TeePiece
 14 0 0 6       !4 : WTap_main
-19 12 0 1      !5 : PuCol
+19 12 0 8      !5 : PuCol
 12 13 0 0      !6 : Collector
 20 11 9 3      !7 : MixDhw
 18 0 0 7       !8 : WTap
