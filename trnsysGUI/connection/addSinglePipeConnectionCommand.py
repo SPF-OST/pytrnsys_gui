@@ -45,7 +45,6 @@ class AddSinglePipeConnectionCommand(_qtw.QUndoCommand):
                 error = _res.error(cancellable)
                 _werrors.showMessageBox(error.message, "Cannot create connection")
 
-            self._connection.deleteConnection()
             self.setObsolete(True)
             return
 
