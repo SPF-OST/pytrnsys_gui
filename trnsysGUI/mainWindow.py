@@ -14,6 +14,7 @@ import PyQt5.QtWidgets as _qtw
 import pytrnsys.utils.log as _ulog
 import pytrnsys.utils.result as _res
 import pytrnsys.utils.warnings as _warn
+import trnsysGUI.configFileUpdater as _cfu
 import trnsysGUI.loggingCallback as _lgcb
 import trnsysGUI.menus.projectMenu.exportPlaceholders as _eph
 from trnsysGUI import buildDck as buildDck
@@ -27,7 +28,6 @@ from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
 from trnsysGUI.ProcessMain import ProcessMain
 from trnsysGUI.RunMain import RunMain
 from trnsysGUI.common import cancelled as _ccl
-from trnsysGUI.configFile import configFile
 from trnsysGUI.diagram import Editor as _de
 from trnsysGUI.storageTank.widget import StorageTank
 
@@ -253,7 +253,7 @@ class MainWindow(_qtw.QMainWindow):
         if result == _qtw.QMessageBox.Cancel:
             return
 
-        startingDirectoryPath = _pl.Path(self.projectFolder).parent
+        startingDirectoryPath = self._projectDirPath.parent
 
         createProjectMaybeCancelled = _prj.getCreateProject(startingDirectoryPath)
         if _ccl.isCancelled(createProjectMaybeCancelled):
@@ -267,7 +267,7 @@ class MainWindow(_qtw.QMainWindow):
         self.editor.save()
 
     def copyToNew(self):
-        currentProjectFolderPath = _pl.Path(self.projectFolder)
+        currentProjectFolderPath = self._projectDirPath
 
         startingDirectoryPath = currentProjectFolderPath.parent
 
@@ -276,7 +276,7 @@ class MainWindow(_qtw.QMainWindow):
             return
         newProjectFolderPath = _ccl.value(maybeCancelled)
 
-        oldProjectFolderPath = _pl.Path(self.projectFolder)
+        oldProjectFolderPath = self._projectDirPath
 
         self.copyContentsToNewFolder(newProjectFolderPath, oldProjectFolderPath)
 
@@ -315,10 +315,25 @@ class MainWindow(_qtw.QMainWindow):
         self.openFile()
 
     def updateRun(self):
-        self.logger.info("Updating run.config")
-        configPath = os.path.join(self.projectFolder, "run.config")
-        runConfig = configFile(configPath, self.editor)
+        configFilePath = self._projectDirPath / "run.config"
+
+        if configFilePath.is_dir():
+            _qtw.QMessageBox.information(
+                self,
+                "`run.config` is a directory",
+                f"Could not create file {configFilePath} because a directory of the same name exists. "
+                "Please remove or rename the directory before trying to update the `run.config` file.",
+            )
+            return
+
+        configFilePath.touch()
+
+        runConfig = _cfu.ConfigFileUpdater(configFilePath)
         runConfig.updateConfig()
+
+    @property
+    def _projectDirPath(self) -> _pl.Path:
+        return _pl.Path(self.projectFolder)
 
     def runSimulation(self):
         ddckPath = os.path.join(self.projectFolder, "ddck")
@@ -486,7 +501,7 @@ class MainWindow(_qtw.QMainWindow):
             _werrors.showMessageBox(errorMessage)
             return
 
-        builder = buildDck.buildDck(self.projectFolder)
+        builder = buildDck.DckBuilder(self._projectDirPath)
 
         result = builder.buildTrnsysDeck()
         if _res.isError(result):

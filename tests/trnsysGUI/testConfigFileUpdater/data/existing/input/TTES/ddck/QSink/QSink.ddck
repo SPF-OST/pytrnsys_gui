@@ -1,0 +1,60 @@
+*******************************
+**BEGIN sink.ddck
+*******************************
+
+***********************************
+** Parameters
+***********************************
+CONSTANTS 1
+dT = 3     ! [K]
+!P = 160    ! Power of sink [kW]
+
+******************************************************************************************
+** READER
+** Reading data from input profile
+******************************************************************************************
+EQUATIONS 1
+unit = 50
+
+ASSIGN  C:\Users\alex.hobe\Projects\icegrid\simulation\Icegrid_ARA_planned_stage_I\ddck\QSnk60\Profile_Snk_60_001.csv unit
+UNIT 33 TYPE 9      !Changed automatically
+Parameters 10
+5     ! 1 Mode
+0     ! 2 Header Lines to Skip
+1     ! 3 No. of values to read
+1     ! 4 Time interval of data
+-1 1 0 0     ! 1st Data to read: 1: Interpolate (+) or not? (-); 2: Multiplication factor; 3: Addition factor; 4: average (0) or instantaneous (1)
+unit     ! 9 Logical unit for input file (used to be 18)
+-1     ! 10 Free format mode
+EQUATIONS 1
+P = ABS([33,1])       !Power of sink read from profile
+
+
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+** Temperature warm pipe to sink: 	 TIn
+EQUATIONS 1
+TIn = @temp(In)
+
+
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+EQUATIONS 2
+TOut = Tin - dT
+@temp(Out) = TOut
+
+
+***********************************
+** outputs to hydraulic control
+***********************************
+EQUATIONS 1
+M = P / ((CPWAT/3600)*dT)	!kg/h
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************

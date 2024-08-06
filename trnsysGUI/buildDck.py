@@ -1,8 +1,7 @@
-# pylint: skip-file
-# type: ignore
-
-import logging
-import os
+import collections.abc as _cabc
+import logging as _log
+import pathlib as _pl
+import typing as _tp
 
 import pytrnsys.rsim.getConfigMixin as _rcm
 import pytrnsys.trnsys_util.buildTrnsysDeck as _btd
@@ -10,22 +9,25 @@ import pytrnsys.trnsys_util.readConfigTrnsys as _rc
 import pytrnsys.utils.result as _res
 import pytrnsys.utils.warnings as _warn
 
-logger = logging.getLogger("root")
+logger = _log.getLogger("root")
 
 
-class buildDck(_rcm.GetConfigMixin):
-    def __init__(self, pathConfig):
+class DckBuilder(_rcm.GetConfigMixin):  # type: ignore[name-defined]
+    def __init__(self, projectDirPath: _pl.Path) -> None:
         super().__init__()
 
-        self.pathConfig = pathConfig
-        self.path = pathConfig
+        self._projectDirPath = projectDirPath
+        self._outputDirPath = projectDirPath
 
-        self._defaultInputs()
-        self.cmds = []
+        self.inputs = dict[str, _tp.Any]()
+        self.overwriteForcedByUser = False
+        self.variablesOutput = list[_tp.Any]()
+        self.lines: _cabc.Sequence[str] | None = None
 
-    def _defaultInputs(self):
+        self._setDefaultInputs()
 
-        self.inputs = {}
+    def _setDefaultInputs(self):
+
         self.inputs["ignoreOnlinePlotter"] = False
         self.inputs["removePopUpWindow"] = False
 
@@ -47,17 +49,13 @@ class buildDck(_rcm.GetConfigMixin):
         self.inputs["runType"] = "runFromConfig"
         self.inputs["outputLevel"] = "INFO"
 
-        self.overwriteForcedByUser = False
-
-        self.variablesOutput = []
-
     def buildTrnsysDeck(self) -> _res.Result[_warn.ValueWithWarnings[str | None]]:
         """
         It builds a TRNSYS Deck from a listDdck with pathDdck using the BuildingTrnsysDeck Class.
         it reads the Deck list and writes a deck file. Afterwards it checks that the deck looks fine
 
         """
-        readConfigResult = self._readConfig(self.pathConfig, "run.config")
+        readConfigResult = self._readConfig()
         if _res.isError(readConfigResult):
             return _res.error(readConfigResult)
 
@@ -66,19 +64,19 @@ class buildDck(_rcm.GetConfigMixin):
         except ValueError as valueError:
             return _res.error(str(valueError))
 
-        self.nameBase = self.inputs["nameRef"]
+        nameBase = self.inputs["nameRef"]
 
         deckExplanation = []
         deckExplanation.append("! ** New deck built from list of ddcks. **\n")
-        deck = _btd.BuildTrnsysDeck(
-            self.path,
-            self.nameBase,
+        deck = _btd.BuildTrnsysDeck(  # type: ignore[attr-defined]
+            str(self._outputDirPath),
+            nameBase,
             self._includedDdckFiles,
             self._defaultVisibility,
             self._ddckPlaceHolderValuesJsonPath,
         )
         result = deck.readDeckList(
-            self.pathConfig,
+            self._projectDirPath,
             doAutoUnitNumbering=self.inputs["doAutoUnitNumbering"],
             dictPaths=self.dictDdckPaths,
             replaceLineList=self.replaceLines,
@@ -86,7 +84,7 @@ class buildDck(_rcm.GetConfigMixin):
 
         if _res.isError(result):
             return _res.error(result)
-        warnings = _res.value(result)
+        warnings: _warn.ValueWithWarnings[None] = _res.value(result)
 
         deck.overwriteForcedByUser = self.overwriteForcedByUser
         deck.writeDeck(addedLines=deckExplanation)
@@ -99,10 +97,10 @@ class buildDck(_rcm.GetConfigMixin):
         if _res.isError(result):
             return _res.error(result)
 
-        if self.inputs["generateUnitTypesUsed"] == True:
+        if self.inputs["generateUnitTypesUsed"]:
             deck.saveUnitTypeFile()
 
-        if self.inputs["addAutomaticEnergyBalance"] == True:
+        if self.inputs["addAutomaticEnergyBalance"]:
             deck.addAutomaticEnergyBalancePrinters()
             deck.writeDeck()  # Deck rewritten with added printer
 
@@ -110,25 +108,37 @@ class buildDck(_rcm.GetConfigMixin):
 
         return warnings.withValue(deck.nameDeck)
 
-    def _readConfig(self, path, name, parseFileCreated=False) -> _res.Result[None]:
-        """
-        It reads the config file used for running TRNSYS and loads the self.inputs dictionary.
-        It also loads the read lines into self.lines
-        """
-        tool = _rc.ReadConfigTrnsys()
+    def _readConfig(self) -> _res.Result[None]:
+        tool = _rc.ReadConfigTrnsys()  # type: ignore[attr-defined]
 
-        self.lines = tool.readFile(path, name, self.inputs, parseFileCreated=parseFileCreated, controlDataType=False)
+        configFileName = "run.config"
+
+        configFilePath = self._projectDirPath / configFileName
+        if not configFilePath.is_file():
+            return _res.Error(
+                f"The config file `{configFilePath}` does not exist or isn't a file. "
+                "Please create it first before exporting the .dck file."
+            )
+
+        self.lines = tool.readFile(
+            str(self._projectDirPath),
+            configFileName,
+            self.inputs,
+            parseFileCreated=False,
+            controlDataType=False,
+        )
         if "pathBaseSimulations" in self.inputs:
-            self.path = self.inputs["pathBaseSimulations"]
+            self._outputDirPath = _pl.Path(self.inputs["pathBaseSimulations"])
 
         resultsFolder = self.inputs.get("addResultsFolder")
         if not resultsFolder:
-            return
+            return None
 
-        self.path = os.path.join(self.path, resultsFolder)
+        self._outputDirPath = self._outputDirPath / resultsFolder
 
-        if not os.path.isdir(self.path):
-            try:
-                os.mkdir(self.path)
-            except FileNotFoundError:
-                return _res.Error(f"The path could not be found: {self.path}")
+        try:
+            self._outputDirPath.mkdir(parents=True, exist_ok=True)
+        except FileNotFoundError:
+            return _res.Error(f"Could not create directory: {self._outputDirPath}")
+
+        return None
