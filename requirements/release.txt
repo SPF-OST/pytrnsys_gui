@@ -10,3 +10,6 @@ pytrnsys @ git+https://github.com/SPF-OST/pytrnsys.git
     # via -r requirements\release.in
 file:.
     # via -r requirements\release.in
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools
