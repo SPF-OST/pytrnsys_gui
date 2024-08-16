@@ -30,11 +30,7 @@ def getSingleOrNone(iterable: _tp.Iterable[_T]) -> _tp.Optional[_T]:
 
 
 def getOrAdd(key: _K, defaultValue: _T, data: dict[_K, _T]) -> _T:
-    value = data.get(key)
+    if not key in data:
+        data[key] = defaultValue
 
-    if value is not None:
-        return value
-
-    data[key] = defaultValue
-
-    return defaultValue
+    return data[key]
