@@ -6,15 +6,13 @@ import pathlib as _pl
 import shutil
 import subprocess
 
-import PyQt5.QtCore as _qtc
-import PyQt5.QtGui as _qtg
-import PyQt5.QtPrintSupport as _qtp
 import PyQt5.QtWidgets as _qtw
 
 import pytrnsys.utils.log as _ulog
 import pytrnsys.utils.result as _res
 import pytrnsys.utils.warnings as _warn
 import trnsysGUI.configFileUpdater as _cfu
+import trnsysGUI.diagram.export as _dexp
 import trnsysGUI.loggingCallback as _lgcb
 import trnsysGUI.menus.projectMenu.exportPlaceholders as _eph
 from trnsysGUI import buildDck as buildDck
@@ -143,10 +141,10 @@ class MainWindow(_qtw.QMainWindow):
         fileMenuCopyToNewAction.triggered.connect(self.copyToNew)
         self.fileMenu.addAction(fileMenuCopyToNewAction)
 
-        exportAsPDF = _qtw.QAction("Export as PDF", self)
-        exportAsPDF.triggered.connect(self.exportPDF)
-        exportAsPDF.setShortcut("Ctrl+e")
-        self.fileMenu.addAction(exportAsPDF)
+        exportDiagram = _qtw.QAction("Export diagram", self)
+        exportDiagram.triggered.connect(self.exportDiagram)
+        exportDiagram.setShortcut("Ctrl+e")
+        self.fileMenu.addAction(exportDiagram)
 
         debugConnections = _qtw.QAction("Debug Conn", self)
         debugConnections.triggered.connect(self.debugConns)
@@ -556,24 +554,17 @@ class MainWindow(_qtw.QMainWindow):
     def openPytrnsysOnlineDoc(self):
         os.system('start "" https://pytrnsys.readthedocs.io')
 
-    def exportPDF(self):
-        fileName, _ = _qtw.QFileDialog.getSaveFileName(self, "Export PDF", None, "PDF files (.pdf);;All Files()")
+    def exportDiagram(self):
+        fileName, _ = _qtw.QFileDialog.getSaveFileName(
+            self, "Export PDF", None, "PDF files (*.pdf);;SVG files (*.svg);;All Files (*)", "PDF files (*.svg)"
+        )
         if fileName == "":
             return
 
-        if _qtc.QFileInfo(fileName).suffix() == "":
+        if _dexp.getExtension(fileName) == "":
             fileName += ".pdf"
 
-        printer = _qtp.QPrinter(_qtp.QPrinter.HighResolution)
-        printer.setOrientation(_qtp.QPrinter.Landscape)
-        printer.setOutputFormat(_qtp.QPrinter.PdfFormat)
-        printer.setOutputFileName(fileName)
-
-        painter = _qtg.QPainter(printer)
-        self.editor.diagramScene.render(painter)
-        painter.end()
-
-        self.logger.info("File exported to %s." % fileName)
+        _dexp.export(self.editor.diagramScene, fileName)
 
     def closeEvent(self, e):
         if self.showBoxOnClose:
