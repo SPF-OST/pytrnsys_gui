@@ -9,6 +9,7 @@ import typing as _tp
 import trnsysGUI.common as _com
 
 from . import _serialization as _ser
+from . import connectionsDefinitionMode as _cdm
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.connection.singlePipeConnection as _spc  # type: ignore[name-defined]
@@ -44,13 +45,13 @@ class HydraulicLoop:
         self,
         name: Name,
         fluid: _ser.Fluid,
-        useLoopWideDefaults: bool,
+        connectionsDefinitionMode: _cdm.ConnectionsDefinitionMode,
         connections: _tp.Sequence[_spc.SinglePipeConnection],  # type: ignore[name-defined]
     ) -> None:
         self.name = name
         self.fluid = fluid
         self.connections: _tp.List[_spc.SinglePipeConnection] = [*connections]  # type: ignore[name-defined]
-        self.useLoopWideDefaults = useLoopWideDefaults
+        self.connectionsDefinitionMode = connectionsDefinitionMode
 
     def addConnection(self, connection: _spc.SinglePipeConnection) -> None:  # type: ignore[name-defined]
         if self.containsConnection(connection):
@@ -108,11 +109,9 @@ class HydraulicLoops:
         fluid = fluids.getFluid(serializedLoop.fluidName)
         assert fluid, f"Unknown fluid {serializedLoop.fluidName}"
 
-        useLoopWideDefaults = serializedLoop.useLoopWideDefaults
-
         connections = [connectionsByTrnsysId[i] for i in serializedLoop.connectionsTrnsysId]
 
-        loop = HydraulicLoop(name, fluid, useLoopWideDefaults, connections)
+        loop = HydraulicLoop(name, fluid, serializedLoop.connectionsDefinitionMode, connections)
         return loop
 
     def toJson(self) -> _tp.Sequence[_tp.Dict]:
@@ -120,7 +119,11 @@ class HydraulicLoops:
         for loop in self.hydraulicLoops:
             connectionTrnsysIds = [c.trnsysId for c in loop.connections]
             serializedLoop = _ser.HydraulicLoop(
-                loop.name.value, loop.name.isUserDefined, loop.fluid.name, loop.useLoopWideDefaults, connectionTrnsysIds
+                loop.name.value,
+                loop.name.isUserDefined,
+                loop.fluid.name,
+                loop.connectionsDefinitionMode,
+                connectionTrnsysIds,
             )
             json = serializedLoop.to_dict()
             result.append(json)

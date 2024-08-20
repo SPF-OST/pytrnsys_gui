@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import trnsysGUI.connection.singlePipeDefaultValues as _defaults
-
-from . import _loopWideDefaults as _lwd
+from . import _setConnectionProperties as _scp
 from . import common as _common
+from . import connectionsDefinitionMode as _cdm
 from . import model as _model
-from ._dialogs.edit import dialog as _gui, model as _gmodel
+from ._dialogs.edit import dialog as _gui
+from ._dialogs.edit import model as _gmodel
 
 
 def edit(hydraulicLoop: _model.HydraulicLoop, hydraulicLoops: _model.HydraulicLoops, fluids: _model.Fluids) -> None:
@@ -29,29 +30,29 @@ def _createGuiLoop(hydraulicLoop: _model.HydraulicLoop) -> _gmodel.HydraulicLoop
     guiConnections = _createGuiConnections(hydraulicLoop)
 
     guiLoop = _gmodel.HydraulicLoop(
-        hydraulicLoop.name.value, hydraulicLoop.fluid, hydraulicLoop.useLoopWideDefaults, guiConnections
+        hydraulicLoop.name.value, hydraulicLoop.fluid, hydraulicLoop.connectionsDefinitionMode, guiConnections
     )
     return guiLoop
 
 
 def _createGuiConnections(hydraulicLoop):
-    if hydraulicLoop.useLoopWideDefaults:
+    if hydraulicLoop.connectionsDefinitionMode == _cdm.ConnectionsDefinitionMode.INDIVIDUAL:
         guiConnections = [
-            _gmodel.Connection(
-                c.displayName,
-                _defaults.DEFAULT_DIAMETER_IN_CM,
-                _defaults.DEFAULT_U_VALUE_IN_W_PER_M2_K,
-                _defaults.DEFAULT_LENGTH_IN_M,
-                _defaults.DEFAULT_SHALL_CREATE_TRNSYS_UNIT,
-                c,
-            )
+            _gmodel.Connection(c.displayName, c.diameterInCm, c.uValueInWPerM2K, c.lengthInM, c.shallBeSimulated, c)
             for c in hydraulicLoop.connections
         ]
 
         return guiConnections
 
     guiConnections = [
-        _gmodel.Connection(c.displayName, c.diameterInCm, c.uValueInWPerM2K, c.lengthInM, c.shallBeSimulated, c)
+        _gmodel.Connection(
+            c.displayName,
+            _defaults.DEFAULT_DIAMETER_IN_CM,
+            _defaults.DEFAULT_U_VALUE_IN_W_PER_M2_K,
+            _defaults.DEFAULT_LENGTH_IN_M,
+            _defaults.DEFAULT_SHALL_CREATE_TRNSYS_UNIT,
+            c,
+        )
         for c in hydraulicLoop.connections
     ]
 
@@ -65,12 +66,17 @@ def _applyModel(guiHydraulicLoop: _gmodel.HydraulicLoop, hydraulicLoop: _model.H
         hydraulicLoop.name = _model.UserDefinedName(newName)
 
     hydraulicLoop.fluid = guiHydraulicLoop.fluid
-    hydraulicLoop.useLoopWideDefaults = guiHydraulicLoop.useLoopWideDefaults
 
-    if guiHydraulicLoop.useLoopWideDefaults:
-        _lwd.resetConnectionPropertiesToLoopWideDefaults(hydraulicLoop.connections, hydraulicLoop.name.value)
-    else:
-        _applyConnectionModels(guiHydraulicLoop)
+    connectionsDefinitionMode = guiHydraulicLoop.connectionsDefinitionMode
+    hydraulicLoop.connectionsDefinitionMode = connectionsDefinitionMode
+
+    if connectionsDefinitionMode != _cdm.ConnectionsDefinitionMode.INDIVIDUAL:
+        _scp.setConnectionPropertiesForDefinitionMode(
+            hydraulicLoop.connections, hydraulicLoop.name.value, hydraulicLoop.connectionsDefinitionMode
+        )
+        return
+
+    _applyConnectionModels(guiHydraulicLoop)
 
 
 def _applyConnectionModels(guiHydraulicLoop: _gmodel.HydraulicLoop) -> None:

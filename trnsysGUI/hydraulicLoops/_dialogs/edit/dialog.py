@@ -11,6 +11,8 @@ import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.dialogs as _dlgs
 import trnsysGUI.hydraulicLoops.model as _model
+import trnsysGUI.hydraulicLoops.connectionsDefinitionMode as _cdm
+
 from . import model as _gmodel
 
 _dlgs.assertThatLocalGeneratedUIModuleAndResourcesExist(__name__)
@@ -38,24 +40,48 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
         self.loopName.setText(self._hydraulicLoop.name)
 
         self._configureFluidComboBox()
-        fluidIndex = self.fluidComboBox.findData(self._hydraulicLoop.fluid)
-        assert fluidIndex >= 0
-        self.fluidComboBox.setCurrentIndex(fluidIndex)
+        self._setCurrentData(self.fluidComboBox, self._hydraulicLoop.fluid)
 
-        self._setUseLoopWideDefaults(self._hydraulicLoop.useLoopWideDefaults)
-        self._configureUseLoopWideDefaultsCheckbox()
+        self._configureConnectionsDefinitionModeComboBox()
+        self._setConnectionsDefinitionMode(self._hydraulicLoop.connectionsDefinitionMode)
 
-    def _configureUseLoopWideDefaultsCheckbox(self) -> None:
-        def onToggled(isSet: bool) -> None:
-            if isSet and not self._doesUserSayContinueWithEnablingLoopWideDefaults():
-                self.useLoopWideDefaultsCheckBox.setChecked(False)
-                return
+    def _configureConnectionsDefinitionModeComboBox(self) -> None:
+        self.connectionsDefinitionModeComboBox.addItem(
+            "Define connections individually", _cdm.ConnectionsDefinitionMode.INDIVIDUAL
+        )
+        self.connectionsDefinitionModeComboBox.addItem(
+            "Define loop wide defaults", _cdm.ConnectionsDefinitionMode.LOOP_WIDE_DEFAULTS
+        )
+        self.connectionsDefinitionModeComboBox.addItem(
+            "All pipes in loops are dummies", _cdm.ConnectionsDefinitionMode.DUMMY_PIPES
+        )
 
-            self._setUseLoopWideDefaults(isSet)
+        def onActivated(newIndex: int) -> None:
+            oldMode = self.connectionsDefinitionModeComboBox.currentIndex()
+            newMode = self.connectionsDefinitionModeComboBox.itemData(newIndex)
+
+            haveChangedAwayFromIndividualMode = (
+                oldMode == _cdm.ConnectionsDefinitionMode.INDIVIDUAL
+                and newMode != _cdm.ConnectionsDefinitionMode.INDIVIDUAL
+            )
+            if haveChangedAwayFromIndividualMode:
+                if not self._doesUserSayContinueWithChangingAwayFromDefiningPipesIndividually():
+                    self._setCurrentData(
+                        self.connectionsDefinitionModeComboBox, _cdm.ConnectionsDefinitionMode.INDIVIDUAL
+                    )
+                    return
+
+            self._setConnectionsDefinitionMode(newMode)
 
             self.adjustSize()
 
-        self.useLoopWideDefaultsCheckBox.toggled.connect(onToggled)
+        self.connectionsDefinitionModeComboBox.activated.connect(onActivated)
+
+    @staticmethod
+    def _setCurrentData(comboBox: _qtw.QComboBox, data: _tp.Any) -> None:
+        index = comboBox.findData(data)
+        assert index >= 0
+        comboBox.setCurrentIndex(index)
 
     def _configureLoopNameLineEdit(self) -> None:
         def onNameChanged(newName: str) -> None:
@@ -133,15 +159,16 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
 
             self._reloadConnections()
 
-        def clearLineEdits() -> None:
+        def clearBulkValues() -> None:
             self.bulkLengthLineEdit.clear()
             self.bulkDiameterLineEdit.clear()
             self.bulkUValueLineEdit.clear()
+            self.bulkShallBeSimulatedComboBox.setCurrentText("")
 
         self.bulkApplyButton.pressed.connect(onBulkApplyButtonPressed)
-        self.bulkApplyButton.pressed.connect(clearLineEdits)
+        self.bulkApplyButton.pressed.connect(clearBulkValues)
 
-        self.bulkCancelButton.pressed.connect(clearLineEdits)
+        self.bulkCancelButton.pressed.connect(clearBulkValues)
 
         self._configureForPositiveFloat(self.bulkLengthLineEdit)
         self._configureForPositiveFloat(self.bulkDiameterLineEdit)
@@ -182,7 +209,7 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
         self._updatePipesStatisticsLabel()
 
     def _updatePipesStatisticsLabel(self) -> None:
-        totalLoopLengthInM = sum(c.lengthInM for c in self._hydraulicLoop.connections)
+        totalLoopLengthInM = sum(c.lengthInM for c in self._hydraulicLoop.connections if c.shallBeSimulated)
         statisticsLabelText = (
             f"Number of pipes: {len(self._hydraulicLoop.connections)}, total loop length: {totalLoopLengthInM:g} m"
         )
@@ -205,24 +232,25 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
         individualPipeLengthM = loopLengthInM / nPipes
         return individualPipeLengthM
 
-    def _doesUserSayContinueWithEnablingLoopWideDefaults(self):
+    def _doesUserSayContinueWithChangingAwayFromDefiningPipesIndividually(self) -> bool:
         messageBox = _qtw.QMessageBox(self)
-        messageBox.setWindowTitle("Do you want to proceed?")
+        messageBox.setWindowTitle("Pipe properties will be lost")
         messageBox.setText(
-            "The values of the length, diameter and U-Value for every pipe in the loop will be "
-            "lost upon OK'ing the main dialog when enabling loop wide defaults. Do you want to proceed?"
+            "Pipe property values will be lost upon OK'ing the dialog when changing away from "
+            "defining pipes individually. Proceed anyway?"
         )
         messageBox.setStandardButtons(messageBox.Yes | messageBox.No)
         pressedButton = messageBox.exec()
         shallContinue = pressedButton == messageBox.Yes
         return shallContinue
 
-    def _setUseLoopWideDefaults(self, isSet: bool) -> None:
-        self._hydraulicLoop.useLoopWideDefaults = isSet
-        self.useLoopWideDefaultsCheckBox.setChecked(isSet)
-        isEnabled = not isSet
-        self.bulkOperationsGroupBox.setVisible(isEnabled)
-        self.pipesGroupBox.setVisible(isEnabled)
+    def _setConnectionsDefinitionMode(self, connectionsDefinitionMode: _cdm.ConnectionsDefinitionMode) -> None:
+        self._hydraulicLoop.connectionsDefinitionMode = connectionsDefinitionMode
+        self._setCurrentData(self.connectionsDefinitionModeComboBox, connectionsDefinitionMode)
+
+        areEditWidgetsEnabled = connectionsDefinitionMode == _cdm.ConnectionsDefinitionMode.INDIVIDUAL
+        self.bulkOperationsGroupBox.setVisible(areEditWidgetsEnabled)
+        self.pipesGroupBox.setVisible(areEditWidgetsEnabled)
         self.adjustSize()
 
     @classmethod
@@ -322,9 +350,10 @@ def _setshallBeSimulated(connection: _gmodel.Connection, shallBeSimulated: _tp.A
 
 
 class _ConnectionsUiModel(_qtc.QAbstractItemModel):
-    c: _gmodel.Connection
+    _SHALL_SIMULATE_PROPERTY = _BoolProperty("Simulate?", lambda c: c.shallBeSimulated, _setshallBeSimulated)
+
     _PROPERTIES = [
-        _BoolProperty("Simulate?", lambda c: c.shallBeSimulated, _setshallBeSimulated),
+        _SHALL_SIMULATE_PROPERTY,
         _TextProperty("Name", lambda c: c.name, shallHighlightOutliers=False),
         _TextProperty("Diameter [cm]", lambda c: c.diameterInCm, _setConnectionDiameter),
         _TextProperty("U value [W/(m^2 K)]", lambda c: c.uValueInWPerM2K, _setConnectionUValue),
@@ -379,12 +408,18 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
 
             return data
 
-        if prop.shallHighlightOutliers and role in [_qtc.Qt.FontRole, _qtc.Qt.ForegroundRole]:
-            return self._getHighlightData(connection, prop, role)
+        if role in [_qtc.Qt.FontRole, _qtc.Qt.ForegroundRole]:
+            return self._getHighlightDataOrNone(connection, prop, role)
 
         return None
 
-    def _getHighlightData(self, connection: _gmodel.Connection, prop: _Property, role: int) -> _tp.Any:
+    def _getHighlightDataOrNone(self, connection: _gmodel.Connection, prop: _Property, role: int) -> _tp.Any:
+        if not prop.shallHighlightOutliers:
+            return None
+
+        if not connection.shallBeSimulated:
+            return None
+
         mostUsedValue = self._getMostUsedValue(prop)
         value = prop.getter(connection)  # type: ignore[misc,call-arg]
         shallHighlight = value != mostUsedValue
@@ -406,7 +441,9 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
         raise ValueError(f"Role must be {_qtc.Qt.FontRole} or {_qtc.Qt.ForegroundRole}.", role)
 
     def _getMostUsedValue(self, prop: _Property) -> _PropertyValue:
-        sortedValues = sorted(prop.getter(c) for c in self.connections)  # type: ignore[misc, call-arg]
+        sortedValues = sorted(
+            prop.getter(c) for c in self.connections if c.shallBeSimulated  # type: ignore[misc, call-arg]
+        )
         groupedValues = _it.groupby(sortedValues)
         valuesWithCount = [{"value": v, "count": len(list(vs))} for v, vs in groupedValues]
         mostUsedValueWithCount = max(valuesWithCount, key=lambda vwc: vwc["count"])
@@ -426,9 +463,15 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
         except ValueError:
             return False
 
-        self.dataChanged.emit(index, index, [role])
+        self._emitRowDataChanged(index)
 
         return True
+
+    def _emitRowDataChanged(self, index: _qtc.QModelIndex) -> None:
+        rowStartIndex = index.siblingAtColumn(0)
+        nRows = index.model().columnCount()
+        rowEndIndex = index.siblingAtColumn(nRows - 1)
+        self.dataChanged.emit(rowStartIndex, rowEndIndex)
 
     def _getConnectionAndProperty(self, modelIndex: _qtc.QModelIndex) -> _tp.Tuple[_gmodel.Connection, _Property]:
         rowIndex = modelIndex.row()
@@ -439,16 +482,17 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
 
         return connection, prop
 
-    def flags(self, index: _qtc.QModelIndex) -> _qtc.Qt.ItemFlags:
-        parentFlags = super().flags(index)
+    def flags(self, index: _qtc.QModelIndex) -> _qtc.Qt.ItemFlag | _qtc.Qt.ItemFlags:
+        connection, prop = self._getConnectionAndProperty(index)
 
-        prop = self._PROPERTIES[index.column()]
+        if not connection.shallBeSimulated and prop != self._SHALL_SIMULATE_PROPERTY:
+            return _qtc.Qt.NoItemFlags
 
+        flags = _qtc.Qt.ItemIsEnabled | _qtc.Qt.ItemIsSelectable
         hasSetter = bool(prop.setter)
         if not hasSetter:
-            return parentFlags
+            return flags
 
-        flags = parentFlags
         if prop.mayBeEditable:
             flags |= _qtc.Qt.ItemIsEditable
 
