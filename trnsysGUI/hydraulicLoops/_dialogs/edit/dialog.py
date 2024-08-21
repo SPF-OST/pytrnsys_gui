@@ -490,10 +490,7 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
         connection, prop = self._getConnectionAndProperty(index)
 
         if not connection.shallBeSimulated and prop != self._SHALL_SIMULATE_PROPERTY:
-            # Hack to turn NoItemFlags of type ItemFlag into a ItemFlags (note the "s" in the end)
-            noItemFlags = _qtc.Qt.NoItemFlags | _qtc.Qt.NoItemFlags
-
-            return noItemFlags
+            return _qtc.Qt.ItemFlags(_qtc.Qt.NoItemFlags)
 
         flags = _qtc.Qt.ItemIsEnabled | _qtc.Qt.ItemIsSelectable
         hasSetter = bool(prop.setter)
