@@ -146,10 +146,10 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
             else:
                 raise AssertionError("Expecting 'Yes' or 'No' for 'Simulate pipe?' combobox.")
 
-            individualPipeLengthInM = self._computeBulkIndividualPipeLengthInM()
             for connection in self._hydraulicLoop.connections:
-                if individualPipeLengthInM is not None:
-                    connection.lengthInM = individualPipeLengthInM
+                pipeLengthInM = self._computeBulkIndividualPipeLength(connection, shallBeSimulated)
+                if pipeLengthInM is not None:
+                    connection.lengthInM = pipeLengthInM
 
                 if diameterInCm is not None:
                     connection.diameterInCm = diameterInCm
@@ -220,7 +220,9 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
 
         self.pipesStatisticsLabel.setText(statisticsLabelText)
 
-    def _computeBulkIndividualPipeLengthInM(self) -> _tp.Optional[float]:
+    def _computeBulkIndividualPipeLength(
+        self, connection: _gmodel.Connection, bulkShallBeSimulated: bool | None
+    ) -> _tp.Optional[float]:
         lengthText = self.bulkLengthLineEdit.text()
         if not lengthText:
             return None
@@ -232,6 +234,22 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
             return individualPipeLengthInM
 
         loopLengthInM = float(lengthText)
+
+        isShallBeSimulatedSameForAllConnections = (
+            len({c.shallBeSimulated for c in self._hydraulicLoop.connections}) == 1
+        )
+
+        willShallBeSimulatedBeSameForAllConnections = isShallBeSimulatedSameForAllConnections or (
+            bulkShallBeSimulated is not None
+        )
+
+        if willShallBeSimulatedBeSameForAllConnections:
+            individualPipeLength = loopLengthInM / self._hydraulicLoop.nConnections
+            return individualPipeLength
+
+        if not connection.shallBeSimulated:
+            return None
+
         individualPipeLengthM = loopLengthInM / self._hydraulicLoop.nSimulatedConnections
 
         return individualPipeLengthM
