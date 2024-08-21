@@ -35,6 +35,9 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
 
         self._reloadConnections()
 
+        self.connectionsTableView.resizeRowsToContents()
+        self.connectionsTableView.resizeColumnsToContents()
+
     def _configureAndInitializeLoopGroupBox(self) -> None:
         self._configureLoopNameLineEdit()
         self.loopName.setText(self._hydraulicLoop.name)
@@ -126,7 +129,6 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
         self.bulkLengthTypeComboBox.currentTextChanged.connect(setTotalLoopLengthInfoToolTipVisible)
 
         def onBulkApplyButtonPressed() -> None:
-            individualPipeLengthInM = self._bulkIndividualPipeLengthInM
 
             diameterText = self.bulkDiameterLineEdit.text()
             diameterInCm = float(diameterText) if diameterText else None
@@ -144,6 +146,7 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
             else:
                 raise AssertionError("Expecting 'Yes' or 'No' for 'Simulate pipe?' combobox.")
 
+            individualPipeLengthInM = self._computeBulkIndividualPipeLengthInM()
             for connection in self._hydraulicLoop.connections:
                 if individualPipeLengthInM is not None:
                     connection.lengthInM = individualPipeLengthInM
@@ -203,20 +206,21 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
 
         self.connectionsTableView.setModel(connectionsModel)
 
-        self.connectionsTableView.resizeRowsToContents()
-        self.connectionsTableView.resizeColumnsToContents()
-
         self._updatePipesStatisticsLabel()
 
     def _updatePipesStatisticsLabel(self) -> None:
-        totalLoopLengthInM = sum(c.lengthInM for c in self._hydraulicLoop.connections if c.shallBeSimulated)
+        totalLoopLengthInM = sum(c.lengthInM for c in self._hydraulicLoop.simulatedConnections)
+        nConnections = self._hydraulicLoop.nConnections
+        nSimulatedConnections = self._hydraulicLoop.nSimulatedConnections
+
         statisticsLabelText = (
-            f"Number of pipes: {len(self._hydraulicLoop.connections)}, total loop length: {totalLoopLengthInM:g} m"
+            f"Number of pipes: {nConnections} (of which {nSimulatedConnections} simulated), "
+            f"total loop length: {totalLoopLengthInM:g}m"
         )
+
         self.pipesStatisticsLabel.setText(statisticsLabelText)
 
-    @property
-    def _bulkIndividualPipeLengthInM(self) -> _tp.Optional[float]:
+    def _computeBulkIndividualPipeLengthInM(self) -> _tp.Optional[float]:
         lengthText = self.bulkLengthLineEdit.text()
         if not lengthText:
             return None
@@ -228,8 +232,8 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
             return individualPipeLengthInM
 
         loopLengthInM = float(lengthText)
-        nPipes = len(self._hydraulicLoop.connections)
-        individualPipeLengthM = loopLengthInM / nPipes
+        individualPipeLengthM = loopLengthInM / self._hydraulicLoop.nSimulatedConnections
+
         return individualPipeLengthM
 
     def _doesUserSayContinueWithChangingAwayFromDefiningPipesIndividually(self) -> bool:

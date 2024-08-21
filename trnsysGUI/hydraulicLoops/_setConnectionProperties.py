@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import typing as _tp
 
-import trnsysGUI.connection.singlePipeDefaultValues as _defaults
 import trnsysGUI.connection.values as _values
 from . import connectionsDefinitionMode as _cdm
 from . import names as _names
@@ -54,7 +53,4 @@ def _setConnectionPropertiesForLoopWideDefaults(
 
 
 def _setConnectionPropertiesForDummyPipe(connection: _spc.SinglePipeConnection) -> None:
-    connection.lengthInM = _defaults.DEFAULT_LENGTH_IN_M
-    connection.diameterInCm = _defaults.DEFAULT_DIAMETER_IN_CM
-    connection.uValueInWPerM2K = _defaults.DEFAULT_U_VALUE_IN_W_PER_M2_K
-    connection.shallBeSimulated = _defaults.DEFAULT_SHALL_CREATE_TRNSYS_UNIT
+    connection.shallBeSimulated = False
