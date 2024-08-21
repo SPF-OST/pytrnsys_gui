@@ -6,10 +6,12 @@ import typing as _tp
 import pytrnsys.utils.result as _res
 import trnsysGUI.common as _com
 import trnsysGUI.singlePipePortItem as _spi
-from . import _loopWideDefaults as _lwd
-from . import search
+from . import _helpers
+from . import _setConnectionProperties as _scp
 from . import common as _lcom
-from . import model as _model, _helpers
+from . import connectionsDefinitionMode as _cdm
+from . import model as _model
+from . import search
 from ._dialogs.merge import dialog as _md
 
 if _tp.TYPE_CHECKING:
@@ -85,16 +87,16 @@ class _Merger:
     @staticmethod
     def _addConnection(connection, loop):
         loop.addConnection(connection)
-        if loop.useLoopWideDefaults:
-            _lwd.resetConnectionPropertiesToLoopWideDefaults([connection], loop.name.value)
+        if loop.connectionsDefinitionMode != _cdm.ConnectionsDefinitionMode.INDIVIDUAL:
+            _scp.setConnectionPropertiesForDefinitionMode([connection], loop.name.value, loop.connectionsDefinitionMode)
 
     def _createLoop(self, connection: _spc.SinglePipeConnection) -> None:  # type: ignore[name-defined]
         name = self._hydraulicLoops.generateName()
         connections = [connection]
 
-        useLoopWideDefaults = True
-        loop = _model.HydraulicLoop(name, self._defaultFluid, useLoopWideDefaults, connections)
-        _lwd.resetConnectionPropertiesToLoopWideDefaults([connection], loop.name.value)
+        connectionsDefinitionMode = _cdm.ConnectionsDefinitionMode.DUMMY_PIPES
+        loop = _model.HydraulicLoop(name, self._defaultFluid, connectionsDefinitionMode, connections)
+        _scp.setConnectionPropertiesForDefinitionMode([connection], loop.name.value, connectionsDefinitionMode)
 
         self._hydraulicLoops.addLoop(loop)
 
@@ -105,12 +107,12 @@ class _Merger:
         connection: _spc.SinglePipeConnection,  # type: ignore[name-defined]
         mergedLoopSummary: _tp.Optional[_lcom.MergedLoopSummary],
     ) -> _lcom.Cancellable[_res.Result[MergeSummary]]:
-        if fromLoop.useLoopWideDefaults != toLoop.useLoopWideDefaults:
+        if fromLoop.connectionsDefinitionMode != toLoop.connectionsDefinitionMode:
             return _res.Error(
-                "Cannot merge two loops with different settings for using loop-wide defaults. "
+                "Cannot merge two loops with different connections definition modes. "
                 "Change the loops so that their settings match and try again."
             )
-        mergedUseLoopWideDefaults = fromLoop.useLoopWideDefaults
+        mergedConnectionsDefinitionMode = fromLoop.connectionsDefinitionMode
 
         connections = [*fromLoop.connections, connection, *toLoop.connections]
         _lcom.setConnectionsSelected(connections, True)
@@ -128,11 +130,11 @@ class _Merger:
 
         mergedName = mergedLoopSummary.name
 
-        if mergedUseLoopWideDefaults:
-            _lwd.resetConnectionPropertiesToLoopWideDefaults(mergedConnections, mergedName.value)
+        if mergedConnectionsDefinitionMode == _cdm.ConnectionsDefinitionMode.LOOP_WIDE_DEFAULTS:
+            _scp.setConnectionPropertiesForLoopWideDefaults(mergedConnections, mergedName.value)
 
         mergedLoop = _model.HydraulicLoop(
-            mergedName, mergedLoopSummary.fluid, mergedUseLoopWideDefaults, mergedConnections
+            mergedName, mergedLoopSummary.fluid, mergedConnectionsDefinitionMode, mergedConnections
         )
 
         self._hydraulicLoops.removeLoop(fromLoop)

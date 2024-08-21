@@ -4,10 +4,11 @@ import dataclasses as _dc
 import typing as _tp
 
 from . import _helpers
-from . import _loopWideDefaults as _lwd
-from . import search
+from . import _setConnectionProperties as _scp
 from . import common as _common
+from . import connectionsDefinitionMode as _cdm
 from . import model as _model
+from . import search
 from ._dialogs.split import dialog as _dialog
 
 if _tp.TYPE_CHECKING:
@@ -105,16 +106,18 @@ class _Splitter:
         fromLoopName = splitLoopsSummary.fromLoop.name
         toLoopName = splitLoopsSummary.toLoop.name
 
-        useLoopWideDefaults = loop.useLoopWideDefaults
-        if useLoopWideDefaults:
-            _lwd.resetConnectionPropertiesToLoopWideDefaults([*fromConnections], fromLoopName.value)
-            _lwd.resetConnectionPropertiesToLoopWideDefaults([*toConnections], toLoopName.value)
+        connectionsDefinitionMode = loop.connectionsDefinitionMode
+        if connectionsDefinitionMode == _cdm.ConnectionsDefinitionMode.LOOP_WIDE_DEFAULTS:
+            _scp.setConnectionPropertiesForLoopWideDefaults([*fromConnections], fromLoopName.value)
+            _scp.setConnectionPropertiesForLoopWideDefaults([*toConnections], fromLoopName.value)
 
         fromLoop = _model.HydraulicLoop(
-            fromLoopName, splitLoopsSummary.fromLoop.fluid, useLoopWideDefaults, [*fromConnections]
+            fromLoopName, splitLoopsSummary.fromLoop.fluid, connectionsDefinitionMode, [*fromConnections]
         )
 
-        toLoop = _model.HydraulicLoop(toLoopName, splitLoopsSummary.toLoop.fluid, useLoopWideDefaults, [*toConnections])
+        toLoop = _model.HydraulicLoop(
+            toLoopName, splitLoopsSummary.toLoop.fluid, connectionsDefinitionMode, [*toConnections]
+        )
 
         self._hydraulicLoops.addLoop(fromLoop)
         self._hydraulicLoops.addLoop(toLoop)

@@ -2,9 +2,10 @@ import typing as _tp
 
 import trnsysGUI.connection.singlePipeConnection as _spc
 import trnsysGUI.singlePipePortItem as _spi
-from . import _loopWideDefaults as _lwd
-from . import search
+from . import _setConnectionProperties as _scp
+from . import connectionsDefinitionMode as _cdm
 from . import model as _model
+from . import search
 
 
 def createLoops(
@@ -22,9 +23,9 @@ def createLoops(
 
         name = loops.generateName()
 
-        useLoopWideDefaults = True
-        _lwd.resetConnectionPropertiesToLoopWideDefaults(reachableConnections, name.value)
-        loop = _model.HydraulicLoop(name, fluid, useLoopWideDefaults, reachableConnections)
+        connectionsDefinitionMode = _cdm.ConnectionsDefinitionMode.LOOP_WIDE_DEFAULTS
+        _scp.setConnectionPropertiesForDefinitionMode(reachableConnections, name.value, connectionsDefinitionMode)
+        loop = _model.HydraulicLoop(name, fluid, connectionsDefinitionMode, reachableConnections)
 
         loops.addLoop(loop)
 

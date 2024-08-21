@@ -10,6 +10,7 @@ import unittest.mock as _mock
 from PyQt5 import QtWidgets as _widgets
 
 import trnsysGUI.connection.singlePipeConnection as _spc
+import trnsysGUI.hydraulicLoops.connectionsDefinitionMode as _cdm
 import trnsysGUI.hydraulicLoops.model as _hlm
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
@@ -131,7 +132,9 @@ class TestStorageTank:
         fluid = _hlm.Fluids.BRINE if i % 2 == 0 else _hlm.Fluids.WATER
         connections = [externalFromPortConnection, externalToPortConnection]
         name = _hlm.UserDefinedName(f"{namePrefix}Loop{i}")
-        loop = _hlm.HydraulicLoop(name, fluid, useLoopWideDefaults=True, connections=connections)
+
+        connectionsDefinitionMode = _cdm.ConnectionsDefinitionMode.LOOP_WIDE_DEFAULTS
+        loop = _hlm.HydraulicLoop(name, fluid, connectionsDefinitionMode, connections=connections)
         hydraulicLoops.addLoop(loop)
 
     @staticmethod

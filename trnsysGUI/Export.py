@@ -626,7 +626,7 @@ EQUATIONS {{nEquations}}
 {% set loopUVal = names.getDefaultUValueName(loopName) -%}
 {% set loopNPipes = names.getNumberOfPipesName(loopName) -%}
 ** {{loopName}}
-{% if hydraulicLoop.useLoopWideDefaults -%}
+{% if hydraulicLoop.connectionsDefinitionMode.useLoopWideDefaults() -%}
 {{loopNPipes}} = {{hydraulicLoop.connections | length}}
 {{loopLen}} = {{values.DEFAULT_LENGTH_IN_M}} ! [m]
 {{loopDia}} = {{values.DEFAULT_DIAMETER_IN_CM / 100}} ! [m]
@@ -639,9 +639,15 @@ EQUATIONS {{nEquations}}
 """
         loops = self._hydraulicLoops
 
-        nEquations = sum(6 if l.useLoopWideDefaults else 2 for l in loops)
+        nEquations = sum(6 if l.connectionsDefinitionMode.useLoopWideDefaults() else 2 for l in loops)
 
-        return self._render(template, loops=loops, nEquations=nEquations, names=_lnames, values=_spdValues)
+        return self._render(
+            template,
+            loops=loops,
+            nEquations=nEquations,
+            names=_lnames,
+            values=_spdValues,
+        )
 
     @staticmethod
     def _render(template: str, /, **kwargs):

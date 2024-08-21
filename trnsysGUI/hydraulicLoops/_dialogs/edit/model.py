@@ -4,7 +4,9 @@ __all__ = ["Connection", "HydraulicLoop"]
 
 import dataclasses as _dc
 import typing as _tp
+import collections.abc as _cabc
 
+import trnsysGUI.hydraulicLoops.connectionsDefinitionMode as _cdm
 from trnsysGUI.hydraulicLoops import _serialization as _ser
 
 if _tp.TYPE_CHECKING:
@@ -25,5 +27,17 @@ class Connection:
 class HydraulicLoop:
     name: str
     fluid: _ser.Fluid
-    useLoopWideDefaults: bool
-    connections: _tp.Sequence[Connection]
+    connectionsDefinitionMode: _cdm.ConnectionsDefinitionMode
+    connections: _cabc.Sequence[Connection]
+
+    @property
+    def nConnections(self) -> int:
+        return len(self.connections)
+
+    @property
+    def simulatedConnections(self) -> _cabc.Sequence[Connection]:
+        return [c for c in self.connections if c.shallBeSimulated]
+
+    @property
+    def nSimulatedConnections(self) -> int:
+        return len(self.simulatedConnections)
