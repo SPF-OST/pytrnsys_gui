@@ -99,7 +99,7 @@ class HeatPump(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMix
             dct["trnsysID"] = self.trnsysId
             dct["childIds"] = self.childIds
             dct["FlippedH"] = self.flippedH
-            dct["FlippedV"] = self.flippedH
+            dct["FlippedV"] = self.flippedV
             dct["RotationN"] = self.rotationN
 
             dictName = "Block-"
@@ -111,6 +111,7 @@ class HeatPump(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMix
 
         self.flippedH = i["FlippedH"]
         self.flippedV = i["FlippedV"]
+        self.rotationN = i["RotationN"]
         self.childIds = i["childIds"]
         self.displayName = i["BlockDisplayName"]
         self.changeSize()
