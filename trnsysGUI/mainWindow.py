@@ -39,8 +39,6 @@ class MainWindow(_qtw.QMainWindow):
         self.jsonPath = None
         self.logger = logger
 
-        self._resetEditor(project)
-
         self.labelVisState = False
         self.calledByVisualizeMf = False
         self.currentFile = "Untitled"
@@ -227,6 +225,8 @@ class MainWindow(_qtw.QMainWindow):
 
         self.editMenu.addAction(undoAction)
         self.editMenu.addAction(redoAction)
+
+        self._resetEditor(project)
 
     def isRunning(self):
         return self.editor.isRunning()
@@ -476,6 +476,8 @@ class MainWindow(_qtw.QMainWindow):
     def _resetEditor(self, project):
         wasRunning = self.editor and self.editor.isRunning()
 
+        self.undoStack.clear()
+
         self.editor = self._createDiagramEditor(project)
         self.setCentralWidget(self.editor)
 
@@ -517,8 +519,7 @@ class MainWindow(_qtw.QMainWindow):
         self.editor.alignMode = not self.editor.alignMode
 
     def toggleSnap(self):
-        self.editor.snapGrid = not self.editor.snapGrid
-        self.editor.diagramScene.update()
+        self.editor.toggleSnap()
 
     def runMassflowSolver(self):
         self.logger.info("Running massflow solver...")

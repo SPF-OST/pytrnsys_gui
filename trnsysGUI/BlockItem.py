@@ -253,10 +253,6 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
     def deleteBlockCom(self):
         self.editor.diagramView.deleteBlockCom(self)
 
-    def setItemSize(self, w, h):
-        self.logger.debug("Inside block item set item size")
-        self.w, self.h = w, h
-
     def updateImage(self):
         if self.flippedH:
             self.updateFlipStateH(self.flippedH)

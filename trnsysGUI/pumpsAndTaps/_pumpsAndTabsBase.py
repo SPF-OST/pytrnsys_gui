@@ -82,15 +82,40 @@ class PumpsAndTabsBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphi
         if _cancel.isCancelled(maybeCancelled):
             return
 
+        oldName = dialogModel.name
+
         newDialogModel = _cancel.value(maybeCancelled)
 
-        oldName = dialogModel.name
+        self._applyDialogModel(oldName, newDialogModel)
+
+    def _applyDialogModel(self, oldName: str, newDialogModel: _dialog.Model) -> None:
         newName = newDialogModel.name
 
         self._renameHelper.rename(oldName, newName)
         _dfh.moveComponentDdckFolderIfNecessary(self, newName, oldName, self._projectDirPath)
         self.setDisplayName(newName)
 
-        self.updateFlipStateH(newDialogModel.isHorizontallyFlipped)
-        self.updateFlipStateV(newDialogModel.isVerticallyFlipped)
+        self._setHorizontallyFlipped(newDialogModel.isHorizontallyFlipped)
+        self._setVerticallyFlipped(newDialogModel.isVerticallyFlipped)
+
         self.massFlowRateInKgPerH = newDialogModel.massFlowRateKgPerH
+
+    def _setHorizontallyFlipped(self, isHorizontallyFlipped: bool) -> None:
+        wasHorizontallyFlipped = self.flippedH
+        hasHorizontallyFlippedChanged = wasHorizontallyFlipped != isHorizontallyFlipped
+
+        if not hasHorizontallyFlippedChanged:
+            return
+
+        self.updateFlipStateH(isHorizontallyFlipped)
+        self.updateSidesFlippedH()
+
+    def _setVerticallyFlipped(self, isVerticallyFlipped: bool) -> None:
+        wasVerticallyFlipped = self.flippedV
+        hasVerticallyFlippedChanged = wasVerticallyFlipped != isVerticallyFlipped
+
+        if not hasVerticallyFlippedChanged:
+            return
+
+        self.updateFlipStateV(isVerticallyFlipped)
+        self.updateSidesFlippedV()

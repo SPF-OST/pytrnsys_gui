@@ -221,6 +221,7 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
 
         for component in components:
             item = _qtg.QStandardItem(component.icon, component.name)
+            item.setEditable(False)
             libraryModel.appendRow(item)
 
         libraryBrowserView = _qtw.QListView()
@@ -974,3 +975,7 @@ Tcw=1
     @_tp.override
     def getInternalPipings(self) -> _cabc.Sequence[_ip.HasInternalPiping]:
         return [o for o in self.trnsysObj if isinstance(o, _ip.HasInternalPiping)]
+
+    def toggleSnap(self) -> None:
+        self.snapGrid = not self.snapGrid
+        self.diagramScene.update()

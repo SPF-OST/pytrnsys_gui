@@ -1,13 +1,12 @@
+import PyQt5.QtCore as _qtc
+import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
-from PyQt5.QtCore import QPointF
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPen
+import numpy as _np
 
-from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
-from trnsysGUI.GraphicalItem import GraphicalItem  # type: ignore[attr-defined]
-from trnsysGUI.ResizerItem import ResizerItem  # type: ignore[attr-defined]
-from trnsysGUI.connection.connectionBase import ConnectionBase  # type: ignore[attr-defined]
-from trnsysGUI.storageTank.widget import StorageTank
+import trnsysGUI.BlockItem as _bi
+import trnsysGUI.GraphicalItem as _gi
+import trnsysGUI.connection.connectionBase as _cb
+import trnsysGUI.storageTank.widget as _widget
 
 
 class Scene(_qtw.QGraphicsScene):
@@ -34,33 +33,33 @@ class Scene(_qtw.QGraphicsScene):
         self._editor.moveDirectPorts = False
 
     def drawBackground(self, painter, rect):
-        # Overwrite drawBackground if snapGrid is True
-        if self._editor.snapGrid:
-            pen = QPen()
-            pen.setWidth(2)
-            pen.setCosmetic(True)
-            painter.setPen(pen)
+        super().drawBackground(painter, rect)
 
-            gridSize = self._editor.snapSize
+        if not self._editor.snapGrid:
+            return
 
-            left = int(rect.left()) - (int(rect.left()) % gridSize)
-            top = int(rect.top()) - (int(rect.top()) % gridSize)
-            points = []
-            for xIndex in range(left, int(rect.height()), gridSize):
-                for yIndex in range(top, int(rect.bottom()), gridSize):
-                    points.append(QPointF(xIndex, yIndex))
+        pen = _qtg.QPen()
+        pen.setWidth(2)
+        pen.setCosmetic(True)
+        painter.setPen(pen)
 
-            for point in points:
-                painter.drawPoint(point)
-        else:
-            super().drawBackground(painter, rect)
+        gridSize = self._editor.snapSize
+
+        left = rect.left() - rect.left() % gridSize
+        top = rect.top() - rect.top() % gridSize
+
+        for x in _np.arange(left, rect.right(), gridSize):
+            for y in _np.arange(top, rect.bottom(), gridSize):
+                xIndex = int(x)
+                yIndex = int(y)
+                painter.drawPoint(xIndex, yIndex)
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_L:
+        if event.key() == _qtc.Qt.Key_L:
             self._editor.moveDirectPorts = not self._editor.moveDirectPorts
             return
 
-        if event.key() == Qt.Key_Delete:
+        if event.key() == _qtc.Qt.Key_Delete:
             trnsysObjects = self._editor.trnsysObj
             selectedObjects = [o for o in trnsysObjects if self._isSelected(o)]
 
@@ -71,23 +70,23 @@ class Scene(_qtw.QGraphicsScene):
 
             selectedObject = selectedObjects[0]
 
-            if isinstance(selectedObject, ConnectionBase):
+            if isinstance(selectedObject, _cb.ConnectionBase):
                 selectedObject.createDeleteUndoCommandAndAddToStack()
-            if isinstance(selectedObject, BlockItem):
+            if isinstance(selectedObject, _bi.BlockItem):
                 selectedObject.deleteBlockCom()
 
     @staticmethod
     def _isSelected(o):
-        return o.isConnectionSelected if isinstance(o, ConnectionBase) else o.isSelected
+        return o.isConnectionSelected if isinstance(o, _cb.ConnectionBase) else o.isSelected
 
     def mousePressEvent(self, event):
         for connection in self._editor.connectionList:
             connection.deselectConnection()
 
         for trnsysObject in self._editor.trnsysObj:
-            if isinstance(trnsysObject, BlockItem):
+            if isinstance(trnsysObject, _bi.BlockItem):
                 trnsysObject.isSelected = False
-            if isinstance(trnsysObject, StorageTank):
+            if isinstance(trnsysObject, _widget.StorageTank):
                 for heatExchanger in trnsysObject.heatExchangers:
                     heatExchanger.unhighlightHx()
 
@@ -95,10 +94,8 @@ class Scene(_qtw.QGraphicsScene):
 
         if self._previouslyHitItems is not None:
             for item in self._previouslyHitItems:
-                if isinstance(item, (GraphicalItem, BlockItem)) and hasattr(item, "resizer"):
+                if isinstance(item, (_gi.GraphicalItem, _bi.BlockItem)) and hasattr(item, "resizer"):
                     self.removeItem(item.resizer)
-                if isinstance(item, ResizerItem):
-                    self.removeItem(item)
 
             self._previouslyHitItems.clear()
 
