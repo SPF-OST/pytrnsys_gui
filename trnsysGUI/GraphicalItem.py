@@ -37,9 +37,6 @@ class GraphicalItem(QGraphicsPixmapItem):
 
         self._editor.graphicalObj.append(self)
 
-    def setItemSize(self, w, h):
-        self.w, self.h = w, h
-
     def contextMenuEvent(self, event):
         menu = QMenu()
 

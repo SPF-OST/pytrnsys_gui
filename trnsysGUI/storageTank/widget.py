@@ -167,7 +167,17 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
         super().updateImage()
         self.label.setPos(self.label.pos().x(), self.h)
 
-    def updatePortItemPositionsAfterTankSizeChange(self, deltaH, deltaW):
+    def setSize(self, *, width: int, height: int) -> None:
+        self.prepareGeometryChange()
+
+        deltaH = height - self.h
+        deltaW = width - self.w
+        self.w = width
+        self.h = height
+        self._updatePortItemPositionsAfterTankSizeChange(deltaW, deltaH)
+        self._updateHeatExchangersAfterTankSizeChange()
+
+    def _updatePortItemPositionsAfterTankSizeChange(self, deltaW: int, deltaH: int) -> None:
         for portItem in self.inputs + self.outputs:
             oldRelativeHeight = portItem.pos().y() / self.h
             if portItem.side == 0:
@@ -175,7 +185,7 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
             else:
                 portItem.setPos(portItem.pos().x() + deltaW, oldRelativeHeight * (self.h + deltaH))
 
-    def updateHeatExchangersAfterTankSizeChange(self):
+    def _updateHeatExchangersAfterTankSizeChange(self):
         for heatExchanger in self.heatExchangers:
             heatExchanger.setTankSize(self.w, self.h)
 

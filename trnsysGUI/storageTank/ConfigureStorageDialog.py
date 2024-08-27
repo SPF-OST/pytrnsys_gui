@@ -512,11 +512,10 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
     def decrSize(self):
         self._changeSize(-self.HEIGHT_INCREMENT, -self.WIDTH_INCREMENT)
 
-    def _changeSize(self, deltaH, deltaW):
-        self.storage.updatePortItemPositionsAfterTankSizeChange(deltaH, deltaW)
-        self.storage.h += deltaH
-        self.storage.w += deltaW
-        self.storage.updateHeatExchangersAfterTankSizeChange()
+    def _changeSize(self, deltaH: int, deltaW: int) -> None:
+        newWidth = self.storage.w + deltaW
+        newHeight = self.storage.h + deltaH
+        self.storage.setSize(width=newWidth, height=newHeight)
         self.storage.updateImage()
 
     def cancel(self):
