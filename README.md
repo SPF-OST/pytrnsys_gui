@@ -52,9 +52,9 @@ to the respective folder of your TRNSYS installation:
     ...\UserLib\ReleaseDLLs
 
 #### Troubleshooting
-`pytrnsys-gui.exe` writes logging messages into the `pytrnsys-gui.log` file located in the same directory
-as the `.exe` file. The `.log` file might give you some hints as to what happened if something doesn't
-work or if `pytrnsys-gui.exe` has crashed.
+`pytrnsys-gui.bat` writes logging messages into the `pytrnsys-gui.log` file located in the same directory
+as the `.bat` file. The `.log` file might give you some hints as to what happened if something doesn't
+work or if `pytrnsys-gui.bat` has crashed.
 
 
 ### Installation from source / Developer installation
@@ -63,7 +63,7 @@ work or if `pytrnsys-gui.exe` has crashed.
 
 ##### Required
 
-1. [Python 3.12](https://www.python.org/ftp/python/3.12.2/python-3.12.2-amd64.exe)
+1. [Python 3.12](https://www.python.org/ftp/python/3.12.2/python-3.12.2-amd64.bat)
 1. Local clones of the following GIT repositories:
     1. `https://github.com/SPF-OST/pytrnsys.git`
     1. `https://github.com/SPF-OST/pytrnsys_gui.git`
