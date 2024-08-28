@@ -16,8 +16,8 @@ class Boiler(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin
         self.w = 80
         self.h = 120
         self.portOffset = 5
-        self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
-        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", self))
 
         self.changeSize()
 
@@ -56,11 +56,6 @@ class Boiler(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
-
-        self.inputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
-        self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
-
-        self.logger.debug(self.outputs[0].pos())
 
         return w, h
 

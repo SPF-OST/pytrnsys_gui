@@ -35,9 +35,9 @@ class DoublePipeTeePiece(_tpb.TeePieceBase):
 
     def _createInputAndOutputPorts(self) -> _tp.Tuple[_pib.PortItemBase, _pib.PortItemBase, _pib.PortItemBase]:
         return (
-            _dppi.DoublePipePortItem("i", 0, self),
-            _dppi.DoublePipePortItem("o", 2, self),
-            _dppi.DoublePipePortItem("o", 2, self),
+            _dppi.DoublePipePortItem("i", self),
+            _dppi.DoublePipePortItem("o", self),
+            _dppi.DoublePipePortItem("o", self),
         )
 
     def _setModels(self) -> None:

@@ -19,8 +19,8 @@ class Collector(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMi
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
-        self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
-        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", self))
 
         self.changeSize()
 
@@ -63,8 +63,5 @@ class Collector(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMi
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
-
-        self.inputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
-        self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 
         return w, h

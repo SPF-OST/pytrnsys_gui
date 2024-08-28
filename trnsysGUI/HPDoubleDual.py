@@ -14,13 +14,13 @@ class HPDoubleDual(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicIte
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
-        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
-        self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
-        self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", self))
 
-        self.outputs.append(_cspi.createSinglePipePortItem("o", 0, self))
-        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
-        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", self))
 
         # For restoring correct order of trnsysObj list
         self.childIds = []
@@ -69,13 +69,6 @@ class HPDoubleDual(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicIte
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
 
-        self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
-        self.inputs[1].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
-        self.inputs[2].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
-
-        self.outputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
-        self.outputs[1].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
-        self.outputs[2].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
         return w, h
 
     def encode(self):

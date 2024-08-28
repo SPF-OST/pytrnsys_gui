@@ -18,10 +18,10 @@ class BlockItemFourPorts(
 
         self.h = 120
         self.w = 120
-        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
-        self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
-        self.outputs.append(_cspi.createSinglePipePortItem("o", 0, self))
-        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", self))
 
         self.childIds = []
         self.childIds.append(self.trnsysId)

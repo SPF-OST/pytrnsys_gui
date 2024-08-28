@@ -17,8 +17,8 @@ class SteamPowerBlock(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphic
         self.w = 240
         self.h = 160
 
-        self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
-        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", self))
 
         self.changeSize()
 
@@ -61,8 +61,5 @@ class SteamPowerBlock(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphic
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
-
-        self.inputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
-        self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 
         return w, h

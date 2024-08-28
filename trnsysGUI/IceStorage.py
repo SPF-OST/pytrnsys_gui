@@ -15,8 +15,8 @@ class IceStorage(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemM
         super().__init__(trnsysType, editor, displayName)
         self.w = 120
         self.h = 120
-        self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
-        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", self))
 
         self.changeSize()
 
@@ -62,6 +62,4 @@ class IceStorage(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemM
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
 
-        self.inputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
-        self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
         return w, h

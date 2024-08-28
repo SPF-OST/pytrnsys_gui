@@ -21,8 +21,8 @@ class GroundSourceHx(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicI
         self.w = 60
         self.h = 80
 
-        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
-        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", self))
 
         self.changeSize()
 
@@ -61,9 +61,6 @@ class GroundSourceHx(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicI
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
-
-        self.inputs[0].side = (self.rotationN + 1 + 2 * self.flippedV) % 4
-        self.outputs[0].side = (self.rotationN + 1 + 2 * self.flippedV) % 4
 
         return w, h
 

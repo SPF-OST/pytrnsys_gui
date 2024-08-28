@@ -168,22 +168,6 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
         self.flippedV = bool(state)
         self._updateTransform()
 
-    def updateSidesFlippedH(self):
-        affectedSides = [0, 2] if self.rotationN % 2 == 0 else [1, 3]
-
-        nQuarterTurnsNeeded = 2
-        self._updatePortSides(nQuarterTurnsNeeded, affectedSides)
-
-    def updateSidesFlippedV(self):
-        affectedSides = [0, 2] if self.rotationN % 2 == 1 else [1, 3]
-
-        nQuarterTurnsNeeded = 2
-        self._updatePortSides(nQuarterTurnsNeeded, affectedSides)
-
-    @staticmethod
-    def _updateSide(port, n):
-        port.side = (port.side + n) % 4
-
     def rotateBlockCW(self):
         self.rotateBlockToN(1)
 
@@ -199,13 +183,8 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
 
     def _rotateBlock(self, nQuarterTurns: int) -> None:
         self.rotationN = nQuarterTurns
-
         self.label.setRotation(-self.rotationN * 90)
-
         self._updateTransform()
-
-        nQuarterTurnsNeeded = nQuarterTurns - self.rotationN
-        self._updatePortSides(nQuarterTurnsNeeded)
 
     def _updateTransform(self) -> None:
         scaleX = -1 if self.flippedH else 1
@@ -223,28 +202,6 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
         transform = scale * translate * rotate  # type: ignore[operator]
 
         self.setTransform(transform)
-
-    def _updatePortSides(
-        self, nQuarterTurnsNeeded: int, affectedSides: _tp.Sequence[_tp.Literal[0, 1, 2, 3]] | None = None
-    ) -> None:
-        if affectedSides is None:
-            affectedSides = [0, 1, 2, 3]
-
-        self._updatePortSidesForPorts(self.inputs, nQuarterTurnsNeeded, affectedSides)
-        self._updatePortSidesForPorts(self.outputs, nQuarterTurnsNeeded, affectedSides)
-
-    def _updatePortSidesForPorts(
-        self,
-        ports: _tp.Sequence[_pib.PortItemBase],
-        nQuarterTurnsNeeded: int,
-        affectedSides: _tp.Sequence[_tp.Literal[0, 1, 2, 3]],
-    ) -> None:
-        for port in ports:
-            if port.side not in affectedSides:
-                continue
-
-            port.itemChange(_qtw.QGraphicsItem.ItemScenePositionHasChanged, port.scenePos())
-            self._updateSide(port, nQuarterTurnsNeeded)
 
     def deleteBlock(self):
         self.editor.trnsysObj.remove(self)

@@ -4,51 +4,50 @@ from __future__ import annotations
 
 import typing as _tp
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import QPointF
-from PyQt5.QtGui import QColor, QBrush, QCursor, QPen
-from PyQt5.QtWidgets import QGraphicsEllipseItem
+import PyQt5.QtCore as _qtc
+import PyQt5.QtGui as _qtg
+import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.internalPiping as _ip
+import trnsysGUI.sideNrs as _snrs
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.connection.connectionBase as _cb
 
 
-class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance-attributes
-    def __init__(self, name, side, parent):
+class PortItemBase(_qtw.QGraphicsEllipseItem):  # pylint: disable = too-many-instance-attributes
+    def __init__(self, name, parent):
         self.parent = parent
 
         self.logger = parent.logger
 
         self.name = name
-        self.side = side
-        self.createdAtSide = side
+        self.createdAtSide = None
         self.posCallbacks = []
         self.connectionList: list[_cb.ConnectionBase] = []
         self.id = self.parent.editor.idGen.getID()  # pylint: disable = invalid-name
 
         self.color = "white"
-        self.ashColorR = QColor(239, 57, 75)
-        self.ashColorB = QColor(20, 83, 245)
+        self.ashColorR = _qtg.QColor(239, 57, 75)
+        self.ashColorB = _qtg.QColor(20, 83, 245)
 
         super().__init__(-4, -4, 7.0, 7.0, parent)
 
-        self.innerCircle = QGraphicsEllipseItem(-4, -4, 6, 6, self)
-        self.innerCircle.setPen(QPen(QColor(0, 0, 0, 0), 0))
+        self.innerCircle = _qtw.QGraphicsEllipseItem(-4, -4, 6, 6, self)
+        self.innerCircle.setPen(_qtg.QPen(_qtg.QColor(0, 0, 0, 0), 0))
 
-        self.visibleColor = QColor(0, 0, 0)
+        self.visibleColor = _qtg.QColor(0, 0, 0)
 
         self.innerCircle.setBrush(self.visibleColor)
 
-        self.setCursor(QCursor(QtCore.Qt.CrossCursor))
+        self.setCursor(_qtg.QCursor(_qtc.Qt.CrossCursor))
         # self.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
 
         # The Port itself is larger than only the innerCircle
-        self.setBrush(QBrush(QtCore.Qt.white))
+        self.setBrush(_qtg.QBrush(_qtc.Qt.white))
 
         # Hacky fix for no border of ellipse
-        p1 = QPen(QColor(0, 0, 0, 0), 0)  # pylint: disable = invalid-name
+        p1 = _qtg.QPen(_qtg.QColor(0, 0, 0, 0), 0)  # pylint: disable = invalid-name
         self.setPen(p1)
 
         self.setFlag(self.ItemSendsScenePositionChanges, True)
@@ -61,6 +60,23 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
     def setParent(self, p):  # pylint: disable = invalid-name
         self.parent = p
         self.setParentItem(p)
+
+    @property
+    def side(self) -> _snrs.SideNr:
+        blockItem = self.parent
+
+        transform = blockItem.transform()
+
+        blockItemRect = _qtc.QRect(0, 0, blockItem.w, blockItem.h)
+        mappedBlockItemRect = transform.mapRect(blockItemRect)
+
+        portItemRect = self.rect()
+        portItemRectInParentCoordinates = self.mapRectToParent(portItemRect)
+        mappedPortItemRect = transform.mapRect(portItemRectInParentCoordinates)
+
+        sideNr = _snrs.getSideNr(mappedPortItemRect, mappedBlockItemRect)
+
+        return sideNr
 
     def itemChange(self, change, value):
         # pylint: disable = fixme, too-many-branches, too-many-statements, too-many-nested-blocks
@@ -75,7 +91,7 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
                 value.setY(max(value.y(), 0))
                 value.setY(min(value.y(), self.parent.h))
 
-                return QPointF(self.savePos.x(), value.y())
+                return _qtc.QPointF(self.savePos.x(), value.y())
 
         if change != self.ItemScenePositionHasChanged:
             return super().itemChange(change, value)

@@ -27,9 +27,9 @@ class TeePiece(_tpb.TeePieceBase):
 
     def _createInputAndOutputPorts(self) -> _tp.Tuple[_pib.PortItemBase, _pib.PortItemBase, _pib.PortItemBase]:
         return (
-            _cspi.createSinglePipePortItem("i", 0, self),
-            _cspi.createSinglePipePortItem("o", 2, self),
-            _cspi.createSinglePipePortItem("o", 2, self),
+            _cspi.createSinglePipePortItem("i", self),
+            _cspi.createSinglePipePortItem("o", self),
+            _cspi.createSinglePipePortItem("o", self),
         )
 
     def _setModels(self) -> None:

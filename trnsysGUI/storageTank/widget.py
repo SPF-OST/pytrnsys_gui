@@ -135,13 +135,11 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
     def _createPort(
         self, name: str, relativeHeight: float, storageTankHeight: float, side: _sd.Side
     ) -> SinglePipePortItem:
-        sideNr = side.toSideNr()
-        portItem = _cspi.createSinglePipePortItem(name, sideNr, self)
+        portItem = _cspi.createSinglePipePortItem(name, self)
         portItem.setZValue(100)
         xPos = 0 if side == _sd.Side.LEFT else self.w
         yPos = storageTankHeight - relativeHeight * storageTankHeight
         portItem.setPos(xPos, yPos)
-        portItem.side = sideNr
         return portItem
 
     @staticmethod

@@ -9,18 +9,16 @@ if _tp.TYPE_CHECKING:
     import trnsysGUI.connection.singlePipeConnection as _spc
 
 GetInternallyConnectedPortItems = _tp.Callable[["SinglePipePortItem"], _tp.Sequence["SinglePipePortItem"]]
-Side = _tp.Literal[0, 1, 2, 3]
 
 
 class SinglePipePortItem(_pi.PortItemBase):
     def __init__(
         self,
         name: str,
-        side: Side,
         parent: _bi.BlockItem,
         getInternallyConnectedPortItems: GetInternallyConnectedPortItems,
     ) -> None:
-        super().__init__(name, side, parent)
+        super().__init__(name, parent)
 
         self.getInternallyConnectedPortItems = getInternallyConnectedPortItems
 

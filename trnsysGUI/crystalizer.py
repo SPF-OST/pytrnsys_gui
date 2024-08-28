@@ -15,8 +15,8 @@ class Crystalizer(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
         self.w = 120
         self.h = 40
 
-        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
-        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", self))
 
         self.changeSize()
 
@@ -40,10 +40,6 @@ class Crystalizer(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
-
-        self.inputs[0].side = (self.rotationN + 0 + 2 * self.flippedH) % 4
-        self.outputs[0].side = (self.rotationN + 2 + 2 * self.flippedH) % 4
-        # pylint: disable=duplicate-code  # 2
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         inputPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)

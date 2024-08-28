@@ -19,8 +19,8 @@ class Connector(
         self.w = 40
         self.h = 40
 
-        self.fromPort = _cspi.createSinglePipePortItem("i", 0, self)
-        self.toPort = _cspi.createSinglePipePortItem("o", 2, self)
+        self.fromPort = _cspi.createSinglePipePortItem("i", self)
+        self.toPort = _cspi.createSinglePipePortItem("o", self)
 
         self.inputs.append(self.fromPort)
         self.outputs.append(self.toPort)
@@ -79,9 +79,6 @@ class Connector(
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
-
-        self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
-        self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4  # pylint: disable=duplicate-code  # 1
 
         return width, height
 

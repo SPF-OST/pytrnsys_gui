@@ -16,8 +16,8 @@ class ParabolicTroughField(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGr
 
         self.w = 160
         self.h = 240
-        self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
-        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", self))
 
         self.changeSize()
 
@@ -60,8 +60,5 @@ class ParabolicTroughField(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGr
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
-
-        self.inputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
-        self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 
         return w, h
