@@ -16,8 +16,8 @@ class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
-        self.fromPort = _dppi.DoublePipePortItem("i", 0, self)
-        self.toPort = _dppi.DoublePipePortItem("o", 2, self)
+        self.fromPort = _dppi.DoublePipePortItem("i", self)
+        self.toPort = _dppi.DoublePipePortItem("o", self)
 
         self.inputs.append(self.fromPort)
         self.outputs.append(self.toPort)
@@ -46,9 +46,6 @@ class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         # pylint: disable=duplicate-code  # 3
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
-
-        self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
-        self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         coldModelPortItemsToGraphicalPortItem = {

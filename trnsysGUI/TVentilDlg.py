@@ -94,19 +94,11 @@ class TVentilDlg(_ndialog.ChangeNameDialogBase):
 
         self.okButton.clicked.connect(self.acceptedEdit)
         self.cancelButton.clicked.connect(self.cancel)
-        self.hFlipBox.stateChanged.connect(self.setNewFlipStateH)
-        self.vFlipBox.stateChanged.connect(self.setNewFlipStateV)
+        self.hFlipBox.stateChanged.connect(self._blockItem.updateFlipStateH)
+        self.vFlipBox.stateChanged.connect(self._blockItem.updateFlipStateV)
         self.complexDiv.stateChanged.connect(self.setNewComplexState)
         self.setWindowTitle("Properties")
         self.show()
-
-    def setNewFlipStateH(self, state):
-        self._blockItem.updateFlipStateH(state)
-        self._blockItem.updateSidesFlippedH()
-
-    def setNewFlipStateV(self, state):
-        self._blockItem.updateFlipStateV(state)
-        self._blockItem.updateSidesFlippedV()
 
     def setNewComplexState(self, state):
         self._blockItem.setComplexDiv(state)

@@ -20,8 +20,8 @@ class GenericBlock(_biip.BlockItemHasInternalPiping, _bmx.RasterImageBlockItemMi
         _biip.BlockItemHasInternalPiping.__init__(self, trnsysType, editor, displayName)
         _bmx.RasterImageBlockItemMixin.__init__(self)
 
-        self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
-        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", self))
 
         self.childIds = []
         self.childIds.append(self.trnsysId)
@@ -143,8 +143,8 @@ class GenericBlock(_biip.BlockItemHasInternalPiping, _bmx.RasterImageBlockItemMi
         w = self.w
         delta = 4
         self.logger.debug("side is " + str(side))
-        self.inputs.append(_cspi.createSinglePipePortItem("i", side, self))
-        self.outputs.append(_cspi.createSinglePipePortItem("o", side, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", self))
         # Allocate id
         self.childIds.append(self.editor.idGen.getTrnsysID())
 

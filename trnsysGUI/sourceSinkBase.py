@@ -18,8 +18,8 @@ class SourceSinkBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicI
 
         self.massFlowRateInKgPerH = 500
 
-        self.inputs.append(_cspi.createSinglePipePortItem("i", 1, self))
-        self.outputs.append(_cspi.createSinglePipePortItem("o", 1, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", self))
 
         self.changeSize()
 
@@ -55,9 +55,6 @@ class SourceSinkBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicI
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
-
-        self.inputs[0].side = (self.rotationN + 1 + 2 * self.flippedV) % 4
-        self.outputs[0].side = (self.rotationN + 1 + 2 * self.flippedV) % 4
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         inputPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)

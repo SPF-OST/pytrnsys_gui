@@ -1,4 +1,5 @@
 import dataclasses as _dc
+import enum as _enum
 import typing as _tp
 import uuid as _uuid
 
@@ -70,29 +71,47 @@ class HydraulicLoopVersion1(_ser.UpgradableJsonSchemaMixin):
         return _uuid.UUID("990b8023-eb4b-408e-8d54-23caa5916b2a")
 
 
+class _ConnectionsDefinitionModeVersion0(_enum.Enum):
+    INDIVIDUAL = _enum.auto()
+    LOOP_WIDE_DEFAULTS = _enum.auto()
+    DUMMY_PIPES = _enum.auto()
+
+    def upgrade(self) -> _cdm.ConnectionsDefinitionMode:
+        if self == self.INDIVIDUAL:
+            return _cdm.ConnectionsDefinitionMode.INDIVIDUAL
+
+        if self == self.LOOP_WIDE_DEFAULTS:
+            return _cdm.ConnectionsDefinitionMode.LOOP_WIDE_DEFAULTS
+
+        if self == self.DUMMY_PIPES:
+            return _cdm.ConnectionsDefinitionMode.DUMMY_PIPES
+
+        raise ValueError("Unknown connections definition mode.", self)
+
+
 @_dc.dataclass
-class HydraulicLoop(_ser.UpgradableJsonSchemaMixin):
+class HydraulicLoopVersion2(_ser.UpgradableJsonSchemaMixin):
     name: str
     hasUserDefinedName: bool
     fluidName: str
-    connectionsDefinitionMode: _cdm.ConnectionsDefinitionMode
+    connectionsDefinitionMode: _ConnectionsDefinitionModeVersion0
     connectionsTrnsysId: _tp.Sequence[int]
 
     @classmethod
-    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "HydraulicLoop":
+    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "HydraulicLoopVersion2":
         assert isinstance(superseded, HydraulicLoopVersion1)
 
-        connectionsEditMode = (
-            _cdm.ConnectionsDefinitionMode.LOOP_WIDE_DEFAULTS
+        connectionsDefinitionMode = (
+            _ConnectionsDefinitionModeVersion0.LOOP_WIDE_DEFAULTS
             if superseded.useLoopWideDefaults
-            else _cdm.ConnectionsDefinitionMode.INDIVIDUAL
+            else _ConnectionsDefinitionModeVersion0.INDIVIDUAL
         )
 
-        return HydraulicLoop(
+        return HydraulicLoopVersion2(
             superseded.name,
             superseded.hasUserDefinedName,
             superseded.fluidName,
-            connectionsEditMode,
+            connectionsDefinitionMode,
             superseded.connectionsTrnsysId,
         )
 
@@ -103,3 +122,32 @@ class HydraulicLoop(_ser.UpgradableJsonSchemaMixin):
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
         return _uuid.UUID("c743e29e-faaa-4e84-bf0f-6a10299097ed")
+
+
+@_dc.dataclass
+class HydraulicLoop(_ser.UpgradableJsonSchemaMixin):
+    name: str
+    hasUserDefinedName: bool
+    fluidName: str
+    connectionsDefinitionMode: _cdm.ConnectionsDefinitionMode
+    connectionsTrnsysId: _tp.Sequence[int]
+
+    @classmethod
+    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "HydraulicLoop":
+        assert isinstance(superseded, HydraulicLoopVersion2)
+
+        return HydraulicLoop(
+            superseded.name,
+            superseded.hasUserDefinedName,
+            superseded.fluidName,
+            superseded.connectionsDefinitionMode.upgrade(),
+            superseded.connectionsTrnsysId,
+        )
+
+    @classmethod
+    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixin]:
+        return HydraulicLoopVersion2
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID("1e16cd15-83b9-46fa-ac63-11b2b2209af1")

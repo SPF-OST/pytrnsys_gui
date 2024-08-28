@@ -95,27 +95,7 @@ class PumpsAndTabsBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphi
         _dfh.moveComponentDdckFolderIfNecessary(self, newName, oldName, self._projectDirPath)
         self.setDisplayName(newName)
 
-        self._setHorizontallyFlipped(newDialogModel.isHorizontallyFlipped)
-        self._setVerticallyFlipped(newDialogModel.isVerticallyFlipped)
+        self.updateFlipStateH(newDialogModel.isHorizontallyFlipped)
+        self.updateFlipStateV(newDialogModel.isVerticallyFlipped)
 
         self.massFlowRateInKgPerH = newDialogModel.massFlowRateKgPerH
-
-    def _setHorizontallyFlipped(self, isHorizontallyFlipped: bool) -> None:
-        wasHorizontallyFlipped = self.flippedH
-        hasHorizontallyFlippedChanged = wasHorizontallyFlipped != isHorizontallyFlipped
-
-        if not hasHorizontallyFlippedChanged:
-            return
-
-        self.updateFlipStateH(isHorizontallyFlipped)
-        self.updateSidesFlippedH()
-
-    def _setVerticallyFlipped(self, isVerticallyFlipped: bool) -> None:
-        wasVerticallyFlipped = self.flippedV
-        hasVerticallyFlippedChanged = wasVerticallyFlipped != isVerticallyFlipped
-
-        if not hasVerticallyFlippedChanged:
-            return
-
-        self.updateFlipStateV(isVerticallyFlipped)
-        self.updateSidesFlippedV()

@@ -86,10 +86,6 @@ class TeePieceBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicIte
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
 
-        self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
-        self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
-        self.outputs[1].side = (self.rotationN + 1 - 2 * self.flippedV) % 4
-
     @property
     def _portOffset(self) -> int:
         raise NotImplementedError()

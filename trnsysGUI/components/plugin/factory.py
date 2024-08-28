@@ -166,33 +166,17 @@ class InternalPipingFactory(_plugin.AbstractInternalPipingFactory):
 
         return graphicalPort, modelInputPort
 
+    @staticmethod
     def _createPort(
-        self, portSpec: _smodel.Port, portHelper: _PortPropertiesBase, blockItem: _bi.BlockItem
+        portSpec: _smodel.Port, portHelper: _PortPropertiesBase, blockItem: _bi.BlockItem
     ) -> _pib.PortItemBase:
-        side = self._getSide(portSpec.position)
-
         match portSpec.type:
             case "standard":
-                return _cspi.createSinglePipePortItem(portHelper.directionLabel, side, blockItem)
+                return _cspi.createSinglePipePortItem(portHelper.directionLabel, blockItem)
             case "hot" | "cold":
-                return _dpi.DoublePipePortItem(portHelper.directionLabel, side, blockItem)
+                return _dpi.DoublePipePortItem(portHelper.directionLabel, blockItem)
             case _:
                 _tp.assert_never(portSpec.type)
-
-    def _getSide(self, portPosition: tuple[int, int]) -> _spi.Side:
-        posX, posY = portPosition
-        width, height = self.specification.size
-
-        if posX == 0:
-            return 0
-        if posY == 0:
-            return 1
-        if posX == width:
-            return 2
-        if posY == height:
-            return 3
-
-        raise ValueError("Invalid port position.", portPosition)
 
     @staticmethod
     def _getDirectionLabel(direction: _mfn.PortItemDirection) -> _tp.Literal["i", "o"]:

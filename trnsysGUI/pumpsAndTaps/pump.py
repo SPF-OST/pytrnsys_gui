@@ -17,8 +17,8 @@ class Pump(_patb.PumpsAndTabsBase):  # pylint: disable=too-many-instance-attribu
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
-        self._fromPort = _cspi.createSinglePipePortItem("i", 0, self)
-        self._toPort = _cspi.createSinglePipePortItem("o", 2, self)
+        self._fromPort = _cspi.createSinglePipePortItem("i", self)
+        self._toPort = _cspi.createSinglePipePortItem("o", self)
 
         self.inputs.append(self._fromPort)
         self.outputs.append(self._toPort)
@@ -112,8 +112,5 @@ class Pump(_patb.PumpsAndTabsBase):  # pylint: disable=too-many-instance-attribu
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
-
-        self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
-        self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 
         return width, height

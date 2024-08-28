@@ -51,18 +51,10 @@ class BlockDlg(_ndialog.ChangeNameDialogBase):  # pylint: disable=too-many-insta
 
         self.okButton.clicked.connect(self.acceptedEdit)
         self.cancelButton.clicked.connect(self.cancel)
-        self.hFlipBox.stateChanged.connect(self.setNewFlipStateH)
-        self.vFlipBox.stateChanged.connect(self.setNewFlipStateV)
+        self.hFlipBox.stateChanged.connect(self._blockItem.updateFlipStateH)
+        self.vFlipBox.stateChanged.connect(self._blockItem.updateFlipStateV)
         self.setWindowTitle("Properties")
         self.show()
-
-    def setNewFlipStateH(self, state):
-        self._blockItem.updateFlipStateH(state)
-        self._blockItem.updateSidesFlippedH()
-
-    def setNewFlipStateV(self, state):
-        self._blockItem.updateFlipStateV(state)
-        self._blockItem.updateSidesFlippedV()
 
     def cancel(self):
         self.close()

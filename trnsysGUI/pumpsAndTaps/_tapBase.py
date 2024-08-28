@@ -14,12 +14,12 @@ class TapBase(_ptb.PumpsAndTabsBase):
         self._modelTerminal: _mfn.TerminalWithPrescribedFlowBase
 
         if direction == _mfn.PortItemDirection.OUTPUT:
-            self._graphicalPortItem = _cspi.createSinglePipePortItem("o", 0, self)
+            self._graphicalPortItem = _cspi.createSinglePipePortItem("o", self)
             self.outputs.append(self._graphicalPortItem)
             modelPortItem = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
             self._modelTerminal = _mfn.TerminalWithPrescribedPosFlow(modelPortItem)
         elif direction == _mfn.PortItemDirection.INPUT:
-            self._graphicalPortItem = _cspi.createSinglePipePortItem("i", 0, self)
+            self._graphicalPortItem = _cspi.createSinglePipePortItem("i", self)
             self.inputs.append(self._graphicalPortItem)
             modelPortItem = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
             self._modelTerminal = _mfn.TerminalWithPrescribedNegFlow(modelPortItem)
@@ -71,8 +71,6 @@ class TapBase(_ptb.PumpsAndTabsBase):
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
-
-        self._graphicalPortItem.side = (self.rotationN + 2 * self.flippedH) % 4
 
         return w, h
 

@@ -17,9 +17,9 @@ class SingleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
-        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
-        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
-        self.outputs.append(_dppi.DoublePipePortItem("o", 2, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", self))
+        self.outputs.append(_dppi.DoublePipePortItem("o", self))
 
         self._setModels()
 
@@ -52,11 +52,6 @@ class SingleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         # pylint: disable=duplicate-code
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
-
-        self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
-        self.inputs[1].side = (self.rotationN + 2 * self.flippedH) % 4
-        # pylint: disable=duplicate-code
-        self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         coldModelPortItemsToGraphicalPortItem = {

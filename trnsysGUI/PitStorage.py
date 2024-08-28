@@ -44,12 +44,6 @@ class PitStorage(BlockItemFourPorts):
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
 
-        self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
-        self.inputs[1].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
-
-        self.outputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
-        self.outputs[1].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
-
         return w, h
 
     def getInternalPiping(self) -> _ip.InternalPiping:

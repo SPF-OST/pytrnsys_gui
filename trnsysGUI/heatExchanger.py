@@ -40,8 +40,8 @@ class HeatExchanger(QGraphicsItemGroup):
 
         self.storageTank.heatExchangers.append(self)
         self.setZValue(100)
-        self.port1 = _cspi.createSinglePipePortItem("i", self.sSide, self.storageTank)
-        self.port2 = _cspi.createSinglePipePortItem("o", self.sSide, self.storageTank)
+        self.port1 = _cspi.createSinglePipePortItem("i", self.storageTank)
+        self.port2 = _cspi.createSinglePipePortItem("o", self.storageTank)
 
         self.storageTank.inputs.append(self.port1)
         self.storageTank.outputs.append(self.port2)

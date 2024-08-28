@@ -30,9 +30,9 @@ class TVentil(
         self.posLabel = _qtw.QGraphicsTextItem(str(self.positionForMassFlowSolver), self)
         self.posLabel.setVisible(False)
 
-        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
-        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
-        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", self))
 
         inputPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
         output1 = _mfn.PortItem("StrOut", _mfn.PortItemDirection.OUTPUT)
@@ -85,10 +85,6 @@ class TVentil(
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
-
-        self.inputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
-        self.outputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
-        self.outputs[1].side = (self.rotationN + 1 + 2 * self.flippedV) % 4
 
         return width, height
 

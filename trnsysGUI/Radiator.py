@@ -18,8 +18,8 @@ class Radiator(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMix
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
-        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
-        self.outputs.append(_cspi.createSinglePipePortItem("o", 0, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", self))
 
         self.changeSize()
 
@@ -64,6 +64,3 @@ class Radiator(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMix
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
-
-        self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
-        self.outputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
