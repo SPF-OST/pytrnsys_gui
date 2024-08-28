@@ -86,7 +86,7 @@ class _ConnectionsDefinitionModeVersion0(_enum.Enum):
         if self == self.DUMMY_PIPES:
             return _cdm.ConnectionsDefinitionMode.DUMMY_PIPES
 
-        _tp.assert_never(self)
+        raise ValueError("Unknown connections definition mode.", self)
 
 
 @_dc.dataclass
