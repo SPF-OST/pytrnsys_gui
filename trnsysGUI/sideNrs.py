@@ -1,7 +1,6 @@
-import PyQt5.QtCore as _qtc
-
 import typing as _tp
 
+import PyQt5.QtCore as _qtc
 
 SideNr = _tp.Literal[0, 1, 2, 3]
 
@@ -21,14 +20,17 @@ def getSideNr(portItemRect: _qtc.QRect, blockItemRect: _qtc.QRect) -> SideNr:
 
     if portItemLeft <= blockItemLeft:
         return SideNrs.LEFT
-    elif portItemRight >= blockItemRight:
+
+    if portItemRight >= blockItemRight:
         return SideNrs.RIGHT
-    elif portItemTop <= blockItemTop:
+
+    if portItemTop <= blockItemTop:
         return SideNrs.TOP
-    elif portItemBottom >= blockItemBottom:
+
+    if portItemBottom >= blockItemBottom:
         return SideNrs.BOTTOM
-    else:
-        raise AssertionError("Port is inside block item.")
+
+    raise AssertionError("Port is inside block item.")
 
 
 def _getLeftRightTopBottom(rect: _qtc.QRect) -> _tp.Tuple[int, int, int, int]:

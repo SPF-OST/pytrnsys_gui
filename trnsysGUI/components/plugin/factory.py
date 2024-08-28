@@ -168,7 +168,7 @@ class InternalPipingFactory(_plugin.AbstractInternalPipingFactory):
 
     @staticmethod
     def _createPort(
-            portSpec: _smodel.Port, portHelper: _PortPropertiesBase, blockItem: _bi.BlockItem
+        portSpec: _smodel.Port, portHelper: _PortPropertiesBase, blockItem: _bi.BlockItem
     ) -> _pib.PortItemBase:
         match portSpec.type:
             case "standard":
