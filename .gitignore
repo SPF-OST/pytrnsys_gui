@@ -25,9 +25,7 @@ _QRC_*_generated.py
 /.idea/
 
 # Virtual environment
-/venv/
-/venv312/
-/venv-stools/
+/venv*/
 
 docs/_build/
 docs/trnsysGUI.uml
@@ -38,5 +36,3 @@ pytrnsys-gui.log
 
 /release/pyinstaller-venv/
 /trnsysGUI/pytrnsys-gui.pyproject.user
-
-/spyder-venv/
