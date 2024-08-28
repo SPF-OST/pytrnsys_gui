@@ -63,7 +63,7 @@ work or if `pytrnsys-gui.bat` has crashed.
 
 ##### Required
 
-1. [Python 3.12](https://www.python.org/ftp/python/3.12.2/python-3.12.2-amd64.bat)
+1. [Python 3.12](https://www.python.org/ftp/python/3.12.2/python-3.12.2-amd64.exe)
 1. Local clones of the following GIT repositories:
     1. `https://github.com/SPF-OST/pytrnsys.git`
     1. `https://github.com/SPF-OST/pytrnsys_gui.git`
