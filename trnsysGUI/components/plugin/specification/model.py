@@ -6,16 +6,33 @@ import pydantic as _pc
 PortType = _tp.Literal["standard", "hot", "cold"]
 
 
+def _nameMustBeCapitalized(what: _tp.Literal["Connection", "Port"], name: str) -> str:
+    if name.capitalize() != name:
+        raise ValueError(f"{what} names must be capitalized.")
+
+    return name
+
+
 class Port(_pc.BaseModel):
     name: str | None = None
     position: tuple[int, int]
     type: PortType = "standard"
+
+    @_pc.field_validator("name")
+    @classmethod
+    def nameMustBeCapitalized(cls, name: str) -> str:
+        return _nameMustBeCapitalized("Port", name)
 
 
 class Connection(_pc.BaseModel):
     name: str
     input: Port
     output: Port
+
+    @_pc.field_validator("name")
+    @classmethod
+    def nameMustBeCapitalized(cls, name: str) -> str:
+        return _nameMustBeCapitalized("Connection", name)
 
 
 class Specification(_pc.BaseModel):

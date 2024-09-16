@@ -1,17 +1,17 @@
 defaultName: thDrivenHp
 description: Thermally driven heat pump
 connections:
-  - name: cold
+  - name: Cold
     input:
       position: [0, 20]
     output:
       position: [0, 100]
-  - name: medium
+  - name: Medium
     input:
       position: [120, 20]
     output:
       position: [120, 100]
-  - name: hot
+  - name: Hot
     input:
       position: [80, 0]
     output:
