@@ -23,7 +23,7 @@ class Port(_pc.BaseModel):
 
     @_pc.field_validator("name")
     @classmethod
-    def nameMustBeCapitalized(cls, name: str | None) -> str:
+    def nameMustBeCapitalized(cls, name: str | None) -> str | None:
         return _nameMustBeCapitalized("Port", name)
 
 
@@ -35,7 +35,9 @@ class Connection(_pc.BaseModel):
     @_pc.field_validator("name")
     @classmethod
     def nameMustBeCapitalized(cls, name: str) -> str:
-        return _nameMustBeCapitalized("Connection", name)
+        validatedName = _nameMustBeCapitalized("Connection", name)
+        assert validatedName is not None
+        return validatedName
 
 
 class Specification(_pc.BaseModel):
