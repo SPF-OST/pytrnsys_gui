@@ -9,7 +9,7 @@ PortType = _tp.Literal["standard", "hot", "cold"]
 def _nameMustBeCapitalized(what: _tp.Literal["Connection", "Port"], name: str | None) -> str | None:
     if name is None:
         return None
-    
+
     if name != name.capitalize():
         raise ValueError(f"{what} names must be capitalized.")
 
