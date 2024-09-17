@@ -29,17 +29,17 @@ def getTestCases() -> _cabc.Iterable[TestCase]:
             description="Thermally driven heat pump",
             connections=[
                 _model.Connection(
-                    name="cold",
+                    name="Cold",
                     input=_model.Port(name=None, position=(0, 20)),
                     output=_model.Port(name=None, position=(0, 100)),
                 ),
                 _model.Connection(
-                    name="medium",
+                    name="Medium",
                     input=_model.Port(name=None, position=(120, 20)),
                     output=_model.Port(name=None, position=(120, 100)),
                 ),
                 _model.Connection(
-                    name="hot",
+                    name="Hot",
                     input=_model.Port(name=None, position=(80, 0)),
                     output=_model.Port(name=None, position=(40, 0)),
                 ),
