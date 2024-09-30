@@ -1,4 +1,5 @@
 import pytest as _pt
+import unittest as _ut
 
 import trnsysGUI.project as prj
 
@@ -22,7 +23,11 @@ def _createMainWindow(projectFolder, projectName, qtbot):
 
 
 @_pt.mark.skip(reason='Incomplete tests')
-class TestConfigureStorageDialog:
+class TestConfigureStorageDialog(_ut.TestCase):
+    def setUp(self, qtbot):
+        self.qtbot = qtbot
+        self.maxDiff = None
+
     def test__load_heat_exchangers(self, qtbot):
         assert False
 
