@@ -8,9 +8,9 @@ import trnsysGUI.project as prj
 import trnsysGUI.mainWindow as mw
 
 _CURRENT_DIR = _pl.Path(__file__).parent
-_PROJECT_DIR = _CURRENT_DIR / '..' 
+_PROJECT_DIR = _CURRENT_DIR / ".." / "data" / "diagramForConfigStorageDialog"
+_PROJECT_NAME = "diagramForConfigStorageDialog"
 
-# tests/trnsysGUI/data/diagramForConfigStorageDialog
 
 def _createMainWindow(projectFolder, projectName, qtbot):
     """ This might fit well as a helper class.
@@ -39,6 +39,7 @@ class TestConfigureStorageDialog(_ut.TestCase):
         """ Is called when project is opened with existing storage tanks.
         Also called when a new heat exchanger is added to a storage tank via _addHeatExchanger method.
         """
+        mainWindow = _createMainWindow(_PROJECT_DIR, _PROJECT_NAME, qtbot)
         assert False
 
     def test__get_heat_exchanger_list_item_text(self, qtbot):
