@@ -1,7 +1,10 @@
 import pytest as _pt
 import unittest as _ut
 
+import pytrnsys.utils.log as _ulog
+
 import trnsysGUI.project as prj
+import trnsysGUI.mainWindow as mw
 
 
 def _createMainWindow(projectFolder, projectName, qtbot):
@@ -13,7 +16,7 @@ def _createMainWindow(projectFolder, projectName, qtbot):
 
     logger = _ulog.getOrCreateCustomLogger("root", "DEBUG")  # type: ignore[attr-defined]
 
-    mainWindow = _mw.MainWindow(logger, project)  # type: ignore[attr-defined]
+    mainWindow = mw.MainWindow(logger, project)  # type: ignore[attr-defined]
 
     qtbot.addWidget(mainWindow)
     mainWindow.showBoxOnClose = False
@@ -24,17 +27,24 @@ def _createMainWindow(projectFolder, projectName, qtbot):
 
 @_pt.mark.skip(reason='Incomplete tests')
 class TestConfigureStorageDialog(_ut.TestCase):
-    def setUp(self, qtbot):
-        self.qtbot = qtbot
+    def setUp(self):
         self.maxDiff = None
 
     def test__load_heat_exchangers(self, qtbot):
+        """ Is called when project is opened with existing storage tanks.
+        Also called when a new heat exchanger is added to a storage tank via _addHeatExchanger method.
+        """
         assert False
 
     def test__get_heat_exchanger_list_item_text(self, qtbot):
+        """ Static method to get the name of the heat exchanger.
+        """
         assert False
 
     def test__load_direct_port_pairs(self, qtbot):
+        """ Called when a project is opened with existing direct port pairs.
+        Called when a new direct port pair is added to the storage tank via addPortPair method
+        """
         assert False
 
     def test__get_direct_port_pair_list_item_text(self, qtbot):
