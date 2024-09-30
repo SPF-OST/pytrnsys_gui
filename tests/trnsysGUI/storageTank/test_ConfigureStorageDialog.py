@@ -1,11 +1,16 @@
 import pytest as _pt
 import unittest as _ut
+import pathlib as _pl
 
 import pytrnsys.utils.log as _ulog
 
 import trnsysGUI.project as prj
 import trnsysGUI.mainWindow as mw
 
+_CURRENT_DIR = _pl.Path(__file__).parent
+_PROJECT_DIR = _CURRENT_DIR / '..' 
+
+# tests/trnsysGUI/data/diagramForConfigStorageDialog
 
 def _createMainWindow(projectFolder, projectName, qtbot):
     """ This might fit well as a helper class.
