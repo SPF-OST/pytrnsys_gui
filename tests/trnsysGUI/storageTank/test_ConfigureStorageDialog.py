@@ -1,11 +1,18 @@
 import pytest as _pt
 import unittest as _ut
 import pathlib as _pl
+import collections.abc as _abc
+
+import PyQt5.QtCore as _core
 
 import pytrnsys.utils.log as _ulog
 
 import trnsysGUI.project as prj
 import trnsysGUI.mainWindow as mw
+import trnsysGUI.blockItemHasInternalPiping as bip
+import trnsysGUI.storageTank.widget as stw
+import trnsysGUI.names.rename as rename
+
 
 _CURRENT_DIR = _pl.Path(__file__).parent
 _PROJECT_DIR = _CURRENT_DIR / ".." / "data" / "diagramForConfigStorageDialog"
@@ -16,6 +23,7 @@ def _createMainWindow(projectFolder, projectName, qtbot):
     """ This might fit well as a helper class.
         At the moment it is unclear whether this is generic enough for that.
     """
+    # TODO: add window to qtbot automatically
     projectJsonFilePath = projectFolder / f"{projectName}.json"
     project = prj.LoadProject(projectJsonFilePath)
 
@@ -30,16 +38,47 @@ def _createMainWindow(projectFolder, projectName, qtbot):
     return mainWindow
 
 
-@_pt.mark.skip(reason='Incomplete tests')
-class TestConfigureStorageDialog(_ut.TestCase):
-    def setUp(self):
-        self.maxDiff = None
+def get_object_from_list(trnsysObjs: _abc.Sequence[bip.BlockItemHasInternalPiping],
+                         desiredBlockItem: bip.BlockItemHasInternalPiping):
+    """ Currently returns only one. """
+    for trnsysObj in trnsysObjs:
+        if isinstance(trnsysObj, desiredBlockItem):
+            return trnsysObj
+
+
+# @_pt.mark.skip(reason='Incomplete tests')
+class TestConfigureStorageDialog:
+    # TODO: ensure popup window does not show up.
+
+    def test__open_dialog_when_dbl_click(self, qtbot):
+        mainWindow = _createMainWindow(_PROJECT_DIR, _PROJECT_NAME, qtbot)
+        qtbot.addWidget(mainWindow)
+        storageTank = get_object_from_list(mainWindow.editor.trnsysObj, stw.StorageTank)
+        storageTank.mouseDoubleClickEvent(_core.QEvent.MouseButtonDblClick)
+
+        # TODO: assert dialog opened.
+
+        assert False
 
     def test__load_heat_exchangers(self, qtbot):
         """ Is called when project is opened with existing storage tanks.
         Also called when a new heat exchanger is added to a storage tank via _addHeatExchanger method.
         """
-        mainWindow = _createMainWindow(_PROJECT_DIR, _PROJECT_NAME, qtbot)
+        # TODO: mock editor,
+        # TODO: prep renameHelper,
+        # TODO: Mock storage tank,
+        # TODO: assert
+        storageTank = mock
+        editor = mock
+        renameHelper = mock
+
+
+
+
+        qtbot.addWidget(ConfigureStorageDialog(self, self.editor, renameHelper, self.editor.projectFolder))
+
+
+
         assert False
 
     def test__get_heat_exchanger_list_item_text(self, qtbot):
