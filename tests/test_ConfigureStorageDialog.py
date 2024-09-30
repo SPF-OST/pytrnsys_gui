@@ -23,12 +23,21 @@ def _createMainWindow(projectFolder, projectName, qtbot):
 
 @_pt.mark.skip(reason='Incomplete tests')
 class TestConfigureStorageDialog:
+
+    """ Is called when project is opened with existing storage tanks.
+    Also called when a new heat exchanger is added to a storage tank via _addHeatExchanger method.
+    """
     def test__load_heat_exchangers(self, qtbot):
         assert False
 
+    """ Static method to get the name of the heat exchanger.
+    """
     def test__get_heat_exchanger_list_item_text(self, qtbot):
         assert False
 
+    """ Called when a project is opened with existing direct port pairs.
+    Called when a new direct port pair is added to the storage tank via addPortPair method
+    """
     def test__load_direct_port_pairs(self, qtbot):
         assert False
 
