@@ -23,7 +23,6 @@ from trnsysGUI.IceStorage import IceStorage
 from trnsysGUI.IceStorageTwoHx import IceStorageTwoHx
 from trnsysGUI.PV import PV
 from trnsysGUI.ParabolicTroughField import ParabolicTroughField
-from trnsysGUI.PitStorage import PitStorage
 from trnsysGUI.Radiator import Radiator
 from trnsysGUI.SaltTankCold import SaltTankCold
 from trnsysGUI.SaltTankHot import SaltTankHot
@@ -65,7 +64,6 @@ _BLOCK_ITEM_CASES = [
     ("Kollektor", Collector, "Coll5"),
     ("HP", HeatPump, "HP5"),
     ("IceStorage", IceStorage, "IceS5"),
-    ("PitStorage", PitStorage, "PitS5"),
     ("Radiator", Radiator, "Rad5"),
     ("WTap", Tap, "WtTp5"),
     ("GenericBlock", GenericBlock, "GBlk5"),

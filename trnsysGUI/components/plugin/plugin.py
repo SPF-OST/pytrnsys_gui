@@ -20,6 +20,11 @@ class CreatedInternalPiping:
     outputPorts: _cabc.Sequence[_pib.PortItemBase]
     internalPiping: _ip.InternalPiping
 
+    @staticmethod
+    def empty() -> CreatedInternalPiping:
+        emptyCreatedInternalPiping = CreatedInternalPiping([], [], _ip.InternalPiping([], {}))
+        return emptyCreatedInternalPiping
+
 
 class AbstractInternalPipingFactory(_abc.ABC):
     @_abc.abstractmethod

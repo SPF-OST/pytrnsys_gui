@@ -44,7 +44,6 @@ def _getHardCodedComponents() -> _cabc.Sequence[Component]:
         Component("AirSourceHP", _img.AIR_SOURCE_HP_SVG.icon()),
         Component("StorageTank", _img.STORAGE_TANK_SVG.icon()),
         Component("IceStorage", _img.ICE_STORAGE_SVG.icon()),
-        Component("PitStorage", _img.PIT_STORAGE_SVG.icon()),
         Component("IceStorageTwoHx", _img.ICE_STORAGE_TWO_HX_SVG.icon()),
         Component("ExternalHx", _img.EXTERNAL_HX_SVG.icon()),
         Component("Radiator", _img.RADIATOR_SVG.icon()),
@@ -92,10 +91,10 @@ def _getPluginComponents() -> _warn.ValueWithWarnings[_cabc.Sequence[Component]]
         pluginComponents.append(pluginComponent)
 
     if namesOfComponentsWhichCouldntBeLoaded:
-        formattedNames = "\t\n".join(namesOfComponentsWhichCouldntBeLoaded)
+        formattedNames = "\n".join(f"\t - {name}" for name in namesOfComponentsWhichCouldntBeLoaded)
         warning = f"""\
 The following plugin components couldn't be loaded (see log file for details):
-    {formattedNames}
+{formattedNames}
 
 """
     else:
