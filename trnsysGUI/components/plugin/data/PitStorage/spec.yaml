@@ -1,11 +1,11 @@
 defaultName: pitStore
 description: Pit Storage
 tee-pieces:
-  - input:
-      position: [40, 0]
-    output0:
+    input:
       position: [80, 0]
-    output1:
+    output0:
       position: [120, 0]
+    output1:
+      position: [160, 0]
 size: [240, 160]
 

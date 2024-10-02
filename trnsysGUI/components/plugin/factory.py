@@ -122,47 +122,60 @@ class InternalPipingFactory(_plugin.AbstractInternalPipingFactory):
         return createdInternalPiping
 
     def _createInternalPipingForTeePieces(self, blockItem: _bi.BlockItem) -> _plugin.CreatedInternalPiping:
-        graphicalInputPorts = []
-        graphicalOutputPorts = []
+        graphicalInputPorts = list[_pib.PortItemBase]()
+        graphicalOutputPorts = list[_pib.PortItemBase]()
 
-        nodes = []
-        modelPortItemsToGraphicalPortItem = {}
+        nodes = list[_mfn.Node]()
+        modelPortItemsToGraphicalPortItem = dict[_mfn.PortItem, _pib.PortItemBase]()
 
         teePieces = self.specification.teePieces
 
         if not teePieces:
             return _plugin.CreatedInternalPiping.empty()
 
-        for teePiece in self.specification.teePieces:
-            graphicalInputPort, modelInputPort = self._createGraphicalAndModelPort(
-                teePiece.input, _INPUT_PORT_PROPERTIES, blockItem
+        for teePiece in teePieces:
+            self._createAndAddNodesAndPortItemsForTeePiece(
+                blockItem, teePiece, nodes, modelPortItemsToGraphicalPortItem, graphicalInputPorts, graphicalOutputPorts
             )
-
-            graphicalOutput0Port, modelOutput0Port = self._createGraphicalAndModelPort(
-                teePiece.output0, _OUTPUT0_PORT_PROPERTIES, blockItem
-            )
-
-            graphicalOutput1Port, modelOutput1Port = self._createGraphicalAndModelPort(
-                teePiece.output1, _OUTPUT1_PORT_PROPERTIES, blockItem
-            )
-
-            graphicalInputPorts.append(graphicalInputPort)
-            graphicalOutputPorts.append(graphicalOutput0Port)
-            graphicalOutputPorts.append(graphicalOutput1Port)
-
-            modelPortItemsToGraphicalPortItem[modelInputPort] = graphicalInputPort
-            modelPortItemsToGraphicalPortItem[modelOutput0Port] = graphicalOutput0Port
-            modelPortItemsToGraphicalPortItem[modelOutput1Port] = graphicalOutput1Port
-
-            teePieceModel = _mfn.TeePiece(modelInputPort, modelOutput0Port, modelOutput1Port)
-
-            nodes.append(teePieceModel)
 
         internalPiping = _ip.InternalPiping(nodes, modelPortItemsToGraphicalPortItem)
 
         createdInternalPiping = _plugin.CreatedInternalPiping(graphicalInputPorts, graphicalOutputPorts, internalPiping)
 
         return createdInternalPiping
+
+    def _createAndAddNodesAndPortItemsForTeePiece(
+        self,
+        blockItem: _bi.BlockItem,
+        teePiece: _smodel.TeePiece,
+        nodes: list[_mfn.Node],
+        modelPortItemsToGraphicalPortItem: dict[_mfn.PortItem, _pib.PortItemBase],
+        graphicalInputPorts: list[_pib.PortItemBase],
+        graphicalOutputPorts: list[_pib.PortItemBase],
+    ) -> None:
+        graphicalInputPort, modelInputPort = self._createGraphicalAndModelPort(
+            teePiece.input, _INPUT_PORT_PROPERTIES, blockItem
+        )
+
+        graphicalOutput0Port, modelOutput0Port = self._createGraphicalAndModelPort(
+            teePiece.output0, _OUTPUT0_PORT_PROPERTIES, blockItem
+        )
+
+        graphicalOutput1Port, modelOutput1Port = self._createGraphicalAndModelPort(
+            teePiece.output1, _OUTPUT1_PORT_PROPERTIES, blockItem
+        )
+
+        graphicalInputPorts.append(graphicalInputPort)
+        graphicalOutputPorts.append(graphicalOutput0Port)
+        graphicalOutputPorts.append(graphicalOutput1Port)
+
+        modelPortItemsToGraphicalPortItem[modelInputPort] = graphicalInputPort
+        modelPortItemsToGraphicalPortItem[modelOutput0Port] = graphicalOutput0Port
+        modelPortItemsToGraphicalPortItem[modelOutput1Port] = graphicalOutput1Port
+
+        teePieceModel = _mfn.TeePiece(modelInputPort, modelOutput0Port, modelOutput1Port)
+
+        nodes.append(teePieceModel)
 
     def _createGraphicalAndModelPort(
         self, portSpec: _smodel.Port, portProperties: _PortProperties, blockItem: _bi.BlockItem

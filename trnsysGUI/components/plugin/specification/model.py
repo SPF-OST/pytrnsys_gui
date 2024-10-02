@@ -27,10 +27,8 @@ class Port(_pc.BaseModel):
         return _nameMustBeCapitalized(cls.__name__, name)
 
 
-class Connection(_pc.BaseModel):
+class NodeBase(_pc.BaseModel):
     name: str | None = None
-    input: Port
-    output: Port
 
     @_pc.field_validator("name")
     @classmethod
@@ -38,8 +36,12 @@ class Connection(_pc.BaseModel):
         return _nameMustBeCapitalized(cls.__name__, name)
 
 
-class TeePiece(_pc.BaseModel):
-    name: str | None = None
+class Connection(NodeBase):
+    input: Port
+    output: Port
+
+
+class TeePiece(NodeBase):
     input: Port
     output0: Port
     output1: Port
@@ -74,6 +76,9 @@ class Specification(_pc.BaseModel):
         nTeePiecesAndConnections = len(connectionsAndTeePieces)
 
         if hasWithoutName and nTeePiecesAndConnections > 1:
-            return ValueError(
-                "A connection or tee piece can only not have a name if there is only a single tee piece or single connection."
+            raise ValueError(
+                "A connection or tee piece can only not have a name if there "
+                "is only a single tee piece or single connection."
             )
+
+        return self
