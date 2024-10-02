@@ -30,7 +30,6 @@ ICE_STORAGE_TWO_HX_SVG = _ia.createForPackageResource(_ia.SvgImageAccessor, "ima
 INBOX_PNG = _ia.createForPackageResource(_ia.PngImageAccessor, "images/inbox.png")
 LABEL_TOGGLE_PNG = _ia.createForPackageResource(_ia.PngImageAccessor, "images/labelToggle.png")
 OUTBOX_PNG = _ia.createForPackageResource(_ia.PngImageAccessor, "images/outbox.png")
-PIT_STORAGE_SVG = _ia.createForPackageResource(_ia.SvgImageAccessor, "images/PitStorage.svg")
 PROCESS_SIMULATION_PNG = _ia.createForPackageResource(_ia.PngImageAccessor, "images/processSimulation.png")
 PROCESS_SIMULATION_SVG = _ia.createForPackageResource(_ia.SvgImageAccessor, "images/processSimulation.svg")
 PT_FIELD_SVG = _ia.createForPackageResource(_ia.SvgImageAccessor, "images/ParabolicTroughField.svg")

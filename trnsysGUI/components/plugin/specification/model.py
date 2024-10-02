@@ -6,7 +6,7 @@ import pydantic as _pc
 PortType = _tp.Literal["standard", "hot", "cold"]
 
 
-def _nameMustBeCapitalized(what: _tp.Literal["Connection", "Port"], name: str | None) -> str | None:
+def _nameMustBeCapitalized(what: str, name: str | None) -> str | None:
     if name is None:
         return None
 
@@ -24,24 +24,61 @@ class Port(_pc.BaseModel):
     @_pc.field_validator("name")
     @classmethod
     def nameMustBeCapitalized(cls, name: str | None) -> str | None:
-        return _nameMustBeCapitalized("Port", name)
+        return _nameMustBeCapitalized(cls.__name__, name)
 
 
-class Connection(_pc.BaseModel):
-    name: str
-    input: Port
-    output: Port
+class NodeBase(_pc.BaseModel):
+    name: str | None = None
 
     @_pc.field_validator("name")
     @classmethod
-    def nameMustBeCapitalized(cls, name: str) -> str:
-        validatedName = _nameMustBeCapitalized("Connection", name)
-        assert validatedName is not None
-        return validatedName
+    def _nameMustBeCapitalized(cls, name: str | None) -> str | None:
+        return _nameMustBeCapitalized(cls.__name__, name)
+
+
+class Connection(NodeBase):
+    input: Port
+    output: Port
+
+
+class TeePiece(NodeBase):
+    input: Port
+    output0: Port
+    output1: Port
+
+    @_pc.field_validator("name")
+    @classmethod
+    def _nameMustBeCapitalized(cls, name: str | None) -> str | None:
+        return _nameMustBeCapitalized(cls.__name__, name)
 
 
 class Specification(_pc.BaseModel):
     defaultName: str
     description: str
-    connections: _cabc.Sequence[Connection]
+    connections: _cabc.Sequence[Connection] | None = None
+    teePieces: _cabc.Sequence[TeePiece] | None = _pc.Field(alias="tee-pieces", default=None)
     size: tuple[int, int]
+
+    @_pc.model_validator(mode="after")
+    def _oneConnectionOrTeePieceMustBeGiven(self) -> _tp.Self:
+        if not self.connections and not self.teePieces:
+            raise ValueError("At least one connection or T-piece must be specified.")
+
+        return self
+
+    @_pc.model_validator(mode="after")
+    def _connectionOrTeePieceCanOmitNameOnlyIfSingle(self) -> _tp.Self:
+        connections = self.connections or []
+        teePieces = self.teePieces or []
+
+        connectionsAndTeePieces = [*connections, *teePieces]
+        hasWithoutName = any(tc for tc in connectionsAndTeePieces if not tc.name)
+        nTeePiecesAndConnections = len(connectionsAndTeePieces)
+
+        if hasWithoutName and nTeePiecesAndConnections > 1:
+            raise ValueError(
+                "A connection or tee piece can only not have a name if there "
+                "is only a single tee piece or single connection."
+            )
+
+        return self

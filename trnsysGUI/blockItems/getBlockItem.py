@@ -25,7 +25,6 @@ from trnsysGUI.IceStorage import IceStorage  # type: ignore[attr-defined]
 from trnsysGUI.IceStorageTwoHx import IceStorageTwoHx  # type: ignore[attr-defined]
 from trnsysGUI.PV import PV  # type: ignore[attr-defined]
 from trnsysGUI.ParabolicTroughField import ParabolicTroughField  # type: ignore[attr-defined]
-from trnsysGUI.PitStorage import PitStorage  # type: ignore[attr-defined]
 from trnsysGUI.Radiator import Radiator  # type: ignore[attr-defined]
 from trnsysGUI.SaltTankCold import SaltTankCold  # type: ignore[attr-defined]
 from trnsysGUI.SaltTankHot import SaltTankHot  # type: ignore[attr-defined]
@@ -78,7 +77,6 @@ def createBlockItem(
         "Kollektor": {"blockItem": Collector, "baseDisplayName": "Coll"},
         "HP": {"blockItem": HeatPump, "baseDisplayName": "HP"},
         "IceStorage": {"blockItem": IceStorage, "baseDisplayName": "IceS"},
-        "PitStorage": {"blockItem": PitStorage, "baseDisplayName": "PitS"},
         "Radiator": {"blockItem": Radiator, "baseDisplayName": "Rad"},
         _names.TAP: {"blockItem": Tap, "baseDisplayName": "WtTp"},
         "WTap_main": {"blockItem": TapMains, "baseDisplayName": "WtSp"},
