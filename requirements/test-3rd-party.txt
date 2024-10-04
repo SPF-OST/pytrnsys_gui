@@ -6,31 +6,11 @@
 #    pip-compile-multi
 #
 -r release-3rd-party.txt
-astroid==3.0.1
-    # via pylint
-black==24.2.0
-    # via -r requirements\test-3rd-party.in
 coverage[toml]==7.3.2
     # via pytest-cov
-dill==0.3.7
-    # via pylint
 iniconfig==2.0.0
     # via pytest
-isort==5.12.0
-    # via pylint
-mccabe==0.7.0
-    # via pylint
 mypy==1.7.1
-    # via -r requirements\test-3rd-party.in
-mypy-extensions==1.0.0
-    # via
-    #   black
-    #   mypy
-pathspec==0.12.1
-    # via black
-pluggy==1.3.0
-    # via pytest
-pylint==3.0.3
     # via -r requirements\test-3rd-party.in
 pyqt5-stubs==5.15.6.0
     # via -r requirements\test-3rd-party.in
@@ -49,9 +29,10 @@ pytest-metadata==3.0.0
     # via pytest-html
 pytest-qt==4.2.0
     # via -r requirements\test-3rd-party.in
-tomlkit==0.12.3
-    # via pylint
 types-pyyaml==6.0.12.20240311
     # via -r requirements\test-3rd-party.in
 wheel==0.42.0
     # via -r requirements\test-3rd-party.in
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools
