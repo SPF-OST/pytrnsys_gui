@@ -1,177 +1,149 @@
-import pytest as _pt
-import unittest as _ut
-import pathlib as _pl
-import collections.abc as _abc
-
-import PyQt5.QtCore as _core
-
-import pytrnsys.utils.log as _ulog
-
-import trnsysGUI.project as prj
-import trnsysGUI.mainWindow as mw
-import trnsysGUI.blockItemHasInternalPiping as bip
 import trnsysGUI.storageTank.widget as stw
-import trnsysGUI.names.rename as rename
+from tests.trnsysGUI.utils.Utils import Utils
 
+import pathlib as _pl
+import PyQt5.QtCore as _core
 
 _CURRENT_DIR = _pl.Path(__file__).parent
 _PROJECT_DIR = _CURRENT_DIR / ".." / "data" / "diagramForConfigStorageDialog"
 _PROJECT_NAME = "diagramForConfigStorageDialog"
 
-
-def _createMainWindow(projectFolder, projectName, qtbot):
-    """ This might fit well as a helper class.
-        At the moment it is unclear whether this is generic enough for that.
-    """
-    # TODO: add window to qtbot automatically
-    projectJsonFilePath = projectFolder / f"{projectName}.json"
-    project = prj.LoadProject(projectJsonFilePath)
-
-    logger = _ulog.getOrCreateCustomLogger("root", "DEBUG")  # type: ignore[attr-defined]
-
-    mainWindow = mw.MainWindow(logger, project)  # type: ignore[attr-defined]
-
-    qtbot.addWidget(mainWindow)
-    mainWindow.showBoxOnClose = False
-    mainWindow.editor.forceOverwrite = True
-
-    return mainWindow
-
-
-def get_object_from_list(trnsysObjs: _abc.Sequence[bip.BlockItemHasInternalPiping],
-                         desiredBlockItem: bip.BlockItemHasInternalPiping):
-    """ Currently returns only one. """
-    for trnsysObj in trnsysObjs:
-        if isinstance(trnsysObj, desiredBlockItem):
-            return trnsysObj
-
-
-# @_pt.mark.skip(reason='Incomplete tests')
 class TestConfigureStorageDialog:
-    # TODO: ensure popup window does not show up.
 
-    def test__open_dialog_when_dbl_click(self, qtbot):
-        mainWindow = _createMainWindow(_PROJECT_DIR, _PROJECT_NAME, qtbot)
+    storageTank=None
+
+    def triggerStorgeDialog(self, qtbot):
+        mainWindow = Utils.createMainWindow(_PROJECT_DIR, _PROJECT_NAME)
         qtbot.addWidget(mainWindow)
-        storageTank = get_object_from_list(mainWindow.editor.trnsysObj, stw.StorageTank)
-        storageTank.mouseDoubleClickEvent(_core.QEvent.MouseButtonDblClick)
+        self.storageTank = Utils.getDesiredTrnsysObjectFromList(mainWindow.editor.trnsysObj, stw.StorageTank)
+        configureStorageDialog = self.storageTank.mouseDoubleClickEvent(_core.QEvent.MouseButtonDblClick, isTest=True)
+        configureStorageDialog.isTest = True
+        qtbot.addWidget(configureStorageDialog)
+        return configureStorageDialog
 
-        # TODO: assert dialog opened.
+    def testAddHxSuccess(self,qtbot):
+        HX_INPUT = "90"
+        HX_OUTPUT = "50"
+        HX_NAME = "Test hx"
+        errors = []
 
-        assert False
+        configureStorageDialog = self.triggerStorgeDialog(qtbot)
+        try:
+            assert len(self.storageTank.heatExchangers) == 1
+        except AssertionError as error:
+            errors.append(error)
+        configureStorageDialog.offsetLeI.setText(HX_INPUT)
+        configureStorageDialog.offsetLeO.setText(HX_OUTPUT)
+        configureStorageDialog.hxNameLe.setText(HX_NAME)
+        configureStorageDialog.rButton.setChecked(True)
+        configureStorageDialog.addHx()
+        print(self.storageTank.heatExchangers)
+        try:
+            assert len(self.storageTank.heatExchangers) == 2
+        except AssertionError as error:
+            errors.append(error)
+        try:
+            assert self.storageTank.heatExchangers[1].displayName == HX_NAME
+        except AssertionError as error:
+            errors.append(error)
+        if errors:
+            raise ExceptionGroup(f"Found {len(errors)} issues.", errors)
 
-    def test__load_heat_exchangers(self, qtbot):
-        """ Is called when project is opened with existing storage tanks.
-        Also called when a new heat exchanger is added to a storage tank via _addHeatExchanger method.
-        """
-        # TODO: mock editor,
-        # TODO: prep renameHelper,
-        # TODO: Mock storage tank,
-        # TODO: assert
-        storageTank = mock
-        editor = mock
-        renameHelper = mock
+    def testAddHxMissingNameFailure(self, qtbot):
+        HX_INPUT = "90"
+        HX_OUTPUT = "50"
+
+        configureStorageDialog = self.triggerStorgeDialog(qtbot)
+        configureStorageDialog.offsetLeI.setText(HX_INPUT)
+        configureStorageDialog.offsetLeO.setText(HX_OUTPUT)
+        configureStorageDialog.rButton.setChecked(True)
+        configureStorageDialog.addHx()
+
+        assert (configureStorageDialog.msgb.text() == configureStorageDialog.MISSING_NAME_ERROR_MESSAGE)
+
+    def testAddHxInvalidRangeFailure(self, qtbot):
+        HX_INPUT = "90"
+        HX_OUTPUT = "90"
 
 
+        configureStorageDialog = self.triggerStorgeDialog(qtbot)
+        EXPECTED_ERROR_MESSAGE = (f"At least {configureStorageDialog.minimumPortDistance}% of difference needed and valid range (0, 100)")
+        configureStorageDialog.offsetLeI.setText(HX_INPUT)
+        configureStorageDialog.offsetLeO.setText(HX_OUTPUT)
+        configureStorageDialog.addHx()
+
+        assert (configureStorageDialog.msgb.text() == EXPECTED_ERROR_MESSAGE)
+        # def assert_async():
+        #     try:
+        #         assert (configureStorageDialog.msgb.text() == EXPECTED_ERROR_MESSAGE)
+        #     except AttributeError as error:
+        #         print(error)
+        #
+        #
+        # def handle_dialog():
+        #     messagebox = _qtWidgets.QApplication.activeWindow()
+        #     ok_button = messagebox.button(_qtWidgets.QMessageBox.Ok)
+        #     qtbot.mouseClick(ok_button, _core.Qt.LeftButton, delay=1)
 
 
-        qtbot.addWidget(ConfigureStorageDialog(self, self.editor, renameHelper, self.editor.projectFolder))
+        # Could not get qtTimer and waitUntil to work as excpected
+        # qtbot.waitUntil(assert_async)
+        # configureStorageDialog.addHx()
+         # _core.QTimer.singleShot(100, handle_dialog())
 
 
+        # Interacting with ui through qtbot also does not work after exec_ method is called
+        # qtbot.mouseClick(configureStorageDialog.addButton, _core.Qt.LeftButton, delay=1)
+        # ok_button = configureStorageDialog.msgb.button(_qtWidgets.QMessageBox.Ok)
+        # qtbot.mouseClick(ok_button, _core.Qt.LeftButton, delay=1)
 
-        assert False
+    def testRemoveHxSuccess(self, qtbot):
+        configureStorageDialog = self.triggerStorgeDialog(qtbot)
+        assert len(self.storageTank.heatExchangers) == 1
+        configureStorageDialog.leftHeatExchangersItemListWidget.item(0).setSelected(True)
+        configureStorageDialog.removeHxL()
 
-    def test__get_heat_exchanger_list_item_text(self, qtbot):
-        """ Static method to get the name of the heat exchanger.
-        """
-        assert False
+        assert len(self.storageTank.heatExchangers) == 0
 
-    def test__load_direct_port_pairs(self, qtbot):
-        """ Called when a project is opened with existing direct port pairs.
-        Called when a new direct port pair is added to the storage tank via addPortPair method
-        """
-        assert False
+    def testAddPortPairSuccess(self, qtbot):
+        PORT_PAIR_INPUT="1"
+        PORT_PAIR_OUTPUT="99"
 
-    def test__get_direct_port_pair_list_item_text(self, qtbot):
-        assert False
+        configureStorageDialog = self.triggerStorgeDialog(qtbot)
+        configureStorageDialog.manPortLeI.setText(PORT_PAIR_INPUT)
+        configureStorageDialog.manPortLeO.setText(PORT_PAIR_OUTPUT)
+        configureStorageDialog.manlButton.setChecked(True)
+        configureStorageDialog.addPortPair()
 
-    def test_list_wlclicked(self, qtbot):
-        assert False
+        assert len(self.storageTank.directPortPairs)==2
 
-    def test_list_wrclicked(self, qtbot):
-        assert False
+    def testAddPortPairHeightFailure(self, qtbot):
+        PORT_PAIR_INPUT="-1"
+        PORT_PAIR_OUTPUT="100"
 
-    def test_list_wl2clicked(self, qtbot):
-        assert False
+        configureStorageDialog = self.triggerStorgeDialog(qtbot)
+        configureStorageDialog.manPortLeI.setText(PORT_PAIR_INPUT)
+        configureStorageDialog.manPortLeO.setText(PORT_PAIR_OUTPUT)
+        configureStorageDialog.manlButton.setChecked(True)
+        configureStorageDialog.addPortPair()
 
-    def test_list_wr2clicked(self, qtbot):
-        assert False
+        assert (configureStorageDialog.msgb.text() == configureStorageDialog.PORT_HEIGHT_ERROR_MESSAGE)
 
-    def test_add_hx(self, qtbot):
-        assert False
+    def testAddPortPairNoSideSelectedFailure(self, qtbot):
+        PORT_PAIR_INPUT = "-1"
+        PORT_PAIR_OUTPUT = "100"
 
-    def test_min_offset_distance(self, qtbot):
-        assert False
+        configureStorageDialog = self.triggerStorgeDialog(qtbot)
+        configureStorageDialog.manPortLeI.setText(PORT_PAIR_INPUT)
+        configureStorageDialog.manPortLeO.setText(PORT_PAIR_OUTPUT)
+        configureStorageDialog.addPortPair()
 
-    def test_offsets_in_range(self, qtbot):
-        assert False
+        assert len(self.storageTank.directPortPairs) == 1
 
-    def test__add_hx_l(self, qtbot):
-        assert False
+    def testRemovePortPairSuccess(self, qtbot):
+        configureStorageDialog = self.triggerStorgeDialog(qtbot)
+        assert len(self.storageTank.directPortPairs) == 1
+        configureStorageDialog._rightDirectPortPairsItemListWidget.item(0).setSelected(True)
+        configureStorageDialog.removePortPairRight()
 
-    def test__add_hx_r(self, qtbot):
-        assert False
-
-    def test__add_heat_exchanger(self, qtbot):
-        assert False
-
-    def test_add_port_pair(self, qtbot):
-        assert False
-
-    def test_remove_port_pair_left(self, qtbot):
-        assert False
-
-    def test_remove_port_pair_right(self, qtbot):
-        assert False
-
-    def test__remove_selected_port_pairs(self, qtbot):
-        assert False
-
-    def test_remove_hx_l(self, qtbot):
-        assert False
-
-    def test_remove_hx_r(self, qtbot):
-        assert False
-
-    def test__remove_selected_heat_exchangers(self, qtbot):
-        assert False
-
-    def test__remove_ports(self, qtbot):
-        assert False
-
-    def test__remove_connection_if_any(self, qtbot):
-        assert False
-
-    def test_modify_hx(self, qtbot):
-        assert False
-
-    def test__get_first_selected_item_and_heat_exchanger(self, qtbot):
-        assert False
-
-    def test_modify_port(self, qtbot):
-        assert False
-
-    def test__get_first_selected_direct_port_pair_list_widget_item(self, qtbot):
-        assert False
-
-    def test_incr_size(self, qtbot):
-        assert False
-
-    def test_decr_size(self, qtbot):
-        assert False
-
-    def test__change_size(self, qtbot):
-        assert False
-
-    def test_cancel(self, qtbot):
-        assert False
+        assert len(self.storageTank.directPortPairs) == 0

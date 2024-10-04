@@ -358,9 +358,11 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
         exportDdckAction = contextMenu.addAction("Export ddck")
         exportDdckAction.triggered.connect(self.exportDck)
 
-    def mouseDoubleClickEvent(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:
+    def mouseDoubleClickEvent(self, event: _qtw.QGraphicsSceneMouseEvent, isTest=False) -> _tp.Optional[ConfigureStorageDialog]:
         renameHelper = _rename.RenameHelper(self.editor.namesManager)
         dialog = ConfigureStorageDialog(self, self.editor, renameHelper, self.editor.projectFolder)
+        if isTest:
+            return dialog
         dialog.exec()
 
     def getInternalPiping(self) -> _ip.InternalPiping:
