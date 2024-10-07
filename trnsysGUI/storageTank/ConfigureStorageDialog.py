@@ -36,6 +36,11 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
     WIDTH_INCREMENT = 10
     HEIGHT_INCREMENT = 100
 
+    MISSING_NAME_ERROR_MESSAGE="Please specify the name of the heat exchanger that you want to add."
+    PORT_HEIGHT_ERROR_MESSAGE="Ports need to be on the tank, please make sure the port heights are within (0 %, 100 %)."
+
+    isTest = False
+
     def __init__(
         self,
         storage: _st.StorageTank,
@@ -104,9 +109,9 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         gridLayout.addWidget(self.lButton, 9, 0, 1, 1)
         gridLayout.addWidget(self.rButton, 9, 2, 1, 1)
 
-        addButton = QPushButton("Add...")
-        addButton.clicked.connect(self.addHx)
-        gridLayout.addWidget(addButton, 10, 0, 1, 1)
+        self.addButton = QPushButton("Add...")
+        self.addButton.clicked.connect(self.addHx)
+        gridLayout.addWidget(self.addButton, 10, 0, 1, 1)
         removeButton = QPushButton("Remove...")
         removeButton.clicked.connect(self.removeHxL)
         removeButton.clicked.connect(self.removeHxR)
@@ -298,9 +303,7 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
                 self._editor.logger.warning("No side selected for heat exchanger.")
                 return
         else:
-            msgb = QMessageBox()
-            msgb.setText(f"At least {self.minimumPortDistance}% of difference needed and valid range (0, 100)")
-            msgb.exec_()
+            self._openMesageBox(f"At least {self.minimumPortDistance}% of difference needed and valid range (0, 100)")
 
     def minOffsetDistance(self):
         return abs(float(self.offsetLeI.text()) - float(self.offsetLeO.text())) >= self.minimumPortDistance
@@ -317,9 +320,7 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
     def _addHeatExchanger(self, side: _sd.Side):
         name = self.hxNameLe.text()
         if not name:
-            messageBox = QMessageBox()
-            messageBox.setText("Please specify the name of the heat exchanger that you want to add.")
-            messageBox.exec_()
+            self._openMesageBox(self.MISSING_NAME_ERROR_MESSAGE)
             return
 
         relativeInputHeight = float(self.offsetLeI.text()) / 100
@@ -347,11 +348,7 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
             max(_inputPortPercentageHeight, _outputPortPercentageHeight) >= 100
             or min(_inputPortPercentageHeight, _outputPortPercentageHeight) <= 0
         ):
-            messageBox = QMessageBox()
-            messageBox.setText(
-                "Ports need to be on the tank, please make sure the port heights are within (0 %, 100 %)."
-            )
-            messageBox.exec_()
+            self._openMesageBox(self.PORT_HEIGHT_ERROR_MESSAGE)
             return
 
         trnsysId = self._editor.idGen.getTrnsysID()
@@ -520,3 +517,10 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
 
     def cancel(self):
         self.close()
+
+    def _openMesageBox(self, text):
+        self.msgb = QMessageBox()
+        self.msgb.setText(text)
+        if not (self.isTest):
+            self.msgb.exec_()
+
