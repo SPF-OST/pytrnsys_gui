@@ -125,11 +125,11 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         manPortLay = QVBoxLayout()
         qhbL2 = QHBoxLayout()
 
-        self._leftDirectPortPairsItemListWidget = QListWidget()
-        qhbL2.addWidget(self._leftDirectPortPairsItemListWidget)
+        self.leftDirectPortPairsItemListWidget = QListWidget()
+        qhbL2.addWidget(self.leftDirectPortPairsItemListWidget)
 
-        self._rightDirectPortPairsItemListWidget = QListWidget()
-        qhbL2.addWidget(self._rightDirectPortPairsItemListWidget)
+        self.rightDirectPortPairsItemListWidget = QListWidget()
+        qhbL2.addWidget(self.rightDirectPortPairsItemListWidget)
 
         manPortLay.addLayout(qhbL2)
 
@@ -211,10 +211,12 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         self.rightHeatExchangersItemListWidget.clicked.connect(self.listWRClicked)
         self.leftHeatExchangersItemListWidget.clicked.connect(self.listWLClicked)
 
-        self._rightDirectPortPairsItemListWidget.setSelectionMode(QListWidget.SelectionMode(1))
-        self._leftDirectPortPairsItemListWidget.setSelectionMode(QListWidget.SelectionMode(1))
-        self._rightDirectPortPairsItemListWidget.clicked.connect(self.listWR2Clicked)
-        self._leftDirectPortPairsItemListWidget.clicked.connect(self.listWL2Clicked)
+        self.rightDirectPortPairsItemListWidget.setSelectionMode(QListWidget.SelectionMode(1))
+        self.leftDirectPortPairsItemListWidget.setSelectionMode(QListWidget.SelectionMode(1))
+        self.rightDirectPortPairsItemListWidget.clicked.connect(self.listWR2Clicked)
+        self.leftDirectPortPairsItemListWidget.clicked.connect(self.listWL2Clicked)
+
+        self.msgb = QMessageBox()
 
         self.show()
 
@@ -239,8 +241,8 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         )
 
     def _loadDirectPortPairs(self):
-        self._leftDirectPortPairsItemListWidget.clear()
-        self._rightDirectPortPairsItemListWidget.clear()
+        self.leftDirectPortPairsItemListWidget.clear()
+        self.rightDirectPortPairsItemListWidget.clear()
 
         directPortPair: _dpp.DirectPortPair
         for directPortPair in self.storage.directPortPairs:
@@ -249,9 +251,9 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
             item.setData(_qtc.Qt.UserRole, directPortPair)
 
             if directPortPair.side.isLeft:
-                self._leftDirectPortPairsItemListWidget.addItem(item)
+                self.leftDirectPortPairsItemListWidget.addItem(item)
             else:
-                self._rightDirectPortPairsItemListWidget.addItem(item)
+                self.rightDirectPortPairsItemListWidget.addItem(item)
 
     @staticmethod
     def _getDirectPortPairListItemText(directPortPair: _dpp.DirectPortPair):
@@ -267,10 +269,10 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         self.leftHeatExchangersItemListWidget.clearSelection()
 
     def listWL2Clicked(self):
-        self._rightDirectPortPairsItemListWidget.clearSelection()
+        self.rightDirectPortPairsItemListWidget.clearSelection()
 
     def listWR2Clicked(self):
-        self._leftDirectPortPairsItemListWidget.clearSelection()
+        self.leftDirectPortPairsItemListWidget.clearSelection()
 
     def addHx(self):
         """
@@ -372,10 +374,10 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         self._loadDirectPortPairs()
 
     def removePortPairLeft(self):
-        self._removeSelectedPortPairs(self._leftDirectPortPairsItemListWidget)
+        self._removeSelectedPortPairs(self.leftDirectPortPairsItemListWidget)
 
     def removePortPairRight(self):
-        self._removeSelectedPortPairs(self._rightDirectPortPairsItemListWidget)
+        self._removeSelectedPortPairs(self.rightDirectPortPairsItemListWidget)
 
     def _removeSelectedPortPairs(self, directPortPairsListWidget):
         for selectedItem in directPortPairsListWidget.selectedItems():
@@ -493,11 +495,11 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
     def _getFirstSelectedDirectPortPairListWidgetItem(
         self,
     ) -> _tp.Optional[QListWidgetItem]:
-        leftSelectedItems = self._leftDirectPortPairsItemListWidget.selectedItems()
+        leftSelectedItems = self.leftDirectPortPairsItemListWidget.selectedItems()
         if leftSelectedItems:
             return leftSelectedItems[0]
 
-        rightSelectedItems = self._rightDirectPortPairsItemListWidget.selectedItems()
+        rightSelectedItems = self.rightDirectPortPairsItemListWidget.selectedItems()
         if rightSelectedItems:
             return rightSelectedItems[0]
 
@@ -519,8 +521,6 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         self.close()
 
     def _openMesageBox(self, text):
-        self.msgb = QMessageBox()
         self.msgb.setText(text)
-        if not (self.isTest):
+        if not self.isTest:
             self.msgb.exec_()
-

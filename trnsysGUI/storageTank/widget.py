@@ -1,7 +1,6 @@
 import dataclasses as _dc
 import pathlib as _pl
 import random as _rnd
-import typing
 import typing as _tp
 
 import PyQt5.QtGui as _qtg
@@ -358,8 +357,11 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
 
         exportDdckAction = contextMenu.addAction("Export ddck")
         exportDdckAction.triggered.connect(self.exportDck)
-    @typing.no_type_check
-    def mouseDoubleClickEvent(self, event: _qtw.QGraphicsSceneMouseEvent, isTest=False) -> _tp.Optional[ConfigureStorageDialog]:
+
+    @_tp.no_type_check
+    # pylint: disable=inconsistent-return-statements
+    def mouseDoubleClickEvent(self, event: _qtw.QGraphicsSceneMouseEvent, isTest=False) -> (
+            _tp.Optional)[ConfigureStorageDialog]:
         renameHelper = _rename.RenameHelper(self.editor.namesManager)
         dialog = ConfigureStorageDialog(self, self.editor, renameHelper, self.editor.projectFolder)
         if isTest:
