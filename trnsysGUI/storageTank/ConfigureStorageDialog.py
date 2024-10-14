@@ -32,12 +32,16 @@ if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
 
 
-class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable = too-many-instance-attributes
+class ConfigureStorageDialog(
+    _ndialog.ChangeNameDialogBase
+):  # pylint: disable = too-many-instance-attributes
     WIDTH_INCREMENT = 10
     HEIGHT_INCREMENT = 100
 
-    MISSING_NAME_ERROR_MESSAGE="Please specify the name of the heat exchanger that you want to add."
-    PORT_HEIGHT_ERROR_MESSAGE="Ports need to be on the tank, please make sure the port heights are within (0 %, 100 %)."
+    MISSING_NAME_ERROR_MESSAGE = (
+        "Please specify the name of the heat exchanger that you want to add."
+    )
+    PORT_HEIGHT_ERROR_MESSAGE = "Ports need to be on the tank, please make sure the port heights are within (0 %, 100 %)."
 
     isTest = False
 
@@ -206,13 +210,21 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         self._loadDirectPortPairs()
 
         # This is to ensure that only one list element is selected
-        self.rightHeatExchangersItemListWidget.setSelectionMode(QListWidget.SelectionMode(1))
-        self.leftHeatExchangersItemListWidget.setSelectionMode(QListWidget.SelectionMode(1))
+        self.rightHeatExchangersItemListWidget.setSelectionMode(
+            QListWidget.SelectionMode(1)
+        )
+        self.leftHeatExchangersItemListWidget.setSelectionMode(
+            QListWidget.SelectionMode(1)
+        )
         self.rightHeatExchangersItemListWidget.clicked.connect(self.listWRClicked)
         self.leftHeatExchangersItemListWidget.clicked.connect(self.listWLClicked)
 
-        self.rightDirectPortPairsItemListWidget.setSelectionMode(QListWidget.SelectionMode(1))
-        self.leftDirectPortPairsItemListWidget.setSelectionMode(QListWidget.SelectionMode(1))
+        self.rightDirectPortPairsItemListWidget.setSelectionMode(
+            QListWidget.SelectionMode(1)
+        )
+        self.leftDirectPortPairsItemListWidget.setSelectionMode(
+            QListWidget.SelectionMode(1)
+        )
         self.rightDirectPortPairsItemListWidget.clicked.connect(self.listWR2Clicked)
         self.leftDirectPortPairsItemListWidget.clicked.connect(self.listWL2Clicked)
 
@@ -236,9 +248,7 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
 
     @staticmethod
     def _getHeatExchangerListItemText(h):  # pylint: disable = invalid-name
-        return (
-            f"{h.displayName}, y_offset = {int(h.relativeInputHeight * 100)}% to {int(h.relativeOutputHeight * 100)}%"
-        )
+        return f"{h.displayName}, y_offset = {int(h.relativeInputHeight * 100)}% to {int(h.relativeOutputHeight * 100)}%"
 
     def _loadDirectPortPairs(self):
         self.leftDirectPortPairsItemListWidget.clear()
@@ -305,13 +315,20 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
                 self._editor.logger.warning("No side selected for heat exchanger.")
                 return
         else:
-            self._openMesageBox(f"At least {self.minimumPortDistance}% of difference needed and valid range (0, 100)")
+            self._openMesageBox(
+                f"At least {self.minimumPortDistance}% of difference needed and valid range (0, 100)"
+            )
 
     def minOffsetDistance(self):
-        return abs(float(self.offsetLeI.text()) - float(self.offsetLeO.text())) >= self.minimumPortDistance
+        return (
+            abs(float(self.offsetLeI.text()) - float(self.offsetLeO.text()))
+            >= self.minimumPortDistance
+        )
 
     def offsetsInRange(self):
-        return (0 <= float(self.offsetLeI.text()) <= 100) and (0 <= float(self.offsetLeO.text()) <= 100)
+        return (0 <= float(self.offsetLeI.text()) <= 100) and (
+            0 <= float(self.offsetLeO.text()) <= 100
+        )
 
     def _addHxL(self):
         self._addHeatExchanger(_sd.Side.LEFT)
@@ -329,7 +346,9 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         relativeOutputHeight = float(self.offsetLeO.text()) / 100
 
         trnsysId = self._editor.idGen.getTrnsysID()
-        self.storage.addHeatExchanger(name, trnsysId, side, relativeInputHeight, relativeOutputHeight)
+        self.storage.addHeatExchanger(
+            name, trnsysId, side, relativeInputHeight, relativeOutputHeight
+        )
 
         self._loadHeatExchangers()
 
@@ -381,9 +400,13 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
 
     def _removeSelectedPortPairs(self, directPortPairsListWidget):
         for selectedItem in directPortPairsListWidget.selectedItems():
-            selectedDirectPortPair: _dpp.DirectPortPair = selectedItem.data(_qtc.Qt.UserRole)
+            selectedDirectPortPair: _dpp.DirectPortPair = selectedItem.data(
+                _qtc.Qt.UserRole
+            )
 
-            self._removePorts(selectedDirectPortPair.fromPort, selectedDirectPortPair.toPort)
+            self._removePorts(
+                selectedDirectPortPair.fromPort, selectedDirectPortPair.toPort
+            )
 
             self.storage.directPortPairs.remove(selectedDirectPortPair)
 
@@ -438,8 +461,16 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         if not newHeights:
             return
 
-        newInputHeight = newHeights.input if newHeights.input != "empty" else heatExchanger.relativeInputHeight
-        newOutputHeight = newHeights.output if newHeights.output != "empty" else heatExchanger.relativeOutputHeight
+        newInputHeight = (
+            newHeights.input
+            if newHeights.input != "empty"
+            else heatExchanger.relativeInputHeight
+        )
+        newOutputHeight = (
+            newHeights.output
+            if newHeights.output != "empty"
+            else heatExchanger.relativeOutputHeight
+        )
         heatExchanger.setRelativeHeights(newInputHeight, newOutputHeight)
 
         listText = self._getHeatExchangerListItemText(heatExchanger)
@@ -482,12 +513,20 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         if not newHeights:
             return
 
-        newRelativeInputHeight = newHeights.input if newHeights.input != "empty" else directPortPair.relativeInputHeight
+        newRelativeInputHeight = (
+            newHeights.input
+            if newHeights.input != "empty"
+            else directPortPair.relativeInputHeight
+        )
         newRelativeOutputHeight = (
-            newHeights.output if newHeights.output != "empty" else directPortPair.relativeOutputHeight
+            newHeights.output
+            if newHeights.output != "empty"
+            else directPortPair.relativeOutputHeight
         )
 
-        directPortPair.setRelativeHeights(newRelativeInputHeight, newRelativeOutputHeight, self.storage.h)
+        directPortPair.setRelativeHeights(
+            newRelativeInputHeight, newRelativeOutputHeight, self.storage.h
+        )
 
         newText = self._getDirectPortPairListItemText(directPortPair)
         selectedItem.setText(newText)

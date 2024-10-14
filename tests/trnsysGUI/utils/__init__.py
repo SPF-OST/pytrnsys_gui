@@ -5,6 +5,7 @@ import trnsysGUI.blockItemHasInternalPiping as bip
 import trnsysGUI.project as prj
 import trnsysGUI.mainWindow as mw
 
+
 def createMainWindow(projectFolder, projectName):
     projectJsonFilePath = projectFolder / f"{projectName}.json"
     project = prj.LoadProject(projectJsonFilePath)
@@ -15,8 +16,11 @@ def createMainWindow(projectFolder, projectName):
 
     return mainWindow
 
-def getDesiredTrnsysObjectFromList(trnsysObjs: _abc.Sequence[bip.BlockItemHasInternalPiping],
-                                   desiredBlockItem: bip.BlockItemHasInternalPiping):
+
+def getDesiredTrnsysObjectFromList(
+    trnsysObjs: _abc.Sequence[bip.BlockItemHasInternalPiping],
+    desiredBlockItem: bip.BlockItemHasInternalPiping,
+):
     for trnsysObj in trnsysObjs:
         if isinstance(type(trnsysObj), type(desiredBlockItem)):
             return trnsysObj

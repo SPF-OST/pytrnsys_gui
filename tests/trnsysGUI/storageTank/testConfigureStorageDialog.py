@@ -8,20 +8,25 @@ _CURRENT_DIR = _pl.Path(__file__).parent
 _PROJECT_DIR = _CURRENT_DIR / ".." / "data" / "diagramForConfigStorageDialog"
 _PROJECT_NAME = "diagramForConfigStorageDialog"
 
+
 class TestConfigureStorageDialog:
 
-    storageTank=None
+    storageTank = None
 
     def triggerStorgeDialog(self, qtbot):
         mainWindow = utils.createMainWindow(_PROJECT_DIR, _PROJECT_NAME)
         qtbot.addWidget(mainWindow)
-        self.storageTank = utils.getDesiredTrnsysObjectFromList(mainWindow.editor.trnsysObj, stw.StorageTank)
-        configureStorageDialog = self.storageTank.mouseDoubleClickEvent(_core.QEvent.MouseButtonDblClick, isTest=True)
+        self.storageTank = utils.getDesiredTrnsysObjectFromList(
+            mainWindow.editor.trnsysObj, stw.StorageTank
+        )
+        configureStorageDialog = self.storageTank.mouseDoubleClickEvent(
+            _core.QEvent.MouseButtonDblClick, isTest=True
+        )
         configureStorageDialog.isTest = True
         qtbot.addWidget(configureStorageDialog)
         return configureStorageDialog
 
-    def testAddHxSuccess(self,qtbot):
+    def testAddHxSuccess(self, qtbot):
         hxInput = "90"
         hxOutput = "50"
         hxName = "Test hx"
@@ -59,15 +64,20 @@ class TestConfigureStorageDialog:
         configureStorageDialog.rButton.setChecked(True)
         configureStorageDialog.addHx()
 
-        assert configureStorageDialog.msgb.text() == configureStorageDialog.MISSING_NAME_ERROR_MESSAGE
+        assert (
+            configureStorageDialog.msgb.text()
+            == configureStorageDialog.MISSING_NAME_ERROR_MESSAGE
+        )
 
     def testAddHxInvalidRangeFailure(self, qtbot):
         hxInput = "90"
         hxOutput = "90"
 
         configureStorageDialog = self.triggerStorgeDialog(qtbot)
-        expectedErrorMessage = (f"At least {configureStorageDialog.minimumPortDistance}"
-                                  f"% of difference needed and valid range (0, 100)")
+        expectedErrorMessage = (
+            f"At least {configureStorageDialog.minimumPortDistance}"
+            f"% of difference needed and valid range (0, 100)"
+        )
         configureStorageDialog.offsetLeI.setText(hxInput)
         configureStorageDialog.offsetLeO.setText(hxOutput)
         configureStorageDialog.addHx()
@@ -77,14 +87,16 @@ class TestConfigureStorageDialog:
     def testRemoveHxSuccess(self, qtbot):
         configureStorageDialog = self.triggerStorgeDialog(qtbot)
         assert len(self.storageTank.heatExchangers) == 1
-        configureStorageDialog.leftHeatExchangersItemListWidget.item(0).setSelected(True)
+        configureStorageDialog.leftHeatExchangersItemListWidget.item(0).setSelected(
+            True
+        )
         configureStorageDialog.removeHxL()
 
         assert len(self.storageTank.heatExchangers) == 0
 
     def testAddPortPairSuccess(self, qtbot):
-        portPairInput="1"
-        portPairOutput="99"
+        portPairInput = "1"
+        portPairOutput = "99"
 
         configureStorageDialog = self.triggerStorgeDialog(qtbot)
         configureStorageDialog.manPortLeI.setText(portPairInput)
@@ -92,11 +104,11 @@ class TestConfigureStorageDialog:
         configureStorageDialog.manlButton.setChecked(True)
         configureStorageDialog.addPortPair()
 
-        assert len(self.storageTank.directPortPairs)==2
+        assert len(self.storageTank.directPortPairs) == 2
 
     def testAddPortPairHeightFailure(self, qtbot):
-        portPairInput="-1"
-        portPairOutput="100"
+        portPairInput = "-1"
+        portPairOutput = "100"
 
         configureStorageDialog = self.triggerStorgeDialog(qtbot)
         configureStorageDialog.manPortLeI.setText(portPairInput)
@@ -104,7 +116,10 @@ class TestConfigureStorageDialog:
         configureStorageDialog.manlButton.setChecked(True)
         configureStorageDialog.addPortPair()
 
-        assert configureStorageDialog.msgb.text() == configureStorageDialog.PORT_HEIGHT_ERROR_MESSAGE
+        assert (
+            configureStorageDialog.msgb.text()
+            == configureStorageDialog.PORT_HEIGHT_ERROR_MESSAGE
+        )
 
     def testAddPortPairNoSideSelectedFailure(self, qtbot):
         portPairInput = "-1"
@@ -120,7 +135,9 @@ class TestConfigureStorageDialog:
     def testRemovePortPairSuccess(self, qtbot):
         configureStorageDialog = self.triggerStorgeDialog(qtbot)
         assert len(self.storageTank.directPortPairs) == 1
-        configureStorageDialog.rightDirectPortPairsItemListWidget.item(0).setSelected(True)
+        configureStorageDialog.rightDirectPortPairsItemListWidget.item(0).setSelected(
+            True
+        )
         configureStorageDialog.removePortPairRight()
 
         assert len(self.storageTank.directPortPairs) == 0
