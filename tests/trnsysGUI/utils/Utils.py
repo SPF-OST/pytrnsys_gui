@@ -21,5 +21,5 @@ class Utils:
     def getDesiredTrnsysObjectFromList(trnsysObjs: _abc.Sequence[bip.BlockItemHasInternalPiping],
                                        desiredBlockItem: bip.BlockItemHasInternalPiping):
         for trnsysObj in trnsysObjs:
-            if isinstance(trnsysObj, desiredBlockItem):
+            if isinstance(type(trnsysObj), type(desiredBlockItem)):
                 return trnsysObj
