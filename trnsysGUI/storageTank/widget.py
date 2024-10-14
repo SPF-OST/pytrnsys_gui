@@ -96,9 +96,10 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
 
     @classmethod
     @_tp.override
+    # pylint: disable=arguments-differ
     def _getImageAccessor(
         cls,
-    ) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+    ) -> _img.SvgImageAccessor:
         return _img.STORAGE_TANK_SVG
 
     # Setter functions
