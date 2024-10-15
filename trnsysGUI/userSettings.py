@@ -1,5 +1,6 @@
-from PyQt5.QtCore import QSettings
 import pathlib as _pl
+from PyQt5.QtCore import QSettings  # pylint: disable=invalid-name
+
 
 class UserSettings:
 

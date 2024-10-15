@@ -16,22 +16,27 @@ import typing as _tp
 import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.common.cancelled as _ccl
-from trnsysGUI.UserSettings import UserSettings
+from trnsysGUI.userSettings import UserSettings
+
 
 @_dc.dataclass
 class CreateProject:
     jsonFilePath: _pl.Path
 
+
 @_dc.dataclass
 class LoadProject:
     jsonFilePath: _pl.Path
+
 
 @_dc.dataclass
 class MigrateProject:
     oldJsonFilePath: _pl.Path
     newProjectFolderPath: _pl.Path
 
+
 Project = CreateProject | LoadProject | MigrateProject
+
 
 def getProject() -> _ccl.MaybeCancelled[Project]:
     createOpenMaybeCancelled = _askUserWhetherToCreateNewProjectOrOpenExisting()
@@ -48,10 +53,12 @@ def getProject() -> _ccl.MaybeCancelled[Project]:
 
     return _ccl.CANCELLED
 
+
 class _CreateNewOrOpenExisting(_enum.Enum):
     CREATE_NEW = _enum.auto()
     OPEN_EXISTING = _enum.auto()
     OPEN_RECENT = _enum.auto()
+
 
 def _askUserWhetherToCreateNewProjectOrOpenExisting() -> _ccl.MaybeCancelled[_CreateNewOrOpenExisting]:
     messageBox = _qtw.QMessageBox()
@@ -130,12 +137,14 @@ def getExistingEmptyDirectory(
         messageBox.setText(errorMessage)
         messageBox.exec()
 
+
 def _isEmptyDirectory(path: _pl.Path) -> bool:
     if not path.is_dir():
         return False
     containedFilesAndDirectories = list(path.iterdir())
     isDirectoryEmpty = len(containedFilesAndDirectories) == 0
     return isDirectoryEmpty
+
 
 def getLoadOrMigrateProject() -> _ccl.MaybeCancelled[LoadProject | MigrateProject]:
     projectFolderPathString, _ = _qtw.QFileDialog.getOpenFileName(caption="Open diagram", filter="*.json")
@@ -145,7 +154,8 @@ def getLoadOrMigrateProject() -> _ccl.MaybeCancelled[LoadProject | MigrateProjec
     projectFolderPath = jsonFilePath.parent
     return checkIfProjectEnviromentIsValid(projectFolderPath, jsonFilePath)
 
-def loadRecentProject()-> _ccl.MaybeCancelled[LoadProject]:
+
+def loadRecentProject() -> _ccl.MaybeCancelled[LoadProject | MigrateProject]:
     messageBox = _qtw.QMessageBox()
     messageBox.setStandardButtons(_qtw.QMessageBox.Ok)
     try:
@@ -157,13 +167,17 @@ def loadRecentProject()-> _ccl.MaybeCancelled[LoadProject]:
                 return _ccl.CANCELLED
         else:
             return checkIfProjectEnviromentIsValid(recentProjectJsonPath.parent, recentProjectJsonPath)
-    except:
+    except TypeError:
         messageBox.setText("No recent project available")
         result = messageBox.exec()
         if result == _qtw.QMessageBox.Ok:
             return _ccl.CANCELLED
+    return _ccl.CANCELLED
 
-def checkIfProjectEnviromentIsValid(projectFolderPath, jsonFilePath) -> _ccl.MaybeCancelled[LoadProject | MigrateProject]:
+
+def checkIfProjectEnviromentIsValid(
+    projectFolderPath, jsonFilePath
+) -> _ccl.MaybeCancelled[LoadProject | MigrateProject]:
     containingFolderIsCalledSameAsJsonFile = projectFolderPath.name == jsonFilePath.stem
     ddckFolder = projectFolderPath / "ddck"
     if not containingFolderIsCalledSameAsJsonFile or not ddckFolder.is_dir():

@@ -60,6 +60,7 @@ from trnsysGUI.storageTank.widget import StorageTank
 from . import _sizes
 from . import fileSystemTreeView as _fst
 
+
 class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
     def __init__(self, parent, projectFolder, jsonPath, loadValue, logger):
         super().__init__(parent)

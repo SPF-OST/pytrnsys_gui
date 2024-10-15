@@ -25,7 +25,7 @@ from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
 from trnsysGUI.ProcessMain import ProcessMain
 from trnsysGUI.RunMain import RunMain
-from trnsysGUI.UserSettings import UserSettings
+from trnsysGUI.userSettings import UserSettings
 from trnsysGUI.common import cancelled as _ccl
 from trnsysGUI.diagram import Editor as _de
 from trnsysGUI.storageTank.widget import StorageTank
