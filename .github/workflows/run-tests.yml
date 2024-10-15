@@ -59,6 +59,7 @@ jobs:
     runs-on: [self-hosted, etna]
     
     env:
+      PY_COLORS: "1"
       PYTRNSYS_DEPENDENCY_CHANGED: ${{github.event_name == 'repository_dispatch' && github.event.client_payload.type == 'run-tests-and-build-executable'}}
 
     steps:
