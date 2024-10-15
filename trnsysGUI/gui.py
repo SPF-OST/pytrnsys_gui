@@ -26,7 +26,6 @@ def main():
 
     app = _qtw.QApplication(_sys.argv)
     app.setApplicationName("Diagram Creator")
-    app.setOrganizationName("pytrnsys")
 
     if errorMessage:
         _werrors.showMessageBox(errorMessage, title="Missing requirements")
