@@ -25,6 +25,7 @@ from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
 from trnsysGUI.ProcessMain import ProcessMain
 from trnsysGUI.RunMain import RunMain
+from trnsysGUI.userSettings import UserSettings
 from trnsysGUI.common import cancelled as _ccl
 from trnsysGUI.diagram import Editor as _de
 from trnsysGUI.storageTank.widget import StorageTank
@@ -129,6 +130,10 @@ class MainWindow(_qtw.QMainWindow):
         fileMenuOpenAction.triggered.connect(self.openFile)
         fileMenuOpenAction.setShortcut("Ctrl+o")
         self.fileMenu.addAction(fileMenuOpenAction)
+
+        fileMenuOpenRecentAction = _qtw.QAction("Open Recent", self)
+        fileMenuOpenRecentAction.triggered.connect(self.openRecentFile)
+        self.fileMenu.addAction(fileMenuOpenRecentAction)
 
         fileMenuSaveAction = _qtw.QAction("Save", self)
         fileMenuSaveAction.triggered.connect(self.saveDia)
@@ -256,6 +261,7 @@ class MainWindow(_qtw.QMainWindow):
         createProjectMaybeCancelled = _prj.getCreateProject(startingDirectoryPath)
         if _ccl.isCancelled(createProjectMaybeCancelled):
             return
+        UserSettings.setRecentProjectJsonPath(self.editor.diagramPath)
         createProject = _ccl.value(createProjectMaybeCancelled)
 
         self._resetEditor(createProject)
@@ -466,12 +472,29 @@ class MainWindow(_qtw.QMainWindow):
         maybeCancelled = _prj.getLoadOrMigrateProject()
         if _ccl.isCancelled(maybeCancelled):
             return
+        UserSettings.setRecentProjectJsonPath(self.editor.diagramPath)
         project = _ccl.value(maybeCancelled)
 
         self._resetEditor(project)
 
         if isinstance(project, _prj.MigrateProject):
             self.editor.save()
+
+    def openRecentFile(self):
+        qmb = _qtw.QMessageBox()
+        qmb.setText("Are you sure you want to open another project? Unsaved progress on the current one will be lost.")
+        qmb.setStandardButtons(_qtw.QMessageBox.Yes | _qtw.QMessageBox.Cancel)
+        qmb.setDefaultButton(_qtw.QMessageBox.Cancel)
+        ret = qmb.exec()
+
+        if ret == _qtw.QMessageBox.Cancel:
+            return
+        maybeCancelled = _prj.loadRecentProject()
+        if _ccl.isCancelled(maybeCancelled):
+            return
+        UserSettings.setRecentProjectJsonPath(self.editor.diagramPath)
+        project = _ccl.value(maybeCancelled)
+        self._resetEditor(project)
 
     def _resetEditor(self, project):
         wasRunning = self.editor and self.editor.isRunning()
@@ -577,11 +600,14 @@ class MainWindow(_qtw.QMainWindow):
             if ret == _qtw.QMessageBox.Cancel:
                 e.ignore()
             elif ret == _qtw.QMessageBox.Close:
+                UserSettings.setRecentProjectJsonPath(self.editor.diagramPath)
                 e.accept()
             elif ret == _qtw.QMessageBox.Save:
                 self.editor.save()
+                UserSettings.setRecentProjectJsonPath(self.editor.diagramPath)
                 e.accept()
         else:
+            UserSettings.setRecentProjectJsonPath(self.editor.diagramPath)
             e.accept()
 
     def ensureSettingsExist(self):
