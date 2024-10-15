@@ -50,7 +50,7 @@ myPelSystem_kW = (ElHpTot_kW+PelContr_kW+PelPuSH_kW+PelPuDHW_kW+qAuxStoreDHW_KW+
 
 EQUATIONS 2    ! Stromverbrauch und Stromnetzbilanz THIS WILL BE ELIMINATED           ! System electricity consumption [kW]
 PelHeatSys_kW = myPelSystem_kW
-PelUsedTotal_kW = PelHeatSys_kW + PelHH_kW + PelBatStandby_kW    !kW, Total konsumierter Strom des Geb√É¬§udes [kW]
+PelUsedTotal_kW = PelHeatSys_kW + PelHH_kW + PelBatStandby_kW    !kW, Total konsumierter Strom des Geb√§udes [kW]
 
 **********************************
 ** Generic constants
@@ -63,14 +63,14 @@ PelFuelCellToBui_kW = 0
 
 CONSTANTS 12   ! Battery
 minElBatFactor = 0.02
-CapBatMaxT0_kWh = 50    !kWh, Maximale Batteriekapazit√§t zur Zeit 0 [kWh]
+CapBatMaxT0_kWh = 50    !kWh, Maximale Batteriekapazit‰t zur Zeit 0 [kWh]
 maxBatteryPower_kW = CapBatMaxT0_kWh * 12./50.    !kW, Maximum battery charging power [kW]
 MinPelFromToBat_kW = minElBatFactor*CapBatMaxT0_kWh    !kW, Minimum delivered power from the battery
 BeginkWhBattery = CapBatMaxT0_kWh*0.2
 PelBatStandby_kW = 0.005    !kW, Standbyverluste + Reglerverbrauch Batterie
-CapBatMax_kWh = CapBatMaxT0_kWh    !kW, Zeitabh√§ngige Batteriekapazit√§t [kWh]
+CapBatMax_kWh = CapBatMaxT0_kWh    !kW, Zeitabh‰ngige Batteriekapazit‰t [kWh]
 FrBatSOCmin = 0.1    !0-1, Minimaler Ladeanteil der Batterie
-SocBatMin_kWh = FrBatSOCmin*CapBatMax_kWh    !kWh, Minimale Ladekapazit√§t der Batterie
+SocBatMin_kWh = FrBatSOCmin*CapBatMax_kWh    !kWh, Minimale Ladekapazit‰t der Batterie
 **inverterEffDCAC = 0.9
 frBatWRloss = 0.1 !0.08
 effBatDischarge = 1-frBatWRloss
@@ -116,7 +116,7 @@ PvToBat_kW     = PvToBatDC_kW
 PvExcess_kW    = MAX(PelPVAC_kW-PvToHH_kW-PvToHeatSys_KW-PvToBat_kW*inverterEffDCAC,0)
 PvToGrid_kW = PvExcess_kW
 ** El from Battery to system. No efficiency to discharge? Yes but if used here then we always need the grid, what we need to do is to decrease the SOC
-PelFromBat_kW  = Max(0.0,Min(maxBatteryPower_kW,(PelUsedTotal_kW-PvToHH_kW-PvToHeatSys_kW-PelFuelCellToBui_kW)/inverterEffDCAC*BoUnloadBat))    !kW, El. Leistung von der Batterie ans Geb√§ude  JS: Include inverter efficiency, as Battery provides DC Power
+PelFromBat_kW  = Max(0.0,Min(maxBatteryPower_kW,(PelUsedTotal_kW-PvToHH_kW-PvToHeatSys_kW-PelFuelCellToBui_kW)/inverterEffDCAC*BoUnloadBat))    !kW, El. Leistung von der Batterie ans Geb‰ude  JS: Include inverter efficiency, as Battery provides DC Power
 PelFromGrid_kW = MAX(PelUsedTotal_kW-PvToHH_kW-PvToHeatSys_KW-PelFromBat_kW-PelFuelCellToBui_kW,0.0)
 
 ** El from battery to Household and thermal system
@@ -140,7 +140,7 @@ PARAMETERS 1
 3   !, 1, number of variables to be remembered
 INPUTS 3
 SOCBat_kWh  BoBatFull  SOCBat  
-0.0    0     0 !, 1-10
+SocBatMin_kWh    0.0    0     0 !, 1-10
 
 EQUATIONS 3   !, Recalled values for collector control
 SOCBatRc_kWh = [98,1] !kWh
