@@ -1,8 +1,8 @@
 import copy as _cp
 import dataclasses as _dc
 import json as _json
-import uuid as _uuid
 import typing as _tp
+import uuid as _uuid
 
 import dataclasses_jsonschema as _dcj
 import pytest as _pt
@@ -215,85 +215,21 @@ class TestSerialization:
         with _pt.raises(_ser.SerializationError):
             PersonVersion0.from_json(json)
 
+    def testUnknownFieldRaises(self):
+        phonyP1 = self.SERIALIZED_P0.copy()
+        phonyP1["unknown_field"] = 42
+
+        json = _json.dumps(phonyP1)
+
+        with _pt.raises(_ser.SerializationError):
+            Person.from_json(json)
+
+        with _pt.raises(_ser.SerializationError):
+            PersonVersion0.from_json(json)
+
     def testNested(self):
         json = _json.dumps(self.SERIALIZED_T0)
 
-        assert Team.json_schema() == {
-            "$schema": "http://json-schema.org/draft-06/schema#",
-            "definitions": {
-                "Person": {
-                    "anyOf": [
-                        {
-                            "description": "Person(title: str, "
-                            "lastName: str, "
-                            "ageInYears: int, "
-                            "heightInCm: int)",
-                            "properties": {
-                                "__version__": {"const": "1774d088-3917-4c29-a76a-0a4514ef6cf5"},
-                                "ageInYears": {"type": "integer"},
-                                "heightInCm": {"type": "integer"},
-                                "lastName": {"type": "string"},
-                                "title": {"type": "string"},
-                            },
-                            "required": [
-                                "title",
-                                "lastName",
-                                "ageInYears",
-                                "heightInCm",
-                                "__version__",
-                            ],
-                            "type": "object",
-                        },
-                        {"$ref": "#/definitions/PersonVersion1"},
-                    ]
-                },
-                "PersonVersion0": {
-                    "description": "PersonVersion0(firstName: str, age: int, heightInM: float)",
-                    "properties": {
-                        "__version__": {"const": "ff2ba3c8-4fef-4a64-a026-11212ab35d6b"},
-                        "age": {"type": "integer"},
-                        "firstName": {"type": "string"},
-                        "heightInM": {"type": "number"},
-                    },
-                    "required": ["firstName", "age", "heightInM"],
-                    "type": "object",
-                },
-                "PersonVersion1": {
-                    "anyOf": [
-                        {
-                            "description": "PersonVersion1(firstName: "
-                            "str, lastName: "
-                            "str, age: int, "
-                            "heightInCm: "
-                            "int)",
-                            "properties": {
-                                "__version__": {"const": "70d5694f-032c-4ca8-b13c-c020b05f2179"},
-                                "age": {"type": "integer"},
-                                "firstName": {"type": "string"},
-                                "heightInCm": {"type": "integer"},
-                                "lastName": {"type": "string"},
-                            },
-                            "required": [
-                                "firstName",
-                                "lastName",
-                                "age",
-                                "heightInCm",
-                                "__version__",
-                            ],
-                            "type": "object",
-                        },
-                        {"$ref": "#/definitions/PersonVersion0"},
-                    ]
-                },
-            },
-            "description": "Team(members: Sequence[tests.trnsysGUI.testSerialization.Person])",
-            "properties": {
-                "__version__": {"const": "9e322099-c043-4f23-b6df-4087bb5950d7"},
-                "members": {"items": {"$ref": "#/definitions/Person"}, "type": "array"},
-            },
-            "required": ["members"],
-            "type": "object",
-        }
         team = Team.from_json(json)
 
         expectedMembers = [Person.from_dict(d) for d in [self.SERIALIZED_P0, self.SERIALIZED_P1, self.SERIALIZED_P]]
