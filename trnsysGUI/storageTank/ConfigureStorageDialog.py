@@ -40,6 +40,7 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
     PORT_HEIGHT_ERROR_MESSAGE = (
         "Ports need to be on the tank, please make sure the port heights are within (0 %, 100 %)."
     )
+    NO_SIDE_SELECTED_ERROR_MESSAGE = "No side selected for heat exchanger."
 
     isTest = False
 
@@ -176,8 +177,8 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         self.okButton = QPushButton("OK")
         self.cancelButton = QPushButton("Cancel")
 
-        increaseSizeButton.clicked.connect(self.incrSize)
-        decreaseSizeButton.clicked.connect(self.decrSize)
+        increaseSizeButton.clicked.connect(self.increaseSize)
+        decreaseSizeButton.clicked.connect(self.decreaseSize)
         self.okButton.clicked.connect(self.acceptedEdit)
         self.cancelButton.clicked.connect(self.cancel)
 
@@ -362,6 +363,7 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
             _pairSide = _sd.Side.RIGHT
         else:
             self._editor.logger.warning("No side selected for port pair.")
+            self._openMessageBox(self.NO_SIDE_SELECTED_ERROR_MESSAGE)
             return
 
         self.storage.addDirectPortPair(
@@ -424,9 +426,6 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
             connection.deleteConnection()
 
     def modifyHx(self):
-        """
-        Modify Hx.
-        """
         result = self._getFirstSelectedItemAndHeatExchanger()
         if not result:
             return
@@ -467,9 +466,6 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         raise AssertionError(f"No heat exchanger with name {name} found.")
 
     def modifyPort(self):
-        """
-        Modify existing ports.
-        """
         selectedItem = self._getFirstSelectedDirectPortPairListWidgetItem()
         if not selectedItem:
             return
@@ -506,10 +502,10 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
 
         return None
 
-    def incrSize(self):
+    def increaseSize(self):
         self._changeSize(self.HEIGHT_INCREMENT, self.WIDTH_INCREMENT)
 
-    def decrSize(self):
+    def decreaseSize(self):
         self._changeSize(-self.HEIGHT_INCREMENT, -self.WIDTH_INCREMENT)
 
     def _changeSize(self, deltaH: int, deltaW: int) -> None:

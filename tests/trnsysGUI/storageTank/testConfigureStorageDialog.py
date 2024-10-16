@@ -8,12 +8,17 @@ _CURRENT_DIR = _pl.Path(__file__).parent
 _PROJECT_DIR = _CURRENT_DIR / ".." / "data" / "diagramForConfigStorageDialog"
 _PROJECT_NAME = "diagramForConfigStorageDialog"
 
+# TODO: find feature that does not allow anything but nrs in the input field.
+# TODO: input and output not a number as a consequence of previous, for both hx and portPairs
+
+# TODO: make issue for AssertionError: Port is inside block item.
+#       [IPKernelApp] WARNING | Parent appears to have exited, shutting down.
+
 
 class TestConfigureStorageDialog:
-
     storageTank = None
 
-    def triggerStorgeDialog(self, qtbot):
+    def triggerStorageDialog(self, qtbot):
         mainWindow = utils.createMainWindow(_PROJECT_DIR, _PROJECT_NAME)
         qtbot.addWidget(mainWindow)
         self.storageTank = utils.getDesiredTrnsysObjectFromList(mainWindow.editor.trnsysObj, stw.StorageTank)
@@ -28,25 +33,29 @@ class TestConfigureStorageDialog:
         hxName = "Test hx"
         errors = []
 
-        configureStorageDialog = self.triggerStorgeDialog(qtbot)
+        configureStorageDialog = self.triggerStorageDialog(qtbot)
+
         try:
             assert len(self.storageTank.heatExchangers) == 1
         except AssertionError as error:
             errors.append(error)
+
         configureStorageDialog.offsetLeI.setText(hxInput)
         configureStorageDialog.offsetLeO.setText(hxOutput)
         configureStorageDialog.hxNameLe.setText(hxName)
         configureStorageDialog.rButton.setChecked(True)
         configureStorageDialog.addHx()
-        print(self.storageTank.heatExchangers)
+
         try:
             assert len(self.storageTank.heatExchangers) == 2
         except AssertionError as error:
             errors.append(error)
+
         try:
             assert self.storageTank.heatExchangers[1].displayName == hxName
         except AssertionError as error:
             errors.append(error)
+
         if errors:
             raise ExceptionGroup(f"Found {len(errors)} issues.", errors)
 
@@ -54,7 +63,7 @@ class TestConfigureStorageDialog:
         hxInput = "90"
         hxOutput = "50"
 
-        configureStorageDialog = self.triggerStorgeDialog(qtbot)
+        configureStorageDialog = self.triggerStorageDialog(qtbot)
         configureStorageDialog.offsetLeI.setText(hxInput)
         configureStorageDialog.offsetLeO.setText(hxOutput)
         configureStorageDialog.rButton.setChecked(True)
@@ -66,18 +75,19 @@ class TestConfigureStorageDialog:
         hxInput = "90"
         hxOutput = "90"
 
-        configureStorageDialog = self.triggerStorgeDialog(qtbot)
-        expectedErrorMessage = (
-            f"At least {configureStorageDialog.minimumPortDistance}" f"% of difference needed and valid range (0, 100)"
-        )
+        configureStorageDialog = self.triggerStorageDialog(qtbot)
         configureStorageDialog.offsetLeI.setText(hxInput)
         configureStorageDialog.offsetLeO.setText(hxOutput)
         configureStorageDialog.addHx()
 
+        expectedErrorMessage = (
+            f"At least {configureStorageDialog.minimumPortDistance}" f"% of difference needed and valid range (0, 100)"
+        )
+
         assert configureStorageDialog.msgb.text() == expectedErrorMessage
 
     def testRemoveHxSuccess(self, qtbot):
-        configureStorageDialog = self.triggerStorgeDialog(qtbot)
+        configureStorageDialog = self.triggerStorageDialog(qtbot)
         assert len(self.storageTank.heatExchangers) == 1
         configureStorageDialog.leftHeatExchangersItemListWidget.item(0).setSelected(True)
         configureStorageDialog.removeHxL()
@@ -88,7 +98,7 @@ class TestConfigureStorageDialog:
         portPairInput = "1"
         portPairOutput = "99"
 
-        configureStorageDialog = self.triggerStorgeDialog(qtbot)
+        configureStorageDialog = self.triggerStorageDialog(qtbot)
         configureStorageDialog.manPortLeI.setText(portPairInput)
         configureStorageDialog.manPortLeO.setText(portPairOutput)
         configureStorageDialog.manlButton.setChecked(True)
@@ -100,7 +110,7 @@ class TestConfigureStorageDialog:
         portPairInput = "-1"
         portPairOutput = "100"
 
-        configureStorageDialog = self.triggerStorgeDialog(qtbot)
+        configureStorageDialog = self.triggerStorageDialog(qtbot)
         configureStorageDialog.manPortLeI.setText(portPairInput)
         configureStorageDialog.manPortLeO.setText(portPairOutput)
         configureStorageDialog.manlButton.setChecked(True)
@@ -109,18 +119,19 @@ class TestConfigureStorageDialog:
         assert configureStorageDialog.msgb.text() == configureStorageDialog.PORT_HEIGHT_ERROR_MESSAGE
 
     def testAddPortPairNoSideSelectedFailure(self, qtbot):
-        portPairInput = "-1"
-        portPairOutput = "100"
+        portPairInput = "9"
+        portPairOutput = "42"
 
-        configureStorageDialog = self.triggerStorgeDialog(qtbot)
+        configureStorageDialog = self.triggerStorageDialog(qtbot)
         configureStorageDialog.manPortLeI.setText(portPairInput)
         configureStorageDialog.manPortLeO.setText(portPairOutput)
         configureStorageDialog.addPortPair()
 
         assert len(self.storageTank.directPortPairs) == 1
+        assert configureStorageDialog.msgb.text() == configureStorageDialog.NO_SIDE_SELECTED_ERROR_MESSAGE
 
     def testRemovePortPairSuccess(self, qtbot):
-        configureStorageDialog = self.triggerStorgeDialog(qtbot)
+        configureStorageDialog = self.triggerStorageDialog(qtbot)
         assert len(self.storageTank.directPortPairs) == 1
         configureStorageDialog.rightDirectPortPairsItemListWidget.item(0).setSelected(True)
         configureStorageDialog.removePortPairRight()
