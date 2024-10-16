@@ -229,7 +229,131 @@ class TestSerialization:
 
     def testNested(self):
         json = _json.dumps(self.SERIALIZED_T0)
-
+        
+        actualSchema = _json.dumps(Team.json_schema(), indent=4)
+        print(actualSchema)
+        expectedSchema = """\
+{
+    "type": "object",
+    "required": [
+        "members"
+    ],
+    "properties": {
+        "members": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Person"
+            }
+        },
+        "__version__": {
+            "const": "9e322099-c043-4f23-b6df-4087bb5950d7"
+        }
+    },
+    "description": "Team(members: Sequence[tests.trnsysGUI.testSerialization.Person])",
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "definitions": {
+        "Person": {
+            "anyOf": [
+                {
+                    "type": "object",
+                    "required": [
+                        "title",
+                        "lastName",
+                        "ageInYears",
+                        "heightInCm",
+                        "__version__"
+                    ],
+                    "properties": {
+                        "title": {
+                            "type": "string"
+                        },
+                        "lastName": {
+                            "type": "string"
+                        },
+                        "ageInYears": {
+                            "type": "integer"
+                        },
+                        "heightInCm": {
+                            "type": "integer"
+                        },
+                        "__version__": {
+                            "const": "1774d088-3917-4c29-a76a-0a4514ef6cf5"
+                        }
+                    },
+                    "description": "Person(title: str, lastName: str, ageInYears: int, heightInCm: int)",
+                    "additionalProperties": false
+                },
+                {
+                    "$ref": "#/definitions/PersonVersion1"
+                }
+            ]
+        },
+        "PersonVersion1": {
+            "anyOf": [
+                {
+                    "type": "object",
+                    "required": [
+                        "firstName",
+                        "lastName",
+                        "age",
+                        "heightInCm",
+                        "__version__"
+                    ],
+                    "properties": {
+                        "firstName": {
+                            "type": "string"
+                        },
+                        "lastName": {
+                            "type": "string"
+                        },
+                        "age": {
+                            "type": "integer"
+                        },
+                        "heightInCm": {
+                            "type": "integer"
+                        },
+                        "__version__": {
+                            "const": "70d5694f-032c-4ca8-b13c-c020b05f2179"
+                        }
+                    },
+                    "description": "PersonVersion1(firstName: str, lastName: str, age: int, heightInCm: int)",
+                    "additionalProperties": false
+                },
+                {
+                    "$ref": "#/definitions/PersonVersion0"
+                }
+            ]
+        },
+        "PersonVersion0": {
+            "type": "object",
+            "required": [
+                "firstName",
+                "age",
+                "heightInM"
+            ],
+            "properties": {
+                "firstName": {
+                    "type": "string"
+                },
+                "age": {
+                    "type": "integer"
+                },
+                "heightInM": {
+                    "type": "number"
+                },
+                "__version__": {
+                    "const": "ff2ba3c8-4fef-4a64-a026-11212ab35d6b"
+                }
+            },
+            "description": "PersonVersion0(firstName: str, age: int, heightInM: float)",
+            "additionalProperties": false
+        }
+    },
+    "additionalProperties": false
+}"""
+        
+        assert actualSchema == expectedSchema
+        
         team = Team.from_json(json)
 
         expectedMembers = [Person.from_dict(d) for d in [self.SERIALIZED_P0, self.SERIALIZED_P1, self.SERIALIZED_P]]
