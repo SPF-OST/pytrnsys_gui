@@ -34,6 +34,7 @@ if _tp.TYPE_CHECKING:
 class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable = too-many-instance-attributes
     WIDTH_INCREMENT = 10
     HEIGHT_INCREMENT = 100
+    minimumPortDistance = 9
 
     MISSING_NAME_ERROR_MESSAGE = "Please specify the name of the heat exchanger that you want to add."
     PORT_HEIGHT_ERROR_MESSAGE = (
@@ -53,10 +54,9 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         super().__init__(storage, renameHelper, _pl.Path(projectDirPath))
         self._editor = editor
         self.storage = storage
-        self.n = 0  # pylint: disable = invalid-name
-        self.m = 0  # pylint: disable = invalid-name
-        self.minimumPortDistance = 9
+        self.__post_init__()
 
+    def __post_init__(self):
         spacerHeight = 15
 
         self.tabs = QTabWidget()
@@ -306,7 +306,7 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
                 self._editor.logger.warning("No side selected for heat exchanger.")
                 return
         else:
-            self._openMesageBox(f"At least {self.minimumPortDistance}% of difference needed and valid range (0, 100)")
+            self._openMessageBox(f"At least {self.minimumPortDistance}% of difference needed and valid range (0, 100)")
 
     def minOffsetDistance(self):
         return abs(float(self.offsetLeI.text()) - float(self.offsetLeO.text())) >= self.minimumPortDistance
@@ -323,7 +323,7 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
     def _addHeatExchanger(self, side: _sd.Side):
         name = self.hxNameLe.text()
         if not name:
-            self._openMesageBox(self.MISSING_NAME_ERROR_MESSAGE)
+            self._openMessageBox(self.MISSING_NAME_ERROR_MESSAGE)
             return
 
         relativeInputHeight = float(self.offsetLeI.text()) / 100
@@ -351,7 +351,7 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
             max(_inputPortPercentageHeight, _outputPortPercentageHeight) >= 100
             or min(_inputPortPercentageHeight, _outputPortPercentageHeight) <= 0
         ):
-            self._openMesageBox(self.PORT_HEIGHT_ERROR_MESSAGE)
+            self._openMessageBox(self.PORT_HEIGHT_ERROR_MESSAGE)
             return
 
         trnsysId = self._editor.idGen.getTrnsysID()
@@ -521,7 +521,7 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
     def cancel(self):
         self.close()
 
-    def _openMesageBox(self, text):
+    def _openMessageBox(self, text):
         self.msgb.setText(text)
         if not self.isTest:
             self.msgb.exec_()
