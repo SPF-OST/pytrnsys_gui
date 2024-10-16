@@ -27,7 +27,7 @@ class _StrictMock:
 
 
 class TestStorageTank:
-    DATA_DIR_PATH = _pl.Path(__file__).parent / "data"
+    DATA_DIR_PATH = _pl.Path(__file__).parent.parent / "data"
     ACTUAL_DIR_PATH = DATA_DIR_PATH / "actual"
     EXPECTED_DIR_PATH = DATA_DIR_PATH / "expected"
     LEGACY_JSON_PATH = DATA_DIR_PATH / "storageTankOldestFormat.json"

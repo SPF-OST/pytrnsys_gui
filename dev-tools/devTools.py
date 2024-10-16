@@ -2,6 +2,9 @@
 
 # Run from top-level directory
 
+# To make black do the reformatting, use the following:
+#   devTools.py --black=""
+
 import argparse as ap
 import pathlib as pl
 import shutil as sh
