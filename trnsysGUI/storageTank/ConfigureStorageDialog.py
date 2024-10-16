@@ -51,13 +51,12 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         renameHelper: _rename.RenameHelper,
         projectDirPath: str,
     ) -> None:
-        # pylint: disable = too-many-locals, too-many-statements
         super().__init__(storage, renameHelper, _pl.Path(projectDirPath))
         self._editor = editor
         self.storage = storage
         self.__post_init__()
 
-    def __post_init__(self):
+    def __post_init__(self):  # pylint: disable = too-many-locals, too-many-statements
         spacerHeight = 15
 
         self.tabs = QTabWidget()
