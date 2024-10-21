@@ -15,12 +15,12 @@ class RequiredDecoderFieldsMixin:
 
 class HandleBlockOrConnectionDictMixinBase(_abc.ABC):
     @classmethod
-    def from_dict(  # pylint: disable=invalid-name
+    def from_dict(  # /NOSONAR  # pylint: disable=invalid-name
         cls,
         data: _dcj.JsonDict,
         validate=True,
-        validate_enums: bool = True,
-        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
+        validate_enums: bool = True,  # /NOSONAR  # pylint: disable=invalid-name
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR  # pylint: disable=invalid-name
     ):
         if not cls.key() in data:
             raise ValueError(f"Not a `{cls.key()}`.", data)
@@ -29,12 +29,12 @@ class HandleBlockOrConnectionDictMixinBase(_abc.ABC):
 
         return super().from_dict(data, validate, validate_enums, schema_type)  # type: ignore[misc]
 
-    def to_dict(  # pylint: disable=invalid-name
+    def to_dict(  # /NOSONAR  # pylint: disable=invalid-name
         self,
-        omit_none: bool = True,
-        validate: bool = False,
-        validate_enums: bool = True,
-        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
+        omit_none: bool = True,  # /NOSONAR  # pylint: disable=invalid-name
+        validate: bool = False,  # /NOSONAR  # pylint: disable=invalid-name
+        validate_enums: bool = True,  # /NOSONAR  # pylint: disable=invalid-name
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR  # pylint: disable=invalid-name
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums, schema_type)  # type: ignore[misc]
 
