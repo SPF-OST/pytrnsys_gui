@@ -4,13 +4,14 @@ import uuid as _uuid
 
 import dataclasses_jsonschema as _dcj
 
-from pytrnsys.utils import serialization as _ser
+import pytrnsys.utils.serialization as _ser
+import trnsysGUI.serialization as _gser
 
 
 @_dc.dataclass
-class BlockItemModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):  # pylint: disable=too-many-instance-attributes
-    BlockName: str  # pylint: disable=invalid-name
-    BlockDisplayName: str  # pylint: disable=invalid-name
+class BlockItemModelVersion0(
+    _ser.UpgradableJsonSchemaMixinVersion0, _gser.RequiredDecoderFieldsMixin
+):  # pylint: disable=too-many-instance-attributes
     BlockPosition: _tp.Tuple[float, float]  # pylint: disable=invalid-name
     ID: int  # pylint: disable=invalid-name
     trnsysID: int
@@ -27,9 +28,9 @@ class BlockItemModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):  # pylint:
 
 
 @_dc.dataclass
-class BlockItemModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
-    BlockName: str  # pylint: disable=invalid-name
-    BlockDisplayName: str  # pylint: disable=invalid-name
+class BlockItemModelVersion1(
+    _ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin
+):  # pylint: disable=too-many-instance-attributes
     blockPosition: _tp.Tuple[float, float]
     Id: int  # pylint: disable=invalid-name
     trnsysId: int
@@ -65,9 +66,9 @@ class BlockItemModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable
 
 
 @_dc.dataclass
-class BlockItemModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
-    BlockName: str  # pylint: disable=invalid-name
-    BlockDisplayName: str  # pylint: disable=invalid-name
+class BlockItemModel(
+    _gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin
+):  # pylint: disable=too-many-instance-attributes
     blockPosition: _tp.Tuple[float, float]
     trnsysId: int
     portsIdsIn: _tp.List[int]
@@ -95,7 +96,6 @@ class BlockItemModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-man
         schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums)
-        data[".__BlockDict__"] = True
         return data
 
     @classmethod

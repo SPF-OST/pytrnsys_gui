@@ -141,7 +141,7 @@ class TeePieceModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=
 
 
 @_dc.dataclass
-class TeePieceModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
+class TeePieceModel(_gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
     teePieceModel: _tpbm.TeePieceBaseModel
 
     @classmethod
@@ -163,7 +163,6 @@ class TeePieceModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsM
         schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums, schema_type)
-        data[".__BlockDict__"] = True
         return data
 
     @classmethod

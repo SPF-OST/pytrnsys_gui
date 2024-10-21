@@ -23,9 +23,9 @@ class BlockItemWithPrescribedMassFlowBaseModel(_ser.UpgradableJsonSchemaMixinVer
 
 
 @_dc.dataclass
-class _PumpModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
-    BlockName: str  # pylint: disable=invalid-name
-    BlockDisplayName: str  # pylint: disable=invalid-name
+class _PumpModelVersion1(
+    _ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin
+):  # pylint: disable=too-many-instance-attributes
     blockPosition: _tp.Tuple[float, float]
     Id: int  # pylint: disable=invalid-name,duplicate-code # 1
     trnsysId: int
@@ -68,7 +68,7 @@ class _PumpModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too
 
 
 @_dc.dataclass
-class PumpModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
+class PumpModel(_gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
     blockItemWithPrescribedMassFlow: BlockItemWithPrescribedMassFlowBaseModel
 
     inputPortId: int
@@ -95,7 +95,6 @@ class PumpModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin
         schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums, schema_type)
-        data[".__BlockDict__"] = True
         return data
 
     @classmethod
@@ -132,7 +131,7 @@ class PumpModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin
 
 
 @_dc.dataclass
-class TerminalWithPrescribedMassFlowModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
+class TerminalWithPrescribedMassFlowModel(_gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
     blockItemWithPrescribedMassFlow: BlockItemWithPrescribedMassFlowBaseModel
 
     portId: int
@@ -158,7 +157,6 @@ class TerminalWithPrescribedMassFlowModel(_ser.UpgradableJsonSchemaMixin, _gser.
         schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums, schema_type)
-        data[".__BlockDict__"] = True
         return data
 
     @classmethod

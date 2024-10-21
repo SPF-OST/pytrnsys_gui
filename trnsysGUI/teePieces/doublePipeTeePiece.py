@@ -147,9 +147,9 @@ class DoublePipeTeePiece(_tpb.TeePieceBase):
 
 
 @_dc.dataclass
-class DoublePipeTeePieceModelVersion0(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
-    BlockName: str  # pylint: disable=invalid-name
-    BlockDisplayName: str  # pylint: disable=invalid-name
+class DoublePipeTeePieceModelVersion0(
+    _ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin
+):  # pylint: disable=too-many-instance-attributes
     blockPosition: _tp.Tuple[float, float]
     id: int  # pylint: disable=invalid-name
     trnsysId: int
@@ -194,7 +194,7 @@ class DoublePipeTeePieceModelVersion0(_ser.UpgradableJsonSchemaMixin):  # pylint
 
 
 @_dc.dataclass
-class DoublePipeTeePieceModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
+class DoublePipeTeePieceModel(_gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
     teePieceModel: _tpbm.TeePieceBaseModel
     childTrnsysIds: _tp.Tuple[int, int]
 
@@ -217,7 +217,6 @@ class DoublePipeTeePieceModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDeco
         schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums, schema_type)  # pylint: disable=duplicate-code
-        data[".__BlockDict__"] = True
         return data
 
     @classmethod

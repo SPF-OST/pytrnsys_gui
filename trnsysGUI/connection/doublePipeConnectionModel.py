@@ -6,6 +6,8 @@ import dataclasses_jsonschema as _dcj
 
 import pytrnsys.utils.serialization as _ser
 
+import trnsysGUI.serialization as _gser
+
 import trnsysGUI.connection.doublePipeDefaultValues as _defaults
 
 
@@ -71,7 +73,9 @@ class DoublePipeConnectionModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pyli
 
 
 @_dc.dataclass
-class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
+class DoublePipeConnectionModel(
+    _gser.ConnectionItemUpgradableJsonSchemaMixin
+):  # pylint: disable=too-many-instance-attributes
     connectionId: int
     name: str
     id: int  # pylint: disable=invalid-name
@@ -116,7 +120,6 @@ class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disa
         validate_enums: bool = True,  # /NOSONAR
         schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> "DoublePipeConnectionModel":
-        data.pop(".__ConnectionDict__")
         doublePipeConnectionModel = super().from_dict(data, validate, validate_enums, schema_type)
         return _tp.cast(DoublePipeConnectionModel, doublePipeConnectionModel)
 
@@ -128,7 +131,6 @@ class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disa
         schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums, schema_type)
-        data[".__ConnectionDict__"] = True
         return data
 
     @classmethod

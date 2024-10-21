@@ -51,9 +51,14 @@ class TVentilModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=t
     def getVersion(cls) -> _uuid.UUID:
         return _uuid.UUID("3fff9a8a-d40e-42e2-824d-c015116d0a1d")
 
+    @classmethod
+    @_tp.override
+    def additionalProperties(cls) -> bool:
+        return True
+
 
 @_dc.dataclass
-class ValveModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
+class ValveModel(_gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
     blockItemModel: _bim.BlockItemBaseModel
     inputPortId: int
     outputPortIds: _tp.Tuple[int, int]
@@ -77,7 +82,6 @@ class ValveModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixi
         schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> _dcj.JsonDict:  # pylint: disable = duplicate-code
         data = super().to_dict(omit_none, validate, validate_enums, schema_type)
-        data[".__BlockDict__"] = True
         return data
 
     @classmethod
@@ -107,3 +111,7 @@ class ValveModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixi
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
         return _uuid.UUID("ccf7f590-c65e-4fa1-bf7c-1850a5f8985e")
+
+    @classmethod
+    def additionalProperties(cls) -> bool:
+        return True

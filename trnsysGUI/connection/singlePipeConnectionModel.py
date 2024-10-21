@@ -5,9 +5,9 @@ import uuid as _uuid
 import dataclasses_jsonschema as _dcj
 
 import pytrnsys.utils.serialization as _ser
-
 import trnsysGUI.connection.singlePipeDefaultValues as _defaults
 import trnsysGUI.connection.values as _values
+import trnsysGUI.serialization as _gser
 
 
 @_dc.dataclass
@@ -177,7 +177,7 @@ class ConnectionModelVersion3(_ser.UpgradableJsonSchemaMixin):  # pylint: disabl
 
 
 @_dc.dataclass
-class ConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
+class ConnectionModel(_gser.ConnectionItemUpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
     connectionId: int
     name: str
     id: int  # pylint: disable=invalid-name
@@ -200,7 +200,6 @@ class ConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-ma
         validate_enums: bool = True,
         schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> "ConnectionModel":
-        data.pop(".__ConnectionDict__")
         connectionModel = super().from_dict(data, validate, validate_enums, schema_type)
         return _tp.cast(ConnectionModel, connectionModel)
 
@@ -212,7 +211,6 @@ class ConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-ma
         schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums, schema_type)
-        data[".__ConnectionDict__"] = True
         return data
 
     @classmethod
