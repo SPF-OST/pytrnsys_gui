@@ -13,7 +13,7 @@ class RequiredDecoderFieldsMixin:
     BlockDisplayName: str  # /NOSONAR  # pylint: disable=invalid-name
 
 
-class HandleBlockOrConnectionDictMixinBase(_abc.ABC):
+class UpgradableJsonSchemaMixinBase(_ser.UpgradableJsonSchemaMixin, _abc.ABC):
     @classmethod
     def from_dict(  # /NOSONAR  # pylint: disable=invalid-name
         cls,
@@ -52,23 +52,15 @@ class HandleBlockOrConnectionDictMixinBase(_abc.ABC):
         raise NotImplementedError()
 
 
-class HandleBlockDictMixin(HandleBlockOrConnectionDictMixinBase):
+class BlockItemUpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinBase, _abc.ABC):
     @classmethod
     @_tp.override
     def key(cls) -> str:
         return ".__BlockDict__"
 
 
-class BlockItemUpgradableJsonSchemaMixin(HandleBlockDictMixin, _ser.UpgradableJsonSchemaMixin, _abc.ABC):
-    pass
-
-
-class HandleConnectionDictMixin(HandleBlockOrConnectionDictMixinBase):
+class ConnectionItemUpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinBase, _abc.ABC):
     @classmethod
     @_tp.override
     def key(cls) -> str:
         return ".__ConnectionDict__"
-
-
-class ConnectionItemUpgradableJsonSchemaMixin(HandleConnectionDictMixin, _ser.UpgradableJsonSchemaMixin, _abc.ABC):
-    pass

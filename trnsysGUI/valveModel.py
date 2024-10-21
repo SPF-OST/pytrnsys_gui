@@ -2,8 +2,6 @@ import dataclasses as _dc
 import typing as _tp
 import uuid as _uuid
 
-import dataclasses_jsonschema as _dcj
-
 import pytrnsys.utils.serialization as _ser
 import trnsysGUI.blockItemModel as _bim
 import trnsysGUI.serialization as _gser
@@ -21,6 +19,8 @@ class TVentilModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=t
     flippedH: bool
     flippedV: bool
     rotationN: int
+    IsTempering: _tp.Optional[bool] = None  # /NOSONAR  # pylint: disable=invalid-name
+    PositionForMassFlowSolver: _tp.Optional[str] = None  # /NOSONAR  # pylint: disable=invalid-name
 
     @classmethod
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixin]:
@@ -51,17 +51,14 @@ class TVentilModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=t
     def getVersion(cls) -> _uuid.UUID:
         return _uuid.UUID("3fff9a8a-d40e-42e2-824d-c015116d0a1d")
 
-    @classmethod
-    @_tp.override
-    def additionalProperties(cls) -> bool:
-        return True
-
 
 @_dc.dataclass
 class ValveModel(_gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
     blockItemModel: _bim.BlockItemBaseModel
     inputPortId: int
     outputPortIds: _tp.Tuple[int, int]
+    IsTempering: _tp.Optional[bool] = None  # /NOSONAR  # pylint: disable=invalid-name
+    PositionForMassFlowSolver: _tp.Optional[_tp.Union[str, float]] = None  # /NOSONAR  # pylint: disable=invalid-name
 
     @classmethod
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixin]:
@@ -90,7 +87,3 @@ class ValveModel(_gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoder
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
         return _uuid.UUID("ccf7f590-c65e-4fa1-bf7c-1850a5f8985e")
-
-    @classmethod
-    def additionalProperties(cls) -> bool:
-        return True
