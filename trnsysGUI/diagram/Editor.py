@@ -59,6 +59,7 @@ from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.storageTank.widget import StorageTank
 from . import _sizes
 from . import fileSystemTreeView as _fst
+from ..recentProjectsHandler import RecentProjectsHandler
 
 
 class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
@@ -73,7 +74,6 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
         self.projectFolder = projectFolder
 
         self.diagramName = os.path.split(self.projectFolder)[-1] + ".json"
-        self.diagramPath = os.path.join(self.projectFolder, self.diagramName)
         self.saveAsPath = _pl.Path()
         self.idGen = IdGenerator()
 
@@ -810,8 +810,9 @@ Tcw=1
 
         """
         self.diagramName = os.path.split(self.projectFolder)[-1] + ".json"
+        diagramPath = os.path.join(self.projectFolder, self.diagramName)
 
-        if os.path.isfile(self.diagramPath) and showWarning:
+        if os.path.isfile(diagramPath) and showWarning:
             qmb = _qtw.QMessageBox(self)
             qmb.setText("Warning: " + "This diagram name exists already. Do you want to overwrite or cancel?")
             qmb.setStandardButtons(_qtw.QMessageBox.Save | _qtw.QMessageBox.Cancel)
@@ -823,13 +824,14 @@ Tcw=1
                 return
 
             self.logger.info("Overwriting")
-            self.encodeDiagram(self.diagramPath)
+            self.encodeDiagram(diagramPath)
 
-        self.encodeDiagram(self.diagramPath)
+        self.encodeDiagram(diagramPath)
+        RecentProjectsHandler.addProject(_pl.Path(diagramPath))
         if showWarning:
             msgb = _qtw.QMessageBox()
             msgb.setWindowTitle("Saved successfully")
-            msgb.setText("Saved diagram at " + self.diagramPath)
+            msgb.setText("Saved diagram at " + diagramPath)
             msgb.setStandardButtons(_qtw.QMessageBox.Ok)
             msgb.setDefaultButton(_qtw.QMessageBox.Ok)
             msgb.exec()

@@ -7,10 +7,14 @@ import shutil
 import subprocess
 
 import PyQt5.QtWidgets as _qtw
+from collections import deque as _deque
+
 
 import pytrnsys.utils.log as _ulog
 import pytrnsys.utils.result as _res
 import pytrnsys.utils.warnings as _warn
+from PyQt5.QtWidgets import QAction
+
 import trnsysGUI.configFileUpdater as _cfu
 import trnsysGUI.diagram.export as _dexp
 import trnsysGUI.loggingCallback as _lgcb
@@ -25,10 +29,12 @@ from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
 from trnsysGUI.ProcessMain import ProcessMain
 from trnsysGUI.RunMain import RunMain
-from trnsysGUI.userSettings import UserSettings
+from trnsysGUI.messageBox import MessageBox
+from trnsysGUI.recentProjectsHandler import RecentProjectsHandler
 from trnsysGUI.common import cancelled as _ccl
 from trnsysGUI.diagram import Editor as _de
 from trnsysGUI.storageTank.widget import StorageTank
+from trnsysGUI.constants import UNSAVED_PROGRESS_LOST
 
 
 class MainWindow(_qtw.QMainWindow):
@@ -131,9 +137,10 @@ class MainWindow(_qtw.QMainWindow):
         fileMenuOpenAction.setShortcut("Ctrl+o")
         self.fileMenu.addAction(fileMenuOpenAction)
 
-        fileMenuOpenRecentAction = _qtw.QAction("Open Recent", self)
-        fileMenuOpenRecentAction.triggered.connect(self.openRecentFile)
-        self.fileMenu.addAction(fileMenuOpenRecentAction)
+        self.recentProjectsMenu = _qtw.QMenu("Recent Projects")
+        self.recentProjectsMenu.triggered.connect(self.openRecentFile)
+        self.fileMenu.addMenu(self.recentProjectsMenu)
+        self.updateRecentFileMenu(project.jsonFilePath)
 
         fileMenuSaveAction = _qtw.QAction("Save", self)
         fileMenuSaveAction.triggered.connect(self.saveDia)
@@ -245,15 +252,7 @@ class MainWindow(_qtw.QMainWindow):
         self.editor.shutdown()
 
     def newDia(self):
-        messageBox = _qtw.QMessageBox()
-        messageBox.setText(
-            "Are you sure you want to start a new project? Unsaved progress on the current one will be lost."
-        )
-        messageBox.setStandardButtons(_qtw.QMessageBox.Yes | _qtw.QMessageBox.Cancel)
-        messageBox.setDefaultButton(_qtw.QMessageBox.Cancel)
-
-        result = messageBox.exec()
-        if result == _qtw.QMessageBox.Cancel:
+        if MessageBox.create(messageText=UNSAVED_PROGRESS_LOST) == _qtw.QMessageBox.Cancel:
             return
 
         startingDirectoryPath = self._projectDirPath.parent
@@ -261,9 +260,10 @@ class MainWindow(_qtw.QMainWindow):
         createProjectMaybeCancelled = _prj.getCreateProject(startingDirectoryPath)
         if _ccl.isCancelled(createProjectMaybeCancelled):
             return
-        UserSettings.setRecentProjectJsonPath(self.editor.diagramPath)
+
         createProject = _ccl.value(createProjectMaybeCancelled)
 
+        self.updateRecentFileMenu(createProject.jsonFilePath)
         self._resetEditor(createProject)
 
     def saveDia(self):
@@ -460,40 +460,32 @@ class MainWindow(_qtw.QMainWindow):
 
     def openFile(self):
         self.logger.info("Opening diagram")
-        qmb = _qtw.QMessageBox()
-        qmb.setText("Are you sure you want to open another project? Unsaved progress on the current one will be lost.")
-        qmb.setStandardButtons(_qtw.QMessageBox.Yes | _qtw.QMessageBox.Cancel)
-        qmb.setDefaultButton(_qtw.QMessageBox.Cancel)
-        ret = qmb.exec()
 
-        if ret == _qtw.QMessageBox.Cancel:
+        if MessageBox.create(messageText=UNSAVED_PROGRESS_LOST) == _qtw.QMessageBox.Cancel:
             return
 
         maybeCancelled = _prj.getLoadOrMigrateProject()
         if _ccl.isCancelled(maybeCancelled):
             return
-        UserSettings.setRecentProjectJsonPath(self.editor.diagramPath)
         project = _ccl.value(maybeCancelled)
-
+        RecentProjectsHandler.addProject(project.jsonFilePath)
+        self.updateRecentFileMenu(project.jsonFilePath)
         self._resetEditor(project)
 
         if isinstance(project, _prj.MigrateProject):
             self.editor.save()
 
-    def openRecentFile(self):
-        qmb = _qtw.QMessageBox()
-        qmb.setText("Are you sure you want to open another project? Unsaved progress on the current one will be lost.")
-        qmb.setStandardButtons(_qtw.QMessageBox.Yes | _qtw.QMessageBox.Cancel)
-        qmb.setDefaultButton(_qtw.QMessageBox.Cancel)
-        ret = qmb.exec()
-
-        if ret == _qtw.QMessageBox.Cancel:
+    def openRecentFile(self, actionClicked: QAction):
+        if MessageBox.create(messageText=UNSAVED_PROGRESS_LOST) == _qtw.QMessageBox.Cancel:
             return
-        maybeCancelled = _prj.loadRecentProject()
+
+        maybeCancelled = _prj.loadRecentProject(_pl.Path(actionClicked.text()))
         if _ccl.isCancelled(maybeCancelled):
             return
-        UserSettings.setRecentProjectJsonPath(self.editor.diagramPath)
+
         project = _ccl.value(maybeCancelled)
+        RecentProjectsHandler.addProject(project.jsonFilePath)
+        self.updateRecentFileMenu(project.jsonFilePath)
         self._resetEditor(project)
 
     def _resetEditor(self, project):
@@ -599,16 +591,14 @@ class MainWindow(_qtw.QMainWindow):
             ret = qmb.exec()
             if ret == _qtw.QMessageBox.Cancel:
                 e.ignore()
-            elif ret == _qtw.QMessageBox.Close:
-                UserSettings.setRecentProjectJsonPath(self.editor.diagramPath)
-                e.accept()
-            elif ret == _qtw.QMessageBox.Save:
+                return
+            if ret == _qtw.QMessageBox.Save:
                 self.editor.save()
-                UserSettings.setRecentProjectJsonPath(self.editor.diagramPath)
+                RecentProjectsHandler.save()
                 e.accept()
-        else:
-            UserSettings.setRecentProjectJsonPath(self.editor.diagramPath)
-            e.accept()
+            else:
+                RecentProjectsHandler.save()
+                e.accept()
 
     def ensureSettingsExist(self):
         settings = _settings.Settings.tryLoadOrNone()
@@ -694,3 +684,12 @@ class MainWindow(_qtw.QMainWindow):
 
     def _loggingCallback(self, logMessage: str) -> None:
         self.editor.loggingTextEdit.appendPlainText(logMessage)
+
+    def updateRecentFileMenu(self, currentProject: _pl.Path):
+        self.recentProjectsMenu.clear()
+        for recentProject in _deque(reversed(RecentProjectsHandler.recentProjects)):
+            if recentProject != currentProject and recentProject.exists():
+                recentProjectAction = _qtw.QAction(str(recentProject), self)
+                self.recentProjectsMenu.addAction(recentProjectAction)
+        print("Help me: ", RecentProjectsHandler.recentProjects)
+        print("Help me: ", _deque(reversed(RecentProjectsHandler.recentProjects)))

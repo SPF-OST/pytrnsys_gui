@@ -9,14 +9,22 @@ __all__ = [
 ]
 
 import dataclasses as _dc
-import enum as _enum
 import pathlib as _pl
 import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.common.cancelled as _ccl
-from trnsysGUI.userSettings import UserSettings
+from trnsysGUI.constants import (
+    NO_RECENT_AVAILABLE,
+    RECENT_MOVED_OR_DELETED,
+    DIRECTORY_MUST_BE_EMPTY,
+    NO_PROPER_PROJECT_ENVIRONMENT,
+    _CreateNewOrOpenExisting,
+)
+from trnsysGUI.dialogs.startupDialog import StartupDialog
+from trnsysGUI.messageBox import MessageBox
+from trnsysGUI.recentProjectsHandler import RecentProjectsHandler
 
 
 @_dc.dataclass
@@ -39,57 +47,22 @@ Project = CreateProject | LoadProject | MigrateProject
 
 
 def getProject() -> _ccl.MaybeCancelled[Project]:
-    createOpenMaybeCancelled = _askUserWhetherToCreateNewProjectOrOpenExisting()
+    createOpenMaybeCancelled = StartupDialog.showDialogAndGetResult()
 
     while not _ccl.isCancelled(createOpenMaybeCancelled):
         createOpen = _ccl.value(createOpenMaybeCancelled)
 
-        projectMaybeCancelled = _getProjectInternal(createOpen)
+        projectMaybeCancelled = (
+            loadRecentProject(createOpen) if isinstance(createOpen, _pl.Path) else _getProjectInternal(createOpen)
+        )
         if not _ccl.isCancelled(projectMaybeCancelled):
             project = _ccl.value(projectMaybeCancelled)
+            RecentProjectsHandler.addProject(project.jsonFilePath)
             return _tp.cast(Project, project)  # Don't know why mypy requires this cast
 
-        createOpenMaybeCancelled = _askUserWhetherToCreateNewProjectOrOpenExisting()
+        createOpenMaybeCancelled = StartupDialog.showDialogAndGetResult()
 
     return _ccl.CANCELLED
-
-
-class _CreateNewOrOpenExisting(_enum.Enum):
-    CREATE_NEW = _enum.auto()
-    OPEN_EXISTING = _enum.auto()
-    OPEN_RECENT = _enum.auto()
-
-
-def _askUserWhetherToCreateNewProjectOrOpenExisting() -> _ccl.MaybeCancelled[_CreateNewOrOpenExisting]:
-    messageBox = _qtw.QMessageBox()
-    messageBox.setWindowTitle("Start a new or open an existing project")
-    messageBox.setText("Do you want to start a new project or open an existing one?")
-    recentButton = _qtw.QPushButton("Recent")
-    createButton = _qtw.QPushButton("New")
-    openButton = _qtw.QPushButton("Open")
-    messageBox.addButton(createButton, _qtw.QMessageBox.YesRole)
-    messageBox.addButton(openButton, _qtw.QMessageBox.NoRole)
-    messageBox.addButton(recentButton, _qtw.QMessageBox.NoRole)
-    messageBox.addButton(_qtw.QMessageBox.Cancel)
-    messageBox.setFocus()
-    messageBox.exec()
-
-    clickedButton = messageBox.clickedButton()
-
-    cancelButton = messageBox.button(_qtw.QMessageBox.Cancel)
-    if clickedButton is cancelButton:
-        return _ccl.CANCELLED
-
-    if clickedButton is createButton:
-        return _CreateNewOrOpenExisting.CREATE_NEW
-
-    if clickedButton is openButton:
-        return _CreateNewOrOpenExisting.OPEN_EXISTING
-
-    if clickedButton is recentButton:
-        return _CreateNewOrOpenExisting.OPEN_RECENT
-
-    raise AssertionError("Unknown button was clicked.")
 
 
 def _getProjectInternal(createOrOpenExisting: "_CreateNewOrOpenExisting") -> _ccl.MaybeCancelled[Project]:
@@ -98,9 +71,6 @@ def _getProjectInternal(createOrOpenExisting: "_CreateNewOrOpenExisting") -> _cc
 
     if createOrOpenExisting == _CreateNewOrOpenExisting.CREATE_NEW:
         return getCreateProject()
-
-    if createOrOpenExisting == _CreateNewOrOpenExisting.OPEN_RECENT:
-        return loadRecentProject()
 
     raise AssertionError(f"Unknown value for enum {_CreateNewOrOpenExisting}: {createOrOpenExisting}")
 
@@ -131,11 +101,7 @@ def getExistingEmptyDirectory(
         if _isEmptyDirectory(selectedDirectoryPath):
             return selectedDirectoryPath
 
-        errorMessage = "The new project directory must be empty."
-
-        messageBox = _qtw.QMessageBox()
-        messageBox.setText(errorMessage)
-        messageBox.exec()
+        MessageBox.create(messageText=DIRECTORY_MUST_BE_EMPTY, buttons=[_qtw.QMessageBox.Ok])
 
 
 def _isEmptyDirectory(path: _pl.Path) -> bool:
@@ -155,22 +121,18 @@ def getLoadOrMigrateProject() -> _ccl.MaybeCancelled[LoadProject | MigrateProjec
     return checkIfProjectEnviromentIsValid(projectFolderPath, jsonFilePath)
 
 
-def loadRecentProject() -> _ccl.MaybeCancelled[LoadProject | MigrateProject]:
-    messageBox = _qtw.QMessageBox()
-    messageBox.setStandardButtons(_qtw.QMessageBox.Ok)
+def loadRecentProject(projectPath: _pl.Path) -> _ccl.MaybeCancelled[LoadProject | MigrateProject]:
     try:
-        recentProjectJsonPath = _pl.Path(UserSettings.getRecentProjectJsonPath())
-        if not recentProjectJsonPath.exists():
-            messageBox.setText("Recent project has moved or was deleted")
-            result = messageBox.exec()
-            if result == _qtw.QMessageBox.Ok:
+        if not projectPath.exists():
+            if (
+                MessageBox.create(messageText=RECENT_MOVED_OR_DELETED, buttons=[_qtw.QMessageBox.Ok])
+                == _qtw.QMessageBox.Ok
+            ):
                 return _ccl.CANCELLED
         else:
-            return checkIfProjectEnviromentIsValid(recentProjectJsonPath.parent, recentProjectJsonPath)
+            return checkIfProjectEnviromentIsValid(projectPath.parent, projectPath)
     except TypeError:
-        messageBox.setText("No recent project available")
-        result = messageBox.exec()
-        if result == _qtw.QMessageBox.Ok:
+        if MessageBox.create(messageText=NO_RECENT_AVAILABLE, buttons=[_qtw.QMessageBox.Ok]) == _qtw.QMessageBox.Ok:
             return _ccl.CANCELLED
     return _ccl.CANCELLED
 
@@ -182,15 +144,7 @@ def checkIfProjectEnviromentIsValid(
     ddckFolder = projectFolderPath / "ddck"
     if not containingFolderIsCalledSameAsJsonFile or not ddckFolder.is_dir():
         oldJsonFilePath = jsonFilePath
-        messageBox = _qtw.QMessageBox()
-        messageBox.setText(
-            "The json you are opening does not have a proper project folder environment. "
-            "Do you want to continue and create one?"
-        )
-        messageBox.setStandardButtons(_qtw.QMessageBox.Yes | _qtw.QMessageBox.Cancel)
-        messageBox.setDefaultButton(_qtw.QMessageBox.Cancel)
-        result = messageBox.exec()
-        if result == _qtw.QMessageBox.Cancel:
+        if MessageBox.create(messageText=NO_PROPER_PROJECT_ENVIRONMENT) == _qtw.QMessageBox.Cancel:
             return _ccl.CANCELLED
         maybeCancelled = getExistingEmptyDirectory(startingDirectoryPath=projectFolderPath.parent)
         if _ccl.isCancelled(maybeCancelled):
