@@ -64,27 +64,6 @@ class ValveModel(_gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoder
     outputPortIds: _tp.Tuple[int, int]
 
     @classmethod
-    def from_dict(
-        cls,
-        data: _dcj.JsonDict,
-        validate=True,
-        validate_enums: bool = True,  # /NOSONAR
-        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
-    ) -> "ValveModel":
-        tVentilModel = super().from_dict(data, validate, validate_enums, schema_type)
-        return _tp.cast(ValveModel, tVentilModel)
-
-    def to_dict(
-        self,
-        omit_none: bool = True,  # /NOSONAR
-        validate: bool = False,
-        validate_enums: bool = True,  # /NOSONAR
-        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
-    ) -> _dcj.JsonDict:  # pylint: disable = duplicate-code
-        data = super().to_dict(omit_none, validate, validate_enums, schema_type)
-        return data
-
-    @classmethod
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixin]:
         return TVentilModelVersion1
 

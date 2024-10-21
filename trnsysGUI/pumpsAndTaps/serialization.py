@@ -76,29 +76,6 @@ class PumpModel(_gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoderF
 
     @classmethod
     @_tp.override
-    def from_dict(
-        cls,  # pylint: disable = duplicate-code 2
-        data: _dcj.JsonDict,  # pylint: disable = duplicate-code 2
-        validate=True,
-        validate_enums: bool = True,  # /NOSONAR
-        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
-    ) -> "PumpModel":
-        pumpModel = super().from_dict(data, validate, validate_enums, schema_type)
-        return _tp.cast(PumpModel, pumpModel)
-
-    @_tp.override
-    def to_dict(
-        self,
-        omit_none: bool = True,  # /NOSONAR
-        validate: bool = False,
-        validate_enums: bool = True,  # /NOSONAR  # pylint: disable=duplicate-code 2
-        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
-    ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums, schema_type)
-        return data
-
-    @classmethod
-    @_tp.override
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
         return _PumpModelVersion1
 
@@ -135,29 +112,6 @@ class TerminalWithPrescribedMassFlowModel(_gser.BlockItemUpgradableJsonSchemaMix
     blockItemWithPrescribedMassFlow: BlockItemWithPrescribedMassFlowBaseModel
 
     portId: int
-
-    @classmethod
-    @_tp.override
-    def from_dict(
-        cls,  # pylint: disable = duplicate-code 3
-        data: _dcj.JsonDict,  # pylint: disable = duplicate-code 3
-        validate=True,
-        validate_enums: bool = True,  # /NOSONAR
-        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
-    ) -> "TerminalWithPrescribedMassFlowModel":
-        terminalModel = super().from_dict(data, validate, validate_enums, schema_type)
-        return _tp.cast(TerminalWithPrescribedMassFlowModel, terminalModel)
-
-    @_tp.override
-    def to_dict(
-        self,
-        omit_none: bool = True,  # /NOSONAR
-        validate: bool = False,
-        validate_enums: bool = True,  # /NOSONAR  # pylint: disable=duplicate-code 3
-        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
-    ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums, schema_type)
-        return data
 
     @classmethod
     @_tp.override

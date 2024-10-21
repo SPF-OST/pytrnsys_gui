@@ -193,27 +193,6 @@ class ConnectionModel(_gser.ConnectionItemUpgradableJsonSchemaMixin):  # pylint:
     shallBeSimulated: bool
 
     @classmethod
-    def from_dict(
-        cls,
-        data: _dcj.JsonDict,
-        validate=True,
-        validate_enums: bool = True,
-        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
-    ) -> "ConnectionModel":
-        connectionModel = super().from_dict(data, validate, validate_enums, schema_type)
-        return _tp.cast(ConnectionModel, connectionModel)
-
-    def to_dict(
-        self,
-        omit_none: bool = True,
-        validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code
-        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
-    ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums, schema_type)
-        return data
-
-    @classmethod
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
         return ConnectionModelVersion3
 

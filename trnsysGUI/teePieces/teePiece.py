@@ -145,27 +145,6 @@ class TeePieceModel(_gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDeco
     teePieceModel: _tpbm.TeePieceBaseModel
 
     @classmethod
-    def from_dict(
-        cls,
-        data: _dcj.JsonDict,
-        validate=True,
-        validate_enums: bool = True,  # /NOSONAR
-        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
-    ) -> "TeePieceModel":
-        teePieceModel = super().from_dict(data, validate, validate_enums, schema_type)
-        return _tp.cast(TeePieceModel, teePieceModel)
-
-    def to_dict(
-        self,
-        omit_none: bool = True,  # /NOSONAR
-        validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code  # /NOSONAR
-        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
-    ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums, schema_type)
-        return data
-
-    @classmethod
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixin]:
         return TeePieceModelVersion1
 
