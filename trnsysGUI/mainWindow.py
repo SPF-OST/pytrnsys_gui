@@ -569,7 +569,11 @@ class MainWindow(_qtw.QMainWindow):
 
     def exportDiagram(self):
         fileName, _ = _qtw.QFileDialog.getSaveFileName(
-            self, "Export PDF", None, "PDF files (*.pdf);;SVG files (*.svg);;All Files (*)", "PDF files (*.svg)"
+            self,
+            "Export PDF",
+            None,
+            "PDF files (*.pdf);;SVG files (*.svg);;All Files (*)",
+            "PDF files (*.svg)",
         )
         if fileName == "":
             return
@@ -581,9 +585,15 @@ class MainWindow(_qtw.QMainWindow):
 
     def closeEvent(self, e):
         if self.showBoxOnClose:
-            ret = MessageBox.create(messageText=constants.SAVE_BEFORE_CLOSE,
-                                    buttons=[_qtw.QMessageBox.Save, _qtw.QMessageBox.Close, _qtw.QMessageBox.Cancel],
-                                    defaultButton=_qtw.QMessageBox.Cancel)
+            ret = MessageBox.create(
+                messageText=constants.SAVE_BEFORE_CLOSE,
+                buttons=[
+                    _qtw.QMessageBox.Save,
+                    _qtw.QMessageBox.Close,
+                    _qtw.QMessageBox.Cancel,
+                ],
+                defaultButton=_qtw.QMessageBox.Cancel,
+            )
             if ret == _qtw.QMessageBox.Cancel:
                 e.ignore()
                 return
