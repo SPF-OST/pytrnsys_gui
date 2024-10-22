@@ -19,5 +19,5 @@ class TestStartupDialog:
 
         startupDialog.clickButtonHandler(recentClicked)
 
-        assert startupDialog.result == PROJECT_1
+        assert startupDialog.signal == PROJECT_1
         assert startupDialog.listWidget.count() == 3
