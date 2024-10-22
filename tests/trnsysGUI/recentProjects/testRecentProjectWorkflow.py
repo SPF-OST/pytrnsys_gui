@@ -1,11 +1,12 @@
 from collections import deque as _deque
+
 import pytrnsys.utils.log as _ulog
 from PyQt5 import QtWidgets as _qtw
 
 import trnsysGUI.common.cancelled as _ccl
+import trnsysGUI.mainWindow as mw
 from tests.trnsysGUI import constants
 from trnsysGUI.dialogs.startupDialog import StartupDialog
-import trnsysGUI.mainWindow as mw
 from trnsysGUI.messageBox import MessageBox
 from trnsysGUI.project import getProject
 from trnsysGUI.recentProjectsHandler import RecentProjectsHandler
@@ -14,6 +15,7 @@ from trnsysGUI.recentProjectsHandler import RecentProjectsHandler
 class TestRecentProjectWorkflow:
 
     def testIfRecentProjectsAreShownInDialog(self, monkeypatch, qtbot):
+        """Tests if the startup dialog displays recent projects as expected"""
         monkeypatch.setattr(
             RecentProjectsHandler, RecentProjectsHandler.initWithExistingRecentProjects.__name__, lambda: None
         )
@@ -32,6 +34,8 @@ class TestRecentProjectWorkflow:
         assert thirdProjectInList.text() == str(constants.PROJECT_1)
 
     def testIfRecenProjectsAreShownCorrectlyInMainWindow(self, monkeypatch, qtbot):
+        """Opens a recent project and makes sure recent project file menu is displayed correctly.
+        Then opens another recent projects and checks if it's still display correctly"""
         monkeypatch.setattr(
             RecentProjectsHandler, RecentProjectsHandler.initWithExistingRecentProjects.__name__, lambda: None
         )
