@@ -2,8 +2,6 @@ import dataclasses as _dc
 import typing as _tp
 import uuid as _uuid
 
-import dataclasses_jsonschema as _dcj
-
 import pytrnsys.utils.serialization as _ser
 import trnsysGUI.blockItemModel as _bim
 import trnsysGUI.serialization as _gser
@@ -21,6 +19,8 @@ class TVentilModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=t
     flippedH: bool
     flippedV: bool
     rotationN: int
+    IsTempering: _tp.Optional[bool] = None  # /NOSONAR  # pylint: disable=invalid-name
+    PositionForMassFlowSolver: _tp.Optional[str] = None  # /NOSONAR  # pylint: disable=invalid-name
 
     @classmethod
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixin]:
@@ -53,32 +53,12 @@ class TVentilModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=t
 
 
 @_dc.dataclass
-class ValveModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
+class ValveModel(_gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
     blockItemModel: _bim.BlockItemBaseModel
     inputPortId: int
     outputPortIds: _tp.Tuple[int, int]
-
-    @classmethod
-    def from_dict(
-        cls,
-        data: _dcj.JsonDict,
-        validate=True,
-        validate_enums: bool = True,  # /NOSONAR
-        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
-    ) -> "ValveModel":
-        tVentilModel = super().from_dict(data, validate, validate_enums, schema_type)
-        return _tp.cast(ValveModel, tVentilModel)
-
-    def to_dict(
-        self,
-        omit_none: bool = True,  # /NOSONAR
-        validate: bool = False,
-        validate_enums: bool = True,  # /NOSONAR
-        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
-    ) -> _dcj.JsonDict:  # pylint: disable = duplicate-code
-        data = super().to_dict(omit_none, validate, validate_enums, schema_type)
-        data[".__BlockDict__"] = True
-        return data
+    IsTempering: _tp.Optional[bool] = None  # /NOSONAR  # pylint: disable=invalid-name
+    PositionForMassFlowSolver: _tp.Optional[_tp.Union[str, float]] = None  # /NOSONAR  # pylint: disable=invalid-name
 
     @classmethod
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixin]:

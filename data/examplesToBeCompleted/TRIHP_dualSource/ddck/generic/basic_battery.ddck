@@ -140,7 +140,7 @@ PARAMETERS 1
 3   !, 1, number of variables to be remembered
 INPUTS 3
 SOCBat_kWh  BoBatFull  SOCBat  
-SocBatMin_kWh    0.0    0     0 !, 1-10
+0.0    0     0 !, 1-10
 
 EQUATIONS 3   !, Recalled values for collector control
 SOCBatRc_kWh = [98,1] !kWh

@@ -147,9 +147,9 @@ class DoublePipeTeePiece(_tpb.TeePieceBase):
 
 
 @_dc.dataclass
-class DoublePipeTeePieceModelVersion0(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
-    BlockName: str  # pylint: disable=invalid-name
-    BlockDisplayName: str  # pylint: disable=invalid-name
+class DoublePipeTeePieceModelVersion0(
+    _ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin
+):  # pylint: disable=too-many-instance-attributes
     blockPosition: _tp.Tuple[float, float]
     id: int  # pylint: disable=invalid-name
     trnsysId: int
@@ -194,31 +194,9 @@ class DoublePipeTeePieceModelVersion0(_ser.UpgradableJsonSchemaMixin):  # pylint
 
 
 @_dc.dataclass
-class DoublePipeTeePieceModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
+class DoublePipeTeePieceModel(_gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
     teePieceModel: _tpbm.TeePieceBaseModel
     childTrnsysIds: _tp.Tuple[int, int]
-
-    @classmethod
-    def from_dict(
-        cls,
-        data: _dcj.JsonDict,
-        validate=True,  # pylint: disable=duplicate-code
-        validate_enums: bool = True,  # /NOSONAR
-        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
-    ) -> "DoublePipeTeePieceModel":
-        doublePipeTeePieceModel = super().from_dict(data, validate, validate_enums, schema_type)
-        return _tp.cast(DoublePipeTeePieceModel, doublePipeTeePieceModel)
-
-    def to_dict(
-        self,
-        omit_none: bool = True,  # /NOSONAR
-        validate: bool = False,
-        validate_enums: bool = True,  # /NOSONAR
-        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
-    ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums, schema_type)  # pylint: disable=duplicate-code
-        data[".__BlockDict__"] = True
-        return data
 
     @classmethod
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:

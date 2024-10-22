@@ -23,9 +23,9 @@ class BlockItemWithPrescribedMassFlowBaseModel(_ser.UpgradableJsonSchemaMixinVer
 
 
 @_dc.dataclass
-class _PumpModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
-    BlockName: str  # pylint: disable=invalid-name
-    BlockDisplayName: str  # pylint: disable=invalid-name
+class _PumpModelVersion1(
+    _ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin
+):  # pylint: disable=too-many-instance-attributes
     blockPosition: _tp.Tuple[float, float]
     Id: int  # pylint: disable=invalid-name,duplicate-code # 1
     trnsysId: int
@@ -68,35 +68,11 @@ class _PumpModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too
 
 
 @_dc.dataclass
-class PumpModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
+class PumpModel(_gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
     blockItemWithPrescribedMassFlow: BlockItemWithPrescribedMassFlowBaseModel
 
     inputPortId: int
     outputPortId: int
-
-    @classmethod
-    @_tp.override
-    def from_dict(
-        cls,  # pylint: disable = duplicate-code 2
-        data: _dcj.JsonDict,  # pylint: disable = duplicate-code 2
-        validate=True,
-        validate_enums: bool = True,  # /NOSONAR
-        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
-    ) -> "PumpModel":
-        pumpModel = super().from_dict(data, validate, validate_enums, schema_type)
-        return _tp.cast(PumpModel, pumpModel)
-
-    @_tp.override
-    def to_dict(
-        self,
-        omit_none: bool = True,  # /NOSONAR
-        validate: bool = False,
-        validate_enums: bool = True,  # /NOSONAR  # pylint: disable=duplicate-code 2
-        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
-    ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums, schema_type)
-        data[".__BlockDict__"] = True
-        return data
 
     @classmethod
     @_tp.override
@@ -132,34 +108,10 @@ class PumpModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin
 
 
 @_dc.dataclass
-class TerminalWithPrescribedMassFlowModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
+class TerminalWithPrescribedMassFlowModel(_gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
     blockItemWithPrescribedMassFlow: BlockItemWithPrescribedMassFlowBaseModel
 
     portId: int
-
-    @classmethod
-    @_tp.override
-    def from_dict(
-        cls,  # pylint: disable = duplicate-code 3
-        data: _dcj.JsonDict,  # pylint: disable = duplicate-code 3
-        validate=True,
-        validate_enums: bool = True,  # /NOSONAR
-        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
-    ) -> "TerminalWithPrescribedMassFlowModel":
-        terminalModel = super().from_dict(data, validate, validate_enums, schema_type)
-        return _tp.cast(TerminalWithPrescribedMassFlowModel, terminalModel)
-
-    @_tp.override
-    def to_dict(
-        self,
-        omit_none: bool = True,  # /NOSONAR
-        validate: bool = False,
-        validate_enums: bool = True,  # /NOSONAR  # pylint: disable=duplicate-code 3
-        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
-    ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums, schema_type)
-        data[".__BlockDict__"] = True
-        return data
 
     @classmethod
     @_tp.override

@@ -31,7 +31,6 @@ class _SuperseedsTestCase:
 
 
 _JSON_VERSION_0 = {
-    ".__ConnectionDict__": True,
     "__version__": "0810c9ea-85df-4431-bb40-3190c25c9161",
     "childIds": [2, 3, 4],
     "connectionId": 1,
@@ -49,7 +48,11 @@ _JSON_VERSION_1 = _JSON_VERSION_0.copy()
 _JSON_VERSION_1["__version__"] = "bdb5f03b-75bb-4c2f-a658-0de489c5b017"
 _JSON_VERSION_1["lengthInM"] = 2.0
 
+_JSON_VERSION_1_FOR_UPGRADING = _JSON_VERSION_1.copy()
+_JSON_VERSION_1_FOR_UPGRADING[".__ConnectionDict__"] = True
+
 _JSON_VERSION_2 = _JSON_VERSION_1.copy()
+_JSON_VERSION_2[".__ConnectionDict__"] = True
 _JSON_VERSION_2["__version__"] = "62a1383d-5a0b-4886-9951-31ffd732637d"
 _JSON_VERSION_2["shallBeSimulated"] = False
 
@@ -135,7 +138,7 @@ _DESERIALIZATION_TEST_CASES = [
     _DeserializationTestCase(_JSON_VERSION_0, _DESERIALIZED_MODEL_VERSION_0),
     _DeserializationTestCase(_JSON_VERSION_0, _UPGRADED_MODEL_VERSION_1, needsUpgrading=True),
     _DeserializationTestCase(_JSON_VERSION_1, _DESERIALIZED_MODEL_VERSION_1),
-    _DeserializationTestCase(_JSON_VERSION_1, _UPGRADED_MODEL, needsUpgrading=True),
+    _DeserializationTestCase(_JSON_VERSION_1_FOR_UPGRADING, _UPGRADED_MODEL, needsUpgrading=True),
     _DeserializationTestCase(_JSON_VERSION_2, _DESERIALIZED_MODEL),
 ]
 
