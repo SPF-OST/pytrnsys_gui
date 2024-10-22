@@ -15,6 +15,7 @@ import typing as _tp
 import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.common.cancelled as _ccl
+import trnsysGUI.messageBox as mb
 from trnsysGUI.constants import (
     NO_RECENT_AVAILABLE,
     RECENT_MOVED_OR_DELETED,
@@ -23,7 +24,6 @@ from trnsysGUI.constants import (
     _CreateNewOrOpenExisting,
 )
 from trnsysGUI.dialogs.startupDialog import StartupDialog
-from trnsysGUI.messageBox import MessageBox
 from trnsysGUI.recentProjectsHandler import RecentProjectsHandler
 
 
@@ -59,6 +59,7 @@ def getProject() -> _ccl.MaybeCancelled[Project]:
         )
         if not _ccl.isCancelled(projectMaybeCancelled):
             project = _ccl.value(projectMaybeCancelled)
+            assert isinstance(project, (CreateProject, LoadProject))
             RecentProjectsHandler.addProject(project.jsonFilePath)
             return _tp.cast(Project, project)  # Don't know why mypy requires this cast
 
@@ -103,7 +104,7 @@ def getExistingEmptyDirectory(
         if _isEmptyDirectory(selectedDirectoryPath):
             return selectedDirectoryPath
 
-        MessageBox.create(messageText=DIRECTORY_MUST_BE_EMPTY, buttons=[_qtw.QMessageBox.Ok])
+        mb.MessageBox.create(messageText=DIRECTORY_MUST_BE_EMPTY, buttons=[_qtw.QMessageBox.Ok])
 
 
 def _isEmptyDirectory(path: _pl.Path) -> bool:
@@ -127,14 +128,14 @@ def loadRecentProject(projectPath: _pl.Path) -> _ccl.MaybeCancelled[LoadProject 
     try:
         if not projectPath.exists():
             if (
-                MessageBox.create(messageText=RECENT_MOVED_OR_DELETED, buttons=[_qtw.QMessageBox.Ok])
+                mb.MessageBox.create(messageText=RECENT_MOVED_OR_DELETED, buttons=[_qtw.QMessageBox.Ok])
                 == _qtw.QMessageBox.Ok
             ):
                 return _ccl.CANCELLED
         else:
             return checkIfProjectEnviromentIsValid(projectPath.parent, projectPath)
     except TypeError:
-        if MessageBox.create(messageText=NO_RECENT_AVAILABLE, buttons=[_qtw.QMessageBox.Ok]) == _qtw.QMessageBox.Ok:
+        if mb.MessageBox.create(messageText=NO_RECENT_AVAILABLE, buttons=[_qtw.QMessageBox.Ok]) == _qtw.QMessageBox.Ok:
             return _ccl.CANCELLED
     return _ccl.CANCELLED
 
@@ -146,7 +147,7 @@ def checkIfProjectEnviromentIsValid(
     ddckFolder = projectFolderPath / "ddck"
     if not containingFolderIsCalledSameAsJsonFile or not ddckFolder.is_dir():
         oldJsonFilePath = jsonFilePath
-        if MessageBox.create(messageText=NO_PROPER_PROJECT_ENVIRONMENT) == _qtw.QMessageBox.Cancel:
+        if mb.MessageBox.create(messageText=NO_PROPER_PROJECT_ENVIRONMENT) == _qtw.QMessageBox.Cancel:
             return _ccl.CANCELLED
         maybeCancelled = getExistingEmptyDirectory(startingDirectoryPath=projectFolderPath.parent)
         if _ccl.isCancelled(maybeCancelled):
