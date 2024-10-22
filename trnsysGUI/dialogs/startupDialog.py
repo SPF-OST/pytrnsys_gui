@@ -1,15 +1,16 @@
 import pathlib as _pl
-from collections import deque as _deque
+
 import PyQt5.QtWidgets as _qtw
 
-
-from trnsysGUI.constants import _CreateNewOrOpenExisting
-from trnsysGUI.recentProjectsHandler import RecentProjectsHandler
 import trnsysGUI.common.cancelled as _ccl
 import trnsysGUI.dialogs._UI_startupDialog_generated as _gen
+from trnsysGUI.constants import _CreateNewOrOpenExisting
+from trnsysGUI.recentProjectsHandler import RecentProjectsHandler
 
 
 class StartupDialog(_qtw.QDialog, _gen.Ui_startupDialog):
+    signal: _ccl.MaybeCancelled[_CreateNewOrOpenExisting | _pl.Path]
+
     def __init__(self) -> None:
         super().__init__()
         self.setupUi(self)
@@ -21,17 +22,17 @@ class StartupDialog(_qtw.QDialog, _gen.Ui_startupDialog):
 
     def clickButtonHandler(self, clickedItem):
         if clickedItem is self.cancelButton:
-            self.result = _ccl.CANCELLED
+            self.signal = _ccl.CANCELLED
         if clickedItem is self.createButton:
-            self.result = _CreateNewOrOpenExisting.CREATE_NEW
+            self.signal = _CreateNewOrOpenExisting.CREATE_NEW
         if clickedItem is self.openButton:
-            self.result = _CreateNewOrOpenExisting.OPEN_EXISTING
+            self.signal = _CreateNewOrOpenExisting.OPEN_EXISTING
         if isinstance(clickedItem, _qtw.QListWidgetItem):
-            self.result = _pl.Path(clickedItem.text())
+            self.signal = _pl.Path(clickedItem.text())
         self.close()
 
     @staticmethod
     def showDialogAndGetResult() -> _ccl.MaybeCancelled[_CreateNewOrOpenExisting | _pl.Path]:
         dialog = StartupDialog()
         dialog.exec()
-        return dialog.result
+        return dialog.signal
