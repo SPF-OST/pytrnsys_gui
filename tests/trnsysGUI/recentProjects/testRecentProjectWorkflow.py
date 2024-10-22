@@ -5,7 +5,7 @@ from PyQt5 import QtWidgets as _qtw
 import trnsysGUI.common.cancelled as _ccl
 from tests.trnsysGUI import constants
 from trnsysGUI.dialogs.startupDialog import StartupDialog
-from trnsysGUI.mainWindow import MainWindow
+import trnsysGUI.mainWindow as mw
 from trnsysGUI.messageBox import MessageBox
 from trnsysGUI.project import getProject
 from trnsysGUI.recentProjectsHandler import RecentProjectsHandler
@@ -42,7 +42,7 @@ class TestRecentProjectWorkflow:
         RecentProjectsHandler.recentProjects = _deque([constants.PROJECT_3, constants.PROJECT_2, constants.PROJECT_1])
         getProjectResult = getProject()
         logger = _ulog.getOrCreateCustomLogger("root", "INFO")
-        mainWindow = MainWindow(logger, _ccl.value(getProjectResult))
+        mainWindow = mw.MainWindow(logger, _ccl.value(getProjectResult))
         qtbot.addWidget(mainWindow)
         mainWindow.showBoxOnClose = False
 
