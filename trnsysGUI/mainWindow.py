@@ -594,15 +594,12 @@ class MainWindow(_qtw.QMainWindow):
                 return
             if ret == _qtw.QMessageBox.Save:
                 self.editor.save()
-                RecentProjectsHandler.save()
-                e.accept()
-            else:
-                RecentProjectsHandler.save()
-                e.accept()
+
+            RecentProjectsHandler.save()
+            e.accept()
 
     def ensureSettingsExist(self):
-        settings = _settings.Settings.tryLoadOrNone()
-        if not settings:
+        if not _settings.Settings.tryLoadOrNone():
             self.askUserForSettingsValuesAndSave()
 
     def askUserForSettingsValuesAndSave(self):
@@ -687,9 +684,7 @@ class MainWindow(_qtw.QMainWindow):
 
     def updateRecentFileMenu(self, currentProject: _pl.Path):
         self.recentProjectsMenu.clear()
-        for recentProject in _deque(reversed(RecentProjectsHandler.recentProjects)):
+        for recentProject in RecentProjectsHandler.recentProjects:
             if recentProject != currentProject and recentProject.exists():
                 recentProjectAction = _qtw.QAction(str(recentProject), self)
                 self.recentProjectsMenu.addAction(recentProjectAction)
-        print("Help me: ", RecentProjectsHandler.recentProjects)
-        print("Help me: ", _deque(reversed(RecentProjectsHandler.recentProjects)))

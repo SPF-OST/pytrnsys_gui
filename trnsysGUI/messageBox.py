@@ -1,4 +1,6 @@
 from functools import reduce as _reduce
+from typing import Optional, List
+
 from PyQt5.QtWidgets import QMessageBox
 
 from trnsysGUI.constants import DEFAULT_MESSAGE_BOX_TITLE, DEFAULT_MESSAGE_BOX_MESSAGE
@@ -11,8 +13,8 @@ class MessageBox:
         cls,
         messageBoxTitle: str = DEFAULT_MESSAGE_BOX_TITLE,
         messageText: str = DEFAULT_MESSAGE_BOX_MESSAGE,
-        buttons: list[int] = None,
-        defaultButton: int = None,
+        buttons: Optional[List[int]] = None,
+        defaultButton: Optional[int] = None,
     ) -> int:
         """
         Configures the QMessageBox

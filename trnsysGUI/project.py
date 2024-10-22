@@ -53,7 +53,9 @@ def getProject() -> _ccl.MaybeCancelled[Project]:
         createOpen = _ccl.value(createOpenMaybeCancelled)
 
         projectMaybeCancelled = (
-            loadRecentProject(createOpen) if isinstance(createOpen, _pl.Path) else _getProjectInternal(createOpen)
+            loadRecentProject(createOpen)
+            if isinstance(createOpen, _pl.Path)
+            else _getProjectInternal(_CreateNewOrOpenExisting(createOpen))
         )
         if not _ccl.isCancelled(projectMaybeCancelled):
             project = _ccl.value(projectMaybeCancelled)

@@ -13,26 +13,22 @@ class StartupDialog(_qtw.QDialog, _gen.Ui_startupDialog):
     def __init__(self) -> None:
         super().__init__()
         self.setupUi(self)
-        self.result = _ccl.CANCELLED
         self.buttonGroup.buttonClicked.connect(self.clickButtonHandler)
         self.listWidget.itemDoubleClicked.connect(self.clickButtonHandler)
         RecentProjectsHandler.initWithExistingRecentProjects()
-        for recentProject in _deque(reversed(RecentProjectsHandler.recentProjects)):
+        for recentProject in RecentProjectsHandler.recentProjects:
             _qtw.QListWidgetItem(str(recentProject), self.listWidget)
 
     def clickButtonHandler(self, clickedItem):
         if clickedItem is self.cancelButton:
             self.result = _ccl.CANCELLED
-            self.close()
         if clickedItem is self.createButton:
             self.result = _CreateNewOrOpenExisting.CREATE_NEW
-            self.close()
         if clickedItem is self.openButton:
             self.result = _CreateNewOrOpenExisting.OPEN_EXISTING
-            self.close()
         if isinstance(clickedItem, _qtw.QListWidgetItem):
             self.result = _pl.Path(clickedItem.text())
-            self.close()
+        self.close()
 
     @staticmethod
     def showDialogAndGetResult() -> _ccl.MaybeCancelled[_CreateNewOrOpenExisting | _pl.Path]:

@@ -1,10 +1,9 @@
 from collections import deque as _deque
-
 import pytrnsys.utils.log as _ulog
 from PyQt5 import QtWidgets as _qtw
 
 import trnsysGUI.common.cancelled as _ccl
-from tests.trnsysGUI.constants import PROJECT_1, PROJECT_2, PROJECT_3
+from tests.trnsysGUI import constants
 from trnsysGUI.dialogs.startupDialog import StartupDialog
 from trnsysGUI.mainWindow import MainWindow
 from trnsysGUI.messageBox import MessageBox
@@ -19,7 +18,7 @@ class TestRecentProjectWorkflow:
             RecentProjectsHandler, RecentProjectsHandler.initWithExistingRecentProjects.__name__, lambda: None
         )
 
-        RecentProjectsHandler.recentProjects = _deque([PROJECT_1, PROJECT_2, PROJECT_3])
+        RecentProjectsHandler.recentProjects = _deque([constants.PROJECT_3, constants.PROJECT_2, constants.PROJECT_1])
         startupDialog = StartupDialog()
         qtbot.addWidget(startupDialog)
         startupDialog.show()
@@ -28,9 +27,9 @@ class TestRecentProjectWorkflow:
         thirdProjectInList = startupDialog.listWidget.item(2)
 
         assert startupDialog.isVisible()
-        assert firstProjectInList.text() == str(PROJECT_3)
-        assert secondProjectInList.text() == str(PROJECT_2)
-        assert thirdProjectInList.text() == str(PROJECT_1)
+        assert firstProjectInList.text() == str(constants.PROJECT_3)
+        assert secondProjectInList.text() == str(constants.PROJECT_2)
+        assert thirdProjectInList.text() == str(constants.PROJECT_1)
 
     def testIfRecenProjectsAreShownCorrectlyInMainWindow(self, monkeypatch, qtbot):
         monkeypatch.setattr(
@@ -38,9 +37,9 @@ class TestRecentProjectWorkflow:
         )
         monkeypatch.setattr(RecentProjectsHandler, RecentProjectsHandler.save.__name__, lambda: None)
         monkeypatch.setattr(MessageBox, MessageBox.create.__name__, lambda messageText: _qtw.QMessageBox.Yes)
-        monkeypatch.setattr(StartupDialog, StartupDialog.showDialogAndGetResult.__name__, lambda: PROJECT_1)
+        monkeypatch.setattr(StartupDialog, StartupDialog.showDialogAndGetResult.__name__, lambda: constants.PROJECT_1)
 
-        RecentProjectsHandler.recentProjects = _deque([PROJECT_1, PROJECT_2, PROJECT_3])
+        RecentProjectsHandler.recentProjects = _deque([constants.PROJECT_3, constants.PROJECT_2, constants.PROJECT_1])
         getProjectResult = getProject()
         logger = _ulog.getOrCreateCustomLogger("root", "INFO")
         mainWindow = MainWindow(logger, _ccl.value(getProjectResult))
@@ -53,12 +52,12 @@ class TestRecentProjectWorkflow:
 
         assert mainWindow.isVisible()
         assert mainWindow.editor.isVisible()
-        assert action1.text() == str(PROJECT_3)
-        assert action2.text() == str(PROJECT_2)
+        assert action1.text() == str(constants.PROJECT_3)
+        assert action2.text() == str(constants.PROJECT_2)
 
         mainWindow.openRecentFile(action1)
         action1 = mainWindow.recentProjectsMenu.actions()[0]
         action2 = mainWindow.recentProjectsMenu.actions()[1]
 
-        assert action1.text() == str(PROJECT_1)
-        assert action2.text() == str(PROJECT_2)
+        assert action1.text() == str(constants.PROJECT_1)
+        assert action2.text() == str(constants.PROJECT_2)
