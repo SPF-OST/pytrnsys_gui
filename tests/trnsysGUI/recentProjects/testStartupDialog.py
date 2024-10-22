@@ -1,5 +1,7 @@
 from collections import deque as _deque
-from PyQt5.QtWidgets import QListWidgetItem
+
+import PyQt5.QtCore as _qtc
+import PyQt5.QtWidgets as _qtw
 
 from tests.trnsysGUI.constants import PROJECT_1, PROJECT_2, PROJECT_3
 from trnsysGUI.dialogs.startupDialog import StartupDialog
@@ -15,7 +17,8 @@ class TestStartupDialog:
         RecentProjectsHandler.recentProjects = _deque([PROJECT_1, PROJECT_2, PROJECT_3])
         startupDialog = StartupDialog()
         qtbot.addWidget(startupDialog)
-        recentClicked = QListWidgetItem(str(PROJECT_1))
+        recentClicked = _qtw.QListWidgetItem(f"{PROJECT_1.stem}: {PROJECT_1}")
+        recentClicked.setData(_qtc.Qt.UserRole, PROJECT_1)
 
         startupDialog.clickButtonHandler(recentClicked)
 

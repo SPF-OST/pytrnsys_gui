@@ -476,7 +476,7 @@ class MainWindow(_qtw.QMainWindow):
         if MessageBox.create(messageText=constants.UNSAVED_PROGRESS_LOST) == _qtw.QMessageBox.Cancel:
             return
 
-        maybeCancelled = _prj.loadRecentProject(_pl.Path(actionClicked.text()))
+        maybeCancelled = _prj.loadRecentProject(actionClicked.data())
         if _ccl.isCancelled(maybeCancelled):
             return
 
@@ -691,5 +691,6 @@ class MainWindow(_qtw.QMainWindow):
         self.recentProjectsMenu.clear()
         for recentProject in RecentProjectsHandler.recentProjects:
             if recentProject != currentProject and recentProject.exists():
-                recentProjectAction = _qtw.QAction(str(recentProject), self)
+                recentProjectAction = _qtw.QAction(f"{recentProject.stem}: {recentProject}", self)
+                recentProjectAction.setData(recentProject)
                 self.recentProjectsMenu.addAction(recentProjectAction)

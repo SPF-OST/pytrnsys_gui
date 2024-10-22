@@ -1,5 +1,6 @@
 import pathlib as _pl
 
+import PyQt5.QtCore as _qtc
 import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.common.cancelled as _ccl
@@ -18,7 +19,9 @@ class StartupDialog(_qtw.QDialog, _gen.Ui_startupDialog):
         self.listWidget.itemDoubleClicked.connect(self.clickButtonHandler)
         RecentProjectsHandler.initWithExistingRecentProjects()
         for recentProject in RecentProjectsHandler.recentProjects:
-            _qtw.QListWidgetItem(str(recentProject), self.listWidget)
+            _qtw.QListWidgetItem(f"{recentProject.stem}: {recentProject}", self.listWidget).setData(
+                _qtc.Qt.UserRole, recentProject
+            )
 
     def clickButtonHandler(self, clickedItem):
         if clickedItem is self.cancelButton:
@@ -28,7 +31,7 @@ class StartupDialog(_qtw.QDialog, _gen.Ui_startupDialog):
         if clickedItem is self.openButton:
             self.signal = _CreateNewOrOpenExisting.OPEN_EXISTING
         if isinstance(clickedItem, _qtw.QListWidgetItem):
-            self.signal = _pl.Path(clickedItem.text())
+            self.signal = clickedItem.data(_qtc.Qt.UserRole)
         self.close()
 
     @staticmethod
