@@ -13,7 +13,7 @@ class MessageBox:
         cls,
         messageBoxTitle: str = DEFAULT_MESSAGE_BOX_TITLE,
         messageText: str = DEFAULT_MESSAGE_BOX_MESSAGE,
-        buttons: Optional[List[int]] = None,
+        buttons: Optional[List[int]] = None,  # type: ignore
         defaultButton: Optional[int] = None,
     ) -> int:
         """
@@ -33,9 +33,9 @@ class MessageBox:
 
         # Add custom buttons
         if buttons:
-            msgBox.setStandardButtons(_reduce(lambda x, y: x | y, buttons))
+            msgBox.setStandardButtons(_reduce(lambda x, y: x | y, buttons))  # type: ignore
             if defaultButton:
-                msgBox.setDefaultButton(defaultButton)
+                msgBox.setDefaultButton(defaultButton)  # type: ignore
         else:
             # Set default buttons (Yes and Cancel) if none are provided
             msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
