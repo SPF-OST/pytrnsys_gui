@@ -4,6 +4,7 @@ import enum as _enum
 UNSAVED_PROGRESS_LOST = (
     "Are you sure you want to open another project? Unsaved progress on the current one will be lost."
 )
+SAVE_BEFORE_CLOSE = "Do you want to save the current state of the project before closing the program?"
 NO_PROPER_PROJECT_ENVIRONMENT = (
     "The json you are opening does not have a proper project folder environment."
     " Do you want to continue and create one?"

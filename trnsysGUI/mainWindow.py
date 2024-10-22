@@ -7,9 +7,6 @@ import shutil
 import subprocess
 
 import PyQt5.QtWidgets as _qtw
-from collections import deque as _deque
-
-
 import pytrnsys.utils.log as _ulog
 import pytrnsys.utils.result as _res
 import pytrnsys.utils.warnings as _warn
@@ -20,6 +17,7 @@ import trnsysGUI.diagram.export as _dexp
 import trnsysGUI.loggingCallback as _lgcb
 import trnsysGUI.menus.projectMenu.exportPlaceholders as _eph
 from trnsysGUI import buildDck as buildDck
+from trnsysGUI import constants
 from trnsysGUI import images as _img
 from trnsysGUI import project as _prj
 from trnsysGUI import settings as _settings
@@ -29,12 +27,11 @@ from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
 from trnsysGUI.ProcessMain import ProcessMain
 from trnsysGUI.RunMain import RunMain
-from trnsysGUI.messageBox import MessageBox
-from trnsysGUI.recentProjectsHandler import RecentProjectsHandler
 from trnsysGUI.common import cancelled as _ccl
 from trnsysGUI.diagram import Editor as _de
+from trnsysGUI.messageBox import MessageBox
+from trnsysGUI.recentProjectsHandler import RecentProjectsHandler
 from trnsysGUI.storageTank.widget import StorageTank
-from trnsysGUI.constants import UNSAVED_PROGRESS_LOST
 
 
 class MainWindow(_qtw.QMainWindow):
@@ -252,7 +249,7 @@ class MainWindow(_qtw.QMainWindow):
         self.editor.shutdown()
 
     def newDia(self):
-        if MessageBox.create(messageText=UNSAVED_PROGRESS_LOST) == _qtw.QMessageBox.Cancel:
+        if MessageBox.create(messageText=constants.UNSAVED_PROGRESS_LOST) == _qtw.QMessageBox.Cancel:
             return
 
         startingDirectoryPath = self._projectDirPath.parent
@@ -461,7 +458,7 @@ class MainWindow(_qtw.QMainWindow):
     def openFile(self):
         self.logger.info("Opening diagram")
 
-        if MessageBox.create(messageText=UNSAVED_PROGRESS_LOST) == _qtw.QMessageBox.Cancel:
+        if MessageBox.create(messageText=constants.UNSAVED_PROGRESS_LOST) == _qtw.QMessageBox.Cancel:
             return
 
         maybeCancelled = _prj.getLoadOrMigrateProject()
@@ -476,7 +473,7 @@ class MainWindow(_qtw.QMainWindow):
             self.editor.save()
 
     def openRecentFile(self, actionClicked: QAction):
-        if MessageBox.create(messageText=UNSAVED_PROGRESS_LOST) == _qtw.QMessageBox.Cancel:
+        if MessageBox.create(messageText=constants.UNSAVED_PROGRESS_LOST) == _qtw.QMessageBox.Cancel:
             return
 
         maybeCancelled = _prj.loadRecentProject(_pl.Path(actionClicked.text()))
@@ -584,11 +581,9 @@ class MainWindow(_qtw.QMainWindow):
 
     def closeEvent(self, e):
         if self.showBoxOnClose:
-            qmb = _qtw.QMessageBox()
-            qmb.setText("Do you want to save the current state of the project before closing the program?")
-            qmb.setStandardButtons(_qtw.QMessageBox.Save | _qtw.QMessageBox.Close | _qtw.QMessageBox.Cancel)
-            qmb.setDefaultButton(_qtw.QMessageBox.Cancel)
-            ret = qmb.exec()
+            ret = MessageBox.create(messageText=constants.SAVE_BEFORE_CLOSE,
+                                    buttons=[_qtw.QMessageBox.Save, _qtw.QMessageBox.Close, _qtw.QMessageBox.Cancel],
+                                    defaultButton=_qtw.QMessageBox.Cancel)
             if ret == _qtw.QMessageBox.Cancel:
                 e.ignore()
                 return
