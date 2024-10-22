@@ -36,7 +36,7 @@ class TestRecentProjectsHandler:
         assert rph.RecentProjectsHandler.recentProjects[0] == PROJECT_1
 
     def testLoadRecentProjectsFromSettingsJson(self, monkeypatch):
-        """ At the end to make sure, that no interaction with other tests occurs. """
+        """At the end to make sure, that no interaction with other tests occurs."""
         monkeypatch.setattr(
             ting.Settings,
             ting.Settings._getSettingsFilePath.__name__,  # pylint: disable=protected-access
