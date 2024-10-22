@@ -12,8 +12,8 @@ import typing as _tp
 import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
-
 import pytrnsys.trnsys_util.deckUtils as _du
+
 import trnsysGUI as _tgui
 import trnsysGUI.components.factory as _cfactory
 import trnsysGUI.connection.connectors.doublePipeConnectorBase as _dctor
@@ -801,7 +801,7 @@ Tcw=1
             storageTank.setHydraulicLoops(self.hydraulicLoops)
 
     # Saving related
-    def save(self, showWarning=True):
+    def saveProject(self, showWarning=True):
         """
         If saveas has not been used, diagram will be saved in "/diagrams"
         If saveas has been used, diagram will be saved in self.saveAsPath

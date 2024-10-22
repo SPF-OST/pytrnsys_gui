@@ -265,7 +265,7 @@ class MainWindow(_qtw.QMainWindow):
 
     def saveDia(self):
         self.logger.info("Saving diagram")
-        self.editor.save()
+        self.editor.saveProject()
 
     def copyToNew(self):
         currentProjectFolderPath = self._projectDirPath
@@ -289,7 +289,7 @@ class MainWindow(_qtw.QMainWindow):
 
         self._resetEditor(loadProject)
 
-        self.editor.save(showWarning=False)
+        self.editor.saveProject(showWarning=False)
 
     @staticmethod
     def _copyContents(oldProjectFolderPath, newProjectFolderPath):
@@ -470,7 +470,7 @@ class MainWindow(_qtw.QMainWindow):
         self._resetEditor(project)
 
         if isinstance(project, _prj.MigrateProject):
-            self.editor.save()
+            self.editor.saveProject()
 
     def openRecentFile(self, actionClicked: QAction):
         if MessageBox.create(messageText=constants.UNSAVED_PROGRESS_LOST) == _qtw.QMessageBox.Cancel:
@@ -588,7 +588,7 @@ class MainWindow(_qtw.QMainWindow):
                 e.ignore()
                 return
             if ret == _qtw.QMessageBox.Save:
-                self.editor.save()
+                self.editor.saveProject()
 
             RecentProjectsHandler.save()
             e.accept()
