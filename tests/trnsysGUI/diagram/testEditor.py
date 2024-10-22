@@ -19,6 +19,7 @@ import trnsysGUI.menus.projectMenu.exportPlaceholders as _eph
 import trnsysGUI.project as _prj
 import trnsysGUI.storageTank.widget as _stw
 import trnsysGUI.warningsAndErrors as _werrors
+from trnsysGUI.recentProjectsHandler import RecentProjectsHandler
 from . import _testHelper as _th
 
 
@@ -184,6 +185,7 @@ class TestEditor:
     def testSaveAndReloadProject(
         self, testProject: _th.Project, qtbot, monkeypatch
     ) -> None:  # pylint: disable=too-many-locals
+        monkeypatch.setattr(RecentProjectsHandler, RecentProjectsHandler.addProject.__name__, lambda path: None)
         logger = _ulog.getOrCreateCustomLogger("root", "DEBUG")  # type: ignore[attr-defined]
 
         helper = _th.Helper(testProject)
