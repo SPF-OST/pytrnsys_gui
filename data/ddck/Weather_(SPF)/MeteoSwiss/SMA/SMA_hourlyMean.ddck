@@ -1,0 +1,31 @@
+*******************************
+**BEGIN City.ddck
+*******************************
+
+*******************************************************************
+** Author         : Daniel Carbonell
+** Creation date  : 2016
+** Last changes   : 10.2024 udpates for defaultVisibility "local"
+********************************************************************
+
+********************************************************************
+** Description:
+** city specific weather data and reference path to Meteonorm file
+********************************************************************
+
+CONSTANTS #
+$city_Lat = 47.38     ! Latitude, °
+$city_TambD = -13.2     ! ambient design temperature of heating system, °C
+$city_TambAvg = 9.99    ! average outdoor temperature, °C
+$city_dTambAmpl = 9.3   ! amplitude of outside temperature, K
+$city_tTambShift = 488  ! Offset of outside air temperature minimum , h
+$city_ddTcwOffset = 40  ! time shift of minimum cold water temperature, d
+$city_altid = 556
+$city_formatWeatherData  = 2  ! 1 = user format, 2 = Standard weather file in the TMY2 format
+$city_unitWeatherData    = 38
+
+ASSIGN PATH$\weather\MeteoSwiss\SMA\SMA_hourlyMean.99 $weather_unitWeatherData
+
+*******************************
+**END City.ddck
+*******************************

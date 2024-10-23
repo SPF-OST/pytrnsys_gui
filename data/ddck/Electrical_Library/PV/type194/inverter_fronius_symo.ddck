@@ -1,0 +1,39 @@
+*******************************
+**BEGIN fronius_symo_inverter.dck
+*******************************
+
+
+**************************************************************************
+** Contact person : Dani Carbonell    
+** Creation date  : 01.08.19
+** Last changes   : 05.05.2020 Mattia Battaglia
+**                : 10.24 DC udpates for defaultVisibility "local"
+**************************************************************************
+
+***************************************************************************
+** Description: 
+** inverter database ddck
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+** None
+***********************************
+** outputs to hydraulic solver
+***********************************
+** None
+
+***********************************
+** outputs to other ddck
+***********************************
+
+CONSTANTS 3
+$inverter_MaxPInv = 12500
+$inverter_MaxVInv = 1000
+$inverter_MinVInv = 200
+
+CONSTANTS 1
+$unitReadInverter = 124
+
+ASSIGN PATH$\pv\type194\database\140911_FRONIUS_SYMO_Inverter.dat $unitReadInverter
