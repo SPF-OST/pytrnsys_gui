@@ -136,7 +136,10 @@ class MainWindow(_qtw.QMainWindow):
         self.fileMenu.addAction(fileMenuOpenAction)
 
         self.recentProjectsMenu = _qtw.QMenu("Recent Projects")
+        # ===============================================================================
+        # Must be monospaced font to ensure paths align nicely.
         self.recentProjectsMenu.setFont(_qtg.QFont(constants.DEFAULT_MONOSPACED_FONT))
+        # ===============================================================================
         self.recentProjectsMenu.triggered.connect(self.openRecentFile)
         self.fileMenu.addMenu(self.recentProjectsMenu)
         self.updateRecentFileMenu(project.jsonFilePath)

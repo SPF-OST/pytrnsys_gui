@@ -17,7 +17,10 @@ class StartupDialog(_qtw.QDialog, _gen.Ui_startupDialog):
         super().__init__()
         self.setupUi(self)
         self.buttonGroup.buttonClicked.connect(self.clickButtonHandler)
+        # ===============================================================================
+        # Must be monospaced font to ensure paths align nicely.
         self.listWidget.setFont(_qtg.QFont(constants.DEFAULT_MONOSPACED_FONT))
+        # ===============================================================================
         self.listWidget.itemDoubleClicked.connect(self.clickButtonHandler)
         RecentProjectsHandler.initWithExistingRecentProjects()
         maxLength = RecentProjectsHandler.getLengthOfLongestFileName()
