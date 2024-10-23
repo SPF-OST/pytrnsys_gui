@@ -16,13 +16,7 @@ import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.common.cancelled as _ccl
 import trnsysGUI.messageBox as mb
-from trnsysGUI.constants import (
-    NO_RECENT_AVAILABLE,
-    RECENT_MOVED_OR_DELETED,
-    DIRECTORY_MUST_BE_EMPTY,
-    NO_PROPER_PROJECT_ENVIRONMENT,
-    _CreateNewOrOpenExisting,
-)
+from trnsysGUI import constants
 from trnsysGUI.dialogs.startupDialog import StartupDialog
 from trnsysGUI.recentProjectsHandler import RecentProjectsHandler
 
@@ -55,7 +49,7 @@ def getProject() -> _ccl.MaybeCancelled[Project]:
         projectMaybeCancelled = (
             loadRecentProject(createOpen)
             if isinstance(createOpen, _pl.Path)
-            else _getProjectInternal(_CreateNewOrOpenExisting(createOpen))
+            else _getProjectInternal(constants.CreateNewOrOpenExisting(createOpen))
         )
         if not _ccl.isCancelled(projectMaybeCancelled):
             project = _ccl.value(projectMaybeCancelled)
@@ -68,14 +62,14 @@ def getProject() -> _ccl.MaybeCancelled[Project]:
     return _ccl.CANCELLED
 
 
-def _getProjectInternal(createOrOpenExisting: "_CreateNewOrOpenExisting") -> _ccl.MaybeCancelled[Project]:
-    if createOrOpenExisting == _CreateNewOrOpenExisting.OPEN_EXISTING:
+def _getProjectInternal(createOrOpenExisting: "CreateNewOrOpenExisting") -> _ccl.MaybeCancelled[Project]:
+    if createOrOpenExisting == constants.CreateNewOrOpenExisting.OPEN_EXISTING:
         return getLoadOrMigrateProject()
 
-    if createOrOpenExisting == _CreateNewOrOpenExisting.CREATE_NEW:
+    if createOrOpenExisting == constants.CreateNewOrOpenExisting.CREATE_NEW:
         return getCreateProject()
 
-    raise AssertionError(f"Unknown value for enum {_CreateNewOrOpenExisting}: {createOrOpenExisting}")
+    raise AssertionError(f"Unknown value for enum {constants.CreateNewOrOpenExisting}: {createOrOpenExisting}")
 
 
 def getCreateProject(startingDirectoryPath: _tp.Optional[_pl.Path] = None) -> _ccl.MaybeCancelled[CreateProject]:
@@ -104,7 +98,7 @@ def getExistingEmptyDirectory(
         if _isEmptyDirectory(selectedDirectoryPath):
             return selectedDirectoryPath
 
-        mb.MessageBox.create(messageText=DIRECTORY_MUST_BE_EMPTY, buttons=[_qtw.QMessageBox.Ok])
+        mb.MessageBox.create(messageText=constants.DIRECTORY_MUST_BE_EMPTY, buttons=[_qtw.QMessageBox.Ok])
 
 
 def _isEmptyDirectory(path: _pl.Path) -> bool:
@@ -128,14 +122,17 @@ def loadRecentProject(projectPath: _pl.Path) -> _ccl.MaybeCancelled[LoadProject 
     try:
         if not projectPath.exists():
             if (
-                mb.MessageBox.create(messageText=RECENT_MOVED_OR_DELETED, buttons=[_qtw.QMessageBox.Ok])
+                mb.MessageBox.create(messageText=constants.RECENT_MOVED_OR_DELETED, buttons=[_qtw.QMessageBox.Ok])
                 == _qtw.QMessageBox.Ok
             ):
                 return _ccl.CANCELLED
         else:
             return checkIfProjectEnviromentIsValid(projectPath.parent, projectPath)
     except TypeError:
-        if mb.MessageBox.create(messageText=NO_RECENT_AVAILABLE, buttons=[_qtw.QMessageBox.Ok]) == _qtw.QMessageBox.Ok:
+        if (
+            mb.MessageBox.create(messageText=constants.NO_RECENT_AVAILABLE, buttons=[_qtw.QMessageBox.Ok])
+            == _qtw.QMessageBox.Ok
+        ):
             return _ccl.CANCELLED
     return _ccl.CANCELLED
 
@@ -147,7 +144,7 @@ def checkIfProjectEnviromentIsValid(
     ddckFolder = projectFolderPath / "ddck"
     if not containingFolderIsCalledSameAsJsonFile or not ddckFolder.is_dir():
         oldJsonFilePath = jsonFilePath
-        if mb.MessageBox.create(messageText=NO_PROPER_PROJECT_ENVIRONMENT) == _qtw.QMessageBox.Cancel:
+        if mb.MessageBox.create(messageText=constants.NO_PROPER_PROJECT_ENVIRONMENT) == _qtw.QMessageBox.Cancel:
             return _ccl.CANCELLED
         maybeCancelled = getExistingEmptyDirectory(startingDirectoryPath=projectFolderPath.parent)
         if _ccl.isCancelled(maybeCancelled):

@@ -1,6 +1,6 @@
-from collections import deque as _deque
 import pathlib as _pl
 import typing as _tp
+from collections import deque as _deque
 
 from trnsysGUI import settings as _settings
 
@@ -32,3 +32,9 @@ class RecentProjectsHandler:
         settings = _settings.Settings.load()
         settings.recentProjects = validPathsToSave
         settings.save()
+
+    @classmethod
+    def getLenghtOfLongestFileName(cls) -> int | None:
+        if len(cls.recentProjects) > 0:
+            return max(len(recentProject.stem) for recentProject in cls.recentProjects)
+        return None

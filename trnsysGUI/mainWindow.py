@@ -6,6 +6,7 @@ import pathlib as _pl
 import shutil
 import subprocess
 
+import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 import pytrnsys.utils.log as _ulog
 import pytrnsys.utils.result as _res
@@ -135,6 +136,7 @@ class MainWindow(_qtw.QMainWindow):
         self.fileMenu.addAction(fileMenuOpenAction)
 
         self.recentProjectsMenu = _qtw.QMenu("Recent Projects")
+        self.recentProjectsMenu.setFont(_qtg.QFont(constants.DEFAULT_MONOSPACED_FONT))
         self.recentProjectsMenu.triggered.connect(self.openRecentFile)
         self.fileMenu.addMenu(self.recentProjectsMenu)
         self.updateRecentFileMenu(project.jsonFilePath)
@@ -689,8 +691,10 @@ class MainWindow(_qtw.QMainWindow):
 
     def updateRecentFileMenu(self, currentProject: _pl.Path):
         self.recentProjectsMenu.clear()
+        maxLength = RecentProjectsHandler.getLenghtOfLongestFileName()
         for recentProject in RecentProjectsHandler.recentProjects:
             if recentProject != currentProject and recentProject.exists():
-                recentProjectAction = _qtw.QAction(f"{recentProject.stem}: {recentProject}", self)
+                formattedFileName = recentProject.stem.ljust(maxLength)
+                recentProjectAction = _qtw.QAction(f"{formattedFileName}: {recentProject}", self)
                 recentProjectAction.setData(recentProject)
                 self.recentProjectsMenu.addAction(recentProjectAction)
