@@ -22,6 +22,7 @@ class StartupDialog(_qtw.QDialog, _gen.Ui_startupDialog):
         RecentProjectsHandler.initWithExistingRecentProjects()
         maxLength = RecentProjectsHandler.getLengthOfLongestFileName()
         for recentProject in RecentProjectsHandler.recentProjects:
+            # Padding name to the longest name to nicely align paths.
             formattedFileName = recentProject.stem.ljust(maxLength)
             _qtw.QListWidgetItem(f"{formattedFileName} {recentProject}", self.listWidget).setData(
                 _qtc.Qt.UserRole, recentProject
@@ -41,9 +42,6 @@ class StartupDialog(_qtw.QDialog, _gen.Ui_startupDialog):
 
     def adjustSizeToContent(self):
         totalHeight = sum(self.listWidget.sizeHintForRow(i) for i in range(self.listWidget.count()))
-        if totalHeight > 115:
-            self.listWidget.setFixedHeight(totalHeight + 2 * self.listWidget.frameWidth())
-
         maxWidth = max(
             (
                 self.listWidget.fontMetrics().width(self.listWidget.item(i).text())
@@ -51,6 +49,14 @@ class StartupDialog(_qtw.QDialog, _gen.Ui_startupDialog):
             ),
             default=0,
         )
+
+        if totalHeight <= 115 and maxWidth <= self.width():
+            # Corresponds to minimum size of dialog.
+            return
+
+        if totalHeight > 115:
+            self.listWidget.setFixedHeight(totalHeight + 2 * self.listWidget.frameWidth())
+
         if maxWidth > self.width():
             self.listWidget.setFixedWidth(maxWidth + 2 * self.listWidget.frameWidth() + 20)
 
