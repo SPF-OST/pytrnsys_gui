@@ -1,4 +1,5 @@
 import pathlib as _pl
+
 import PyQt5.QtCore as _core
 
 import trnsysGUI.storageTank.widget as stw
@@ -7,12 +8,6 @@ from tests.trnsysGUI import utils  # pylint complains when using .utils as utils
 _CURRENT_DIR = _pl.Path(__file__).parent
 _PROJECT_DIR = _CURRENT_DIR / ".." / "data" / "diagramForConfigStorageDialog"
 _PROJECT_NAME = "diagramForConfigStorageDialog"
-
-# TODO: find feature that does not allow anything but nrs in the input field.
-# TODO: input and output not a number as a consequence of previous, for both hx and portPairs
-
-# TODO: make issue for AssertionError: Port is inside block item.
-#       [IPKernelApp] WARNING | Parent appears to have exited, shutting down.
 
 
 class TestConfigureStorageDialog:
