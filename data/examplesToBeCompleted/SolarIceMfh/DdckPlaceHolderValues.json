@@ -1,0 +1,103 @@
+{
+    "Collector": {
+        "In": {
+            "@cp": "LsolarLoopCp",
+            "@mfr": "MCollector_A",
+            "@rho": "LsolarLoopRho",
+            "@temp": "TPiColIn"
+        },
+        "Out": {
+            "@temp": "TCollector"
+        }
+    },
+    "HP": {
+        "CondIn": {
+            "@cp": "LLoopHpCondCp",
+            "@mfr": "MHPCond_A",
+            "@rho": "LLoopHpCondRho",
+            "@temp": "TPiHpCondIn"
+        },
+        "CondOut": {
+            "@temp": "THPCond"
+        },
+        "EvapIn": {
+            "@cp": "LsolarLoopCp",
+            "@mfr": "MHPEvap_A",
+            "@rho": "LsolarLoopRho",
+            "@temp": "TPiHpEvapIn"
+        },
+        "EvapOut": {
+            "@temp": "THPEvap"
+        }
+    },
+    "HxCool": {
+        "Side1In": {
+            "@cp": "LsolarLoopCp",
+            "@mfr": "MHxCoolSide1_A",
+            "@rho": "LsolarLoopRho",
+            "@temp": "TPiHxCoolBriIn"
+        },
+        "Side1Out": {
+            "@temp": "THxCoolSide1"
+        },
+        "Side2In": {
+            "@cp": "LLoopHpCondCp",
+            "@mfr": "MHxCoolSide2_A",
+            "@rho": "LLoopHpCondRho",
+            "@temp": "TPiHxCoolWatIn"
+        },
+        "Side2Out": {
+            "@temp": "THxCoolSide2"
+        }
+    },
+    "HxDHW": {
+        "Side1In": {
+            "@cp": "LloopDHWTesCp",
+            "@mfr": "MHxDHWSide1_A",
+            "@rho": "LloopDHWTesRho",
+            "@temp": "TPiHxDhwIn"
+        },
+        "Side1Out": {
+            "@temp": "THxDHWSide1"
+        },
+        "Side2In": {
+            "@cp": "LloopDhwDemCp",
+            "@mfr": "MHxDHWSide2_A",
+            "@rho": "LloopDhwDemRho",
+            "@temp": "TPiHxDhwSecIn"
+        },
+        "Side2Out": {
+            "@temp": "THxDHWSide2"
+        }
+    },
+    "IceTes": {
+        "In": {
+            "@cp": "LsolarLoopCp",
+            "@mfr": "MIceTes_A",
+            "@rho": "LsolarLoopRho",
+            "@temp": "TPiIceIn"
+        },
+        "Out": {
+            "@temp": "TIceTes"
+        }
+    },
+    "RadiatorSH": {
+        "In": {
+            "@cp": "LLoopHpCondCp",
+            "@mfr": "MRadiatorSH_A",
+            "@rho": "LLoopHpCondRho",
+            "@temp": "TPiRadIn"
+        },
+        "Out": {
+            "@temp": "TRadiatorSH"
+        }
+    },
+    "tapWater": {
+        "In": {
+            "@cp": "LloopDhwDemCp",
+            "@mfr": "MtapWater_A",
+            "@rho": "LloopDhwDemRho",
+            "@temp": "TPiDhwDemand"
+        }
+    }
+}

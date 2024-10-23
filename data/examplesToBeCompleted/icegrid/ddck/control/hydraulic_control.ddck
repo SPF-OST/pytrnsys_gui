@@ -1,0 +1,32 @@
+*************************************
+**BEGIN hydraulic_control.ddck
+*************************************
+EQUATIONS 10
+*** Massflowrates
+MfrQSnkA = QSnkAM
+MfrQSnkB = QSnkBM
+MfrQSnkI = QSnkIM
+MfrQSnkJ = QSnkJM
+MfrQSnkH = QSnkHM
+MfrQSnkC = QSnkCM
+MfrQSnkD = QSnkDM
+MfrQSnkG = QSnkGM
+MfrQSnkE = QSnkEM
+MfrQSnkF = QSnkFM
+
+EQUATIONS 2
+PSnk = QSnkAP + QSnkBP + QSnkCP + QSnkDP + QSnkEP + QSnkFP + QSnkGP + QSnkHP + QSnkIP + QSnkJP
+qSysOut_Snk = PSnk
+
+EQUATIONS 3
+dT = QSrc1TOut - QSrc1TIn
+MfrQSrc1 = QSnkAM + QSnkBM + QSnkCM + QSnkDM + QSnkEM + QSnkFM + QSnkGM + QSnkHM + QSnkIM + QSnkJM
+QSrc1P = MfrQSrc1*CPWAT*dT/3600
+
+EQUATIONS 3
+TambAvg = 10
+DTAmbAmpl = 15
+ddTcwOffset = 0
+
+EQUATIONS 1
+TRoomStore = 10

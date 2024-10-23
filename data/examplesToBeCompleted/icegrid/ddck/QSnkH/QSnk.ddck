@@ -1,0 +1,40 @@
+*******************************
+**BEGIN sink.ddck
+*******************************
+
+***********************************
+** Parameters
+***********************************
+EQUATIONS 1
+:dT = 3			! K
+
+EQUATIONS 1
+:P = 150 !Power of sink
+
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+** Temperature warm pipe to sink: 	 TIn
+EQUATIONS 1
+:TIn = @temp(In)
+
+
+***********************************
+** outputs
+***********************************
+EQUATIONS 2
+:TOut = :Tin - :dT
+@temp(Out) = :TOut
+
+***********************************
+** outputs to hydraulic control
+***********************************
+EQUATIONS 1
+:M = :P / ((CPWAT/3600)*:dT)	!kg/h
+
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
