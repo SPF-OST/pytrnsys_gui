@@ -423,7 +423,7 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
 
         auxiliaryPorts = self._getAuxiliaryPortForExport(inputs)
 
-        tool.setInputs(inputs, directPairsPorts, heatExchangerPorts, auxiliaryPorts)
+        tool.setInputs(inputs, directPairsPorts, heatExchangerPorts, auxiliaryPorts,self.displayName)
 
         projectDirPath = _pl.Path(self.editor.projectFolder)
         ddckDirPath = _dfh.getComponentDdckDirPath(self.displayName, projectDirPath)
@@ -438,7 +438,7 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
             return
 
         tool.createDDck(str(ddckDirPath), self.displayName, typeFile="ddck")
-
+        a=1
     def _getDirectPairPortsForExport(self):
         directPairsPorts = []
         for directPortPair in self.directPortPairs:
