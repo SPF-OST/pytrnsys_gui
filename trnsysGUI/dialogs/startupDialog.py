@@ -23,9 +23,10 @@ class StartupDialog(_qtw.QDialog, _gen.Ui_startupDialog):
         maxLength = RecentProjectsHandler.getLengthOfLongestFileName()
         for recentProject in RecentProjectsHandler.recentProjects:
             formattedFileName = recentProject.stem.ljust(maxLength)
-            _qtw.QListWidgetItem(f"{formattedFileName}: {recentProject}", self.listWidget).setData(
+            _qtw.QListWidgetItem(f"{formattedFileName} {recentProject}", self.listWidget).setData(
                 _qtc.Qt.UserRole, recentProject
             )
+        self.adjustSizeToContent()
 
     def clickButtonHandler(self, clickedItem):
         if clickedItem is self.cancelButton:
@@ -37,6 +38,21 @@ class StartupDialog(_qtw.QDialog, _gen.Ui_startupDialog):
         if isinstance(clickedItem, _qtw.QListWidgetItem):
             self.signal = clickedItem.data(_qtc.Qt.UserRole)
         self.close()
+
+    def adjustSizeToContent(self):
+        totalHeight = sum(self.listWidget.sizeHintForRow(i) for i in range(self.listWidget.count()))
+        if totalHeight > 115:
+            self.listWidget.setFixedHeight(totalHeight + 2 * self.listWidget.frameWidth())
+
+        maxWidth = max(
+            (
+                self.listWidget.fontMetrics().width(self.listWidget.item(i).text())
+                for i in range(self.listWidget.count())
+            ),
+            default=0,
+        )
+        if maxWidth > self.width():
+            self.listWidget.setFixedWidth(maxWidth + 2 * self.listWidget.frameWidth() + 20)
 
     @staticmethod
     def showDialogAndGetResult() -> _ccl.MaybeCancelled[constants.CreateNewOrOpenExisting | _pl.Path]:

@@ -480,6 +480,7 @@ class MainWindow(_qtw.QMainWindow):
 
         maybeCancelled = _prj.loadRecentProject(actionClicked.data())
         if _ccl.isCancelled(maybeCancelled):
+            self.recentProjectsMenu.removeAction(actionClicked)
             return
 
         project = _ccl.value(maybeCancelled)
@@ -693,8 +694,8 @@ class MainWindow(_qtw.QMainWindow):
         self.recentProjectsMenu.clear()
         maxLength = RecentProjectsHandler.getLengthOfLongestFileName()
         for recentProject in RecentProjectsHandler.recentProjects:
-            if recentProject != currentProject and recentProject.exists():
+            if recentProject != currentProject:
                 formattedFileName = recentProject.stem.ljust(maxLength)
-                recentProjectAction = _qtw.QAction(f"{formattedFileName}: {recentProject}", self)
+                recentProjectAction = _qtw.QAction(f"{formattedFileName} {recentProject}", self)
                 recentProjectAction.setData(recentProject)
                 self.recentProjectsMenu.addAction(recentProjectAction)

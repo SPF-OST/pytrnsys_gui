@@ -125,6 +125,7 @@ def loadRecentProject(projectPath: _pl.Path) -> _ccl.MaybeCancelled[LoadProject 
                 mb.MessageBox.create(messageText=constants.RECENT_MOVED_OR_DELETED, buttons=[_qtw.QMessageBox.Ok])
                 == _qtw.QMessageBox.Ok
             ):
+                RecentProjectsHandler.removeProject(projectPath)
                 return _ccl.CANCELLED
         else:
             return checkIfProjectEnviromentIsValid(projectPath.parent, projectPath)

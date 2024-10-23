@@ -27,8 +27,13 @@ class RecentProjectsHandler:
         cls.save()
 
     @classmethod
+    def removeProject(cls, projectToRemove: _pl.Path):
+        cls.recentProjects.remove(projectToRemove)
+        cls.save()
+
+    @classmethod
     def save(cls):
-        validPathsToSave = _deque([p.as_posix() for p in cls.recentProjects if p.exists()])
+        validPathsToSave = _deque([p.as_posix() for p in cls.recentProjects])
         settings = _settings.Settings.load()
         settings.recentProjects = validPathsToSave
         settings.save()

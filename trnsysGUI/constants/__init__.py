@@ -10,7 +10,7 @@ NO_PROPER_PROJECT_ENVIRONMENT = (
     " Do you want to continue and create one?"
 )
 NO_RECENT_AVAILABLE = "No recent project available"
-RECENT_MOVED_OR_DELETED = "Recent project has moved or was deleted"
+RECENT_MOVED_OR_DELETED = "Recent project has moved or was deleted, it will be removed from the list of recent projects"
 DIRECTORY_MUST_BE_EMPTY = "The new project directory must be empty."
 DEFAULT_MESSAGE_BOX_MESSAGE = "Do you want to proceed?"
 DEFAULT_MESSAGE_BOX_TITLE = "Message"

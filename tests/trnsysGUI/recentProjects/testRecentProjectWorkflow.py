@@ -31,9 +31,9 @@ class TestRecentProjectWorkflow:
         thirdProjectInList = startupDialog.listWidget.item(2)
 
         assert startupDialog.isVisible()
-        assert firstProjectInList.text() == f"{constants.PATH_TO_PROJECT_3.stem}: {constants.PATH_TO_PROJECT_3}"
-        assert secondProjectInList.text() == f"{constants.PATH_TO_PROJECT_2.stem}: {constants.PATH_TO_PROJECT_2}"
-        assert thirdProjectInList.text() == f"{constants.PATH_TO_PROJECT_1.stem}: {constants.PATH_TO_PROJECT_1}"
+        assert firstProjectInList.text() == f"{constants.PATH_TO_PROJECT_3.stem} {constants.PATH_TO_PROJECT_3}"
+        assert secondProjectInList.text() == f"{constants.PATH_TO_PROJECT_2.stem} {constants.PATH_TO_PROJECT_2}"
+        assert thirdProjectInList.text() == f"{constants.PATH_TO_PROJECT_1.stem} {constants.PATH_TO_PROJECT_1}"
 
     def testIfRecenProjectsAreShownCorrectlyInMainWindow(self, monkeypatch, qtbot):
         """Opens a recent project and makes sure recent project file menu is displayed correctly.
@@ -62,12 +62,12 @@ class TestRecentProjectWorkflow:
 
         assert mainWindow.isVisible()
         assert mainWindow.editor.isVisible()
-        assert action1.text() == f"{constants.PATH_TO_PROJECT_3.stem}: {constants.PATH_TO_PROJECT_3}"
-        assert action2.text() == f"{constants.PATH_TO_PROJECT_2.stem}: {constants.PATH_TO_PROJECT_2}"
+        assert action1.text() == f"{constants.PATH_TO_PROJECT_3.stem} {constants.PATH_TO_PROJECT_3}"
+        assert action2.text() == f"{constants.PATH_TO_PROJECT_2.stem} {constants.PATH_TO_PROJECT_2}"
 
         mainWindow.openRecentFile(action1)
         action1 = mainWindow.recentProjectsMenu.actions()[0]
         action2 = mainWindow.recentProjectsMenu.actions()[1]
 
-        assert action1.text() == f"{constants.PATH_TO_PROJECT_1.stem}: {constants.PATH_TO_PROJECT_1}"
-        assert action2.text() == f"{constants.PATH_TO_PROJECT_2.stem}: {constants.PATH_TO_PROJECT_2}"
+        assert action1.text() == f"{constants.PATH_TO_PROJECT_1.stem} {constants.PATH_TO_PROJECT_1}"
+        assert action2.text() == f"{constants.PATH_TO_PROJECT_2.stem} {constants.PATH_TO_PROJECT_2}"
