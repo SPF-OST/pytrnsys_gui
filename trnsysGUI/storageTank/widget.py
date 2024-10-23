@@ -91,7 +91,10 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
 
     @classmethod
     @_tp.override
-    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+    # pylint: disable=arguments-differ
+    def _getImageAccessor(
+        cls,
+    ) -> _img.SvgImageAccessor:
         return _img.STORAGE_TANK_SVG
 
     # Setter functions
@@ -124,7 +127,12 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
             outputPort.id = portIds.outputId
 
         directPortPair = DirectPortPair(
-            trnsysId, inputPort, outputPort, relativeInputHeight, relativeOutputHeight, side
+            trnsysId,
+            inputPort,
+            outputPort,
+            relativeInputHeight,
+            relativeOutputHeight,
+            side,
         )
 
         self.directPortPairs.append(directPortPair)
@@ -358,9 +366,15 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
         exportDdckAction = contextMenu.addAction("Export ddck")
         exportDdckAction.triggered.connect(self.exportDck)
 
-    def mouseDoubleClickEvent(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:
+    @_tp.no_type_check
+    # pylint: disable=inconsistent-return-statements
+    def mouseDoubleClickEvent(
+        self, event: _qtw.QGraphicsSceneMouseEvent, isTest=False
+    ) -> (_tp.Optional)[ConfigureStorageDialog]:
         renameHelper = _rename.RenameHelper(self.editor.namesManager)
         dialog = ConfigureStorageDialog(self, self.editor, renameHelper, self.editor.projectFolder)
+        if isTest:
+            return dialog
         dialog.exec()
 
     def getInternalPiping(self) -> _ip.InternalPiping:
@@ -368,14 +382,20 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
         heatExchangerPortItems = {
             mpi: gpi
             for hx in self.heatExchangers
-            for mpi, gpi in [(hx.modelPipe.fromPort, hx.port1), (hx.modelPipe.toPort, hx.port2)]
+            for mpi, gpi in [
+                (hx.modelPipe.fromPort, hx.port1),
+                (hx.modelPipe.toPort, hx.port2),
+            ]
         }
 
         portPairNodes = [pp.modelPipe for pp in self.directPortPairs]
         portPairsPortItems = {
             mpi: gpi
             for pp in self.directPortPairs
-            for mpi, gpi in [(pp.modelPipe.fromPort, pp.fromPort), (pp.modelPipe.toPort, pp.toPort)]
+            for mpi, gpi in [
+                (pp.modelPipe.fromPort, pp.fromPort),
+                (pp.modelPipe.toPort, pp.toPort),
+            ]
         }
 
         nodes = [*heatExchangerNodes, *portPairNodes]
