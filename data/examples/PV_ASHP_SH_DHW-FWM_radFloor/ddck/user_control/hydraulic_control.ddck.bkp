@@ -1,0 +1,31 @@
+*************************************
+**BEGIN hydraulic_control.ddck
+*************************************
+EQUATIONS 9
+*** Massflowrates
+xFracDivDhw = 1.0
+MfrWtTp = -1000.0
+MfrWtSp = 1000.0
+MfrPuCirc = 500.0
+MfrPuDhw = 500.0
+xFracDivDhwOut = 1.0
+MfrPuSh = 500.0
+xFracMixAux = 0.0
+MfrPuAux = 500.0
+
+CONSTANTS 1
+T_set_MixSh=50
+
+UNIT 441 TYPE 811 ! Passive Divider for heating 
+PARAMETERS 1
+5 !Nb.of iterations before fixing the value 
+INPUTS 4 
+TTesSh_MixSh
+TTeeSh_MixSh
+MMixSh_RadFloor
+T_set_MixSh
+*** INITIAL INPUT VALUES
+35.0 21.0 800.0 T_set_MixSh
+EQUATIONS 1
+xFracMixSh =  1.-[441,5] 
+
