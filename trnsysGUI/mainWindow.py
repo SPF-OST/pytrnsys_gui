@@ -691,7 +691,7 @@ class MainWindow(_qtw.QMainWindow):
 
     def updateRecentFileMenu(self, currentProject: _pl.Path):
         self.recentProjectsMenu.clear()
-        maxLength = RecentProjectsHandler.getLenghtOfLongestFileName()
+        maxLength = RecentProjectsHandler.getLengthOfLongestFileName()
         for recentProject in RecentProjectsHandler.recentProjects:
             if recentProject != currentProject and recentProject.exists():
                 formattedFileName = recentProject.stem.ljust(maxLength)

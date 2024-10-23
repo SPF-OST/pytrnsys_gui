@@ -20,7 +20,7 @@ class StartupDialog(_qtw.QDialog, _gen.Ui_startupDialog):
         self.listWidget.setFont(_qtg.QFont(constants.DEFAULT_MONOSPACED_FONT))
         self.listWidget.itemDoubleClicked.connect(self.clickButtonHandler)
         RecentProjectsHandler.initWithExistingRecentProjects()
-        maxLength = RecentProjectsHandler.getLenghtOfLongestFileName()
+        maxLength = RecentProjectsHandler.getLengthOfLongestFileName()
         for recentProject in RecentProjectsHandler.recentProjects:
             formattedFileName = recentProject.stem.ljust(maxLength)
             _qtw.QListWidgetItem(f"{formattedFileName}: {recentProject}", self.listWidget).setData(

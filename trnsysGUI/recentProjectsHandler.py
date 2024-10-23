@@ -34,7 +34,5 @@ class RecentProjectsHandler:
         settings.save()
 
     @classmethod
-    def getLenghtOfLongestFileName(cls) -> int | None:
-        if len(cls.recentProjects) > 0:
-            return max(len(recentProject.stem) for recentProject in cls.recentProjects)
-        return None
+    def getLengthOfLongestFileName(cls) -> int:
+        return max((len(recentProject.stem) for recentProject in cls.recentProjects), default=0)

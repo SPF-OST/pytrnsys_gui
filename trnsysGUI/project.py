@@ -62,7 +62,7 @@ def getProject() -> _ccl.MaybeCancelled[Project]:
     return _ccl.CANCELLED
 
 
-def _getProjectInternal(createOrOpenExisting: "CreateNewOrOpenExisting") -> _ccl.MaybeCancelled[Project]:
+def _getProjectInternal(createOrOpenExisting: "constants.CreateNewOrOpenExisting") -> _ccl.MaybeCancelled[Project]:
     if createOrOpenExisting == constants.CreateNewOrOpenExisting.OPEN_EXISTING:
         return getLoadOrMigrateProject()
 
