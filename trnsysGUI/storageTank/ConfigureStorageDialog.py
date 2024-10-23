@@ -5,7 +5,7 @@ import pathlib as _pl
 import typing as _tp
 
 import PyQt5.QtCore as _qtc
-from PyQt5.QtGui import QIntValidator
+from PyQt5.QtGui import QDoubleValidator
 from PyQt5.QtWidgets import QGridLayout
 from PyQt5.QtWidgets import QHBoxLayout
 from PyQt5.QtWidgets import QLabel
@@ -94,9 +94,9 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         offsetLeILabel = QLabel("Input:")
         offsetLeOLabel = QLabel("Output:")
         self.offsetLeI = QLineEdit("0")
-        self.offsetLeI.setValidator(QIntValidator())
+        self.offsetLeI.setValidator(QDoubleValidator())
         self.offsetLeO = QLineEdit("0")
-        self.offsetLeO.setValidator(QIntValidator())
+        self.offsetLeO.setValidator(QDoubleValidator())
         self.lButton = QRadioButton("Left side")
         self.rButton = QRadioButton("Right side")
 
@@ -141,10 +141,10 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         manPortLabel2 = QLabel("Enter height in percent: ")
         portlabelUpper = QLabel("Inlet")
         self.manPortLeI = QLineEdit("0")
-        self.manPortLeI.setValidator(QIntValidator())
+        self.manPortLeI.setValidator(QDoubleValidator())
         portlabelLower = QLabel("Outlet")
         self.manPortLeO = QLineEdit("0")
-        self.manPortLeO.setValidator(QIntValidator())
+        self.manPortLeO.setValidator(QDoubleValidator())
 
         qhbl3 = QHBoxLayout()
         self.manlButton = QRadioButton("Left side")
