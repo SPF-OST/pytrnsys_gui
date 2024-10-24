@@ -3,9 +3,6 @@ from typing import Optional, List
 
 from PyQt6 import QtWidgets as _qtw
 
-# import os
-#
-# os.environ["QT_API"] = "pyqt6"
 from trnsysGUI.constants import DEFAULT_MESSAGE_BOX_TITLE, DEFAULT_MESSAGE_BOX_MESSAGE
 
 

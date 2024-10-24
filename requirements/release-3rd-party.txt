@@ -137,12 +137,11 @@ pyqt5-qt5==5.15.2
 pyqt5-sip==12.13.0
     # via pyqt5
 pyqt6==6.7.1
-
+    # via -r requirements\release-3rd-party.in
 pyqt6-qt6==6.7.3
-
+    # via pyqt6
 pyqt6-sip==13.8.0
-
-
+    # via pyqt6
 python-dateutil==2.8.2
     # via
     #   dataclasses-jsonschema
