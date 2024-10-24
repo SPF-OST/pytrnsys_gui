@@ -31,7 +31,6 @@ def main():
         _werrors.showMessageBox(errorMessage, title="Missing requirements")
         return
 
-    # TODO: test timing till first window opens
     import trnsysGUI.common.cancelled as _ccl  # pylint: disable=import-outside-toplevel
     import trnsysGUI.project as _prj  # pylint: disable=import-outside-toplevel
 
