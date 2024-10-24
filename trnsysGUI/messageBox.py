@@ -1,8 +1,11 @@
 from functools import reduce as _reduce
 from typing import Optional, List
 
-from PyQt5.QtWidgets import QMessageBox
+from PyQt6 import QtWidgets as _qtw
 
+# import os
+#
+# os.environ["QT_API"] = "pyqt6"
 from trnsysGUI.constants import DEFAULT_MESSAGE_BOX_TITLE, DEFAULT_MESSAGE_BOX_MESSAGE
 
 
@@ -24,12 +27,12 @@ class MessageBox:
         :param buttons: List of QMessageBox standard buttons
         :param defaultButton: QMessageBox default button
         """
-        msgBox = QMessageBox()
+        msgBox = _qtw.QMessageBox()
         msgBox.setWindowTitle(messageBoxTitle)
         msgBox.setText(messageText)
 
         # Clear the default buttons
-        msgBox.setStandardButtons(QMessageBox.NoButton)
+        msgBox.setStandardButtons(_qtw.QMessageBox.NoButton)
 
         # Add custom buttons
         if buttons:
@@ -38,7 +41,7 @@ class MessageBox:
                 msgBox.setDefaultButton(defaultButton)  # type: ignore
         else:
             # Set default buttons (Yes and Cancel) if none are provided
-            msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
-            msgBox.setDefaultButton(QMessageBox.Cancel)
+            msgBox.setStandardButtons(_qtw.QMessageBox.Yes | _qtw.QMessageBox.Cancel)
+            msgBox.setDefaultButton(_qtw.QMessageBox.Cancel)
 
         return msgBox.exec()
