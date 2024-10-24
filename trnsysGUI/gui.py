@@ -57,6 +57,7 @@ def main():
         mainWindow.loadTrnsysPath()
 
         import trnsysGUI.tracing as trc  # pylint: disable=import-outside-toplevel
+
         tracer = trc.createTracer(arguments.shallTrace)
         tracer.run(app.exec)
     finally:
