@@ -31,15 +31,16 @@ def main():
         _werrors.showMessageBox(errorMessage, title="Missing requirements")
         return
 
+    # TODO: test timing till first window opens
     import trnsysGUI.common.cancelled as _ccl  # pylint: disable=import-outside-toplevel
-    import trnsysGUI.mainWindow as _mw  # pylint: disable=import-outside-toplevel
     import trnsysGUI.project as _prj  # pylint: disable=import-outside-toplevel
-    import trnsysGUI.tracing as trc  # pylint: disable=import-outside-toplevel
 
     maybeCancelled = _prj.getProject()
     if _ccl.isCancelled(maybeCancelled):
         return
     project = _ccl.value(maybeCancelled)
+
+    import trnsysGUI.mainWindow as _mw  # pylint: disable=import-outside-toplevel
 
     mainWindow = _mw.MainWindow(logger, project)
     mainWindow.start()
@@ -55,6 +56,7 @@ def main():
         mainWindow.ensureSettingsExist()
         mainWindow.loadTrnsysPath()
 
+        import trnsysGUI.tracing as trc  # pylint: disable=import-outside-toplevel
         tracer = trc.createTracer(arguments.shallTrace)
         tracer.run(app.exec)
     finally:
