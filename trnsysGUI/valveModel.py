@@ -20,7 +20,7 @@ class TVentilModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=t
     flippedV: bool
     rotationN: int
     IsTempering: _tp.Optional[bool] = None  # /NOSONAR  # pylint: disable=invalid-name
-    PositionForMassFlowSolver: _tp.Optional[str] = None  # /NOSONAR  # pylint: disable=invalid-name
+    PositionForMassFlowSolver: _tp.Optional[_tp.Union[str, float]] = None  # /NOSONAR  # pylint: disable=invalid-name
 
     @classmethod
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixin]:
