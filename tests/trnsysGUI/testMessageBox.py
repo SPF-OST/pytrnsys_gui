@@ -1,4 +1,5 @@
 from trnsysGUI.messageBox import MessageBox
+import pytest as _pt
 
 
 class TestMessageBox:
@@ -11,19 +12,23 @@ class TestMessageBox:
         print("I am after message box")
         assert False
 
+    @_pt.mark.PyQt6
     def testCreatePyQt6(self, qtbot):
         """ This reproduces the failure. """
         print("I am before message box")
-
         from PyQt6 import QtWidgets as _qtw
 
-        qtbot.addWidget(_qtw.QMessageBox().exec())
+        qtbot.addWidget(_qtw.QMessageBox())
         print("I am after message box")
         assert False
 
     def testCreate_actual(self, qtbot):
+        """ This causes issues with the NoButton for some reason.
+            QApplication needed to make the messagebox work.
+            This may be a bug in qtbot.
+        """
         from PyQt6.QtWidgets import QApplication
-        app = QApplication([])
+        # app = QApplication([])
         qtbot.addWidget(MessageBox().create())
         assert False
 

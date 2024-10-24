@@ -24,12 +24,15 @@ class MessageBox:
         :param buttons: List of QMessageBox standard buttons
         :param defaultButton: QMessageBox default button
         """
+        print("Got here")
+        app = _qtw.QApplication([])
         msgBox = _qtw.QMessageBox()
+        print("after box")
         msgBox.setWindowTitle(messageBoxTitle)
         msgBox.setText(messageText)
 
         # Clear the default buttons
-        msgBox.setStandardButtons(_qtw.QMessageBox.NoButton)
+        msgBox.setStandardButtons(_qtw.QMessageBox.StandardButton.NoButton)
 
         # Add custom buttons
         if buttons:
@@ -38,7 +41,7 @@ class MessageBox:
                 msgBox.setDefaultButton(defaultButton)  # type: ignore
         else:
             # Set default buttons (Yes and Cancel) if none are provided
-            msgBox.setStandardButtons(_qtw.QMessageBox.Yes | _qtw.QMessageBox.Cancel)
-            msgBox.setDefaultButton(_qtw.QMessageBox.Cancel)
+            msgBox.setStandardButtons(_qtw.QMessageBox.StandardButton.Yes | _qtw.QMessageBox.StandardButton.Cancel)
+            msgBox.setDefaultButton(_qtw.QMessageBox.StandardButton.Cancel)
 
         return msgBox.exec()
