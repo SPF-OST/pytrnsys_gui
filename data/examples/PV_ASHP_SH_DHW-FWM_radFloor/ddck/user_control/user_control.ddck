@@ -42,7 +42,7 @@ $userControl_TsensorTesSh = $TesSh_T8
 
 EQUATIONS 3
 !dependencies from type888 control
-myBoSH           = $type888_BoHS
+BoHS           = $type888_BoHS !heating season
 HpForDHWIsNeeded = $type888_HpForDhwIsNeeded
 HpForSHIsNeeded  = $type888_HpForSHIsNeeded
 
@@ -58,33 +58,38 @@ myTroomRc      = $type5998_TroomRc
 EQUATIONS #
 ! Massflowrates
 $MfrPuAux  = $MfrHpPD*hpOnRc
-$MfrPuSh   = $type1792_MfrBuiRd
+$MfrPuSh   = $heatDisSys_MfrBuiRdNom*PIDRadBui*BoHS
 $MfrWtSp   = $dhw_MfrDHWset
 $MfrPuCirc = 50
 $MfrPuDHW  = $HxDwh_MfrSrcDhwHx
-$MfrWtTp   = $MfrWtSp
+$MfrWtTp   = -$MfrWtSp
 EQUATIONS 4
 ! mixing valves
 $xFracMixAux        = HpForDHWIsNRc
 $xFracDivDhw        = NOT(GT($MfrWtSp,0))
 $xFracDivDhwOut     = NOT(GT($MfrWtSp,0))
-$xFracDivSolarDhwSh = (AND(xFracDivSolarDhwShRc,GT(TTesDhwBotRc+15,TTesShBotRc))+NOT(xFracDivSolarDhwShRc)*LT(TTesShBotRc,TTesDhwBotRc))*myBoSH
+$xFracDivSolarDhwSh = (AND(xFracDivSolarDhwShRc,GT(TTesDhwBotRc+15,TTesShBotRc))+NOT(xFracDivSolarDhwShRc)*LT(TTesShBotRc,TTesDhwBotRc))*BoHS
 
 ***********************************
 ** outputs to other ddck
 ***********************************
 
 EQUATIONS #
-$userControl_hpIsOn       = hpOnRc
-$userControl_PIDRadBui    = MIN(GT(PIDBuiOut,PIDRadBuiMin)*PIDBuiOut,1)
+$userControl_hpIsOn = hpOnRc !Recall value
 
+*************************************
+***** Control defintion
+*************************************
+
+EQUATIONS 1
+hpOn   = OR(HpForDHWIsNeeded,HpForSHIsNeeded)
 
 ************************************************************
 ***** Tempering valves adapted from hydraulic_control.ddck
 ************************************************************
 
 CONSTANTS 1
-T_set_MixSh = $type888_TRdSet ! I do not use $ since this ddck is global and currently $ is not accepted in global ddck. to be changed?
+T_set_MixSh = $type888_TRdSet
 
 UNIT 441 TYPE 811 ! Passive Divider for heating
 PARAMETERS 1
@@ -126,25 +131,11 @@ myTroomRc		! Building: 1- (air temperature of zone)  TAIR   1 ->Feedback room te
 *** INITIAL INPUT VALUES
 22 18 inversionHeat
 
-EQUATIONS 2
+EQUATIONS #
 PIDRadBuiMin = 0.15																		! 0.05		!0.01
 PIDBuiOut =  [41,1]
+PIDRadBui  = MIN(GT(PIDBuiOut,PIDRadBuiMin)*PIDBuiOut,1)
 
-*************************************
-***** Control defintion
-*************************************
-
-EQUATIONS 2
-hpOn   = OR(HpForDHWIsNeeded,HpForSHIsNeeded)
-hpIsOn = $userControl_hpIsOn
-
-!tSetBoiler = (TRdSet)*NOT(HpForDhwIsNeeded)+(TdhwSet+10)*HpForDhwIsNeeded
-!mySenTesSolarTop = MIN(TTesDhwTop,TTesShTop)*myBoHS + TTesDhwTop*NOT(myBoHS)
-!mySenTesSolarBot = MIN(TTesDhwBot,TTesShBot)*myBoHS + TTesDhwBot*NOT(myBoHS)
-
-CONSTANTS 2
-tMaxTes = 95
-TesOverheat=0 ! Not possible to overheat with a heat pump alone
 
 ***********************************
 ** Begin TYPE Recall
@@ -152,17 +143,16 @@ TesOverheat=0 ! Not possible to overheat with a heat pump alone
 
 UNIT 18 TYPE 993
 PARAMETERS 1     
-6   ! 1: number of variables to be remembered
-INPUTS 6
-hpOn $userControl_TTesDhwBot $userControl_TTesShBot $userControl_hpIsOn $type888_HpForDHWIsNeeded $xFracDivSolarDhwSh
-0.0 0.0 0.0 0.0 0.0 0.0
-EQUATIONS 6   ! outputs of Input Value Recall
+5   ! 1: number of variables to be remembered
+INPUTS 5
+hpOn $userControl_TTesDhwBot $userControl_TTesShBot  $type888_HpForDHWIsNeeded $xFracDivSolarDhwSh
+0.0 0.0 0.0 0.0 0.0
+EQUATIONS #   ! outputs of Input Value Recall
 hpOnRc = [18,1]
 TTesDhwBotRc = [18,2]
 TTesShBotRc = [18,3]
-hpIsOnRc = [18,4]
-HpForDHWIsNRc= [18,5]
-xFracDivSolarDhwShRc = [18,6]
+HpForDHWIsNRc= [18,4]
+xFracDivSolarDhwShRc = [18,5]
 
 UNIT 89 TYPE 65     ! Online Plotter Control
 PARAMETERS 12     

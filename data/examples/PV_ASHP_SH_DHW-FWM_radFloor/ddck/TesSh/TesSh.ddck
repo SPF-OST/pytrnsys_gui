@@ -14,7 +14,6 @@
 
 *************************************
 ** outputs to energy balance in kWh
-** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
 *************************************
 EQUATIONS 3
 @energy(out, heat, TesShLoss) = QLoss
@@ -44,6 +43,17 @@ EQUATIONS 2
 $TTesShDpR1_99=[50,1]
 $TTesShDpL99_35=[50,3]
 
+
+*************************************
+**inputs from other ddck
+*************************************
+
+EQUATIONS #
+RhoWat = $RhoWat  ! kg/m3, density of storage media
+CpWat  = $CpWat   ! kJ/kgK, specific heat of storage media
+PI     = $PI
+zero   = 0.0
+
 *************************************
 **outputs to other ddck
 *************************************
@@ -59,11 +69,15 @@ $TesSh_T7 =[50,27] !temperature at 0.65
 $TesSh_T8 =[50,28] !temperature at 0.75 
 $TesSh_T9 =[50,29] !temperature at 0.85 
 $TesSh_T10 =[50,30] !temperature at 0.95 
-$TesSh_qHeatSource = qHeatSource 
+$TesSh_qHeatSource = qHeatSource
+
 *************************************
 ****** Parameters of Type1924 *******
 *************************************
-CONSTANTS 1
+
+CONSTANTS #
+TRoomStore=15 !
+VStoreRef = 0.763
 ratio = Vol / VStoreRef
 *********Connecting values of DIRECT PORT=1***********
 CONSTANTS 2
@@ -110,10 +124,8 @@ zSenAvgBot4 = 0.65
 zSenAvgTop4 = 0.75
 zSenAvgBot5 = 0.85
 zSenAvgTop5 = 0.95
-CONSTANTS 12
+CONSTANTS #
 Vol=1          ! 1: m3, volume of store
-RhoWat=RhoWat  ! 2: kg/m3, density of storage media
-CpWat=CpWat    ! 3: kJ/kgK, specific heat of storage media
 lamZ=0.6       ! 4: W/mK, effective vertical thermal conductivity of TES
 Heigh=1.       ! 5: m, storage height
 Tini=60.       ! 6: oC, initial temperature
@@ -196,7 +208,7 @@ nHxUsed     ! 85: number Of used Hx
 -1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 5
 ** Parameters for heat Exchanger number 6
 -1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 6
-** 20 height position for any heat source, e.g. electrical backup or heat pump condenser. Any position can be due to a different heat source
+! 20 height position for any heat source, e.g. electrical backup or heat pump condenser. Any position can be due to a different heat source
 zAux1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero 
 INPUTS 69
 ************10 DIRECT PORTS INPUTS***************

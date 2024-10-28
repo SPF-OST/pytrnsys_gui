@@ -4,8 +4,8 @@
 import pytrnsys.rsim.runParallelTrnsys as runTrnsys
 import os
 
-pathConfig = "./"
+if __name__ == "__main__":
 
-configFile = "run.config"
-
-runTool = runTrnsys.RunParallelTrnsys(pathConfig, configFile=configFile)
+    pathConfig = "./"
+    configFile = "run.config"
+    runTool = runTrnsys.RunParallelTrnsys(pathConfig, configFile=configFile)

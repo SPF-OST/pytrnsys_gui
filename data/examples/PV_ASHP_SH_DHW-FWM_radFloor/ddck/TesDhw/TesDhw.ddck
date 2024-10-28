@@ -14,7 +14,6 @@
 
 *************************************
 ** outputs to energy balance in kWh
-** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
 *************************************
 EQUATIONS 3
 @energy(out, heat, TesDhwLoss) = QLoss
@@ -50,6 +49,15 @@ $TTesDhwDpR1_99=[50,3]
 $TTesDhwDpR65_95=[50,5]
 
 *************************************
+**inputs from other ddck
+*************************************
+
+EQUATIONS #
+RhoWat = $RhoWat  ! kg/m3, density of storage media
+CpWat  = $CpWat   ! kJ/kgK, specific heat of storage media
+PI     = $PI
+zero   = 0.0
+*************************************
 **outputs to other ddck
 *************************************
 ***Temperatures at 10 equally distributed height 
@@ -64,11 +72,13 @@ $TesDhw_T7 =[50,27] !temperature at 0.65
 $TesDhw_T8 =[50,28] !temperature at 0.75 
 $TesDhw_T9 =[50,29] !temperature at 0.85 
 $TesDhw_T10 =[50,30] !temperature at 0.95 
-$TesDhw_qHeatSource = qHeatSource 
+$TesDhw_qHeatSource = qHeatSource
+
 *************************************
 ****** Parameters of Type1924 *******
 *************************************
-CONSTANTS 3
+
+CONSTANTS #
 TRoomStore=15 ! 
 VStoreRef = 0.763
 ratio = Vol / VStoreRef
@@ -124,10 +134,8 @@ zSenAvgBot4 = 0.65
 zSenAvgTop4 = 0.75
 zSenAvgBot5 = 0.85
 zSenAvgTop5 = 0.95
-CONSTANTS 12
+CONSTANTS #
 Vol=1          ! 1: m3, volume of store
-RhoWat=RhoWat  ! 2: kg/m3, density of storage media
-CpWat=CpWat    ! 3: kJ/kgK, specific heat of storage media
 lamZ=0.6       ! 4: W/mK, effective vertical thermal conductivity of TES
 Heigh=1.       ! 5: m, storage height
 Tini=60.       ! 6: oC, initial temperature

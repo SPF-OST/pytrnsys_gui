@@ -3,7 +3,7 @@
 *******************************
 
 ************************************************************************
-** Author         : exported by GUI
+** Author         : to be exported by GUI in near future
 ** Last changes   : 10.24 DC adapted to specific system
 *************************************************************************
 
@@ -13,6 +13,23 @@
 ** The nominal mass flow rate is taken from GUI, if not precise adapt here
 ** All values from hydraulic.ddck should be used here as $
 *************************************************************************************
+
+EQUATIONS 2
+@energy(out, el, PuShDemand) = PelPuSh_kW
+@energy(out, el, PuShHpCond) = PelPuAux_kW
+
+***********************************
+** outputs to other ddck
+***********************************
+
+EQUATIONS #
+$PelPuAux_kW = PelPuAux_kW
+$PelPuSh_kW  = PelPuSh_kW
+$PelPuDHW_kW = 0
+
+*******************************************
+*** Calculation of pump consumption
+*******************************************
 
 EQUATIONS #		! Electric pump power for space heat distribution
 !MfrShNom = type1792_MfrBuiRdNom   							! nominal mass flow rate, kg/h. How to calculate this from GUI?
@@ -28,11 +45,7 @@ EQUATIONS #
 dpPuAux_bar = 0.2												! assumption pressure drop
 pFlowPuAux_W = (($MfrPuAux/3600)/$Lloop1rho)*dpPuAux_bar*100000	! required power to drive the flow, W
 etaPuAux = 0.35													! Assumption
-PelPuAux_kW_calc = (pFlowPuAux_W/1000)/etaPuAux				    ! required pump electric power, kW
-PelPuAux_kW      = GT($MfrPuAux,0.1)*PelPuCond_kW_calc			! required pump electric power, kW
-
-EQUATIONS 1
-PelPuDHW_kW = 0
+PelPuAux_kW = GT($MfrPuAux,0.1)*(pFlowPuAux_W/1000)/etaPuAux				    ! required pump electric power, kW
 
 *******************************
 **END pump_consumption.ddck

@@ -10,10 +10,14 @@
 *************************************
 EQUATIONS 2
 *** single pipes
-qSysOut_PipeLoss = PipeLossTot
-qSysOut_spPipeIntTot = spPipeIntTot
+!qSysOut_PipeLoss = PipeLossTot
+!qSysOut_spPipeIntTot = spPipeIntTot
+@energy(out, heat, PipeLoss) = PipeLossTot
+@energy(out, heat, PipeAcum) = spPipeIntTot
 
 
+CONSTANTS 1
+TRoomStore = 15 ! used to calculate pipe losses
 
 
 
