@@ -43,9 +43,9 @@ TTesDhwAuxOn  = $userControl_TTesDhwHpOn
 TTesDhwAuxOff = $userControl_TTesDhwHpOff
 TsensorTesSh  = $userControl_TsensorTesSh
 tRoomSet      = $type5998_tRoomSet
-TBuiFlNom     = $building_TBuiFlNom
-TBuiRtNom     = $building_TBuiRtNom
-TreturnSH     = $tHpCondIn
+TBuiFlNom     = $mfb_TBuiFlNom
+TBuiRtNom     = $mfb_TBuiRtNom
+TreturnSH     = $tHpCondIn !to be check
 tDhwSet       = $dhw_TdhwSet
 
 

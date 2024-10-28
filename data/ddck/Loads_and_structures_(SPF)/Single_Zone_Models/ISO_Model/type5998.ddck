@@ -30,7 +30,7 @@
 ** Dependencies with other ddck
 ***********************************
 
-EQUATIONS 8
+EQUATIONS #
 buiIT_N   = $weather_IT_N
 buiIT_W   = $weather_IT_W
 buiIT_E   = $weather_IT_E
@@ -39,23 +39,23 @@ buivWind  = $weather_vWind
 buiTamb   = $weather_Tamb
 buiTamb24 = $type888_tAmb24 !average temperature over a period (It can the average over 24, 48 or 96 h that define the heating season on/off)
 time      = $Time
+!myScaleBuilding = $mfb_scaleBuilding not necessary since mfb must be in same folder or use same name in config to chares all names.
 
-EQUATIONS 2
-myPheatBui_kJh    = $type1792_PHeatBui_kJh
+EQUATIONS #
+myPheatBui_kJh    = $heatDisSys_PHeatBui_kJh
 myPBuiIntGain_kJh = $intGains_PbuiIntGain_kJh !from internal gains calculation
 
 ***********************************
 ** outputs to other ddck
 ***********************************
 
-CONSTANTS 2
+CONSTANTS #
 $type5998_TroomSet     = TroomSet     ! Setpoint for Room temperature, °C
 $type5998_TroomSetCool = TroomSetCool ! Setpoint for Room temperature for cooling, °C
 
-EQUATIONS 3
+EQUATIONS #
 $type5998_TroomRc       = TRoomRc
 $type5998_Troom         = Troom
-$type5998_CoolingNeeded = CoolingNeeded
 
 ***********************************
 ** Case definition
@@ -70,9 +70,6 @@ TroomSetCool      = 24.00                                                ! Setpo
 ***********************************
 ** Body of ddck
 ***********************************
-
-EQUATIONS 1
-CoolingNeeded  = OR(AND(GE(TroomRc,TroomSetCool-dTCool),CoolingNeededRc),GE(TroomRc,TroomSetCool))*GT(buiTamb24,17) !Deadband
 
 CONSTANTS 5
 dTCool            = 1
@@ -187,10 +184,10 @@ vWindAbove10=[49,1]
 	
 
 EQUATIONS 4	! Variable Shading
-**FshBalc=MAX(0,(2.6-1/ABS(TAN(AISZ)+0.0001)*3.15)/2.6)!shading from real balcny geometry
-**FshWall=MAX(0,(12-ABS(TAN(AISA))*3.15)/12)!shading from real balcny geometry
+!FshBalc=MAX(0,(2.6-1/ABS(TAN(AISZ)+0.0001)*3.15)/2.6)!shading from real balcny geometry
+!FshWall=MAX(0,(12-ABS(TAN(AISA))*3.15)/12)!shading from real balcny geometry
 Fsh_N = shd_fix_N * (AND(shadingConTemp,shadingControlN)*win_g_shd+NOT(AND(shadingConTemp,shadingControlN))*win_g)
-**Fsh_S = (0.1*shd_fix_S +0.9*FshBalc*FshWall)* (AND(shadingConTemp,shadingControlS)*(realUserBehaviour*win_g*0.7 + NOT(realUserBehaviour)*win_g_shd)+NOT(AND(shadingConTemp,shadingControlS))*win_g)	! Wird Fenster g-Value im Model berücksichtigt??? Entsprechend dann XX ausfüllen bei ideal sind die Hälfte der Fenster geschlossen
+!Fsh_S = (0.1*shd_fix_S +0.9*FshBalc*FshWall)* (AND(shadingConTemp,shadingControlS)*(realUserBehaviour*win_g*0.7 + NOT(realUserBehaviour)*win_g_shd)+NOT(AND(shadingConTemp,shadingControlS))*win_g)	! Wird Fenster g-Value im Model berücksichtigt??? Entsprechend dann XX ausfüllen bei ideal sind die Hälfte der Fenster geschlossen
 Fsh_S = shd_fix_S * (AND(shadingConTemp,shadingControlS)*win_g_shd+NOT(AND(shadingConTemp,shadingControlS))*win_g)	! Wird Fenster g-Value im Model berücksichtigt??? Entsprechend dann XX ausfüllen bei ideal sind die Hälfte der Fenster geschlossen
 Fsh_E = shd_fix_E * (AND(shadingConTemp,shadingControlE)*win_g_shd+NOT(AND(shadingConTemp,shadingControlE))*win_g)
 Fsh_W = shd_fix_W * (AND(shadingConTemp,shadingControlW)*win_g_shd+NOT(AND(shadingConTemp,shadingControlW))*win_g)
@@ -301,7 +298,7 @@ VfrAirExTot = VfrInf + VfrVent*useAHU + VfrWindow	! Air exchange of the building
 EQUATIONS 3	! Ventilation and Infiltration
 TairSup = NOT(useAHU)*buiTamb+useAHU*((buiTamb+(TRoom-buiTamb)*etaHeatRec)*VfrVent+buiTamb*(VfrInf+VfrWindow))/VfrAirExTot	! Temperature of the air coming into the building (infiltration and ventilation)
 Ua_vent = CPAIR * 1000 * (VfrAirExTot) *RHOAIR	! Thermal transmission coefficient due ventilation and infiltration [W/K]
-HveISO = Ua_vent*scaleBuilding ! ventilation heat loss coefficient 300 ; m3/day *day/s * kg/m3 * J/kg K = W/K
+HveISO = Ua_vent*ScaleBuilding ! ventilation heat loss coefficient 300 ; m3/day *day/s * kg/m3 * J/kg K = W/K
 
 
 CONSTANTS 1
@@ -399,15 +396,14 @@ PBuiGrd_kW  = 0
 
 UNIT 57 TYPE 993 !CHANGED DC     ! Input value recall (element RcB)
 PARAMETERS 1     
-3     ! 1: number of variables to be remembered
-INPUTS 3    
-Troom TRoomStar CoolingNeeded
-20 20 0
+2     ! 1: number of variables to be remembered
+INPUTS 2
+Troom TRoomStar
+20 20
      
-EQUATIONS 3    ! outputs of Input Value Recall
+EQUATIONS 2    ! outputs of Input Value Recall
 TRoomRc         = [57,1]
 TRoomStarRc     = [57,2]
-CoolingNeededRc = [57,3]
 
 EQUATIONS 7     ! penalty calculation for space haeting / cooling according to Task 26 and Task 32
 X = 2     ! exponent for penalty calculation

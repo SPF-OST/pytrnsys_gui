@@ -36,4 +36,4 @@ $inverter_MinVInv = 200
 CONSTANTS 1
 $unitReadInverter = 124
 
-ASSIGN PATH$\pv\type194\database\140911_FRONIUS_SYMO_Inverter.dat $unitReadInverter
+ASSIGN PATH$\Electrical_Library\PV\type194\database\140911_FRONIUS_SYMO_Inverter.dat $unitReadInverter

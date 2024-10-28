@@ -47,21 +47,22 @@ TRdRt = [42,1]
 EQUATIONS #
 @energy(out, heat, buiDemand) = PheatBui_kW
 
-********************************************************************************************
-** Dependencies with other ddck
-********************************************************************************************
+***********************************
+** inputs from other ddck
+***********************************
 
 EQUATIONS #
-myAreaBui       = $building_AreaBui
+myAreaBui = $mfb_AreaBui
+myTroomRc = $type5998_TroomRc
 
 ***********************************
 ** outputs to other ddck
 ***********************************
 
 EQUATIONS #
-$type1792_PHeatBui_kJh = PheatBui_kW*3600  ! Heat to Building from heating distribution system: W -> kJ/h
-$type1792_MfrBuiRd     = MfrBuiRd
-$type1792_MfrBuiRdNom  = MfrBuiRdNom
+
+$heatDisSys_PHeatBui_kJh = PheatBui_kW*3600  ! Heat to Building from heating distribution system: W -> kJ/h
+$heatDisSys_MfrBuiRdNom  = MfrBuiRdNom
 
 *******************************************************
 ** Definition of radiant floor ************************
@@ -69,7 +70,7 @@ $type1792_MfrBuiRdNom  = MfrBuiRdNom
 
 CONSTANTS #
 MfrBuiRdNom = 200*nParallelPipe	!  Nominal mass flow of heat distribution system [kg/h]  was adjusted because of iteration problems... realistic value would have to be double checked with a building expert
-PheatRadNom = MfrBuiRdNom*cpRadFloor*(TBuiFlNom-TBuiRtNom)
+!PheatRadNom = MfrBuiRdNom*cpRadFloor*(TBuiFlNom-TBuiRtNom)
 
 CONSTANTS #
 AFloor = myAreaBui									! m2 !JS it is 120, was added on config level
@@ -173,7 +174,7 @@ UBelowFloor		! room field temperature below if bocoDown=1, if bocoDown=0 UA betw
 *** INITIAL INPUT VALUES     
 35 MfrBuiRdNom 21 21 21 21 -1 0
 
-EQUATIONS 19
+EQUATIONS #
 mFlowPerRadFloorTube = [42,2] 
 PRdIn_kW = [42,4]/1000 										! heat injected by fluid to floor W -> kW
 PtotBui_kW = [42,3]/1000      								! Heat to Building from Radiator: W --> kW
@@ -188,11 +189,10 @@ PheatBuiConv_kW = [42,10]/1000 								! total useful
 PheatBuiRadBot_kW = [42,11]/1000  							! loss
 PheatBuiConvBot_kW = [42,12]/1000 							! loss
 PheatBuiBot_KW = PheatBuiRadBot_kW+PheatBuiConvBot_kW		! we assume losses below are inputs to lower flat. 
-MfrSh = MfrBuiRd     
-BoPumpShOn = GT(MfrSh,0.0001)								! actual pressure-drop of space heat distribution in Pascal, Pa
-ImbRad=PRdIn_KW+QAcumRadiator-PtotBui_kW     
-RadInImb = PRdIn_kW-cpRadFloor*MfrBuiRd*(TRdFl-@temp(Out, TRdRt))/3600
-ratioRad = GT(PtotBui_kW,0.)*(PheatBuiRad_kW/(0.00001+PheatBuiConv_kW))
+!BoPumpShOn = GT(MfrBuiRd,0.0001)								! actual pressure-drop of space heat distribution in Pascal, Pa
+ImbRad   = PRdIn_KW+QAcumRadiator-PtotBui_kW
+!RadInImb = PRdIn_kW-cpRadFloor*MfrBuiRd*(TRdFl-@temp(Out, TRdRt))/3600
+!ratioRad = GT(PtotBui_kW,0.)*(PheatBuiRad_kW/(0.00001+PheatBuiConv_kW))
 TfloorLayerBot = [42,13]	
  
 EQUATIONS 2
@@ -259,10 +259,10 @@ MfrBuiRd PRdIn_KW  PheatBui_kW
 !0					! 11: Output file units
 !0					! 12: Output file delimiter
 !INPUTS 11
-!Tamb  myTroomRc  TRdFl @temp(Out)
+!Tamb  TroomRc  TRdFl @temp(Out)
 !BoHS RadFloorLoss_kW PIDRadBui MfrBuiRd   PRdIn_KW    PheatBuiRad_kW   ImbRad
 !*******
-!Tamb  myTroomRc  TRdFl @temp(Out)
+!Tamb  TroomRc  TRdFl @temp(Out)
 !BoHS RadFloorLoss_kW PIDRadBui MfrBuiRd   PRdIn_KW    PheatBuiRad_kW  ImbRad
 !****
 !LABELS  3

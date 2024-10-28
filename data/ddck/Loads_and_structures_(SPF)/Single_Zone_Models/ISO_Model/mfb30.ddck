@@ -14,28 +14,30 @@
 ** Description: 
 ** parametrization of SPF Multi-family bulding MFB30.
 ** Parameters were fitted to fit the IDA-ICE results
-** To be used together with bui_ISO_rad_floor.ddck or bui_ISO_radiator.ddck
-** The whole ddck is "global" so it should be placed in the same fodler as type5998.ddck
+** To be used together with type5998.ddck
+** The whole ddck is "global" respect to type5998 so it should be placed in the same folder as type5998.ddck
 *****************************************************************************************
 
 ***********************************
 ** outputs to other ddck
 ***********************************
 
-EQUATIONS 3
-$building_TBuiFlNom = 30
-$building_TBuiRtNom = 25
-$building_AreaBui   = AreaBui
+EQUATIONS #
+$mfb_TBuiFlNom = 30
+$mfb_TBuiRtNom = 25
+$mfb_AreaBui   = AreaBui
+$mfb_scaleBuilding = scaleBuilding
+$mfb_PGainPer   = PGainPer
+$mfb_PGainEquip = PGainEquip
+$mfb_PGainLight = PGainLight
 
 ***********************************
 ** Generic variables
 ***********************************
 
-CONSTANTS 4
+CONSTANTS #
 scaleBuilding = 1
 !PheatBuiD = 12830*scaleBuilding  ! design heating rate for building an location [kJ/h]
-TBuiFlNom = 30 ! 35     ! Design flow temp. heating syst. [°C]
-TBuiRtNom = 25 ! 30     ! Design return temp. heating syst. [°C]
 Precond = 0      ! Extracted mean ground preconditioning power
 !PheatBuiD = 15*3600
 

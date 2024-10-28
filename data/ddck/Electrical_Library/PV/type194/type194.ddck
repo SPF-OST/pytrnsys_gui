@@ -27,16 +27,15 @@
 
 ******************************************************************************************
 ** outputs to energy balance in kWh
-** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
 ******************************************************************************************
-EQUATIONS 1
-@energy(in, el, PV) = PelArrayMPP_kW
 
-** elSysOut_InvLoss = PvInverterLoss_kW  !JS: Only correct if there is no battery, otherwise the inverter losses have to be accounted for in the battery ddck.
+EQUATIONS #
+@energy(in, el, PV)     = PelArrayMPP_kW
+@energy(in, el, InvLoss) = PvInverterLoss_kW ! Only correct if there is no battery, otherwise the inverter losses have to be accounted for in the battery ddck.
 
-*************************************************************************************************
-** Dependencies with other types
-*************************************************************************************************
+******************************
+** inputs from other ddck
+*****************************
 
 CONSTANTS #
 
@@ -62,6 +61,14 @@ vWind        = $weather_vwind
 IT_H_kW      = $weather_IT_H_kW ! for printing
 IB_H_kW      = $weather_IB_H_kW ! for printing
 IT_PV_Wm2    = $weather_IT_surfUser_2/3.6
+
+***********************************
+** outputs to other ddck
+***********************************
+
+EQUATIONS #
+$PelPVAC_kW      = PelPVAC_kW
+$inverterEffDCAC = inverterEffDCAC
 
 ****************************
 **PV DATA
@@ -134,13 +141,11 @@ vWind	    	! Wind speed
 
 
 EQUATIONS #   !, Output of PV collector
-** PelOperating_kW = [154,3]/1000  	! We assume an mpp tracker, so this output is not used	- this corresponds to power at operating point, only meaningful if op is defined (Load Voltage, Input 3)
+! PelOperating_kW = [154,3]/1000  	! We assume an mpp tracker, so this output is not used	- this corresponds to power at operating point, only meaningful if op is defined (Load Voltage, Input 3)
 PelMaxPower_kW = [154,4]*NInverters/1000   	! this corresponds to power at mpp after inverter (AC)
 PelArrayMPP_kW = [154,16]*NInverters/1000  	! this corresponds to power at mpp before inverter (DC)
-** PelArray_kW = [154,20]/1000	    ! We assume an mpp tracker, so this output is not used	- this corresponds to power at operating point, only meaningful if op is defined (Load Voltage, Input 3)
-** VelOp = [154,1] 					! We assume an mpp tracker, so this output is not used
-VelMp = [154,6]  					! Voltage at MPP (including inverter effects)
-** VelArrayOp = [154,18]			! We assume an mpp tracker, so this output is not used
+!VelMp = [154,6]  					! Voltage at MPP (including inverter effects)
+! VelArrayOp = [154,18]			! We assume an mpp tracker, so this output is not used
 VelArrayMp = [154,14]				! Voltage at MPP (NOT including inverter effects)
 PelPvRoofDC = PelArrayMPP_kW*3600 	! Power DC in kJ/h
 PelPVDC = PelPVRoofDC				! Power DC in kJ/h
@@ -149,7 +154,7 @@ PelPVDC_kW = PelArrayMPP_kW  		! Power DC in kW
 PelPVAC_kW = PelPVRoof_kW
 inverterEffDCAC_mp = [154,13]		! Inverter efficiency at mpp
 inverterEffDCAC = MAX(inverterEffDCAC_mp,0.887) !MAX(inverterEffDCAC_mp,0.000000001) ! Prevent division by 0  JS: Set minimum to 0.887 because this efficiency is used by battery basic_battery.ddck
-** inverterEffDCAC_op = [154,17]	! We assume an mpp tracker, so this output is not used
+! inverterEffDCAC_op = [154,17]	! We assume an mpp tracker, so this output is not used
 PvInverterLoss_kW = PelPVDC_kW-PelPVAC_kW
 
 *******************************

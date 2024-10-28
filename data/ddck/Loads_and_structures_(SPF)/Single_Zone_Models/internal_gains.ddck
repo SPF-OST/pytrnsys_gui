@@ -26,27 +26,25 @@
 
 ******************************************************************************************
 ** outputs to energy balance in kWh and ABSOLUTE value
-** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
 ******************************************************************************************
 
 EQUATIONS 3
-!qSysOut_CiBuiSH = PBuiGainCircLoss_KW*HeatingSeasonOn
-!qSysOut_CiBui = PBuiGainCircLoss_KW*Not(HeatingSeasonOn)
-!qSysOut_CiLoss = CircLoss-qSysOut_CiBuiSH-qSysOut_CiBui
 
-@energy(out, heat, CircBuiWinter) = PBuiGainCircLoss_KW*HeatingSeasonOn
-@energy(out, heat, CircBuiNotWinter) = PBuiGainCircLoss_KW*Not(HeatingSeasonOn)
-@energy(out, heat, CircLoss) = CircLoss-PBuiGainCircLoss_KW
+@energy(out, heat, CircBuiWinter)    = PBuiGainCircLoss_KW * HeatingSeasonOn
+@energy(out, heat, CircBuiNotWinter) = PBuiGainCircLoss_KW * Not(HeatingSeasonOn)
+@energy(out, heat, CircLoss)         = qCircLoss_kW - PBuiGainCircLoss_KW
 
 ***********************************
 ** Dependencies with other ddck
 ***********************************
 
-EQUATIONS 4
-PPiCircLoss_kW = $PPiTeeCirc1_PuCirc+$PPiPuCirc_TeeCirc2+$PTeeCirc2_HxDhw_kW+$PHxDhw_TeeCirc1_kW
-CircLoss = PPiCircLoss_kW
+EQUATIONS #
+qCircLoss_kW    = $PPiTeeCirc1_PuCirc_kW + $PPiPuCirc_TeeCirc2_kW + $PTeeCirc2_HxDhw_kW + $PHxDhw_TeeCirc1_kW
 HeatingSeasonOn = $type888_BoHS
-scaleBuiSize    = $radFloorScaleBuilding
+scaleBuiSize    = $mfb_scaleBuilding
+PGainPer   = $mfb_PGainPer
+PGainEquip = $mfb_PGainEquip
+PGainLight = $mfb_PGainPer
 
 ***********************************
 ** outputs to other ddck
@@ -69,7 +67,8 @@ factorCircToSh = 0.5 !How much of circulation losses go to SH
 CONSTANTS 1
 unitReadIntGain=36 
 
-ASSIGN PATH$\building\profiles\int_gains_mfb_2019.txt  unitReadIntGain     
+!ASSIGN PATH$\Loads_and_structures_(SPF)\Single_Zone_Models\Profiles\Internal Gains\mfb.txt  unitReadIntGain Not accpted by pytrnsys
+ASSIGN PATH$\Loads_and_structures\Single_Zone_Models\Profiles\Internal_Gains\mfb.txt  unitReadIntGain
 
 UNIT 36 TYPE 9     ! Data reader internal gains
 PARAMETERS 22     
@@ -84,10 +83,10 @@ PARAMETERS 22
 unitReadIntGain     ! 9 Logical unit for input file (vorher 18)
 -1     ! 10 Free format mode     
 EQUATIONS 4    ! Internal Gains
-PBuiLight_kW = scaleBuiSize*[36,4]/1000*PGainLight     ! Internal Gains [kJ/h] TO BE CHECKED
-PbuiGainPers_KW = scaleBuiSize*[36,3]/1000*PGainPer     ! Internal Gains [kJ/h]
-PBuiGainEq_KW = scaleBuiSize*[36,2]/1000*PGainEquip     ! Internal Gains [kJ/h]
-PBuiGainCircLoss_KW = CircLoss*factorCircToSh    ! relative air mass flow rate for the SFH, -
+PBuiLight_kW        = scaleBuiSize*[36,4]/1000*PGainLight   ! Internal Gains [kJ/h] TO BE CHECKED
+PbuiGainPers_KW     = scaleBuiSize*[36,3]/1000*PGainPer     ! Internal Gains [kJ/h]
+PBuiGainEq_KW       = scaleBuiSize*[36,2]/1000*PGainEquip   ! Internal Gains [kJ/h]
+PBuiGainCircLoss_KW = qCircLoss_kW*factorCircToSh           ! Factor of circilarion losses that serve to heat the building
 
 *******************************
 **END InternalGains.dck

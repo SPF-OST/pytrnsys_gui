@@ -38,8 +38,6 @@ EQUATIONS 2
 
 *************************************************************************************************
 ** Dependencies with other types
-** If only one dependency defined here. 
-** If a variable is used more than once, redefine it here, e.g. varUsedInside=varFromAnotherDeck
 *************************************************************************************************
 
 EQUATIONS #

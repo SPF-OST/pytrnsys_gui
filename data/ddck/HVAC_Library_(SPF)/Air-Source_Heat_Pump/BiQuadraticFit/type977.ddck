@@ -42,11 +42,9 @@ EQUATIONS 4
 @energy(in, heat, QEvap)   = PauxEvap_kW
 @energy(out, el, HpCompD)  = PelAuxComp_kW
 
-*************************************************************************************************
-** Dependencies with other types
-** If only one dependency defined here. 
-** If a variable is used more than once, redefine it here, e.g. varUsedInside=varFromAnotherDeck
-*************************************************************************************************
+**********************************
+** inputs from other ddck
+**********************************
 
 EQUATIONS 2
 myHpIsOn  = $userControl_hpIsOn		! control signal for the heat pump. this is coming from the control file PvAshpDhwShMFh_controller.ddck

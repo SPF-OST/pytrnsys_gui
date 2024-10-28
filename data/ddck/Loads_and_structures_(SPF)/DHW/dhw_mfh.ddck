@@ -53,7 +53,8 @@ $dhw_TdhwSet   = TdhwSetProfile
 ***********************************
 CONSTANTS 1
 unitReadDhw=21
-ASSIGN PATH$\demands\dhw\profiles\DhwForMFH6appartments_2min_tset55.dat unitReadDhw				! water draw profile
+!ASSIGN PATH$\Loads_and_structures_(SPF)\DHW\Profiles\DhwForMFH6appartments_2min_tSet55.dat unitReadDhw				! water draw profile
+ASSIGN PATH$\Loads_and_structures\DHW\Profiles\DhwForMFH6appartments_2min_tSet55.dat unitReadDhw				! water draw profile
 
 CONSTANTS 2
 scaleDHW = 1
