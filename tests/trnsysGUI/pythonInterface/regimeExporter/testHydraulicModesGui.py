@@ -10,6 +10,7 @@ import trnsysGUI.mainWindow as mw
 import trnsysGUI.menus.hydraulicModesMenu.hydraulicModes as hm
 import trnsysGUI.project as prj
 from trnsysGUI import constants
+from trnsysGUI.recentProjectsHandler import RecentProjectsHandler
 
 
 class TestHydraulicModesGui:
@@ -34,6 +35,7 @@ class TestHydraulicModesGui:
     def testRunModesFailure(self, qtbot, project, monkeypatch):
         mockedMessageBox = Mock()
         monkeypatch.setattr("trnsysGUI.messageBox.MessageBox.create", mockedMessageBox)
+        monkeypatch.setattr(RecentProjectsHandler, RecentProjectsHandler.save.__name__, lambda: None)
         logger = _ulog.getOrCreateCustomLogger("root", "INFO")
         mainWindow = mw.MainWindow(logger, project)
         qtbot.addWidget(mainWindow)
