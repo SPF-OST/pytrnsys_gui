@@ -27,9 +27,9 @@ class StartupDialog(_qtw.QDialog, _gen.Ui_startupDialog):
         for recentProject in RecentProjectsHandler.recentProjects:
             # Padding name to the longest name to nicely align paths.
             formattedFileName = recentProject.stem.ljust(maxLength)
-            _qtw.QListWidgetItem(f"{formattedFileName} {recentProject}", self.listWidget).setData(
-                _qtc.Qt.UserRole, recentProject
-            )
+            _qtw.QListWidgetItem(
+                f"{formattedFileName} {recentProject}", self.listWidget
+            ).setData(_qtc.Qt.UserRole, recentProject)
         self.adjustSizeToContent()
 
     def clickButtonHandler(self, clickedItem):
@@ -44,10 +44,15 @@ class StartupDialog(_qtw.QDialog, _gen.Ui_startupDialog):
         self.close()
 
     def adjustSizeToContent(self):
-        totalHeight = sum(self.listWidget.sizeHintForRow(i) for i in range(self.listWidget.count()))
+        totalHeight = sum(
+            self.listWidget.sizeHintForRow(i)
+            for i in range(self.listWidget.count())
+        )
         maxWidth = max(
             (
-                self.listWidget.fontMetrics().width(self.listWidget.item(i).text())
+                self.listWidget.fontMetrics().width(
+                    self.listWidget.item(i).text()
+                )
                 for i in range(self.listWidget.count())
             ),
             default=0,
@@ -58,13 +63,19 @@ class StartupDialog(_qtw.QDialog, _gen.Ui_startupDialog):
             return
 
         if totalHeight > 115:
-            self.listWidget.setFixedHeight(totalHeight + 2 * self.listWidget.frameWidth())
+            self.listWidget.setFixedHeight(
+                totalHeight + 2 * self.listWidget.frameWidth()
+            )
 
         if maxWidth > self.width():
-            self.listWidget.setFixedWidth(maxWidth + 2 * self.listWidget.frameWidth() + 20)
+            self.listWidget.setFixedWidth(
+                maxWidth + 2 * self.listWidget.frameWidth() + 20
+            )
 
     @staticmethod
-    def showDialogAndGetResult() -> _ccl.MaybeCancelled[constants.CreateNewOrOpenExisting | _pl.Path]:
+    def showDialogAndGetResult() -> (
+        _ccl.MaybeCancelled[constants.CreateNewOrOpenExisting | _pl.Path]
+    ):
         dialog = StartupDialog()
         dialog.exec()
         return dialog.signal

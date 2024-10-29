@@ -22,13 +22,17 @@ class CreatedInternalPiping:
 
     @staticmethod
     def empty() -> CreatedInternalPiping:
-        emptyCreatedInternalPiping = CreatedInternalPiping([], [], _ip.InternalPiping([], {}))
+        emptyCreatedInternalPiping = CreatedInternalPiping(
+            [], [], _ip.InternalPiping([], {})
+        )
         return emptyCreatedInternalPiping
 
 
 class AbstractInternalPipingFactory(_abc.ABC):
     @_abc.abstractmethod
-    def createInternalPiping(self, blockItem: _bi.BlockItem) -> CreatedInternalPiping:
+    def createInternalPiping(
+        self, blockItem: _bi.BlockItem
+    ) -> CreatedInternalPiping:
         raise NotImplementedError()
 
 

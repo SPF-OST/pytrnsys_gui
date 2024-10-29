@@ -8,7 +8,9 @@ import trnsysGUI.serialization as _gser
 
 
 @_dc.dataclass
-class TVentilModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
+class TVentilModelVersion1(
+    _ser.UpgradableJsonSchemaMixin
+):  # pylint: disable=too-many-instance-attributes
     BlockName: str  # pylint: disable = invalid-name
     BlockDisplayName: str  # pylint: disable = invalid-name
     blockPosition: _tp.Tuple[float, float]
@@ -19,8 +21,10 @@ class TVentilModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=t
     flippedH: bool
     flippedV: bool
     rotationN: int
-    IsTempering: _tp.Optional[bool] = None  # /NOSONAR  # pylint: disable=invalid-name
-    PositionForMassFlowSolver: _tp.Optional[_tp.Union[str, float]] = None  # /NOSONAR  # pylint: disable=invalid-name
+    # /NOSONAR  # pylint: disable=invalid-name
+    IsTempering: _tp.Optional[bool] = None
+    # /NOSONAR  # pylint: disable=invalid-name
+    PositionForMassFlowSolver: _tp.Optional[_tp.Union[str, float]] = None
 
     @classmethod
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixin]:
@@ -53,12 +57,16 @@ class TVentilModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=t
 
 
 @_dc.dataclass
-class ValveModel(_gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
+class ValveModel(
+    _gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin
+):
     blockItemModel: _bim.BlockItemBaseModel
     inputPortId: int
     outputPortIds: _tp.Tuple[int, int]
-    IsTempering: _tp.Optional[bool] = None  # /NOSONAR  # pylint: disable=invalid-name
-    PositionForMassFlowSolver: _tp.Optional[_tp.Union[str, float]] = None  # /NOSONAR  # pylint: disable=invalid-name
+    # /NOSONAR  # pylint: disable=invalid-name
+    IsTempering: _tp.Optional[bool] = None
+    # /NOSONAR  # pylint: disable=invalid-name
+    PositionForMassFlowSolver: _tp.Optional[_tp.Union[str, float]] = None
 
     @classmethod
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixin]:
@@ -74,7 +82,9 @@ class ValveModel(_gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoder
         inputPortId = superseded.portsIdsIn[0]
         outputPortIds = (superseded.portsIdsOut[0], superseded.portsIdsOut[1])
 
-        blockItemModel = _bim.createBlockItemBaseModelFromLegacyModel(superseded)
+        blockItemModel = _bim.createBlockItemBaseModelFromLegacyModel(
+            superseded
+        )
 
         return ValveModel(
             superseded.BlockName,

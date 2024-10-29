@@ -12,7 +12,9 @@ import trnsysGUI.serialization as _gser
 
 
 @_dc.dataclass
-class BlockItemWithPrescribedMassFlowBaseModel(_ser.UpgradableJsonSchemaMixinVersion0):
+class BlockItemWithPrescribedMassFlowBaseModel(
+    _ser.UpgradableJsonSchemaMixinVersion0
+):
     blockItem: _bim.BlockItemBaseModel
     massFlowRateInKgPerH: float
 
@@ -39,12 +41,16 @@ class _PumpModelVersion1(
 
     @classmethod
     @_tp.override
-    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+    def getSupersededClass(
+        cls,
+    ) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
         return _bim.BlockItemModelVersion1
 
     @classmethod
     @_tp.override
-    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "_PumpModelVersion1":
+    def upgrade(
+        cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0
+    ) -> "_PumpModelVersion1":
         assert isinstance(superseded, _bim.BlockItemModelVersion1)
 
         return _PumpModelVersion1(
@@ -68,7 +74,9 @@ class _PumpModelVersion1(
 
 
 @_dc.dataclass
-class PumpModel(_gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
+class PumpModel(
+    _gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin
+):
     blockItemWithPrescribedMassFlow: BlockItemWithPrescribedMassFlowBaseModel
 
     inputPortId: int
@@ -76,18 +84,24 @@ class PumpModel(_gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoderF
 
     @classmethod
     @_tp.override
-    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+    def getSupersededClass(
+        cls,
+    ) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
         return _PumpModelVersion1
 
     @classmethod
     @_tp.override
-    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "PumpModel":
+    def upgrade(
+        cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0
+    ) -> "PumpModel":
         assert isinstance(superseded, _PumpModelVersion1)
 
         blockItem = _bim.createBlockItemBaseModelFromLegacyModel(superseded)
 
-        blockItemWithPrescribedMassFlow = BlockItemWithPrescribedMassFlowBaseModel(
-            blockItem, superseded.massFlowRateInKgPerH
+        blockItemWithPrescribedMassFlow = (
+            BlockItemWithPrescribedMassFlowBaseModel(
+                blockItem, superseded.massFlowRateInKgPerH
+            )
         )
 
         inputPortId = superseded.portsIdsIn[0]
@@ -108,29 +122,41 @@ class PumpModel(_gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoderF
 
 
 @_dc.dataclass
-class TerminalWithPrescribedMassFlowModel(_gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
+class TerminalWithPrescribedMassFlowModel(
+    _gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin
+):
     blockItemWithPrescribedMassFlow: BlockItemWithPrescribedMassFlowBaseModel
 
     portId: int
 
     @classmethod
     @_tp.override
-    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+    def getSupersededClass(
+        cls,
+    ) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
         return _bim.BlockItemModelVersion1
 
     @classmethod
     @_tp.override
-    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "TerminalWithPrescribedMassFlowModel":
+    def upgrade(
+        cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0
+    ) -> "TerminalWithPrescribedMassFlowModel":
         assert isinstance(superseded, _bim.BlockItemModelVersion1)
 
-        blockItemBaseModel = _bim.createBlockItemBaseModelFromLegacyModel(superseded)
+        blockItemBaseModel = _bim.createBlockItemBaseModelFromLegacyModel(
+            superseded
+        )
 
         prescribedMassFlowModel = BlockItemWithPrescribedMassFlowBaseModel(
             blockItemBaseModel,
             _defaults.DEFAULT_MASS_FLOW_RATE,
         )
 
-        portId = superseded.portsIdsIn[0] if superseded.BlockName == _bnames.TAP else superseded.portsIdsOut[0]
+        portId = (
+            superseded.portsIdsIn[0]
+            if superseded.BlockName == _bnames.TAP
+            else superseded.portsIdsOut[0]
+        )
 
         terminalModel = TerminalWithPrescribedMassFlowModel(
             superseded.BlockName,

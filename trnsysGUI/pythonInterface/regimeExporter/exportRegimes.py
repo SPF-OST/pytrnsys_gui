@@ -16,7 +16,11 @@ def getPumpsAndValvesWithValuesFromJson(projectJson):
 
     data = {}
     blockItemsAndConnections = jsonValues["Blocks"].values()
-    blockItems = [bc for bc in blockItemsAndConnections if isinstance(bc, dict) and ".__BlockDict__" in bc]
+    blockItems = [
+        bc
+        for bc in blockItemsAndConnections
+        if isinstance(bc, dict) and ".__BlockDict__" in bc
+    ]
 
     data = _getPumps(blockItems, data)
     data = _getValves(blockItems, data)
@@ -30,7 +34,12 @@ def getPumpsAndValvesWithValuesFromJson(projectJson):
 
 
 def _getSourceSinks(blockItems, data):
-    sourceSinks = [b for b in blockItems if b["BlockName"] in ("Sink", "Source", "SourceSink", "Geotherm", "Water")]
+    sourceSinks = [
+        b
+        for b in blockItems
+        if b["BlockName"]
+        in ("Sink", "Source", "SourceSink", "Geotherm", "Water")
+    ]
     for sourceSink in sourceSinks:
         # This isn't in the json yet, so I am applying a default value directly at first.
         blockDisplayName = sourceSink["BlockDisplayName"]
@@ -43,7 +52,9 @@ def _getTaps(blockItems, data):
     taps = [b for b in blockItems if b["BlockName"] in ("WTap_main", "WTap")]
     for tap in taps:
         curBlockItem = _se.TerminalWithPrescribedMassFlowModel.from_dict(tap)
-        data[curBlockItem.BlockDisplayName] = curBlockItem.blockItemWithPrescribedMassFlow.massFlowRateInKgPerH
+        data[curBlockItem.BlockDisplayName] = (
+            curBlockItem.blockItemWithPrescribedMassFlow.massFlowRateInKgPerH
+        )
 
     return data
 
@@ -61,7 +72,9 @@ def _getPumps(blockItems, data):
     pumps = [b for b in blockItems if b["BlockName"] == "Pump"]
     for pump in pumps:
         curBlockItem = _se.PumpModel.from_dict(pump)
-        data[curBlockItem.BlockDisplayName] = curBlockItem.blockItemWithPrescribedMassFlow.massFlowRateInKgPerH
+        data[curBlockItem.BlockDisplayName] = (
+            curBlockItem.blockItemWithPrescribedMassFlow.massFlowRateInKgPerH
+        )
 
     return data
 
@@ -74,5 +87,7 @@ def getData(curDict, data, desiredValueName):
 
 
 def writeToCsv(pumpsAndValvesAndValues, regimeFileName):
-    pumpsAndValvesAndValues = pumpsAndValvesAndValues.sort_index(axis="columns")
+    pumpsAndValvesAndValues = pumpsAndValvesAndValues.sort_index(
+        axis="columns"
+    )
     pumpsAndValvesAndValues.to_csv(regimeFileName)

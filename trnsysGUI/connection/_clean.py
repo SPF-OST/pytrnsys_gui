@@ -4,8 +4,8 @@ import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
 
-import trnsysGUI.cornerItem as _ci
 import trnsysGUI.connection.delete as _cdelete
+import trnsysGUI.cornerItem as _ci
 import trnsysGUI.segments.node as _node
 import trnsysGUI.segments.segmentItemBase as _sib
 
@@ -13,15 +13,23 @@ if _tp.TYPE_CHECKING:
     import trnsysGUI.connection.connectionBase as _cb
 
 
-def removeUnnecessarySegments(segments: _tp.Sequence[_sib.SegmentItemBase]) -> _tp.Sequence[_sib.SegmentItemBase]:
-    remainingIntermediateSegments = _removeUnnecessaryIntermediateSegmentsFromSceneAndGetRemaining(segments)
+def removeUnnecessarySegments(
+    segments: _tp.Sequence[_sib.SegmentItemBase],
+) -> _tp.Sequence[_sib.SegmentItemBase]:
+    remainingIntermediateSegments = (
+        _removeUnnecessaryIntermediateSegmentsFromSceneAndGetRemaining(
+            segments
+        )
+    )
 
     isHorizontal = _isHorizontal(segments)
 
     firstSegment = segments[0]
     lastSegment = segments[-1]
 
-    newSegments = _possiblyMergeLastTwoSegments(firstSegment, remainingIntermediateSegments, lastSegment, isHorizontal)
+    newSegments = _possiblyMergeLastTwoSegments(
+        firstSegment, remainingIntermediateSegments, lastSegment, isHorizontal
+    )
 
     return newSegments
 
@@ -37,7 +45,9 @@ def _removeUnnecessaryIntermediateSegmentsFromSceneAndGetRemaining(
     for currentSegment in intermediateSegments[1:]:
         previousSegment = remainingIntermediateSegments[-1]
 
-        if _isTrulyVertical(previousSegment) or _isTrulyVertical(currentSegment):
+        if _isTrulyVertical(previousSegment) or _isTrulyVertical(
+            currentSegment
+        ):
             remainingIntermediateSegments.append(currentSegment)
             continue
 
@@ -54,7 +64,9 @@ def _possiblyMergeLastTwoSegments(
 ) -> _tp.Sequence[_sib.SegmentItemBase]:
     lastRemainingIntermediate = remainingIntermediateSegments[-1]
 
-    areLastTwoSegmentsHorizontal = lastRemainingIntermediate.isHorizontal() and lastSegment.isHorizontal()
+    areLastTwoSegmentsHorizontal = (
+        lastRemainingIntermediate.isHorizontal() and lastSegment.isHorizontal()
+    )
 
     canMergeLastTwoSegments = areLastTwoSegmentsHorizontal
     if isHorizontal:
@@ -62,7 +74,11 @@ def _possiblyMergeLastTwoSegments(
         canMergeLastTwoSegments &= len(remainingIntermediateSegments) > 1
 
     if not canMergeLastTwoSegments:
-        newSegments = [firstSegment, *remainingIntermediateSegments, lastSegment]
+        newSegments = [
+            firstSegment,
+            *remainingIntermediateSegments,
+            lastSegment,
+        ]
     else:
         _removeFromScene(lastRemainingIntermediate, lastSegment)
         newAllButLastSegments = remainingIntermediateSegments
@@ -72,7 +88,10 @@ def _possiblyMergeLastTwoSegments(
     return newSegments
 
 
-def _removeFromScene(previousSegment: _sib.SegmentItemBase, segmentToDelete: _sib.SegmentItemBase) -> None:
+def _removeFromScene(
+    previousSegment: _sib.SegmentItemBase,
+    segmentToDelete: _sib.SegmentItemBase,
+) -> None:
     endPortOrCornerItem = _getPortOrCornerItem(segmentToDelete.endNode)
 
     previousLine = previousSegment.line()

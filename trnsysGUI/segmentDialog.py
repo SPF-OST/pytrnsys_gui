@@ -8,7 +8,11 @@ import trnsysGUI.names.rename as _rename
 
 
 class SegmentDialog(_qtw.QDialog):
-    def __init__(self, connection: _cb.ConnectionBase, renameHelper: _rename.RenameHelper) -> None:
+    def __init__(
+        self,
+        connection: _cb.ConnectionBase,
+        renameHelper: _rename.RenameHelper,
+    ) -> None:
         super().__init__()
         self._connection = connection
         self._renameHelper = renameHelper
@@ -38,7 +42,9 @@ class SegmentDialog(_qtw.QDialog):
         currentName = self._connection.displayName
 
         checkDdckFolder = False
-        result = self._renameHelper.canRename(currentName, newName, checkDdckFolder)
+        result = self._renameHelper.canRename(
+            currentName, newName, checkDdckFolder
+        )
         if _res.isError(result):
             errorMessage = _res.error(result)
             _werrors.showMessageBox(errorMessage.message)

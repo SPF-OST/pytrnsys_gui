@@ -44,13 +44,17 @@ string PROJECT$ "{ddckDirPath}"'''
             if lineProjectPathDdck == -1:
                 self.lines.append(f'string PROJECT$ "{ddckDirPath}"')
             else:
-                self.lines[lineProjectPathDdck] = f'string PROJECT$ "{ddckDirPath}"'
+                self.lines[lineProjectPathDdck] = (
+                    f'string PROJECT$ "{ddckDirPath}"'
+                )
 
         lineProjectPath = self.statementChecker("string projectPath")
         if lineProjectPath == -1:
             self.lines.append(f'string projectPath "{self._projectDirPath}"')
         else:
-            self.lines[lineProjectPath] = f'string projectPath "{self._projectDirPath}"'
+            self.lines[lineProjectPath] = (
+                f'string projectPath "{self._projectDirPath}"'
+            )
 
         lineDdck = self.statementChecker("USED DDCKs")
         if lineDdck == -1:
@@ -61,13 +65,17 @@ string PROJECT$ "{ddckDirPath}"'''
 
         for i, ddckFilePath in enumerate(sortedDdckFilePaths):
             ddckFilePathWithoutSuffix = ddckFilePath.with_suffix("")
-            self.lines.insert(lineDdck + 2 + i, f"PROJECT$ {ddckFilePathWithoutSuffix}")
+            self.lines.insert(
+                lineDdck + 2 + i, f"PROJECT$ {ddckFilePathWithoutSuffix}"
+            )
 
         newConfigFileContents = "\n".join(self.lines)
         self._configFilePath.write_text(newConfigFileContents)
 
     @staticmethod
-    def _getSortedDdckFilePaths(ddckDirPath: _pl.Path) -> _cabc.Sequence[_pl.Path]:
+    def _getSortedDdckFilePaths(
+        ddckDirPath: _pl.Path,
+    ) -> _cabc.Sequence[_pl.Path]:
         @_ft.cmp_to_key
         def cmpHeadFirstEndLast(path1: _pl.Path, path2: _pl.Path) -> int:
             stem1 = path1.stem
@@ -88,8 +96,12 @@ string PROJECT$ "{ddckDirPath}"'''
             return -1 if str(path1) < str(path2) else 1
 
         absoluteDdckFilePaths = ddckDirPath.rglob("*.ddck")
-        relativeDdckFilePaths = [p.relative_to(ddckDirPath) for p in absoluteDdckFilePaths]
-        sortedDdckFilePaths = sorted(relativeDdckFilePaths, key=cmpHeadFirstEndLast)
+        relativeDdckFilePaths = [
+            p.relative_to(ddckDirPath) for p in absoluteDdckFilePaths
+        ]
+        sortedDdckFilePaths = sorted(
+            relativeDdckFilePaths, key=cmpHeadFirstEndLast
+        )
         return sortedDdckFilePaths
 
     @property

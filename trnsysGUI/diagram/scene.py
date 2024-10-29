@@ -66,7 +66,9 @@ class Scene(_qtw.QGraphicsScene):
             if not selectedObjects:
                 return
 
-            assert len(selectedObjects) == 1, "It shouldn't be possible select more than one object"
+            assert (
+                len(selectedObjects) == 1
+            ), "It shouldn't be possible select more than one object"
 
             selectedObject = selectedObjects[0]
 
@@ -77,7 +79,11 @@ class Scene(_qtw.QGraphicsScene):
 
     @staticmethod
     def _isSelected(o):
-        return o.isConnectionSelected if isinstance(o, _cb.ConnectionBase) else o.isSelected
+        return (
+            o.isConnectionSelected
+            if isinstance(o, _cb.ConnectionBase)
+            else o.isSelected
+        )
 
     def mousePressEvent(self, event):
         for connection in self._editor.connectionList:
@@ -94,7 +100,9 @@ class Scene(_qtw.QGraphicsScene):
 
         if self._previouslyHitItems is not None:
             for item in self._previouslyHitItems:
-                if isinstance(item, (_gi.GraphicalItem, _bi.BlockItem)) and hasattr(item, "resizer"):
+                if isinstance(
+                    item, (_gi.GraphicalItem, _bi.BlockItem)
+                ) and hasattr(item, "resizer"):
                     self.removeItem(item.resizer)
 
             self._previouslyHitItems.clear()

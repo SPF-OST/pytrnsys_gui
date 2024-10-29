@@ -14,7 +14,10 @@ if _tp.TYPE_CHECKING:
 
 
 def moveComponentDdckFolderIfNecessary(
-    blockItem: _bi.BlockItem, newName: str, oldName: str, projectDirPath: _pl.Path
+    blockItem: _bi.BlockItem,
+    newName: str,
+    oldName: str,
+    projectDirPath: _pl.Path,
 ) -> None:
     if not hasComponentDdckFolder(blockItem):
         return
@@ -33,11 +36,17 @@ def moveComponentDdckFolderIfNecessary(
 
 
 def hasComponentDdckFolder(blockItem: _bi.BlockItem) -> bool:
-    hasDdckFolder = blockItem.hasDdckDirectory() if isinstance(blockItem, _ip.HasInternalPiping) else False
+    hasDdckFolder = (
+        blockItem.hasDdckDirectory()
+        if isinstance(blockItem, _ip.HasInternalPiping)
+        else False
+    )
     return hasDdckFolder
 
 
-def getComponentDdckDirPath(displayName: str, projectDirPath: _pl.Path) -> _pl.Path:
+def getComponentDdckDirPath(
+    displayName: str, projectDirPath: _pl.Path
+) -> _pl.Path:
     oldComponentDirPath = projectDirPath / "ddck" / displayName
     return oldComponentDirPath
 
@@ -47,7 +56,9 @@ def createComponentDdckFolder(name: str, projectDirPath: _pl.Path) -> None:
     newComponentDirPath.mkdir()
 
 
-def maybeDeleteNonEmptyComponentDdckFolder(blockItem: _bi.BlockItem, projectFolder: _pl.Path) -> None:
+def maybeDeleteNonEmptyComponentDdckFolder(
+    blockItem: _bi.BlockItem, projectFolder: _pl.Path
+) -> None:
     if not hasComponentDdckFolder(blockItem):
         return
 
@@ -69,9 +80,14 @@ and contains the following items:
 
 Would you like to delete the component ddck folder nonetheless? This cannot be undone.
 """
-        standardButton = _qtw.QMessageBox.question(None, "Delete component ddck folder?", message)
+        standardButton = _qtw.QMessageBox.question(
+            None, "Delete component ddck folder?", message
+        )
 
-        if standardButton != _qtw.QMessageBox.StandardButton.Yes:  # pylint: disable=no-member
+        if (
+            standardButton
+            != _qtw.QMessageBox.StandardButton.Yes  # pylint: disable=no-member
+        ):
             return
 
     _su.rmtree(dirPath)

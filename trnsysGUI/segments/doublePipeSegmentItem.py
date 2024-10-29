@@ -50,7 +50,9 @@ class DoublePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
             return
 
         self._doublePipeConnection.lengthInM = connection.lengthInM
-        self._doublePipeConnection.shallBeSimulated = connection.shallBeSimulated
+        self._doublePipeConnection.shallBeSimulated = (
+            connection.shallBeSimulated
+        )
 
         self._doublePipeConnection.updateSegmentGradients()
 
@@ -83,14 +85,18 @@ class DoublePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
         if self._doublePipeConnection.shallBeSimulated:
             return _qtg.QPen(globalColor, _LINE_PEN_WIDTH)
 
-        color = self._getTransparentColor(globalColor, _common.NOT_SIMULATED_COLOR_ALPHA)
+        color = self._getTransparentColor(
+            globalColor, _common.NOT_SIMULATED_COLOR_ALPHA
+        )
         pen = _qtg.QPen(color, _LINE_PEN_WIDTH)
         pen.setStyle(_qtc.Qt.DashLine)
 
         return pen
 
     @staticmethod
-    def _getTransparentColor(globalColor: _qtc.Qt.GlobalColor, alpha: int) -> _qtg.QColor:
+    def _getTransparentColor(
+        globalColor: _qtc.Qt.GlobalColor, alpha: int
+    ) -> _qtg.QColor:
         color = _qtg.QColor(globalColor)
         color.setAlpha(alpha)
         return color

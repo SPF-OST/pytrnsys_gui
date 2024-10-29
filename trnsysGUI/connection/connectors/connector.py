@@ -44,12 +44,18 @@ class Connector(
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         return _ip.InternalPiping(
-            [self._modelPipe], {self._modelPipe.fromPort: self.inputs[0], self._modelPipe.toPort: self.outputs[0]}
+            [self._modelPipe],
+            {
+                self._modelPipe.fromPort: self.inputs[0],
+                self._modelPipe.toPort: self.outputs[0],
+            },
         )
 
     @classmethod
     @_tp.override
-    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+    def _getImageAccessor(  # pylint: disable=arguments-differ
+        cls,
+    ) -> _img.SvgImageAccessor:
         return _img.CONNECTOR_SVG
 
     def _setModels(self) -> None:
@@ -73,14 +79,24 @@ class Connector(
         self.label.setPos(labelPosX, height)
 
         self.origInputsPos = [[0, delta]]
-        self.origOutputsPos = [[width, delta]]  # pylint: disable=duplicate-code  # 1
-        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
-        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
+        self.origOutputsPos = [
+            [width, delta]
+        ]  # pylint: disable=duplicate-code  # 1
+        self.inputs[0].setPos(
+            self.origInputsPos[0][0], self.origInputsPos[0][1]
+        )
+        self.outputs[0].setPos(
+            self.origOutputsPos[0][0], self.origOutputsPos[0][1]
+        )
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
 
         return width, height
 
-    def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
-        return _cehspc.exportDummySinglePipeConnection(self, startingUnit, self.fromPort, self.toPort, self._modelPipe)
+    def exportPipeAndTeeTypesForTemp(
+        self, startingUnit: int
+    ) -> _tp.Tuple[str, int]:
+        return _cehspc.exportDummySinglePipeConnection(
+            self, startingUnit, self.fromPort, self.toPort, self._modelPipe
+        )

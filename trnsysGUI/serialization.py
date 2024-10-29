@@ -52,14 +52,18 @@ class UpgradableJsonSchemaMixinBase(_ser.UpgradableJsonSchemaMixin, _abc.ABC):
         raise NotImplementedError()
 
 
-class BlockItemUpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinBase, _abc.ABC):
+class BlockItemUpgradableJsonSchemaMixin(
+    UpgradableJsonSchemaMixinBase, _abc.ABC
+):
     @classmethod
     @_tp.override
     def key(cls) -> str:
         return ".__BlockDict__"
 
 
-class ConnectionItemUpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinBase, _abc.ABC):
+class ConnectionItemUpgradableJsonSchemaMixin(
+    UpgradableJsonSchemaMixinBase, _abc.ABC
+):
     @classmethod
     @_tp.override
     def key(cls) -> str:

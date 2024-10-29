@@ -62,7 +62,9 @@ class SettingsDlg(_widgets.QDialog):
         self._settings: MaybeCancelled[_settings.Settings] = CANCELLED
 
     @staticmethod
-    def showDialogAndGetSettings(parent=None) -> MaybeCancelled[_settings.Settings]:
+    def showDialogAndGetSettings(
+        parent=None,
+    ) -> MaybeCancelled[_settings.Settings]:
         dialog = SettingsDlg(parent)
         dialog.exec()
         return dialog._settings

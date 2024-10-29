@@ -66,7 +66,9 @@ class MassFlowVisualizer(_qtw.QDialog):
         self._timeStepIncrease = 1
         self._timeStepIncreaseLineEdit = _qtw.QLineEdit()
         self._timeStepIncreaseLineEdit.setText(str(self._timeStepIncrease))
-        self._timeStepIncreaseLineEdit.editingFinished.connect(self._onTimeStepIncreaseLineEditEditingFinished)
+        self._timeStepIncreaseLineEdit.editingFinished.connect(
+            self._onTimeStepIncreaseLineEditEditingFinished
+        )
 
         self.slider = _qtw.QSlider(parent)
         self.setSlider()
@@ -82,7 +84,9 @@ class MassFlowVisualizer(_qtw.QDialog):
         self.paused = True
 
         nameLabel = _qtw.QLabel("Name:")
-        self.currentStepLabel = _qtw.QLabel("Time: " + str(self.convertTime(self.getTime(0))))
+        self.currentStepLabel = _qtw.QLabel(
+            "Time: " + str(self.convertTime(self.getTime(0)))
+        )
         self.le = _qtw.QLineEdit("NONE")
 
         self.showMassButton = _qtw.QPushButton("Show mass")  # comment out
@@ -124,7 +128,9 @@ class MassFlowVisualizer(_qtw.QDialog):
         layout.addLayout(colorLayout, 1, 0, 1, 0)
         layout.addLayout(buttonLayout, 2, 0, 2, 0)
         layout.addWidget(self.currentStepLabel, 3, 0, 1, 2)
-        layout.addWidget(self.slider, 4, 0, 1, 2)  # Only for debug (Why do I need a 3 here instead of a 2 for int:row?)
+        layout.addWidget(
+            self.slider, 4, 0, 1, 2
+        )  # Only for debug (Why do I need a 3 here instead of a 2 for int:row?)
 
         self.setLayout(layout)
 
@@ -151,7 +157,9 @@ class MassFlowVisualizer(_qtw.QDialog):
         except ValueError:
             timeStepIncrease = None
 
-        if timeStepIncrease is None or not (1 <= timeStepIncrease <= self.maxTimeStep):
+        if timeStepIncrease is None or not (
+            1 <= timeStepIncrease <= self.maxTimeStep
+        ):
             errorMessage = f"The time-step increase must be an integer between 1 and {self.maxTimeStep}, inclusive."
             _werrors.showMessageBox(errorMessage, title="Invalid value")
             self._timeStepIncreaseLineEdit.setText(str(self._timeStepIncrease))
@@ -183,17 +191,24 @@ class MassFlowVisualizer(_qtw.QDialog):
             if isinstance(t, _cb.ConnectionBase):
                 t.massFlowLabel.setVisible(self.showMass)
 
-        self.logger.debug("%s %s %s" % (str(self.minValue), str(self.medianValue), str(self.maxValue)))
+        self.logger.debug(
+            "%s %s %s"
+            % (str(self.minValue), str(self.medianValue), str(self.maxValue))
+        )
 
     def loadFile(self):
         if not self.loadedFile:
-            self.massFlowData = _pd.read_csv(self.dataFilePath, sep="\t").rename(columns=lambda x: x.strip())
+            self.massFlowData = _pd.read_csv(
+                self.dataFilePath, sep="\t"
+            ).rename(columns=lambda x: x.strip())
             _truncateColumnNames(self.massFlowData)
         self.loadedFile = True
 
     def loadTempFile(self):
         if not self.tempLoadedFile:
-            self.tempMassFlowData = _pd.read_csv(self.tempDatafilePath, sep="\t").rename(columns=lambda x: x.strip())
+            self.tempMassFlowData = _pd.read_csv(
+                self.tempDatafilePath, sep="\t"
+            ).rename(columns=lambda x: x.strip())
             _truncateColumnNames(self.tempMassFlowData)
         self.tempLoadedFile = True
 
@@ -215,63 +230,128 @@ class MassFlowVisualizer(_qtw.QDialog):
             for t in self.parent.editor.trnsysObj:
                 if isinstance(t, _spc.SinglePipeConnection):
                     mfrVariableName = _mnames.getCanonicalMassFlowVariableName(
-                        componentDisplayName=t.getDisplayName(), pipeName=t.modelPipe.name
+                        componentDisplayName=t.getDisplayName(),
+                        pipeName=t.modelPipe.name,
                     )
-                    temperatureVariableName = _cnames.getTemperatureVariableName(t, _mfn.PortItemType.STANDARD)
+                    temperatureVariableName = (
+                        _cnames.getTemperatureVariableName(
+                            t, _mfn.PortItemType.STANDARD
+                        )
+                    )
 
                     if (
                         mfrVariableName in self.massFlowData.columns
                         and temperatureVariableName in self.tempMassFlowData
                     ):
-                        massFlow = self._getMassFlow(mfrVariableName, self.timeStep)
-                        temperature = self._getTemperature(temperatureVariableName, self.timeStep)
+                        massFlow = self._getMassFlow(
+                            mfrVariableName, self.timeStep
+                        )
+                        temperature = self._getTemperature(
+                            temperatureVariableName, self.timeStep
+                        )
 
                         t.setMassFlowAndTemperature(massFlow, temperature)
                         thickValue = self.getThickness(massFlow)
                         self.logger.debug("Thickvalue: " + str(thickValue))
-                        if self.massFlowData[mfrVariableName].iloc[self.timeStep] == 0:
+                        if (
+                            self.massFlowData[mfrVariableName].iloc[
+                                self.timeStep
+                            ]
+                            == 0
+                        ):
                             t.setColor(thickValue, mfr="ZeroMfr")
                         elif round(abs(temperature)) == self.maxValue:
                             t.setColor(thickValue, mfr="max")
                         elif round(abs(temperature)) == self.minValue:
                             t.setColor(thickValue, mfr="min")
-                        elif self.minValue < round(abs(temperature)) <= self.lowerQuarter:
+                        elif (
+                            self.minValue
+                            < round(abs(temperature))
+                            <= self.lowerQuarter
+                        ):
                             t.setColor(thickValue, mfr="minTo25")
-                        elif self.lowerQuarter < round(abs(temperature)) <= self.medianValue:
+                        elif (
+                            self.lowerQuarter
+                            < round(abs(temperature))
+                            <= self.medianValue
+                        ):
                             t.setColor(thickValue, mfr="25To50")
-                        elif self.medianValue < round(abs(temperature)) <= self.upperQuarter:
+                        elif (
+                            self.medianValue
+                            < round(abs(temperature))
+                            <= self.upperQuarter
+                        ):
                             t.setColor(thickValue, mfr="50To75")
-                        elif self.upperQuarter < round(abs(temperature)) < self.maxValue:
+                        elif (
+                            self.upperQuarter
+                            < round(abs(temperature))
+                            < self.maxValue
+                        ):
                             t.setColor(thickValue, mfr="75ToMax")
                         else:
                             t.setColor(thickValue, mfr="test")
                         i += 1
                 if isinstance(t, _dpc.DoublePipeConnection):
-                    coldMassFlowVariableName = _mnames.getCanonicalMassFlowVariableName(
-                        componentDisplayName=t.displayName, pipeName=t.coldModelPipe.name
+                    coldMassFlowVariableName = (
+                        _mnames.getCanonicalMassFlowVariableName(
+                            componentDisplayName=t.displayName,
+                            pipeName=t.coldModelPipe.name,
+                        )
                     )
-                    coldTemperatureVariableName = _cnames.getTemperatureVariableName(t, _mfn.PortItemType.COLD)
-
-                    hotMassFlowVariableName = _mnames.getCanonicalMassFlowVariableName(
-                        componentDisplayName=t.displayName, pipeName=t.hotModelPipe.name
+                    coldTemperatureVariableName = (
+                        _cnames.getTemperatureVariableName(
+                            t, _mfn.PortItemType.COLD
+                        )
                     )
-                    hotTemperatureVariableName = _cnames.getTemperatureVariableName(t, _mfn.PortItemType.HOT)
 
-                    coldMassFlow = self._getMassFlow(coldMassFlowVariableName, self.timeStep)
-                    coldTemperature = self._getTemperature(coldTemperatureVariableName, self.timeStep)
+                    hotMassFlowVariableName = (
+                        _mnames.getCanonicalMassFlowVariableName(
+                            componentDisplayName=t.displayName,
+                            pipeName=t.hotModelPipe.name,
+                        )
+                    )
+                    hotTemperatureVariableName = (
+                        _cnames.getTemperatureVariableName(
+                            t, _mfn.PortItemType.HOT
+                        )
+                    )
 
-                    hotMassFlow = self._getMassFlow(hotMassFlowVariableName, self.timeStep)
-                    hotTemperature = self._getTemperature(hotTemperatureVariableName, self.timeStep)
+                    coldMassFlow = self._getMassFlow(
+                        coldMassFlowVariableName, self.timeStep
+                    )
+                    coldTemperature = self._getTemperature(
+                        coldTemperatureVariableName, self.timeStep
+                    )
 
-                    t.setMassFlowAndTemperature(coldMassFlow, coldTemperature, hotMassFlow, hotTemperature)
+                    hotMassFlow = self._getMassFlow(
+                        hotMassFlowVariableName, self.timeStep
+                    )
+                    hotTemperature = self._getTemperature(
+                        hotTemperatureVariableName, self.timeStep
+                    )
+
+                    t.setMassFlowAndTemperature(
+                        coldMassFlow,
+                        coldTemperature,
+                        hotMassFlow,
+                        hotTemperature,
+                    )
 
                 elif isinstance(t, _tv.TVentil):
-                    valvePositionVariableName = _mnames.getInputVariableName(t, t.modelDiverter)
+                    valvePositionVariableName = _mnames.getInputVariableName(
+                        t, t.modelDiverter
+                    )
                     if valvePositionVariableName in self.massFlowData.columns:
-                        valvePosition = str(self.massFlowData[valvePositionVariableName].iloc[self.timeStep])
+                        valvePosition = str(
+                            self.massFlowData[valvePositionVariableName].iloc[
+                                self.timeStep
+                            ]
+                        )
                         t.setPositionForMassFlowSolver(valvePosition)
                         t.posLabel.setPlainText(valvePosition)
-                        self.logger.debug("valve position: " + str(valvePosition))
+                        self.logger.debug(
+                            "valve position: " + str(valvePosition)
+                        )
 
         else:
             return
@@ -281,9 +361,15 @@ class MassFlowVisualizer(_qtw.QDialog):
         mass = self.massFlowData[truncatedMfrVariableName].iloc[timeStep]
         return mass
 
-    def _getTemperature(self, temperatureVariableName: str, timeStep: int) -> float:
-        truncatedTemperatureVariableName = _truncateName(temperatureVariableName)
-        return self.tempMassFlowData[truncatedTemperatureVariableName].iloc[timeStep]
+    def _getTemperature(
+        self, temperatureVariableName: str, timeStep: int
+    ) -> float:
+        truncatedTemperatureVariableName = _truncateName(
+            temperatureVariableName
+        )
+        return self.tempMassFlowData[truncatedTemperatureVariableName].iloc[
+            timeStep
+        ]
 
     def pauseVis(self):
         self.paused = True
@@ -373,7 +459,9 @@ class MassFlowVisualizer(_qtw.QDialog):
 
     def checkTempTimeStep(self):
         tempMassFlowDataDup = self.tempMassFlowData
-        tempMassFlowDataDup = tempMassFlowDataDup.drop(tempMassFlowDataDup.index[0])
+        tempMassFlowDataDup = tempMassFlowDataDup.drop(
+            tempMassFlowDataDup.index[0]
+        )
         for items in tempMassFlowDataDup.nunique().items():
             if items[0] != "TIME":
                 if items[1] > 1:
@@ -393,18 +481,34 @@ class MassFlowVisualizer(_qtw.QDialog):
         -------
         """
 
-        data = self.massFlowData.values.tolist()  # data frame converted to nested list
+        data = (
+            self.massFlowData.values.tolist()
+        )  # data frame converted to nested list
         for sublist in data:  # delete the time column from the list
             del sublist[0]
-        data = list(_it.chain.from_iterable(data))  # nested list combined into one list
-        cleanedData = [x for x in data if str(x) != "nan"]  # remove nan from list
-        cleanedData = [round(abs(num)) for num in cleanedData]  # get absolute value and round off
+        data = list(
+            _it.chain.from_iterable(data)
+        )  # nested list combined into one list
+        cleanedData = [
+            x for x in data if str(x) != "nan"
+        ]  # remove nan from list
+        cleanedData = [
+            round(abs(num)) for num in cleanedData
+        ]  # get absolute value and round off
         noDuplicateData = list(dict.fromkeys(cleanedData))
 
-        self.medianValueMfr = _np.percentile(noDuplicateData, 50)  # median value / 50th percentile
-        self.lowerQuarterMfr = _np.percentile(noDuplicateData, 25)  # 25th percentile
-        self.upperQuarterMfr = _np.percentile(noDuplicateData, 75)  # 75th percentile
-        self.minValueMfr = _np.min(noDuplicateData)  # minimum value excluding 0
+        self.medianValueMfr = _np.percentile(
+            noDuplicateData, 50
+        )  # median value / 50th percentile
+        self.lowerQuarterMfr = _np.percentile(
+            noDuplicateData, 25
+        )  # 25th percentile
+        self.upperQuarterMfr = _np.percentile(
+            noDuplicateData, 75
+        )  # 75th percentile
+        self.minValueMfr = _np.min(
+            noDuplicateData
+        )  # minimum value excluding 0
         self.maxValueMfr = _np.max(noDuplicateData)  # max value
 
     def getThickness(self, mass: float) -> int:
@@ -433,17 +537,31 @@ class MassFlowVisualizer(_qtw.QDialog):
         -------
         """
 
-        data = self.tempMassFlowData.values.tolist()  # data frame converted to nested list
+        data = (
+            self.tempMassFlowData.values.tolist()
+        )  # data frame converted to nested list
         for sublist in data:  # delete the time column from the list
             del sublist[0]
-        data = list(_it.chain.from_iterable(data))  # nested list combined into one list
-        cleanedData = [x for x in data if str(x) != "nan"]  # remove nan from list
-        cleanedData = [round(abs(num)) for num in cleanedData]  # get absolute value and round off
+        data = list(
+            _it.chain.from_iterable(data)
+        )  # nested list combined into one list
+        cleanedData = [
+            x for x in data if str(x) != "nan"
+        ]  # remove nan from list
+        cleanedData = [
+            round(abs(num)) for num in cleanedData
+        ]  # get absolute value and round off
         noDuplicateData = list(dict.fromkeys(cleanedData))
 
-        self.medianValue = _np.percentile(noDuplicateData, 50)  # median value / 50th percentile
-        self.lowerQuarter = _np.percentile(noDuplicateData, 25)  # 25th percentile
-        self.upperQuarter = _np.percentile(noDuplicateData, 75)  # 75th percentile
+        self.medianValue = _np.percentile(
+            noDuplicateData, 50
+        )  # median value / 50th percentile
+        self.lowerQuarter = _np.percentile(
+            noDuplicateData, 25
+        )  # 25th percentile
+        self.upperQuarter = _np.percentile(
+            noDuplicateData, 75
+        )  # 75th percentile
         self.minValue = _np.min(noDuplicateData)  # minimum value excluding 0
         self.maxValue = _np.max(noDuplicateData)  # max value
 
@@ -466,7 +584,10 @@ class MassFlowVisualizer(_qtw.QDialog):
         noOfHours = 8760
         decHour = float(time) / float(noOfHours)
         base = _dt.datetime(_dt.MINYEAR, 1, 1)
-        result = base + _dt.timedelta(seconds=(base.replace(year=base.year + 1) - base).total_seconds() * decHour)
+        result = base + _dt.timedelta(
+            seconds=(base.replace(year=base.year + 1) - base).total_seconds()
+            * decHour
+        )
         return str(result)
 
     def pressedSlider(self):
@@ -490,9 +611,13 @@ def _truncateColumnNames(df: _pd.DataFrame) -> None:
     df.columns = [_truncateName(n) for n in df.columns]
 
 
-def _ensureNamesDontCollideAfterTruncating(columnNames: _tp.Sequence[str]) -> None:
+def _ensureNamesDontCollideAfterTruncating(
+    columnNames: _tp.Sequence[str],
+) -> None:
     sortedColumnNames = sorted(columnNames)
-    groupedNames = [list(g) for _, g in _it.groupby(sortedColumnNames, key=_truncateName)]
+    groupedNames = [
+        list(g) for _, g in _it.groupby(sortedColumnNames, key=_truncateName)
+    ]
     collidingNames = _flatten(g for g in groupedNames if len(g) > 1)
     if collidingNames:
         formattedCollidingNames = "\n\t".join(collidingNames)

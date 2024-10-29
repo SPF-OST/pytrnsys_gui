@@ -15,7 +15,9 @@ def main():
     arguments = _args.getArgsOrExit()
 
     logFilePath = _getLogFilePath()
-    logger = _ulog.getOrCreateCustomLogger("root", arguments.logLevel, logFilePath)
+    logger = _ulog.getOrCreateCustomLogger(
+        "root", arguments.logLevel, logFilePath
+    )
 
     _registerExceptionHook(logger)
 
@@ -69,7 +71,9 @@ def _getLogFilePath():
 
 def _registerExceptionHook(logger: _log.Logger) -> None:
     def exceptionHook(exceptionType, value, traceback):
-        logger.critical("Uncaught exception", exc_info=(exceptionType, value, traceback))
+        logger.critical(
+            "Uncaught exception", exc_info=(exceptionType, value, traceback)
+        )
 
         for handler in logger.handlers:
             handler.flush()

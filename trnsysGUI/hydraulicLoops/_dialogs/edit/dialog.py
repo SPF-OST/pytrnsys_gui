@@ -21,7 +21,12 @@ from . import _UI_dialog_generated as _uigen  # type: ignore[import]  # pylint: 
 
 
 class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
-    def __init__(self, hydraulicLoop: _gmodel.HydraulicLoop, occupiedNames: _tp.Sequence[str], fluids: _model.Fluids):
+    def __init__(
+        self,
+        hydraulicLoop: _gmodel.HydraulicLoop,
+        occupiedNames: _tp.Sequence[str],
+        fluids: _model.Fluids,
+    ):
         super().__init__()
         self.setupUi(self)
 
@@ -46,17 +51,22 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
         self._setCurrentData(self.fluidComboBox, self._hydraulicLoop.fluid)
 
         self._configureConnectionsDefinitionModeComboBox()
-        self._setConnectionsDefinitionMode(self._hydraulicLoop.connectionsDefinitionMode)
+        self._setConnectionsDefinitionMode(
+            self._hydraulicLoop.connectionsDefinitionMode
+        )
 
     def _configureConnectionsDefinitionModeComboBox(self) -> None:
         self.connectionsDefinitionModeComboBox.addItem(
-            "Define connections individually", _cdm.ConnectionsDefinitionMode.INDIVIDUAL
+            "Define connections individually",
+            _cdm.ConnectionsDefinitionMode.INDIVIDUAL,
         )
         self.connectionsDefinitionModeComboBox.addItem(
-            "Define loop wide defaults", _cdm.ConnectionsDefinitionMode.LOOP_WIDE_DEFAULTS
+            "Define loop wide defaults",
+            _cdm.ConnectionsDefinitionMode.LOOP_WIDE_DEFAULTS,
         )
         self.connectionsDefinitionModeComboBox.addItem(
-            "All pipes in loops are dummies", _cdm.ConnectionsDefinitionMode.DUMMY_PIPES
+            "All pipes in loops are dummies",
+            _cdm.ConnectionsDefinitionMode.DUMMY_PIPES,
         )
 
         def onActivated(newIndex: int) -> None:
@@ -68,9 +78,12 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
                 and newMode != _cdm.ConnectionsDefinitionMode.INDIVIDUAL
             )
             if haveChangedAwayFromIndividualMode:
-                if not self._doesUserSayContinueWithChangingAwayFromDefiningPipesIndividually():
+                if (
+                    not self._doesUserSayContinueWithChangingAwayFromDefiningPipesIndividually()
+                ):
                     self._setCurrentData(
-                        self.connectionsDefinitionModeComboBox, _cdm.ConnectionsDefinitionMode.INDIVIDUAL
+                        self.connectionsDefinitionModeComboBox,
+                        _cdm.ConnectionsDefinitionMode.INDIVIDUAL,
                     )
                     return
 
@@ -126,7 +139,9 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
             isVisible = self._isBulkTotalPipeLengthTypeSelected()
             self.bulkLengthInfoIconWidget.setVisible(isVisible)
 
-        self.bulkLengthTypeComboBox.currentTextChanged.connect(setTotalLoopLengthInfoToolTipVisible)
+        self.bulkLengthTypeComboBox.currentTextChanged.connect(
+            setTotalLoopLengthInfoToolTipVisible
+        )
 
         def onBulkApplyButtonPressed() -> None:
 
@@ -136,7 +151,9 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
             uValueText = self.bulkUValueLineEdit.text()
             uValueInWPerM2K = float(uValueText) if uValueText else None
 
-            shallBeSimulatedText = self.bulkShallBeSimulatedComboBox.currentText()
+            shallBeSimulatedText = (
+                self.bulkShallBeSimulatedComboBox.currentText()
+            )
             if not shallBeSimulatedText:
                 shallBeSimulated = None
             elif shallBeSimulatedText == "Yes":
@@ -144,10 +161,14 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
             elif shallBeSimulatedText == "No":
                 shallBeSimulated = False
             else:
-                raise AssertionError("Expecting 'Yes' or 'No' for 'Simulate pipe?' combobox.")
+                raise AssertionError(
+                    "Expecting 'Yes' or 'No' for 'Simulate pipe?' combobox."
+                )
 
             for connection in self._hydraulicLoop.connections:
-                pipeLengthInM = self._computeBulkIndividualPipeLength(connection, shallBeSimulated)
+                pipeLengthInM = self._computeBulkIndividualPipeLength(
+                    connection, shallBeSimulated
+                )
                 if pipeLengthInM is not None:
                     connection.lengthInM = pipeLengthInM
 
@@ -202,14 +223,18 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
     def _reloadConnections(self) -> None:
         connectionsModel = _ConnectionsUiModel(self._hydraulicLoop.connections)
 
-        connectionsModel.dataChanged.connect(lambda *_: self._updatePipesStatisticsLabel())
+        connectionsModel.dataChanged.connect(
+            lambda *_: self._updatePipesStatisticsLabel()
+        )
 
         self.connectionsTableView.setModel(connectionsModel)
 
         self._updatePipesStatisticsLabel()
 
     def _updatePipesStatisticsLabel(self) -> None:
-        totalLoopLengthInM = sum(c.lengthInM for c in self._hydraulicLoop.simulatedConnections)
+        totalLoopLengthInM = sum(
+            c.lengthInM for c in self._hydraulicLoop.simulatedConnections
+        )
         nConnections = self._hydraulicLoop.nConnections
         nSimulatedConnections = self._hydraulicLoop.nSimulatedConnections
 
@@ -236,25 +261,33 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
         loopLengthInM = float(lengthText)
 
         isShallBeSimulatedSameForAllConnections = (
-            len({c.shallBeSimulated for c in self._hydraulicLoop.connections}) == 1
+            len({c.shallBeSimulated for c in self._hydraulicLoop.connections})
+            == 1
         )
 
-        willShallBeSimulatedBeSameForAllConnections = isShallBeSimulatedSameForAllConnections or (
-            bulkShallBeSimulated is not None
+        willShallBeSimulatedBeSameForAllConnections = (
+            isShallBeSimulatedSameForAllConnections
+            or (bulkShallBeSimulated is not None)
         )
 
         if willShallBeSimulatedBeSameForAllConnections:
-            individualPipeLength = loopLengthInM / self._hydraulicLoop.nConnections
+            individualPipeLength = (
+                loopLengthInM / self._hydraulicLoop.nConnections
+            )
             return individualPipeLength
 
         if not connection.shallBeSimulated:
             return None
 
-        individualPipeLengthM = loopLengthInM / self._hydraulicLoop.nSimulatedConnections
+        individualPipeLengthM = (
+            loopLengthInM / self._hydraulicLoop.nSimulatedConnections
+        )
 
         return individualPipeLengthM
 
-    def _doesUserSayContinueWithChangingAwayFromDefiningPipesIndividually(self) -> bool:
+    def _doesUserSayContinueWithChangingAwayFromDefiningPipesIndividually(
+        self,
+    ) -> bool:
         messageBox = _qtw.QMessageBox(self)
         messageBox.setWindowTitle("Pipe properties will be lost")
         messageBox.setText(
@@ -266,18 +299,30 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
         shallContinue = pressedButton == messageBox.Yes
         return shallContinue
 
-    def _setConnectionsDefinitionMode(self, connectionsDefinitionMode: _cdm.ConnectionsDefinitionMode) -> None:
-        self._hydraulicLoop.connectionsDefinitionMode = connectionsDefinitionMode
-        self._setCurrentData(self.connectionsDefinitionModeComboBox, connectionsDefinitionMode)
+    def _setConnectionsDefinitionMode(
+        self, connectionsDefinitionMode: _cdm.ConnectionsDefinitionMode
+    ) -> None:
+        self._hydraulicLoop.connectionsDefinitionMode = (
+            connectionsDefinitionMode
+        )
+        self._setCurrentData(
+            self.connectionsDefinitionModeComboBox, connectionsDefinitionMode
+        )
 
-        areEditWidgetsEnabled = connectionsDefinitionMode == _cdm.ConnectionsDefinitionMode.INDIVIDUAL
+        areEditWidgetsEnabled = (
+            connectionsDefinitionMode
+            == _cdm.ConnectionsDefinitionMode.INDIVIDUAL
+        )
         self.bulkOperationsGroupBox.setVisible(areEditWidgetsEnabled)
         self.pipesGroupBox.setVisible(areEditWidgetsEnabled)
         self.adjustSize()
 
     @classmethod
     def showDialog(
-        cls, hydraulicLoop: _gmodel.HydraulicLoop, occupiedNames: _tp.Sequence[str], fluids: _model.Fluids
+        cls,
+        hydraulicLoop: _gmodel.HydraulicLoop,
+        occupiedNames: _tp.Sequence[str],
+        fluids: _model.Fluids,
     ) -> _tp.Literal["oked", "cancelled"]:
         dialog = HydraulicLoopDialog(hydraulicLoop, occupiedNames, fluids)
 
@@ -299,7 +344,9 @@ _PropertyValue = str | float | bool
 class _Property(_abc.ABC):
     header: str
     getter: _tp.Callable[[_gmodel.Connection], _PropertyValue]
-    setter: _tp.Optional[_tp.Callable[[_gmodel.Connection, _PropertyValue], None]] = None
+    setter: _tp.Optional[
+        _tp.Callable[[_gmodel.Connection, _PropertyValue], None]
+    ] = None
     shallHighlightOutliers: bool = True
 
     @property
@@ -355,31 +402,49 @@ def _parsePositiveFloat(text: str) -> float:
     return value
 
 
-def _setConnectionDiameter(connection: _gmodel.Connection, diameterInCmText: _tp.Any) -> None:
+def _setConnectionDiameter(
+    connection: _gmodel.Connection, diameterInCmText: _tp.Any
+) -> None:
     connection.diameterInCm = _parsePositiveFloat(diameterInCmText)
 
 
-def _setConnectionUValue(connection: _gmodel.Connection, uValueInWPerM2KText: _tp.Any) -> None:
+def _setConnectionUValue(
+    connection: _gmodel.Connection, uValueInWPerM2KText: _tp.Any
+) -> None:
     connection.uValueInWPerM2K = _parsePositiveFloat(uValueInWPerM2KText)
 
 
-def _setConnectionLength(connection: _gmodel.Connection, lengthInMText: _tp.Any) -> None:
+def _setConnectionLength(
+    connection: _gmodel.Connection, lengthInMText: _tp.Any
+) -> None:
     connection.lengthInM = _parsePositiveFloat(lengthInMText)
 
 
-def _setshallBeSimulated(connection: _gmodel.Connection, shallBeSimulated: _tp.Any) -> None:
+def _setshallBeSimulated(
+    connection: _gmodel.Connection, shallBeSimulated: _tp.Any
+) -> None:
     connection.shallBeSimulated = shallBeSimulated
 
 
 class _ConnectionsUiModel(_qtc.QAbstractItemModel):
-    _SHALL_SIMULATE_PROPERTY = _BoolProperty("Simulate?", lambda c: c.shallBeSimulated, _setshallBeSimulated)
+    _SHALL_SIMULATE_PROPERTY = _BoolProperty(
+        "Simulate?", lambda c: c.shallBeSimulated, _setshallBeSimulated
+    )
 
     _PROPERTIES = [
         _SHALL_SIMULATE_PROPERTY,
         _TextProperty("Name", lambda c: c.name, shallHighlightOutliers=False),
-        _TextProperty("Diameter [cm]", lambda c: c.diameterInCm, _setConnectionDiameter),
-        _TextProperty("U value [W/(m^2 K)]", lambda c: c.uValueInWPerM2K, _setConnectionUValue),
-        _TextProperty("Length [m]", lambda c: c.lengthInM, _setConnectionLength),
+        _TextProperty(
+            "Diameter [cm]", lambda c: c.diameterInCm, _setConnectionDiameter
+        ),
+        _TextProperty(
+            "U value [W/(m^2 K)]",
+            lambda c: c.uValueInWPerM2K,
+            _setConnectionUValue,
+        ),
+        _TextProperty(
+            "Length [m]", lambda c: c.lengthInM, _setConnectionLength
+        ),
     ]
 
     def __init__(self, connections: _tp.Sequence[_gmodel.Connection]):
@@ -393,13 +458,20 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
 
         return len(self.connections)
 
-    def columnCount(self, parent: _qtc.QModelIndex = _qtc.QModelIndex()) -> int:
+    def columnCount(
+        self, parent: _qtc.QModelIndex = _qtc.QModelIndex()
+    ) -> int:
         if not self._isTopLevel(parent):
             return 0
 
         return len(self._headers)
 
-    def headerData(self, section: int, orientation: _qtc.Qt.Orientation, role: int = _qtc.Qt.DisplayRole) -> _tp.Any:
+    def headerData(
+        self,
+        section: int,
+        orientation: _qtc.Qt.Orientation,
+        role: int = _qtc.Qt.DisplayRole,
+    ) -> _tp.Any:
         if role != _qtc.Qt.DisplayRole or orientation != _qtc.Qt.Horizontal:
             return None
 
@@ -409,7 +481,9 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
     def _headers(self) -> _tp.Sequence[str]:
         return [p.header for p in self._PROPERTIES]
 
-    def data(self, modelIndex: _qtc.QModelIndex, role: int = _qtc.Qt.DisplayRole) -> _tp.Any:
+    def data(
+        self, modelIndex: _qtc.QModelIndex, role: int = _qtc.Qt.DisplayRole
+    ) -> _tp.Any:
         connection, prop = self._getConnectionAndProperty(modelIndex)
 
         if role == _qtc.Qt.DisplayRole:
@@ -435,7 +509,9 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
 
         return None
 
-    def _getHighlightDataOrNone(self, connection: _gmodel.Connection, prop: _Property, role: int) -> _tp.Any:
+    def _getHighlightDataOrNone(
+        self, connection: _gmodel.Connection, prop: _Property, role: int
+    ) -> _tp.Any:
         if not prop.shallHighlightOutliers:
             return None
 
@@ -460,18 +536,30 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
 
             return _qtg.QColorConstants.Red
 
-        raise ValueError(f"Role must be {_qtc.Qt.FontRole} or {_qtc.Qt.ForegroundRole}.", role)
+        raise ValueError(
+            f"Role must be {_qtc.Qt.FontRole} or {_qtc.Qt.ForegroundRole}.",
+            role,
+        )
 
     def _getMostUsedValue(self, prop: _Property) -> _PropertyValue:
         sortedValues = sorted(
             prop.getter(c) for c in self.connections if c.shallBeSimulated  # type: ignore[misc, call-arg]
         )
         groupedValues = _it.groupby(sortedValues)
-        valuesWithCount = [{"value": v, "count": len(list(vs))} for v, vs in groupedValues]
-        mostUsedValueWithCount = max(valuesWithCount, key=lambda vwc: vwc["count"])
+        valuesWithCount = [
+            {"value": v, "count": len(list(vs))} for v, vs in groupedValues
+        ]
+        mostUsedValueWithCount = max(
+            valuesWithCount, key=lambda vwc: vwc["count"]
+        )
         return mostUsedValueWithCount["value"]
 
-    def setData(self, index: _qtc.QModelIndex, value: _tp.Any, role: int = _qtc.Qt.EditRole) -> bool:
+    def setData(
+        self,
+        index: _qtc.QModelIndex,
+        value: _tp.Any,
+        role: int = _qtc.Qt.EditRole,
+    ) -> bool:
         if role not in [_qtc.Qt.EditRole, _qtc.Qt.CheckStateRole]:
             return False
 
@@ -495,7 +583,9 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
         rowEndIndex = index.siblingAtColumn(nRows - 1)
         self.dataChanged.emit(rowStartIndex, rowEndIndex)
 
-    def _getConnectionAndProperty(self, modelIndex: _qtc.QModelIndex) -> _tp.Tuple[_gmodel.Connection, _Property]:
+    def _getConnectionAndProperty(
+        self, modelIndex: _qtc.QModelIndex
+    ) -> _tp.Tuple[_gmodel.Connection, _Property]:
         rowIndex = modelIndex.row()
         connection = self.connections[rowIndex]
 
@@ -507,7 +597,10 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
     def flags(self, index: _qtc.QModelIndex) -> _qtc.Qt.ItemFlags:
         connection, prop = self._getConnectionAndProperty(index)
 
-        if not connection.shallBeSimulated and prop != self._SHALL_SIMULATE_PROPERTY:
+        if (
+            not connection.shallBeSimulated
+            and prop != self._SHALL_SIMULATE_PROPERTY
+        ):
             return _qtc.Qt.ItemFlags(_qtc.Qt.NoItemFlags)
 
         flags = _qtc.Qt.ItemIsEnabled | _qtc.Qt.ItemIsSelectable
@@ -523,7 +616,12 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
 
         return flags
 
-    def index(self, row: int, column: int, parent: _tp.Optional[_qtc.QModelIndex] = None) -> _qtc.QModelIndex:
+    def index(
+        self,
+        row: int,
+        column: int,
+        parent: _tp.Optional[_qtc.QModelIndex] = None,
+    ) -> _qtc.QModelIndex:
         assert parent
 
         if not self._isTopLevel(parent):

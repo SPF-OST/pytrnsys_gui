@@ -15,7 +15,9 @@ if _tp.TYPE_CHECKING:
     import trnsysGUI.connection.connectionBase as _cb
 
 
-class PortItemBase(_qtw.QGraphicsEllipseItem):  # pylint: disable = too-many-instance-attributes
+class PortItemBase(
+    _qtw.QGraphicsEllipseItem
+):  # pylint: disable = too-many-instance-attributes
     def __init__(self, name, parent):
         self.parent = parent
 
@@ -25,7 +27,9 @@ class PortItemBase(_qtw.QGraphicsEllipseItem):  # pylint: disable = too-many-ins
         self.createdAtSide = None
         self.posCallbacks = []
         self.connectionList: list[_cb.ConnectionBase] = []
-        self.id = self.parent.editor.idGen.getID()  # pylint: disable = invalid-name
+        self.id = (
+            self.parent.editor.idGen.getID()
+        )  # pylint: disable = invalid-name
 
         self.color = "white"
         self.ashColorR = _qtg.QColor(239, 57, 75)
@@ -47,7 +51,9 @@ class PortItemBase(_qtw.QGraphicsEllipseItem):  # pylint: disable = too-many-ins
         self.setBrush(_qtg.QBrush(_qtc.Qt.white))
 
         # Hacky fix for no border of ellipse
-        p1 = _qtg.QPen(_qtg.QColor(0, 0, 0, 0), 0)  # pylint: disable = invalid-name
+        p1 = _qtg.QPen(
+            _qtg.QColor(0, 0, 0, 0), 0
+        )  # pylint: disable = invalid-name
         self.setPen(p1)
 
         self.setFlag(self.ItemSendsScenePositionChanges, True)
@@ -98,14 +104,19 @@ class PortItemBase(_qtw.QGraphicsEllipseItem):  # pylint: disable = too-many-ins
 
         for conn in self.connectionList:
             if conn.fromPort is self:
-                if (self.createdAtSide not in (1, 3)) or not conn.segments[0].isVertical():
+                if (self.createdAtSide not in (1, 3)) or not conn.segments[
+                    0
+                ].isVertical():
                     if len(conn.getCorners()) > 0 and len(conn.segments) > 0:
                         cor = conn.getCorners()[0]
                         cor.setPos(cor.pos().x(), self.scenePos().y())
 
                         seg = conn.segments[0]  # first segment
                         seg.setLine(
-                            self.scenePos().x(), self.scenePos().y(), cor.scenePos().x() + 0.6, cor.scenePos().y()
+                            self.scenePos().x(),
+                            self.scenePos().y(),
+                            cor.scenePos().x() + 0.6,
+                            cor.scenePos().y(),
                         )
                         if len(conn.segments) > 2:
                             verSeg = conn.segments[1]
@@ -127,10 +138,17 @@ class PortItemBase(_qtw.QGraphicsEllipseItem):  # pylint: disable = too-many-ins
                         cor.setPos(self.scenePos().x(), cor.pos().y())
 
                         seg = conn.segments[0]  # first segment
-                        seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
+                        seg.setLine(
+                            self.scenePos().x(),
+                            self.scenePos().y(),
+                            cor.scenePos().x(),
+                            cor.scenePos().y(),
+                        )
 
             elif conn.toPort is self:
-                if (conn.fromPort.createdAtSide not in (1, 3)) or not conn.segments[0].isVertical():
+                if (
+                    conn.fromPort.createdAtSide not in (1, 3)
+                ) or not conn.segments[0].isVertical():
                     if len(conn.getCorners()) > 0 and len(conn.segments) > 0:
                         cor = conn.getCorners()[-1]
                         cor.setPos(cor.pos().x(), self.scenePos().y())
@@ -149,7 +167,9 @@ class PortItemBase(_qtw.QGraphicsEllipseItem):  # pylint: disable = too-many-ins
                                 if (
                                     int(nextSeg.endNode.parent.pos().y() - 0)
                                     <= int(seg.line().p2().y())
-                                    <= int(nextSeg.endNode.parent.pos().y() + 0)
+                                    <= int(
+                                        nextSeg.endNode.parent.pos().y() + 0
+                                    )
                                 ):
                                     self.hideCorners(conn)
                                     verSeg.setVisible(False)
@@ -162,16 +182,30 @@ class PortItemBase(_qtw.QGraphicsEllipseItem):  # pylint: disable = too-many-ins
                         cor.setPos(cor.pos().x(), self.scenePos().y())
 
                         seg = conn.segments[-1]  # last segment
-                        seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
-                    elif len(conn.getCorners()) == 2 and len(conn.segments) > 0:
+                        seg.setLine(
+                            self.scenePos().x(),
+                            self.scenePos().y(),
+                            cor.scenePos().x(),
+                            cor.scenePos().y(),
+                        )
+                    elif (
+                        len(conn.getCorners()) == 2 and len(conn.segments) > 0
+                    ):
                         cor = conn.getCorners()[-1]
                         cor.setPos(self.scenePos().x(), cor.pos().y())
 
                         seg = conn.segments[-1]  # last segment
-                        seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
+                        seg.setLine(
+                            self.scenePos().x(),
+                            self.scenePos().y(),
+                            cor.scenePos().x(),
+                            cor.scenePos().y(),
+                        )
 
             else:
-                raise ValueError("moving a portItem, portItem is neither from nor toPort")
+                raise ValueError(
+                    "moving a portItem, portItem is neither from nor toPort"
+                )
 
         for posCallback in self.posCallbacks:  # pylint: disable = invalid-name
             posCallback(value)
@@ -179,7 +213,9 @@ class PortItemBase(_qtw.QGraphicsEllipseItem):  # pylint: disable = too-many-ins
         return value
 
     def mousePressEvent(self, event):  # pylint: disable = unused-argument
-        if self.parent.editor.moveDirectPorts and hasattr(self.parent, "heatExchangers"):
+        if self.parent.editor.moveDirectPorts and hasattr(
+            self.parent, "heatExchangers"
+        ):
             self.setFlag(self.ItemIsMovable)
             self.savePos = self.pos()
             return
@@ -230,9 +266,13 @@ class PortItemBase(_qtw.QGraphicsEllipseItem):  # pylint: disable = too-many-ins
 
         formattedPortItems = self._getFormattedPortItems()
         jointFormattedPortItems = "\n".join(formattedPortItems)
-        self.parent.editor.contextInfoList.addItem(f"Names: {jointFormattedPortItems}")
+        self.parent.editor.contextInfoList.addItem(
+            f"Names: {jointFormattedPortItems}"
+        )
 
-        self.parent.editor.contextInfoList.addItem("Block: " + self.parent.displayName)
+        self.parent.editor.contextInfoList.addItem(
+            "Block: " + self.parent.displayName
+        )
 
         self.parent.editor.contextInfoList.addItem("Connections:")
         for connection in self.connectionList:
@@ -278,7 +318,9 @@ class PortItemBase(_qtw.QGraphicsEllipseItem):  # pylint: disable = too-many-ins
         connection = self.getConnectionOrNone()
 
         if not connection or connection != massFlowContributor:
-            raise ValueError("`massFlowContributor' is not adjacent to this port item.")
+            raise ValueError(
+                "`massFlowContributor' is not adjacent to this port item."
+            )
 
         return self.parent
 

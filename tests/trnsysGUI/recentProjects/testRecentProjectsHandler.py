@@ -3,13 +3,22 @@ from collections import deque as _deque
 
 import trnsysGUI.recentProjectsHandler as rph
 import trnsysGUI.settings as ting
-from tests.trnsysGUI.constants import PATH_TO_SETTINGS_JSON, PATH_TO_PROJECT_1, PATH_TO_PROJECT_2, PATH_TO_PROJECT_3
+from tests.trnsysGUI.constants import (
+    PATH_TO_SETTINGS_JSON,
+    PATH_TO_PROJECT_1,
+    PATH_TO_PROJECT_2,
+    PATH_TO_PROJECT_3,
+)
 
 
 class TestRecentProjectsHandler:
 
     def testAddingRecentProject(self, monkeypatch):
-        monkeypatch.setattr(rph.RecentProjectsHandler, rph.RecentProjectsHandler.save.__name__, lambda: None)
+        monkeypatch.setattr(
+            rph.RecentProjectsHandler,
+            rph.RecentProjectsHandler.save.__name__,
+            lambda: None,
+        )
         rph.RecentProjectsHandler.recentProjects = _deque(
             [
                 PATH_TO_PROJECT_2,
@@ -22,7 +31,11 @@ class TestRecentProjectsHandler:
         assert len(rph.RecentProjectsHandler.recentProjects) == 3
 
     def testAddingProjectThatAlreadyExists(self, monkeypatch):
-        monkeypatch.setattr(rph.RecentProjectsHandler, rph.RecentProjectsHandler.save.__name__, lambda: None)
+        monkeypatch.setattr(
+            rph.RecentProjectsHandler,
+            rph.RecentProjectsHandler.save.__name__,
+            lambda: None,
+        )
         rph.RecentProjectsHandler.recentProjects = _deque(
             [
                 PATH_TO_PROJECT_2,

@@ -17,11 +17,17 @@ class TestRecentProjectWorkflow:
     def testIfRecentProjectsAreShownInDialog(self, monkeypatch, qtbot):
         """Tests if the startup dialog displays recent projects as expected"""
         monkeypatch.setattr(
-            RecentProjectsHandler, RecentProjectsHandler.initWithExistingRecentProjects.__name__, lambda: None
+            RecentProjectsHandler,
+            RecentProjectsHandler.initWithExistingRecentProjects.__name__,
+            lambda: None,
         )
 
         RecentProjectsHandler.recentProjects = _deque(
-            [constants.PATH_TO_PROJECT_3, constants.PATH_TO_PROJECT_2, constants.PATH_TO_PROJECT_1]
+            [
+                constants.PATH_TO_PROJECT_3,
+                constants.PATH_TO_PROJECT_2,
+                constants.PATH_TO_PROJECT_1,
+            ]
         )
         startupDialog = StartupDialog()
         qtbot.addWidget(startupDialog)
@@ -31,24 +37,52 @@ class TestRecentProjectWorkflow:
         thirdProjectInList = startupDialog.listWidget.item(2)
 
         assert startupDialog.isVisible()
-        assert firstProjectInList.text() == f"{constants.PATH_TO_PROJECT_3.stem} {constants.PATH_TO_PROJECT_3}"
-        assert secondProjectInList.text() == f"{constants.PATH_TO_PROJECT_2.stem} {constants.PATH_TO_PROJECT_2}"
-        assert thirdProjectInList.text() == f"{constants.PATH_TO_PROJECT_1.stem} {constants.PATH_TO_PROJECT_1}"
-
-    def testIfRecenProjectsAreShownCorrectlyInMainWindow(self, monkeypatch, qtbot):
-        """Opens a recent project and makes sure recent project file menu is displayed correctly.
-        Then opens another recent projects and checks if it's still display correctly"""
-        monkeypatch.setattr(
-            RecentProjectsHandler, RecentProjectsHandler.initWithExistingRecentProjects.__name__, lambda: None
+        assert (
+            firstProjectInList.text()
+            == f"{constants.PATH_TO_PROJECT_3.stem} {constants.PATH_TO_PROJECT_3}"
         )
-        monkeypatch.setattr(RecentProjectsHandler, RecentProjectsHandler.save.__name__, lambda: None)
-        monkeypatch.setattr(MessageBox, MessageBox.create.__name__, lambda messageText: _qtw.QMessageBox.Yes)
+        assert (
+            secondProjectInList.text()
+            == f"{constants.PATH_TO_PROJECT_2.stem} {constants.PATH_TO_PROJECT_2}"
+        )
+        assert (
+            thirdProjectInList.text()
+            == f"{constants.PATH_TO_PROJECT_1.stem} {constants.PATH_TO_PROJECT_1}"
+        )
+
+    def testIfRecenProjectsAreShownCorrectlyInMainWindow(
+        self, monkeypatch, qtbot
+    ):
+        """Opens a recent project and makes sure recent project file menu is displayed correctly.
+        Then opens another recent projects and checks if it's still display correctly
+        """
         monkeypatch.setattr(
-            StartupDialog, StartupDialog.showDialogAndGetResult.__name__, lambda: constants.PATH_TO_PROJECT_1
+            RecentProjectsHandler,
+            RecentProjectsHandler.initWithExistingRecentProjects.__name__,
+            lambda: None,
+        )
+        monkeypatch.setattr(
+            RecentProjectsHandler,
+            RecentProjectsHandler.save.__name__,
+            lambda: None,
+        )
+        monkeypatch.setattr(
+            MessageBox,
+            MessageBox.create.__name__,
+            lambda messageText: _qtw.QMessageBox.Yes,
+        )
+        monkeypatch.setattr(
+            StartupDialog,
+            StartupDialog.showDialogAndGetResult.__name__,
+            lambda: constants.PATH_TO_PROJECT_1,
         )
 
         RecentProjectsHandler.recentProjects = _deque(
-            [constants.PATH_TO_PROJECT_3, constants.PATH_TO_PROJECT_2, constants.PATH_TO_PROJECT_1]
+            [
+                constants.PATH_TO_PROJECT_3,
+                constants.PATH_TO_PROJECT_2,
+                constants.PATH_TO_PROJECT_1,
+            ]
         )
         getProjectResult = getProject()
         logger = _ulog.getOrCreateCustomLogger("root", "INFO")
@@ -62,12 +96,24 @@ class TestRecentProjectWorkflow:
 
         assert mainWindow.isVisible()
         assert mainWindow.editor.isVisible()
-        assert action1.text() == f"{constants.PATH_TO_PROJECT_3.stem} {constants.PATH_TO_PROJECT_3}"
-        assert action2.text() == f"{constants.PATH_TO_PROJECT_2.stem} {constants.PATH_TO_PROJECT_2}"
+        assert (
+            action1.text()
+            == f"{constants.PATH_TO_PROJECT_3.stem} {constants.PATH_TO_PROJECT_3}"
+        )
+        assert (
+            action2.text()
+            == f"{constants.PATH_TO_PROJECT_2.stem} {constants.PATH_TO_PROJECT_2}"
+        )
 
         mainWindow.openRecentFile(action1)
         action1 = mainWindow.recentProjectsMenu.actions()[0]
         action2 = mainWindow.recentProjectsMenu.actions()[1]
 
-        assert action1.text() == f"{constants.PATH_TO_PROJECT_1.stem} {constants.PATH_TO_PROJECT_1}"
-        assert action2.text() == f"{constants.PATH_TO_PROJECT_2.stem} {constants.PATH_TO_PROJECT_2}"
+        assert (
+            action1.text()
+            == f"{constants.PATH_TO_PROJECT_1.stem} {constants.PATH_TO_PROJECT_1}"
+        )
+        assert (
+            action2.text()
+            == f"{constants.PATH_TO_PROJECT_2.stem} {constants.PATH_TO_PROJECT_2}"
+        )

@@ -47,11 +47,18 @@ class Factory:
         specification = _res.value(specificationResult)
 
         width, height = specification.size
-        graphics = _graphics.Graphics.createForTypeNameAndSize(typeName, width=width, height=height)
+        graphics = _graphics.Graphics.createForTypeNameAndSize(
+            typeName, width=width, height=height
+        )
 
         internalPipingFactory = InternalPipingFactory(specification)
 
-        plugin = _plugin.Plugin(typeName, specification.defaultName, graphics, internalPipingFactory)
+        plugin = _plugin.Plugin(
+            typeName,
+            specification.defaultName,
+            graphics,
+            internalPipingFactory,
+        )
 
         return plugin
 
@@ -66,26 +73,45 @@ class _PortProperties:
         return nameSpec or self.defaultName
 
 
-_INPUT_PORT_PROPERTIES = _PortProperties("In", "in", _mfn.PortItemDirection.INPUT)
-_OUTPUT_PORT_PROPERTIES = _PortProperties("Out", "out", _mfn.PortItemDirection.OUTPUT)
-_OUTPUT0_PORT_PROPERTIES = _PortProperties("Out0", "out", _mfn.PortItemDirection.OUTPUT)
-_OUTPUT1_PORT_PROPERTIES = _PortProperties("Out1", "out", _mfn.PortItemDirection.OUTPUT)
+_INPUT_PORT_PROPERTIES = _PortProperties(
+    "In", "in", _mfn.PortItemDirection.INPUT
+)
+_OUTPUT_PORT_PROPERTIES = _PortProperties(
+    "Out", "out", _mfn.PortItemDirection.OUTPUT
+)
+_OUTPUT0_PORT_PROPERTIES = _PortProperties(
+    "Out0", "out", _mfn.PortItemDirection.OUTPUT
+)
+_OUTPUT1_PORT_PROPERTIES = _PortProperties(
+    "Out1", "out", _mfn.PortItemDirection.OUTPUT
+)
 
 
 @_dc.dataclass
 class InternalPipingFactory(_plugin.AbstractInternalPipingFactory):
     specification: _smodel.Specification
 
-    def createInternalPiping(self, blockItem: _bi.BlockItem) -> _plugin.CreatedInternalPiping:
-        connectionsCreatedInternalPiping = self._createInternalPipingForConnections(blockItem)
-        teePiecesCreatedInternalPiping = self._createInternalPipingForTeePieces(blockItem)
+    def createInternalPiping(
+        self, blockItem: _bi.BlockItem
+    ) -> _plugin.CreatedInternalPiping:
+        connectionsCreatedInternalPiping = (
+            self._createInternalPipingForConnections(blockItem)
+        )
+        teePiecesCreatedInternalPiping = (
+            self._createInternalPipingForTeePieces(blockItem)
+        )
 
-        combinedCreatedInternalPiping = self._createCombinedCreatedInternalPiping(
-            connectionsCreatedInternalPiping, teePiecesCreatedInternalPiping
+        combinedCreatedInternalPiping = (
+            self._createCombinedCreatedInternalPiping(
+                connectionsCreatedInternalPiping,
+                teePiecesCreatedInternalPiping,
+            )
         )
         return combinedCreatedInternalPiping
 
-    def _createInternalPipingForConnections(self, blockItem: _bi.BlockItem) -> _plugin.CreatedInternalPiping:
+    def _createInternalPipingForConnections(
+        self, blockItem: _bi.BlockItem
+    ) -> _plugin.CreatedInternalPiping:
         connections = self.specification.connections
 
         if not connections:
@@ -98,35 +124,51 @@ class InternalPipingFactory(_plugin.AbstractInternalPipingFactory):
         modelPortItemsToGraphicalPortItem = {}
 
         for connection in connections:
-            graphicalInputPort, modelInputPort = self._createGraphicalAndModelPort(
-                connection.input, _INPUT_PORT_PROPERTIES, blockItem
+            graphicalInputPort, modelInputPort = (
+                self._createGraphicalAndModelPort(
+                    connection.input, _INPUT_PORT_PROPERTIES, blockItem
+                )
             )
 
             graphicalInputPorts.append(graphicalInputPort)
-            modelPortItemsToGraphicalPortItem[modelInputPort] = graphicalInputPort
+            modelPortItemsToGraphicalPortItem[modelInputPort] = (
+                graphicalInputPort
+            )
 
-            graphicalOutputPort, modelOutputPort = self._createGraphicalAndModelPort(
-                connection.output, _OUTPUT_PORT_PROPERTIES, blockItem
+            graphicalOutputPort, modelOutputPort = (
+                self._createGraphicalAndModelPort(
+                    connection.output, _OUTPUT_PORT_PROPERTIES, blockItem
+                )
             )
 
             graphicalOutputPorts.append(graphicalOutputPort)
-            modelPortItemsToGraphicalPortItem[modelOutputPort] = graphicalOutputPort
+            modelPortItemsToGraphicalPortItem[modelOutputPort] = (
+                graphicalOutputPort
+            )
 
             pipe = _mfn.Pipe(modelInputPort, modelOutputPort, connection.name)
             nodes.append(pipe)
 
-        internalPiping = _ip.InternalPiping(nodes, modelPortItemsToGraphicalPortItem)
+        internalPiping = _ip.InternalPiping(
+            nodes, modelPortItemsToGraphicalPortItem
+        )
 
-        createdInternalPiping = _plugin.CreatedInternalPiping(graphicalInputPorts, graphicalOutputPorts, internalPiping)
+        createdInternalPiping = _plugin.CreatedInternalPiping(
+            graphicalInputPorts, graphicalOutputPorts, internalPiping
+        )
 
         return createdInternalPiping
 
-    def _createInternalPipingForTeePieces(self, blockItem: _bi.BlockItem) -> _plugin.CreatedInternalPiping:
+    def _createInternalPipingForTeePieces(
+        self, blockItem: _bi.BlockItem
+    ) -> _plugin.CreatedInternalPiping:
         graphicalInputPorts = list[_pib.PortItemBase]()
         graphicalOutputPorts = list[_pib.PortItemBase]()
 
         nodes = list[_mfn.Node]()
-        modelPortItemsToGraphicalPortItem = dict[_mfn.PortItem, _pib.PortItemBase]()
+        modelPortItemsToGraphicalPortItem = dict[
+            _mfn.PortItem, _pib.PortItemBase
+        ]()
 
         teePieces = self.specification.teePieces
 
@@ -135,12 +177,21 @@ class InternalPipingFactory(_plugin.AbstractInternalPipingFactory):
 
         for teePiece in teePieces:
             self._createAndAddNodesAndPortItemsForTeePiece(
-                blockItem, teePiece, nodes, modelPortItemsToGraphicalPortItem, graphicalInputPorts, graphicalOutputPorts
+                blockItem,
+                teePiece,
+                nodes,
+                modelPortItemsToGraphicalPortItem,
+                graphicalInputPorts,
+                graphicalOutputPorts,
             )
 
-        internalPiping = _ip.InternalPiping(nodes, modelPortItemsToGraphicalPortItem)
+        internalPiping = _ip.InternalPiping(
+            nodes, modelPortItemsToGraphicalPortItem
+        )
 
-        createdInternalPiping = _plugin.CreatedInternalPiping(graphicalInputPorts, graphicalOutputPorts, internalPiping)
+        createdInternalPiping = _plugin.CreatedInternalPiping(
+            graphicalInputPorts, graphicalOutputPorts, internalPiping
+        )
 
         return createdInternalPiping
 
@@ -149,7 +200,9 @@ class InternalPipingFactory(_plugin.AbstractInternalPipingFactory):
         blockItem: _bi.BlockItem,
         teePiece: _smodel.TeePiece,
         nodes: list[_mfn.Node],
-        modelPortItemsToGraphicalPortItem: dict[_mfn.PortItem, _pib.PortItemBase],
+        modelPortItemsToGraphicalPortItem: dict[
+            _mfn.PortItem, _pib.PortItemBase
+        ],
         graphicalInputPorts: list[_pib.PortItemBase],
         graphicalOutputPorts: list[_pib.PortItemBase],
     ) -> None:
@@ -157,12 +210,16 @@ class InternalPipingFactory(_plugin.AbstractInternalPipingFactory):
             teePiece.input, _INPUT_PORT_PROPERTIES, blockItem
         )
 
-        graphicalOutput0Port, modelOutput0Port = self._createGraphicalAndModelPort(
-            teePiece.output0, _OUTPUT0_PORT_PROPERTIES, blockItem
+        graphicalOutput0Port, modelOutput0Port = (
+            self._createGraphicalAndModelPort(
+                teePiece.output0, _OUTPUT0_PORT_PROPERTIES, blockItem
+            )
         )
 
-        graphicalOutput1Port, modelOutput1Port = self._createGraphicalAndModelPort(
-            teePiece.output1, _OUTPUT1_PORT_PROPERTIES, blockItem
+        graphicalOutput1Port, modelOutput1Port = (
+            self._createGraphicalAndModelPort(
+                teePiece.output1, _OUTPUT1_PORT_PROPERTIES, blockItem
+            )
         )
 
         graphicalInputPorts.append(graphicalInputPort)
@@ -170,15 +227,24 @@ class InternalPipingFactory(_plugin.AbstractInternalPipingFactory):
         graphicalOutputPorts.append(graphicalOutput1Port)
 
         modelPortItemsToGraphicalPortItem[modelInputPort] = graphicalInputPort
-        modelPortItemsToGraphicalPortItem[modelOutput0Port] = graphicalOutput0Port
-        modelPortItemsToGraphicalPortItem[modelOutput1Port] = graphicalOutput1Port
+        modelPortItemsToGraphicalPortItem[modelOutput0Port] = (
+            graphicalOutput0Port
+        )
+        modelPortItemsToGraphicalPortItem[modelOutput1Port] = (
+            graphicalOutput1Port
+        )
 
-        teePieceModel = _mfn.TeePiece(modelInputPort, modelOutput0Port, modelOutput1Port)
+        teePieceModel = _mfn.TeePiece(
+            modelInputPort, modelOutput0Port, modelOutput1Port
+        )
 
         nodes.append(teePieceModel)
 
     def _createGraphicalAndModelPort(
-        self, portSpec: _smodel.Port, portProperties: _PortProperties, blockItem: _bi.BlockItem
+        self,
+        portSpec: _smodel.Port,
+        portProperties: _PortProperties,
+        blockItem: _bi.BlockItem,
     ) -> tuple[_pib.PortItemBase, _mfn.PortItem]:
         graphicalPort = self._createPort(portSpec, portProperties, blockItem)
 
@@ -187,24 +253,34 @@ class InternalPipingFactory(_plugin.AbstractInternalPipingFactory):
 
         portName = portProperties.getName(portSpec.name)
         portItemType = _mfn.PortItemType(portSpec.type)
-        modelInputPort = _mfn.PortItem(portName, portProperties.direction, portItemType)
+        modelInputPort = _mfn.PortItem(
+            portName, portProperties.direction, portItemType
+        )
 
         return graphicalPort, modelInputPort
 
     @staticmethod
     def _createPort(
-        portSpec: _smodel.Port, portProperties: _PortProperties, blockItem: _bi.BlockItem
+        portSpec: _smodel.Port,
+        portProperties: _PortProperties,
+        blockItem: _bi.BlockItem,
     ) -> _pib.PortItemBase:
         match portSpec.type:
             case "standard":
-                return _cspi.createSinglePipePortItem(portProperties.directionLabel, blockItem)
+                return _cspi.createSinglePipePortItem(
+                    portProperties.directionLabel, blockItem
+                )
             case "hot" | "cold":
-                return _dpi.DoublePipePortItem(portProperties.directionLabel, blockItem)
+                return _dpi.DoublePipePortItem(
+                    portProperties.directionLabel, blockItem
+                )
             case _:
                 _tp.assert_never(portSpec.type)
 
     @staticmethod
-    def _getDirectionLabel(direction: _mfn.PortItemDirection) -> _tp.Literal["i", "o"]:
+    def _getDirectionLabel(
+        direction: _mfn.PortItemDirection,
+    ) -> _tp.Literal["i", "o"]:
         match direction:
             case _mfn.PortItemDirection.INPUT:
                 return "i"
@@ -229,8 +305,14 @@ class InternalPipingFactory(_plugin.AbstractInternalPipingFactory):
             },
         )
         createdInternalPiping = _plugin.CreatedInternalPiping(
-            [*connectionsCreatedInternalPiping.inputPorts, *teePiecesCreatedInternalPiping.inputPorts],
-            [*connectionsCreatedInternalPiping.outputPorts, *teePiecesCreatedInternalPiping.outputPorts],
+            [
+                *connectionsCreatedInternalPiping.inputPorts,
+                *teePiecesCreatedInternalPiping.inputPorts,
+            ],
+            [
+                *connectionsCreatedInternalPiping.outputPorts,
+                *teePiecesCreatedInternalPiping.outputPorts,
+            ],
             internalPiping,
         )
         return createdInternalPiping

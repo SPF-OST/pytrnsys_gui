@@ -10,5 +10,9 @@ if _tp.TYPE_CHECKING:
     import trnsysGUI.BlockItem as _bi
 
 
-def createSinglePipePortItem(name: str, parent: _bi.BlockItem) -> _spc.SinglePipePortItem:
-    return _spc.SinglePipePortItem(name, parent, search.getInternallyConnectedPortItems)
+def createSinglePipePortItem(
+    name: str, parent: _bi.BlockItem
+) -> _spc.SinglePipePortItem:
+    return _spc.SinglePipePortItem(
+        name, parent, search.getInternallyConnectedPortItems
+    )

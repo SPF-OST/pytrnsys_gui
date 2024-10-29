@@ -44,7 +44,11 @@ OutputVariableIndex = _tp.Literal[1, 2, 3]
 
 MAX_N_OUTPUT_VARIABLES_PER_NODE = 3
 
-OutputVariables = _tp.Tuple[_tp.Optional[OutputVariable], _tp.Optional[OutputVariable], _tp.Optional[OutputVariable]]
+OutputVariables = _tp.Tuple[
+    _tp.Optional[OutputVariable],
+    _tp.Optional[OutputVariable],
+    _tp.Optional[OutputVariable],
+]
 
 
 class PortItemDirection(_enum.Enum):
@@ -88,11 +92,15 @@ class Node(_abc.ABC):
         return False
 
     def getInputVariablePrefix(self) -> str:
-        raise ValueError(f"`{type(self).__name__}` doesn't have an input variable prefix.")
+        raise ValueError(
+            f"`{type(self).__name__}` doesn't have an input variable prefix."
+        )
 
 
 class OneNeighbourBase(Node, _abc.ABC):
-    def __init__(self, portItem: PortItem, name: _tp.Optional[str] = None) -> None:
+    def __init__(
+        self, portItem: PortItem, name: _tp.Optional[str] = None
+    ) -> None:
         super().__init__(name)
         self.portItem = portItem
 
@@ -129,7 +137,12 @@ class TerminalWithFreeFlow(OneNeighbourBase):
 
 
 class TwoNeighboursBase(Node, _abc.ABC):
-    def __init__(self, fromPort: PortItem, toPort: PortItem, name: _tp.Optional[str] = None) -> None:
+    def __init__(
+        self,
+        fromPort: PortItem,
+        toPort: PortItem,
+        name: _tp.Optional[str] = None,
+    ) -> None:
         super().__init__(name)
         self.fromPort = fromPort
         self.toPort = toPort
@@ -156,7 +169,11 @@ class Pump(TwoNeighboursBase):
 
 class ThreeNeighboursBase(Node, _abc.ABC):
     def __init__(
-        self, inputPort: PortItem, output1Port: PortItem, output2Port: PortItem, name: _tp.Optional[str] = None
+        self,
+        inputPort: PortItem,
+        output1Port: PortItem,
+        output2Port: PortItem,
+        name: _tp.Optional[str] = None,
     ) -> None:
         super().__init__(name)
         self.input = inputPort

@@ -25,7 +25,9 @@ class ExternalHx(BlockItemFourPorts):
     @_tp.override
     def _getImageAccessor(
         cls,
-    ) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ  # pylint: disable=arguments-differ
+    ) -> (
+        _img.SvgImageAccessor
+    ):  # pylint: disable=arguments-differ  # pylint: disable=arguments-differ
         return _img.EXTERNAL_HX_SVG
 
     def changeSize(self):
@@ -48,10 +50,18 @@ class ExternalHx(BlockItemFourPorts):
 
         self.origInputsPos = [[0, delta], [w, h - delta]]
         self.origOutputsPos = [[0, h - delta], [w, delta]]
-        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
-        self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1])
-        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
-        self.outputs[1].setPos(self.origOutputsPos[1][0], self.origOutputsPos[1][1])
+        self.inputs[0].setPos(
+            self.origInputsPos[0][0], self.origInputsPos[0][1]
+        )
+        self.inputs[1].setPos(
+            self.origInputsPos[1][0], self.origInputsPos[1][1]
+        )
+        self.outputs[0].setPos(
+            self.origOutputsPos[0][0], self.origOutputsPos[0][1]
+        )
+        self.outputs[1].setPos(
+            self.origOutputsPos[1][0], self.origOutputsPos[1][1]
+        )
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
@@ -74,4 +84,6 @@ class ExternalHx(BlockItemFourPorts):
             side2Output: self.outputs[1],
         }
 
-        return _ip.InternalPiping([side1Pipe, side2Pipe], modelPortItemsToGraphicalPortItem)
+        return _ip.InternalPiping(
+            [side1Pipe, side2Pipe], modelPortItemsToGraphicalPortItem
+        )

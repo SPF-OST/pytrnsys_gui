@@ -9,7 +9,9 @@ class RecentProjectsHandler:
 
     NUMBER_OF_RECENT_PROJECTS = 15
 
-    recentProjects: _tp.Deque[_pl.Path] = _deque(maxlen=NUMBER_OF_RECENT_PROJECTS)
+    recentProjects: _tp.Deque[_pl.Path] = _deque(
+        maxlen=NUMBER_OF_RECENT_PROJECTS
+    )
 
     @classmethod
     def initWithExistingRecentProjects(cls):
@@ -40,4 +42,7 @@ class RecentProjectsHandler:
 
     @classmethod
     def getLengthOfLongestFileName(cls) -> int:
-        return max((len(recentProject.stem) for recentProject in cls.recentProjects), default=0)
+        return max(
+            (len(recentProject.stem) for recentProject in cls.recentProjects),
+            default=0,
+        )

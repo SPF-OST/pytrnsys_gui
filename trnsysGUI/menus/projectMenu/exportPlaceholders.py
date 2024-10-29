@@ -16,9 +16,13 @@ import trnsysGUI.warningsAndErrors as _werrs
 
 def exportDdckPlaceHolderValuesJsonFile(editor: _ed.Editor) -> _res.Result[None]:  # type: ignore[name-defined]
     if not editor.isHydraulicConnected():
-        return _res.Error("You need to connect all port items before you can export the hydraulics.")
+        return _res.Error(
+            "You need to connect all port items before you can export the hydraulics."
+        )
 
-    jsonFilePath = _pl.Path(editor.projectFolder) / "DdckPlaceHolderValues.json"
+    jsonFilePath = (
+        _pl.Path(editor.projectFolder) / "DdckPlaceHolderValues.json"
+    )
 
     if jsonFilePath.is_dir():
         _qtw.QMessageBox.information(
@@ -41,7 +45,10 @@ def exportDdckPlaceHolderValuesJsonFile(editor: _ed.Editor) -> _res.Result[None]
             return None
 
     valueWithWarnings = encodeDdckPlaceHolderValuesToJson(
-        editor.projectFolder, jsonFilePath, editor.trnsysObj, editor.hydraulicLoops
+        editor.projectFolder,
+        jsonFilePath,
+        editor.trnsysObj,
+        editor.hydraulicLoops,
     )
     if valueWithWarnings.hasWarnings():
         message = (
@@ -49,7 +56,9 @@ def exportDdckPlaceHolderValuesJsonFile(editor: _ed.Editor) -> _res.Result[None]
             + valueWithWarnings.toWarningMessage()
             + "\n"
         )
-        _werrs.showMessageBox(message, title="Warnings encountered generating placeholders")
+        _werrs.showMessageBox(
+            message, title="Warnings encountered generating placeholders"
+        )
 
     _qtw.QMessageBox.information(
         editor,
@@ -70,13 +79,21 @@ def encodeDdckPlaceHolderValuesToJson(
 
     ddckDirNames = _getDdckDirNames(projectFolder)
 
-    blockItems = [o for o in trnsysObjects if isinstance(o, _biip.BlockItemHasInternalPiping)]
+    blockItems = [
+        o
+        for o in trnsysObjects
+        if isinstance(o, _biip.BlockItemHasInternalPiping)
+    ]
 
-    placeHoldersWithWarnings = _ph.getPlaceholderValues(ddckDirNames, blockItems, hydraulicLoops)
+    placeHoldersWithWarnings = _ph.getPlaceholderValues(
+        ddckDirNames, blockItems, hydraulicLoops
+    )
 
     ddckPlaceHolderValuesDictionary = placeHoldersWithWarnings.value
 
-    jsonContent = _json.dumps(ddckPlaceHolderValuesDictionary, indent=4, sort_keys=True)
+    jsonContent = _json.dumps(
+        ddckPlaceHolderValuesDictionary, indent=4, sort_keys=True
+    )
     filePath.write_text(jsonContent)
 
     return placeHoldersWithWarnings.withValue(None)

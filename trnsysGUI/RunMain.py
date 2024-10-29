@@ -34,5 +34,8 @@ class RunMain:
             runTrnsys.RunParallelTrnsys(pathConfig, configFile=configFile)
             return False, ""
         except Exception as e:
-            logger.error("EXCEPTION WHILE TRYING TO EXECUTE RunParallelTrnsys: %s", str(e))
+            logger.error(
+                "EXCEPTION WHILE TRYING TO EXECUTE RunParallelTrnsys: %s",
+                str(e),
+            )
             return True, str(e)

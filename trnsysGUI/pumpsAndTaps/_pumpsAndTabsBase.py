@@ -17,7 +17,9 @@ from . import _dialog
 from . import serialization as _ser
 
 
-class PumpsAndTabsBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin):
+class PumpsAndTabsBase(
+    _bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin
+):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
@@ -31,7 +33,9 @@ class PumpsAndTabsBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphi
 
     @classmethod
     @_tp.override
-    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+    def _getImageAccessor(  # pylint: disable=arguments-differ
+        cls,
+    ) -> _img.SvgImageAccessor:
         raise NotImplementedError()
 
     def getInternalPiping(self) -> _ip.InternalPiping:
@@ -57,28 +61,44 @@ class PumpsAndTabsBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphi
         equationNr = 1
         return result, equationNr
 
-    def _createBlockItemWithPrescribedMassFlowForEncode(self) -> _ser.BlockItemWithPrescribedMassFlowBaseModel:
+    def _createBlockItemWithPrescribedMassFlowForEncode(
+        self,
+    ) -> _ser.BlockItemWithPrescribedMassFlowBaseModel:
         blockItemModel = self._encodeBaseModel()
 
-        blockItemWithPrescribedMassFlowModel = _ser.BlockItemWithPrescribedMassFlowBaseModel(
-            blockItemModel,
-            self.massFlowRateInKgPerH,
+        blockItemWithPrescribedMassFlowModel = (
+            _ser.BlockItemWithPrescribedMassFlowBaseModel(
+                blockItemModel,
+                self.massFlowRateInKgPerH,
+            )
         )
 
         return blockItemWithPrescribedMassFlowModel
 
     def _applyBlockItemModelWithPrescribedMassFlowForDecode(
-        self, blockItemWithPrescribedMassFlow: _ser.BlockItemWithPrescribedMassFlowBaseModel
+        self,
+        blockItemWithPrescribedMassFlow: _ser.BlockItemWithPrescribedMassFlowBaseModel,
     ) -> None:
         blockItemModel = blockItemWithPrescribedMassFlow.blockItem
         self._decodeBaseModel(blockItemModel)
 
-        self.massFlowRateInKgPerH = blockItemWithPrescribedMassFlow.massFlowRateInKgPerH
+        self.massFlowRateInKgPerH = (
+            blockItemWithPrescribedMassFlow.massFlowRateInKgPerH
+        )
 
-    def mouseDoubleClickEvent(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:
-        dialogModel = _dialog.Model(self.displayName, self.flippedH, self.flippedV, self.massFlowRateInKgPerH)
+    def mouseDoubleClickEvent(
+        self, event: _qtw.QGraphicsSceneMouseEvent
+    ) -> None:
+        dialogModel = _dialog.Model(
+            self.displayName,
+            self.flippedH,
+            self.flippedV,
+            self.massFlowRateInKgPerH,
+        )
 
-        maybeCancelled = _dialog.Dialog.showDialogAndGetResult(dialogModel, self._renameHelper)
+        maybeCancelled = _dialog.Dialog.showDialogAndGetResult(
+            dialogModel, self._renameHelper
+        )
         if _cancel.isCancelled(maybeCancelled):
             return
 
@@ -88,11 +108,15 @@ class PumpsAndTabsBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphi
 
         self._applyDialogModel(oldName, newDialogModel)
 
-    def _applyDialogModel(self, oldName: str, newDialogModel: _dialog.Model) -> None:
+    def _applyDialogModel(
+        self, oldName: str, newDialogModel: _dialog.Model
+    ) -> None:
         newName = newDialogModel.name
 
         self._renameHelper.rename(oldName, newName)
-        _dfh.moveComponentDdckFolderIfNecessary(self, newName, oldName, self._projectDirPath)
+        _dfh.moveComponentDdckFolderIfNecessary(
+            self, newName, oldName, self._projectDirPath
+        )
         self.setDisplayName(newName)
 
         self.updateFlipStateH(newDialogModel.isHorizontallyFlipped)

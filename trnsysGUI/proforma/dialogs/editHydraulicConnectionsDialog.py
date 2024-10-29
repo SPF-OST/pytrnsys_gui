@@ -13,7 +13,9 @@ import trnsysGUI.common.cancelled as _cancel
 import trnsysGUI.dialogs as _dlgs
 from .. import models as _models
 
-_dlgs.assertThatLocalGeneratedUIModuleAndResourcesExist(__name__, moduleName="_UI_hydraulicConnections_generated")
+_dlgs.assertThatLocalGeneratedUIModuleAndResourcesExist(
+    __name__, moduleName="_UI_hydraulicConnections_generated"
+)
 
 from . import _UI_hydraulicConnections_generated as _uigen  # type: ignore[import]  # pylint: disable=wrong-import-position
 
@@ -45,7 +47,9 @@ class _Callbacks:
 
     def onLineEditTextEdited(self, newText: str) -> None:
         newTextWithWildcardsForWhitespace = _re.sub(r"\s+", "*", newText)
-        self._proxyModel.setFilterWildcard(f"*{newTextWithWildcardsForWhitespace}*")
+        self._proxyModel.setFilterWildcard(
+            f"*{newTextWithWildcardsForWhitespace}*"
+        )
 
 
 @_dc.dataclass
@@ -54,7 +58,9 @@ class DialogResult:
     defaultVisibility: _dv.DefaultVisibility
 
 
-class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnections):
+class EditHydraulicConnectionsDialog(
+    _qtw.QDialog, _uigen.Ui_HydraulicConnections
+):
     _DEFAULT_CONNECTION_LABEL = "<Default connection>"
 
     def __init__(
@@ -66,7 +72,9 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
         self.setupUi(self)
 
         self._variablesByRole = variablesByRole
-        self.hydraulicConnections = self._getDeepCopiesSortedByName(suggestedHydraulicConnections)
+        self.hydraulicConnections = self._getDeepCopiesSortedByName(
+            suggestedHydraulicConnections
+        )
 
         self._callbacks = list[_Callbacks]()
 
@@ -86,26 +94,38 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
 
     @staticmethod
     def _getDeepCopiesSortedByName(suggestedHydraulicConnections):
-        hydraulicConnections = [_copy.deepcopy(c) for c in suggestedHydraulicConnections]
+        hydraulicConnections = [
+            _copy.deepcopy(c) for c in suggestedHydraulicConnections
+        ]
 
         def getConnectionName(connection: _models.Connection) -> str:
             return connection.name or ""
 
-        sortedHydraulicConnections = sorted(hydraulicConnections, key=getConnectionName)
+        sortedHydraulicConnections = sorted(
+            hydraulicConnections, key=getConnectionName
+        )
         return sortedHydraulicConnections
 
     def _configureHydraulicConnections(self):
-        self.connectionsListWidget.setSelectionMode(_qtw.QAbstractItemView.SingleSelection)
+        self.connectionsListWidget.setSelectionMode(
+            _qtw.QAbstractItemView.SingleSelection
+        )
 
         for hydraulicConnection in self.hydraulicConnections:
-            name = hydraulicConnection.name if hydraulicConnection.name else self._DEFAULT_CONNECTION_LABEL
+            name = (
+                hydraulicConnection.name
+                if hydraulicConnection.name
+                else self._DEFAULT_CONNECTION_LABEL
+            )
             item = _qtw.QListWidgetItem(name)
             item.setData(_qtc.Qt.UserRole, hydraulicConnection)
             self.connectionsListWidget.addItem(item)
 
         self.connectionsListWidget.setCurrentRow(0)
 
-        self.connectionsListWidget.itemSelectionChanged.connect(self._onSelectedConnectionChanged)
+        self.connectionsListWidget.itemSelectionChanged.connect(
+            self._onSelectedConnectionChanged
+        )
 
     def _onSelectedConnectionChanged(self) -> None:
         self._reconfigureGroupBoxLabels()
@@ -115,14 +135,22 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
         selectedConnection = self._getSelectedConnection()
 
         connectionGroupBoxLabel = (
-            f'"{selectedConnection.name}"' if selectedConnection.name else self._DEFAULT_CONNECTION_LABEL
+            f'"{selectedConnection.name}"'
+            if selectedConnection.name
+            else self._DEFAULT_CONNECTION_LABEL
         )
-        connectionGroupBoxTitle = f"Hydraulic connection {connectionGroupBoxLabel}"
+        connectionGroupBoxTitle = (
+            f"Hydraulic connection {connectionGroupBoxLabel}"
+        )
         self.hydraulicConnectionGroupBox.setTitle(connectionGroupBoxTitle)
 
-        self.inletPortGroupBox.setTitle(f'Inlet port "{selectedConnection.inputPort.name}"')
+        self.inletPortGroupBox.setTitle(
+            f'Inlet port "{selectedConnection.inputPort.name}"'
+        )
 
-        self.outletPortGroupBox.setTitle(f'Outlet port "{selectedConnection.outputPort.name}"')
+        self.outletPortGroupBox.setTitle(
+            f'Outlet port "{selectedConnection.outputPort.name}"'
+        )
 
     def _reconfigureComboBoxOptions(self) -> None:
         self._reconfigureFluid()
@@ -136,40 +164,75 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
     def _addParametersAndInputOptions(self, comboBox: _qtw.QComboBox) -> None:
         _addOptions(comboBox, self._getParameters(comboBox))
         comboBox.addItem("-----", _models.UNSET)
-        _addOptions(comboBox, self._getInputs(comboBox), withUnset=False, clear=False)
+        _addOptions(
+            comboBox, self._getInputs(comboBox), withUnset=False, clear=False
+        )
 
     def _reconfigureInputs(self) -> None:
-        _addOptions(self.massFlowRateComboBox, self._getInputs(self.massFlowRateComboBox))
-        _addOptions(self.inputTempComboBox, self._getInputs(self.inputTempComboBox))
+        _addOptions(
+            self.massFlowRateComboBox,
+            self._getInputs(self.massFlowRateComboBox),
+        )
+        _addOptions(
+            self.inputTempComboBox, self._getInputs(self.inputTempComboBox)
+        )
 
     def _reconfigureOutputs(self) -> None:
-        _addOptions(self.outputTempComboBox, self._getOutputs(self.outputTempComboBox))
-        _addOptions(self.outputRevTempComboBox, self._getInputs(self.outputRevTempComboBox))
+        _addOptions(
+            self.outputTempComboBox, self._getOutputs(self.outputTempComboBox)
+        )
+        _addOptions(
+            self.outputRevTempComboBox,
+            self._getInputs(self.outputRevTempComboBox),
+        )
 
     @property
     def _selectedVariables(self) -> _cabc.Sequence[_models.Variable]:
-        selectedVariables = [v for c in self.hydraulicConnections for v in c.allVariables]
+        selectedVariables = [
+            v for c in self.hydraulicConnections for v in c.allVariables
+        ]
         return selectedVariables
 
-    def _getParameters(self, comboBox: _qtw.QComboBox) -> _cabc.Sequence[_models.Variable]:
-        return self._removeSelectedVariablesOfOtherComboBoxes(comboBox, self._variablesByRole.parameters)
+    def _getParameters(
+        self, comboBox: _qtw.QComboBox
+    ) -> _cabc.Sequence[_models.Variable]:
+        return self._removeSelectedVariablesOfOtherComboBoxes(
+            comboBox, self._variablesByRole.parameters
+        )
 
-    def _getInputs(self, comboBox: _qtw.QComboBox) -> _cabc.Sequence[_models.Variable]:
-        return self._removeSelectedVariablesOfOtherComboBoxes(comboBox, self._variablesByRole.inputs)
+    def _getInputs(
+        self, comboBox: _qtw.QComboBox
+    ) -> _cabc.Sequence[_models.Variable]:
+        return self._removeSelectedVariablesOfOtherComboBoxes(
+            comboBox, self._variablesByRole.inputs
+        )
 
-    def _getOutputs(self, comboBox: _qtw.QComboBox) -> _cabc.Sequence[_models.Variable]:
-        return self._removeSelectedVariablesOfOtherComboBoxes(comboBox, self._variablesByRole.outputs)
+    def _getOutputs(
+        self, comboBox: _qtw.QComboBox
+    ) -> _cabc.Sequence[_models.Variable]:
+        return self._removeSelectedVariablesOfOtherComboBoxes(
+            comboBox, self._variablesByRole.outputs
+        )
 
     def _removeSelectedVariablesOfOtherComboBoxes(
-        self, comboBox: _qtw.QComboBox, variables: _cabc.Sequence[_models.Variable]
+        self,
+        comboBox: _qtw.QComboBox,
+        variables: _cabc.Sequence[_models.Variable],
     ) -> _cabc.Sequence[_models.Variable]:
-        selectedVariableForComboBox = self._getVariableCorrespondingToComboBox(comboBox)
+        selectedVariableForComboBox = self._getVariableCorrespondingToComboBox(
+            comboBox
+        )
         selectedOrOtherUnselectedVariables = [
-            v for v in variables if v == selectedVariableForComboBox or v not in self._selectedVariables
+            v
+            for v in variables
+            if v == selectedVariableForComboBox
+            or v not in self._selectedVariables
         ]
         return selectedOrOtherUnselectedVariables
 
-    def _getVariableCorrespondingToComboBox(self, comboBox: _qtw.QComboBox) -> _models.Variable | _models.Unset:
+    def _getVariableCorrespondingToComboBox(
+        self, comboBox: _qtw.QComboBox
+    ) -> _models.Variable | _models.Unset:
         selectedConnection = self._getSelectedConnection()
 
         if comboBox == self.fluidDensityComboBox:
@@ -183,7 +246,10 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
         if comboBox == self.outputTempComboBox:
             return selectedConnection.outputPort.temperature
         if comboBox == self.outputRevTempComboBox:
-            return selectedConnection.outputPort.reverseTemperature or _models.UNSET
+            return (
+                selectedConnection.outputPort.reverseTemperature
+                or _models.UNSET
+            )
 
         raise AssertionError("Unknown combo box.")
 
@@ -196,13 +262,21 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
 
     def _configureVariableComboBoxes(self) -> None:
         for variableComboBox in self._variableComboBoxes:
-            sortFilterProxyModel = self._createSortFilterProxyModelAndAddToCompleter(variableComboBox)
+            sortFilterProxyModel = (
+                self._createSortFilterProxyModelAndAddToCompleter(
+                    variableComboBox
+                )
+            )
 
-            onActivatedCallback = _Callbacks.createAndConnect(self, variableComboBox, sortFilterProxyModel)
+            onActivatedCallback = _Callbacks.createAndConnect(
+                self, variableComboBox, sortFilterProxyModel
+            )
             self._callbacks.append(onActivatedCallback)
 
     @staticmethod
-    def _createSortFilterProxyModelAndAddToCompleter(variableComboBox: _qtw.QComboBox) -> _qtc.QSortFilterProxyModel:
+    def _createSortFilterProxyModelAndAddToCompleter(
+        variableComboBox: _qtw.QComboBox,
+    ) -> _qtc.QSortFilterProxyModel:
         sortFilterProxyModel = _qtc.QSortFilterProxyModel()
         sortFilterProxyModel.setSourceModel(variableComboBox.model())
         sortFilterProxyModel.setFilterCaseSensitivity(_qtc.Qt.CaseInsensitive)
@@ -211,14 +285,18 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
         completer.setModel(sortFilterProxyModel)
         return sortFilterProxyModel
 
-    def onVariableComboBoxActivated(self, comboBox: _qtw.QComboBox, newIndex: int) -> None:
+    def onVariableComboBoxActivated(
+        self, comboBox: _qtw.QComboBox, newIndex: int
+    ) -> None:
         data = comboBox.itemData(newIndex)
         self._setVariableCorrespondingToComboBox(comboBox, data)
         self._reloadConnections()
 
     def _configureDefaultVisibilityGroupBox(self) -> None:
         for defaultVisibility in _dv.DefaultVisibility:
-            self.defaultVisibilityComboBox.addItem(defaultVisibility.name.capitalize(), defaultVisibility)
+            self.defaultVisibilityComboBox.addItem(
+                defaultVisibility.name.capitalize(), defaultVisibility
+            )
 
     def _reloadConnections(self) -> None:
         self._resetOkButton()
@@ -226,7 +304,9 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
         self._reloadSummaryText()
 
     def _reloadSummaryText(self) -> None:
-        overallSummary = "\n".join(s for c in self.hydraulicConnections if (s := c.getSummary()))
+        overallSummary = "\n".join(
+            s for c in self.hydraulicConnections if (s := c.getSummary())
+        )
         self.summaryTextEdit.setPlainText(overallSummary)
 
     def _resetOkButton(self) -> None:
@@ -242,7 +322,9 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
         okButton.setToolTip(toolTip)
 
     def _areAnyRequiredVariablesUnset(self) -> bool:
-        areAnyRequiredVariablesUnset = any(c.areAnyRequiredVariablesUnset for c in self.hydraulicConnections)
+        areAnyRequiredVariablesUnset = any(
+            c.areAnyRequiredVariablesUnset for c in self.hydraulicConnections
+        )
         return areAnyRequiredVariablesUnset
 
     def _reloadSelectedComboBoxItems(self) -> None:
@@ -268,7 +350,9 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
     ) -> None:
         selectedConnection = self._getSelectedConnection()
 
-        valueForOptionalVariables = value if isinstance(value, _models.Variable) else None
+        valueForOptionalVariables = (
+            value if isinstance(value, _models.Variable) else None
+        )
 
         if comboBox == self.fluidDensityComboBox:
             selectedConnection.fluid.density = valueForOptionalVariables
@@ -281,7 +365,9 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
         elif comboBox == self.outputTempComboBox:
             selectedConnection.outputPort.temperature = value
         elif comboBox == self.outputRevTempComboBox:
-            selectedConnection.outputPort.reverseTemperature = valueForOptionalVariables
+            selectedConnection.outputPort.reverseTemperature = (
+                valueForOptionalVariables
+            )
         else:
             raise AssertionError("Unknown combo box.")
 
@@ -290,7 +376,9 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
         suggestedHydraulicConnections: _cabc.Sequence[_models.Connection],
         variablesByRole: _models.VariablesByRole,
     ) -> _cancel.MaybeCancelled[DialogResult]:
-        dialog = EditHydraulicConnectionsDialog(suggestedHydraulicConnections, variablesByRole)
+        dialog = EditHydraulicConnectionsDialog(
+            suggestedHydraulicConnections, variablesByRole
+        )
         returnValue = dialog.exec()
 
         if returnValue == _qtw.QDialog.Rejected:
@@ -302,7 +390,9 @@ class EditHydraulicConnectionsDialog(_qtw.QDialog, _uigen.Ui_HydraulicConnection
             else _dv.DefaultVisibility.LOCAL
         )
 
-        dialogResult = DialogResult(dialog.hydraulicConnections, defaultVisibility)
+        dialogResult = DialogResult(
+            dialog.hydraulicConnections, defaultVisibility
+        )
 
         return dialogResult
 
@@ -326,7 +416,9 @@ def _addOptions(
         _maybeAddToolTipToLatestEntry(variable, comboBox)
 
 
-def _maybeAddToolTipToLatestEntry(variable: _models.Variable, comboBox: _qtw.QComboBox) -> None:
+def _maybeAddToolTipToLatestEntry(
+    variable: _models.Variable, comboBox: _qtw.QComboBox
+) -> None:
     if not variable.definition:
         return
 
@@ -337,13 +429,17 @@ def _maybeAddToolTipToLatestEntry(variable: _models.Variable, comboBox: _qtw.QCo
     comboBox.setItemData(index, toolTipText, _qtc.Qt.ToolTipRole)
 
 
-def _setSelected(comboBox: _qtw.QComboBox, data: _models.Variable | _models.Unset) -> None:
+def _setSelected(
+    comboBox: _qtw.QComboBox, data: _models.Variable | _models.Unset
+) -> None:
     # Cannot use `QComboBox.findData` as `findData` works by reference, but we want by value
     for index in range(comboBox.count()):
         rowData = comboBox.itemData(index)
         if rowData == data:
             comboBox.setCurrentIndex(index)
-            if isinstance(data, _models.Variable) and (definition := data.definition):
+            if isinstance(data, _models.Variable) and (
+                definition := data.definition
+            ):
                 lineEdit = comboBox.lineEdit()
                 lineEdit.setToolTip(definition)
             return

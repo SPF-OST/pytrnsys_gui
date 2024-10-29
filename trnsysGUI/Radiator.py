@@ -14,7 +14,9 @@ import trnsysGUI.blockItemGraphicItemMixins as _gimx
 import trnsysGUI.blockItemHasInternalPiping as _bip
 
 
-class Radiator(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin):
+class Radiator(
+    _bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin
+):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
@@ -28,14 +30,18 @@ class Radiator(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMix
         outputPort = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
         pipe = _mfn.Pipe(inputPort, outputPort)
 
-        return _Ip.InternalPiping([pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]})
+        return _Ip.InternalPiping(
+            [pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]}
+        )
 
     def getDisplayName(self) -> str:
         return self.displayName
 
     @classmethod
     @_tp.override
-    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+    def _getImageAccessor(
+        cls,
+    ) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.RADIATOR_SVG
 
     def changeSize(self):
@@ -59,8 +65,12 @@ class Radiator(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMix
 
         self.origInputsPos = [[0, delta]]
         self.origOutputsPos = [[0, h - delta]]
-        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
-        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
+        self.inputs[0].setPos(
+            self.origInputsPos[0][0], self.origInputsPos[0][1]
+        )
+        self.outputs[0].setPos(
+            self.origOutputsPos[0][0], self.origOutputsPos[0][1]
+        )
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)

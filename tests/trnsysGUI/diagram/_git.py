@@ -3,14 +3,23 @@ import subprocess as _sp
 import typing as _tp
 
 
-def getUntrackedRelativePaths(projectFolderPathUnderVersionControl: _pl.Path) -> _tp.Sequence[_pl.Path]:
-    untrackedPathsRelativeToRepoRoot = _getUntrackedPathsRelativeToRepoRoot(projectFolderPathUnderVersionControl)
+def getUntrackedRelativePaths(
+    projectFolderPathUnderVersionControl: _pl.Path,
+) -> _tp.Sequence[_pl.Path]:
+    untrackedPathsRelativeToRepoRoot = _getUntrackedPathsRelativeToRepoRoot(
+        projectFolderPathUnderVersionControl
+    )
 
     repositoryRootDirPath = _getRepositoryRootDirPath()
 
-    untrackedAbsolutePaths = [repositoryRootDirPath / p for p in untrackedPathsRelativeToRepoRoot]
+    untrackedAbsolutePaths = [
+        repositoryRootDirPath / p for p in untrackedPathsRelativeToRepoRoot
+    ]
 
-    untrackedRelativePaths = [p.relative_to(projectFolderPathUnderVersionControl) for p in untrackedAbsolutePaths]
+    untrackedRelativePaths = [
+        p.relative_to(projectFolderPathUnderVersionControl)
+        for p in untrackedAbsolutePaths
+    ]
 
     return untrackedRelativePaths
 
@@ -28,9 +37,17 @@ def _getRepositoryRootDirPath() -> _pl.Path:
     return _pl.Path(repositoryRootDirPath)
 
 
-def _getUntrackedPathsRelativeToRepoRoot(projectFolderPathUnderVersionControl: _pl.Path) -> _tp.Sequence[_pl.Path]:
+def _getUntrackedPathsRelativeToRepoRoot(
+    projectFolderPathUnderVersionControl: _pl.Path,
+) -> _tp.Sequence[_pl.Path]:
     completedProcess = _sp.run(
-        ["git", "status", "-unormal", "--porcelain", str(projectFolderPathUnderVersionControl)],
+        [
+            "git",
+            "status",
+            "-unormal",
+            "--porcelain",
+            str(projectFolderPathUnderVersionControl),
+        ],
         check=True,
         text=True,
         capture_output=True,

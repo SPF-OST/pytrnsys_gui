@@ -15,8 +15,12 @@ class SideNrs:
 
 
 def getSideNr(portItemRect: _qtc.QRect, blockItemRect: _qtc.QRect) -> SideNr:
-    portItemLeft, portItemRight, portItemTop, portItemBottom = _getLeftRightTopBottom(portItemRect)
-    blockItemLeft, blockItemRight, blockItemTop, blockItemBottom = _getLeftRightTopBottom(blockItemRect)
+    portItemLeft, portItemRight, portItemTop, portItemBottom = (
+        _getLeftRightTopBottom(portItemRect)
+    )
+    blockItemLeft, blockItemRight, blockItemTop, blockItemBottom = (
+        _getLeftRightTopBottom(blockItemRect)
+    )
 
     if portItemLeft <= blockItemLeft:
         return SideNrs.LEFT

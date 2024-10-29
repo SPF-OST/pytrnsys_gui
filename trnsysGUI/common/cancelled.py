@@ -10,12 +10,16 @@ _T = _tp.TypeVar("_T")
 MaybeCancelled: _tp.TypeAlias = _T | Cancelled
 
 
-def isCancelled(maybeCancelled: MaybeCancelled[_T]) -> _tp.TypeGuard[Cancelled]:
+def isCancelled(
+    maybeCancelled: MaybeCancelled[_T],
+) -> _tp.TypeGuard[Cancelled]:
     if maybeCancelled == CANCELLED:
         return True
 
     if isinstance(maybeCancelled, Cancelled):
-        raise AssertionError(f"Don't instantiate {Cancelled} but use the variable `CANCELLED' instead.")
+        raise AssertionError(
+            f"Don't instantiate {Cancelled} but use the variable `CANCELLED' instead."
+        )
 
     return False
 

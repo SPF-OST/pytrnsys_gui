@@ -8,7 +8,9 @@ if _tp.TYPE_CHECKING:
     import trnsysGUI.BlockItem as _bi
     import trnsysGUI.connection.singlePipeConnection as _spc
 
-GetInternallyConnectedPortItems = _tp.Callable[["SinglePipePortItem"], _tp.Sequence["SinglePipePortItem"]]
+GetInternallyConnectedPortItems = _tp.Callable[
+    ["SinglePipePortItem"], _tp.Sequence["SinglePipePortItem"]
+]
 
 
 class SinglePipePortItem(_pi.PortItemBase):

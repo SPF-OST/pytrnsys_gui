@@ -5,7 +5,8 @@ from trnsysGUI.connection import connectorsAndPipesExportHelpers as _helper
 
 
 def exportDummyConnection(
-    singlePipeConnection: _spc.ExportHydraulicSinglePipeConnection, unitNumber: int
+    singlePipeConnection: _spc.ExportHydraulicSinglePipeConnection,
+    unitNumber: int,
 ) -> _tp.Tuple[str, int]:
     unitText = _helper.getIfThenElseUnit(
         unitNumber,

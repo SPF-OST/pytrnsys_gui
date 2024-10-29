@@ -8,7 +8,9 @@ import trnsysGUI.internalPiping as _ip
 import trnsysGUI.teePieces.teePieceBaseModel as _tpbm
 
 
-class TeePieceBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin):
+class TeePieceBase(
+    _bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin
+):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
@@ -24,10 +26,14 @@ class TeePieceBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicIte
 
     @classmethod
     @_tp.override
-    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+    def _getImageAccessor(  # pylint: disable=arguments-differ
+        cls,
+    ) -> _img.SvgImageAccessor:
         raise NotImplementedError()
 
-    def _createInputAndOutputPorts(self) -> _tp.Tuple[_pib.PortItemBase, _pib.PortItemBase, _pib.PortItemBase]:
+    def _createInputAndOutputPorts(
+        self,
+    ) -> _tp.Tuple[_pib.PortItemBase, _pib.PortItemBase, _pib.PortItemBase]:
         raise NotImplementedError()
 
     def getDisplayName(self) -> str:
@@ -60,7 +66,9 @@ class TeePieceBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicIte
 
         return baseModel
 
-    def _decodeTeePieceBaseModel(self, baseModel: _tpbm.TeePieceBaseModel) -> None:
+    def _decodeTeePieceBaseModel(
+        self, baseModel: _tpbm.TeePieceBaseModel
+    ) -> None:
         self.inputs[0].id = baseModel.inputPortId
 
         self.outputs[0].id = baseModel.outputPortIds[0]
@@ -68,7 +76,9 @@ class TeePieceBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicIte
 
         self._decodeBaseModel(baseModel.blockItemModel)
 
-    def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
+    def exportPipeAndTeeTypesForTemp(
+        self, startingUnit: int
+    ) -> _tp.Tuple[str, int]:
         raise NotImplementedError()
 
     def changeSize(self):
@@ -77,11 +87,20 @@ class TeePieceBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicIte
         width, _ = self._getCappedWidthAndHeight()
 
         self.origInputsPos = [[0, self._portOffset]]
-        self.origOutputsPos = [[width, self._portOffset], [self._portOffset, 0]]
+        self.origOutputsPos = [
+            [width, self._portOffset],
+            [self._portOffset, 0],
+        ]
 
-        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
-        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
-        self.outputs[1].setPos(self.origOutputsPos[1][0], self.origOutputsPos[1][1])
+        self.inputs[0].setPos(
+            self.origInputsPos[0][0], self.origInputsPos[0][1]
+        )
+        self.outputs[0].setPos(
+            self.origOutputsPos[0][0], self.origOutputsPos[0][1]
+        )
+        self.outputs[1].setPos(
+            self.origOutputsPos[1][0], self.origOutputsPos[1][1]
+        )
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
