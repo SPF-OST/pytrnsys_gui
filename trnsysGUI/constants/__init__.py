@@ -14,9 +14,17 @@ RECENT_MOVED_OR_DELETED = "Recent project has moved or was deleted, it will be r
 DIRECTORY_MUST_BE_EMPTY = "The new project directory must be empty."
 DEFAULT_MESSAGE_BOX_MESSAGE = "Do you want to proceed?"
 DEFAULT_MESSAGE_BOX_TITLE = "Message"
+MODE_CSV_CRATED = (
+    "modes_template.csv has been created in your project directory."
+    " Please rename the file and provide pump and valve values"
+)
+MODE_CSV_ALREADY_EXISTS = "modes_template.csv file already exists in your project. Would you like to overwrite?"
+ERROR_RUNNING_MODES = "Error running modes"
+
 
 # Config
 DEFAULT_MONOSPACED_FONT = "Courier New"
+MODES_TEMPLATE_FILE_NAME = "modes_template.csv"
 
 
 class CreateNewOrOpenExisting(_enum.Enum):
