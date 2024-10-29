@@ -18,7 +18,9 @@ _INVALID_CHARACTER_ERROR_MESSAGE = (
     "Found unacceptable characters (this includes spaces at the start and the end)\n"
     "Please use only letters, numbers, and underscores."
 )
-_NAME_ALREADY_EXISTS_ERROR_MESSAGE = "Name already exist (note: names are case insensitive)."
+_NAME_ALREADY_EXISTS_ERROR_MESSAGE = (
+    "Name already exist (note: names are case insensitive)."
+)
 
 _NAMES_AND_ERROR_MESSAGES = [
     (" name with spaces ", _INVALID_CHARACTER_ERROR_MESSAGE),
@@ -39,15 +41,21 @@ _NAMES_AND_ERROR_MESSAGES = [
 _INVALID_NAMES = [n for n, _ in _NAMES_AND_ERROR_MESSAGES]
 
 
-class _DummyDdckFileOrDirNamesProvider(_nm.AbstractDdckDirFileOrDirNamesProvider):
+class _DummyDdckFileOrDirNamesProvider(
+    _nm.AbstractDdckDirFileOrDirNamesProvider
+):
     @_tp.override
     def hasFileOrDirName(self, name: str) -> bool:
         raise AssertionError("Shouldn't get here")
 
 
 class TestComponentAndPipeNameValidator:
-    @_pt.mark.parametrize(["newName", "expectedErrorMessage"], _NAMES_AND_ERROR_MESSAGES)
-    def testValidateNameInvalidNames(self, newName: str, expectedErrorMessage: str) -> None:
+    @_pt.mark.parametrize(
+        ["newName", "expectedErrorMessage"], _NAMES_AND_ERROR_MESSAGES
+    )
+    def testValidateNameInvalidNames(
+        self, newName: str, expectedErrorMessage: str
+    ) -> None:
         validator = self._createManager()
         result = validator.validateName(newName, checkDdckFolder=False)
 
@@ -65,5 +73,7 @@ class TestComponentAndPipeNameValidator:
 
     @staticmethod
     def _createManager() -> _nm.NamesManager:
-        manager = _nm.NamesManager(_EXISTING_NAMES, _DummyDdckFileOrDirNamesProvider())
+        manager = _nm.NamesManager(
+            _EXISTING_NAMES, _DummyDdckFileOrDirNamesProvider()
+        )
         return manager

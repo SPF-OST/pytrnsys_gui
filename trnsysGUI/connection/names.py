@@ -5,7 +5,9 @@ import trnsysGUI.names.create as _nc
 import trnsysGUI.temperatures as _temps
 
 
-def getTemperatureVariableName(connection: _cb.ConnectionBase, portItemType: _mfn.PortItemType) -> str:
+def getTemperatureVariableName(
+    connection: _cb.ConnectionBase, portItemType: _mfn.PortItemType
+) -> str:
     modelPipe = connection.getModelPipe(portItemType)
     variableName = _temps.getTemperatureVariableName(
         connection.shallRenameOutputTemperaturesInHydraulicFile(),
@@ -16,7 +18,9 @@ def getTemperatureVariableName(connection: _cb.ConnectionBase, portItemType: _mf
 
 
 def generateDefaultConnectionName(
-    fromPort: _pib.PortItemBase, toPort: _pib.PortItemBase, createNamingHelper: _nc.CreateNamingHelper
+    fromPort: _pib.PortItemBase,
+    toPort: _pib.PortItemBase,
+    createNamingHelper: _nc.CreateNamingHelper,
 ) -> str:
     baseName = getDefaultConnectionNameBase(fromPort, toPort)
     defaultDisplayName = createNamingHelper.generateName(
@@ -25,7 +29,9 @@ def generateDefaultConnectionName(
     return defaultDisplayName
 
 
-def getDefaultConnectionNameBase(fromPort: _pib.PortItemBase, toPort: _pib.PortItemBase) -> str:
+def getDefaultConnectionNameBase(
+    fromPort: _pib.PortItemBase, toPort: _pib.PortItemBase
+) -> str:
     fromDisplayName = fromPort.parent.getDisplayName()
     toDisplayName = toPort.parent.getDisplayName()
     return f"{fromDisplayName}_{toDisplayName}"

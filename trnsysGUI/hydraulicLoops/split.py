@@ -22,10 +22,14 @@ class SplitSummary:
 
     @staticmethod
     def fromLoops(
-        mergedLoop: _model.HydraulicLoop, fromLoop: _model.HydraulicLoop, toLoop: _model.HydraulicLoop
+        mergedLoop: _model.HydraulicLoop,
+        fromLoop: _model.HydraulicLoop,
+        toLoop: _model.HydraulicLoop,
     ) -> "SplitSummary":
         mergedLoopSummary = _common.MergedLoopSummary.fromLoop(mergedLoop)
-        splitLoopsSummary = _common.SplitLoopsSummary.fromLoops(fromLoop, toLoop)
+        splitLoopsSummary = _common.SplitLoopsSummary.fromLoops(
+            fromLoop, toLoop
+        )
         return SplitSummary(mergedLoopSummary, splitLoopsSummary)
 
 
@@ -41,7 +45,11 @@ def split(
 
 
 class _Splitter:
-    def __init__(self, hydraulicLoops: _model.HydraulicLoops, fluids: _tp.Sequence[_model.Fluid]) -> None:
+    def __init__(
+        self,
+        hydraulicLoops: _model.HydraulicLoops,
+        fluids: _tp.Sequence[_model.Fluid],
+    ) -> None:
         self._hydraulicLoops = hydraulicLoops
         self._fluids = fluids
 
@@ -52,8 +60,12 @@ class _Splitter:
     ) -> _common.Cancellable[_tp.Optional[SplitSummary]]:
         fromPort, toPort = _helpers.getFromAndToPort(connection)
 
-        fromConnections = search.getReachableConnections(fromPort, ignoreConnections={connection})
-        toConnections = search.getReachableConnections(toPort, ignoreConnections={connection})
+        fromConnections = search.getReachableConnections(
+            fromPort, ignoreConnections={connection}
+        )
+        toConnections = search.getReachableConnections(
+            toPort, ignoreConnections={connection}
+        )
 
         loop = self._hydraulicLoops.getLoopForExistingConnection(connection)
 
@@ -64,13 +76,14 @@ class _Splitter:
             return None
 
         isConnectionRedundant = (
-            fromConnections == otherConnections  # pylint: disable=consider-using-in
+            fromConnections  # pylint: disable=consider-using-in
+            == otherConnections
             or toConnections == otherConnections
         )
         if isConnectionRedundant:
-            assert (not fromConnections or fromConnections == otherConnections) and (
-                not toConnections or toConnections == otherConnections
-            )
+            assert (
+                not fromConnections or fromConnections == otherConnections
+            ) and (not toConnections or toConnections == otherConnections)
 
             self._removeConnection(connection, loop)
             return None
@@ -92,11 +105,17 @@ class _Splitter:
     ) -> _common.Cancellable[SplitSummary]:
         fromPort, toPort = _helpers.getFromAndToPort(connection)
 
-        fromConnections = search.getReachableConnections(fromPort, ignoreConnections={connection})
-        toConnections = search.getReachableConnections(toPort, ignoreConnections={connection})
+        fromConnections = search.getReachableConnections(
+            fromPort, ignoreConnections={connection}
+        )
+        toConnections = search.getReachableConnections(
+            toPort, ignoreConnections={connection}
+        )
 
         if not splitLoopsSummary:
-            cancellable = self._createSplitLoopsSummary(loop, fromConnections, connection, toConnections)
+            cancellable = self._createSplitLoopsSummary(
+                loop, fromConnections, connection, toConnections
+            )
             if cancellable == "cancelled":
                 return "cancelled"
             splitLoopsSummary = cancellable
@@ -107,16 +126,29 @@ class _Splitter:
         toLoopName = splitLoopsSummary.toLoop.name
 
         connectionsDefinitionMode = loop.connectionsDefinitionMode
-        if connectionsDefinitionMode == _cdm.ConnectionsDefinitionMode.LOOP_WIDE_DEFAULTS:
-            _scp.setConnectionPropertiesForLoopWideDefaults([*fromConnections], fromLoopName.value)
-            _scp.setConnectionPropertiesForLoopWideDefaults([*toConnections], fromLoopName.value)
+        if (
+            connectionsDefinitionMode
+            == _cdm.ConnectionsDefinitionMode.LOOP_WIDE_DEFAULTS
+        ):
+            _scp.setConnectionPropertiesForLoopWideDefaults(
+                [*fromConnections], fromLoopName.value
+            )
+            _scp.setConnectionPropertiesForLoopWideDefaults(
+                [*toConnections], fromLoopName.value
+            )
 
         fromLoop = _model.HydraulicLoop(
-            fromLoopName, splitLoopsSummary.fromLoop.fluid, connectionsDefinitionMode, [*fromConnections]
+            fromLoopName,
+            splitLoopsSummary.fromLoop.fluid,
+            connectionsDefinitionMode,
+            [*fromConnections],
         )
 
         toLoop = _model.HydraulicLoop(
-            toLoopName, splitLoopsSummary.toLoop.fluid, connectionsDefinitionMode, [*toConnections]
+            toLoopName,
+            splitLoopsSummary.toLoop.fluid,
+            connectionsDefinitionMode,
+            [*toConnections],
         )
 
         self._hydraulicLoops.addLoop(fromLoop)
@@ -134,9 +166,13 @@ class _Splitter:
         if not loop.name.isUserDefined:
             return self._createSplitLoopsSummaryForAutomaticLoop(loop)
 
-        return self._askUserForSplitLoopsSummary(loop, fromConnections, connection, toConnections)
+        return self._askUserForSplitLoopsSummary(
+            loop, fromConnections, connection, toConnections
+        )
 
-    def _createSplitLoopsSummaryForAutomaticLoop(self, loop: _model.HydraulicLoop) -> _common.SplitLoopsSummary:
+    def _createSplitLoopsSummaryForAutomaticLoop(
+        self, loop: _model.HydraulicLoop
+    ) -> _common.SplitLoopsSummary:
         fromLoopSummary = _common.LoopSummary(loop.name, loop.fluid)
 
         toLoopName = self._hydraulicLoops.generateName()
@@ -151,10 +187,16 @@ class _Splitter:
         connection: _spc.SinglePipeConnection,  # type: ignore[name-defined]
         toConnections: _tp.Set[_spc.SinglePipeConnection],  # type: ignore[name-defined]
     ) -> _common.Cancellable[_common.SplitLoopsSummary]:
-        occupiedNames = {l.name.value for l in self._hydraulicLoops.hydraulicLoops} - {loop.name.value}
+        occupiedNames = {
+            l.name.value for l in self._hydraulicLoops.hydraulicLoops
+        } - {loop.name.value}
 
-        setLoop1Selected = self._createSetConnectionsSelectedCallback(fromConnections)
-        setLoop2Selected = self._createSetConnectionsSelectedCallback(toConnections)
+        setLoop1Selected = self._createSetConnectionsSelectedCallback(
+            fromConnections
+        )
+        setLoop2Selected = self._createSetConnectionsSelectedCallback(
+            toConnections
+        )
 
         connection.deselectConnection()
 

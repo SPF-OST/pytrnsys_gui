@@ -2,7 +2,7 @@ import pytrnsys.rsim.runParallelTrnsys as runTrnsys
 import os, sys
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     pathBase = os.getcwd()
 
@@ -19,4 +19,3 @@ if __name__ == '__main__':
     runTool.runConfig()
 
     runTool.runParallel()
-

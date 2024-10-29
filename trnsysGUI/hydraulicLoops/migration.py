@@ -18,14 +18,22 @@ def createLoops(
         nextConnection = todo[0]
         assert isinstance(nextConnection.fromPort, _spi.SinglePipePortItem)
 
-        reachableConnections = [*search.getReachableConnections(nextConnection.fromPort)]
+        reachableConnections = [
+            *search.getReachableConnections(nextConnection.fromPort)
+        ]
         todo = [c for c in todo if c not in reachableConnections]
 
         name = loops.generateName()
 
-        connectionsDefinitionMode = _cdm.ConnectionsDefinitionMode.LOOP_WIDE_DEFAULTS
-        _scp.setConnectionPropertiesForDefinitionMode(reachableConnections, name.value, connectionsDefinitionMode)
-        loop = _model.HydraulicLoop(name, fluid, connectionsDefinitionMode, reachableConnections)
+        connectionsDefinitionMode = (
+            _cdm.ConnectionsDefinitionMode.LOOP_WIDE_DEFAULTS
+        )
+        _scp.setConnectionPropertiesForDefinitionMode(
+            reachableConnections, name.value, connectionsDefinitionMode
+        )
+        loop = _model.HydraulicLoop(
+            name, fluid, connectionsDefinitionMode, reachableConnections
+        )
 
         loops.addLoop(loop)
 

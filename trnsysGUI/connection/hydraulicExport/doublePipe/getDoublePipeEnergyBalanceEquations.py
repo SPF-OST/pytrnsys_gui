@@ -80,12 +80,16 @@ def _getEquationTerms(
     )
     dissipatedHeatFluxesToFarField.append(dissipatedHeatFluxToFarField)
     coldPipeInternalEnergyChange = energyBalanceVariableNameGenerator.getName(
-        _dpebv.EnergyBalanceVariables.PIPE_INTERNAL_CHANGE, _mfn.PortItemType.COLD
+        _dpebv.EnergyBalanceVariables.PIPE_INTERNAL_CHANGE,
+        _mfn.PortItemType.COLD,
     )
     hotPipeInternalEnergyChange = energyBalanceVariableNameGenerator.getName(
-        _dpebv.EnergyBalanceVariables.PIPE_INTERNAL_CHANGE, _mfn.PortItemType.HOT
+        _dpebv.EnergyBalanceVariables.PIPE_INTERNAL_CHANGE,
+        _mfn.PortItemType.HOT,
     )
-    pipeInternalEnergyChanges.extend([coldPipeInternalEnergyChange, hotPipeInternalEnergyChange])
+    pipeInternalEnergyChanges.extend(
+        [coldPipeInternalEnergyChange, hotPipeInternalEnergyChange]
+    )
     soilInternalEnergyChange = energyBalanceVariableNameGenerator.getName(
         _dpebv.EnergyBalanceVariables.SOIL_INTERNAL_CHANGE
     )

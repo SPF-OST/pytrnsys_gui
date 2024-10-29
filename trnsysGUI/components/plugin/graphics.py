@@ -18,10 +18,14 @@ class Graphics:
     size: Size
 
     @classmethod
-    def createForTypeNameAndSize(cls, typeName: str, *, width: int, height: int) -> "Graphics":
+    def createForTypeNameAndSize(
+        cls, typeName: str, *, width: int, height: int
+    ) -> "Graphics":
         componentResourcePath = _paths.getComponentResourcePath(typeName)
         imageResourcePath = f"{componentResourcePath}/image.svg"
-        accessor = _ia.createForPackageResource(_ia.SvgImageAccessor, imageResourcePath)
+        accessor = _ia.createForPackageResource(
+            _ia.SvgImageAccessor, imageResourcePath
+        )
 
         size = Size(width=width, height=height)
 

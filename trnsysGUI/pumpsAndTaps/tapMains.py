@@ -9,7 +9,9 @@ from . import _tapBase as _tb
 
 class TapMains(_tb.TapBase):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
-        super().__init__(trnsysType, editor, _mfn.PortItemDirection.OUTPUT, displayName)
+        super().__init__(
+            trnsysType, editor, _mfn.PortItemDirection.OUTPUT, displayName
+        )
 
     @classmethod
     @_tp.override
@@ -18,13 +20,17 @@ class TapMains(_tb.TapBase):
 
     @classmethod
     @_tp.override
-    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+    def _getImageAccessor(
+        cls,
+    ) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.TAP_MAINS_SVG
 
     def _getCanonicalMassFlowRate(self) -> float:
         return self.massFlowRateInKgPerH
 
-    def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
+    def exportPipeAndTeeTypesForTemp(
+        self, startingUnit: int
+    ) -> _tp.Tuple[str, int]:
         temperatureVariable = _temps.getTemperatureVariableName(
             self.shallRenameOutputTemperaturesInHydraulicFile(),
             componentDisplayName=self.displayName,
@@ -40,4 +46,6 @@ EQUATIONS 1
 
     def _setUnFlippedPortPos(self, delta: int) -> None:
         self.origOutputsPos = [[0, delta]]
-        self._graphicalPortItem.setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
+        self._graphicalPortItem.setPos(
+            self.origOutputsPos[0][0], self.origOutputsPos[0][1]
+        )

@@ -19,7 +19,9 @@ class PV(_bi.BlockItem, _bimx.SvgBlockItemGraphicItemMixin):
 
     @classmethod
     @_tp.override
-    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+    def _getImageAccessor(
+        cls,
+    ) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.PV_SVG
 
     def changeSize(self):

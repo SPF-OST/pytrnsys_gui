@@ -7,25 +7,39 @@ import trnsysGUI.dialogs.connections.doublePipe as _dpcdlg
 import trnsysGUI.warningsAndErrors as _werrors
 
 
-_SHOW_ERROR_FUNCTION_NAME = f"{_werrors.__name__}.{_werrors.showMessageBox.__name__}"
+_SHOW_ERROR_FUNCTION_NAME = (
+    f"{_werrors.__name__}.{_werrors.showMessageBox.__name__}"
+)
 
 
 class TestDoublePipeConnectionPropertiesDialog:  # pylint: disable = attribute-defined-outside-init
     def setup(self):
-        self.connectionModel = _dpcdlg.ConnectionModel("TS_A", lengthInM=5, shallBeSimulated=False)
-        self.dialog = _dpcdlg.DoublePipeConnectionPropertiesDialog(self.connectionModel)
+        self.connectionModel = _dpcdlg.ConnectionModel(
+            "TS_A", lengthInM=5, shallBeSimulated=False
+        )
+        self.dialog = _dpcdlg.DoublePipeConnectionPropertiesDialog(
+            self.connectionModel
+        )
 
     def _setLengthAndPressButton(
-        self, bot, value, standardButton: _qtw.QDialogButtonBox.StandardButton = _qtw.QDialogButtonBox.Ok
+        self,
+        bot,
+        value,
+        standardButton: _qtw.QDialogButtonBox.StandardButton = _qtw.QDialogButtonBox.Ok,
     ):
         bot.addWidget(self.dialog)
         self._clearAndWriteAndPressButton(bot, value, standardButton)
 
     def _clearAndWriteAndPressButton(
-        self, bot, value, standardButton: _qtw.QDialogButtonBox.StandardButton = _qtw.QDialogButtonBox.Ok
+        self,
+        bot,
+        value,
+        standardButton: _qtw.QDialogButtonBox.StandardButton = _qtw.QDialogButtonBox.Ok,
     ) -> None:
         bot.mouseClick(self.dialog.lengthInMLineEdit, _qtc.Qt.LeftButton)
-        bot.keyClick(self.dialog.lengthInMLineEdit, "A", _qtc.Qt.ControlModifier)
+        bot.keyClick(
+            self.dialog.lengthInMLineEdit, "A", _qtc.Qt.ControlModifier
+        )
         bot.keyClicks(self.dialog.lengthInMLineEdit, value)
         bot.keyClick(self.dialog.lengthInMLineEdit, _qtc.Qt.Key_Enter)
 
@@ -39,7 +53,9 @@ class TestDoublePipeConnectionPropertiesDialog:  # pylint: disable = attribute-d
     def testDialogRaises(self, qtbot):
         with _m.patch(_SHOW_ERROR_FUNCTION_NAME) as box:
             self._setLengthAndPressButton(qtbot, "-7")
-            box.assert_called_with("Could not parse the length. Please make sure it's a non-negative number.")
+            box.assert_called_with(
+                "Could not parse the length. Please make sure it's a non-negative number."
+            )
 
     def testDialogInputAfterRaises(self, qtbot):
         with _m.patch(_SHOW_ERROR_FUNCTION_NAME):

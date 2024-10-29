@@ -27,7 +27,9 @@ class TVentil(
         self.w = 40
         self.isTempering = False
         self.positionForMassFlowSolver = 1.0
-        self.posLabel = _qtw.QGraphicsTextItem(str(self.positionForMassFlowSolver), self)
+        self.posLabel = _qtw.QGraphicsTextItem(
+            str(self.positionForMassFlowSolver), self
+        )
         self.posLabel.setVisible(False)
 
         self.outputs.append(_cspi.createSinglePipePortItem("o", self))
@@ -56,7 +58,9 @@ class TVentil(
 
     @classmethod
     @_tp.override
-    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+    def _getImageAccessor(  # pylint: disable=arguments-differ
+        cls,
+    ) -> _img.SvgImageAccessor:
         return _img.T_VENTIL_SVG
 
     def changeSize(self):
@@ -73,15 +77,23 @@ class TVentil(
         labelWidth = rect.width()
         labelPosX = (width - labelWidth) / 2
 
-        self.label.setPos(labelPosX, height - self.flippedV * (height + height / 2))
+        self.label.setPos(
+            labelPosX, height - self.flippedV * (height + height / 2)
+        )
         self.posLabel.setPos(labelPosX + 5, -15)
 
         self.origInputsPos = [[width, delta]]
         self.origOutputsPos = [[0, delta], [delta, 0]]
 
-        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
-        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
-        self.outputs[1].setPos(self.origOutputsPos[1][0], self.origOutputsPos[1][1])
+        self.inputs[0].setPos(
+            self.origInputsPos[0][0], self.origInputsPos[0][1]
+        )
+        self.outputs[0].setPos(
+            self.origOutputsPos[0][0], self.origOutputsPos[0][1]
+        )
+        self.outputs[1].setPos(
+            self.origOutputsPos[1][0], self.origOutputsPos[1][1]
+        )
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
@@ -109,7 +121,9 @@ class TVentil(
     def setComplexDiv(self, b):  # pylint: disable = invalid-name
         self.isTempering = bool(b)
 
-    def setPositionForMassFlowSolver(self, f):  # pylint: disable = invalid-name
+    def setPositionForMassFlowSolver(
+        self, f
+    ):  # pylint: disable = invalid-name
         self.positionForMassFlowSolver = f
 
     def encode(self) -> _tp.Tuple[str, _dcj.JsonDict]:
@@ -126,7 +140,13 @@ class TVentil(
         inputPortId = self.inputs[0].id
         outputPortIds = (self.outputs[0].id, self.outputs[1].id)
 
-        valveModel = _vm.ValveModel(self.name, self.displayName, blockItemModel, inputPortId, outputPortIds)
+        valveModel = _vm.ValveModel(
+            self.name,
+            self.displayName,
+            blockItemModel,
+            inputPortId,
+            outputPortIds,
+        )
 
         dictName = "Block-"
 
@@ -158,8 +178,12 @@ class TVentil(
 
     def exportMassFlows(self):
         if not self.isTempering:
-            mfsInputVariableName = _mnames.getInputVariableName(self, self.modelDiverter)
-            resStr = f"{mfsInputVariableName} = {self.positionForMassFlowSolver}\n"
+            mfsInputVariableName = _mnames.getInputVariableName(
+                self, self.modelDiverter
+            )
+            resStr = (
+                f"{mfsInputVariableName} = {self.positionForMassFlowSolver}\n"
+            )
             equationNr = 1
             return resStr, equationNr
         return "", 0
@@ -195,7 +219,9 @@ class TVentil(
             lines += "*** INITIAL INPUT VALUES" + "\n"
             lines += "35.0 21.0 800.0 T_set_" + self.displayName + "\n"
 
-            mfsInputVariableName = _mnames.getInputVariableName(self, self.modelDiverter)
+            mfsInputVariableName = _mnames.getInputVariableName(
+                self, self.modelDiverter
+            )
             lines += "EQUATIONS 1\n"
             lines += f"{mfsInputVariableName} =  1.-[{nUnit},5] \n\n"
 
@@ -209,7 +235,9 @@ class TVentil(
             self.modelDiverter.output2: self.outputs[1],
         }
 
-        return _ip.InternalPiping([self.modelDiverter], modelPortItemsToGraphicalPortItem)
+        return _ip.InternalPiping(
+            [self.modelDiverter], modelPortItemsToGraphicalPortItem
+        )
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         if self.isVisible():
@@ -229,17 +257,29 @@ class TVentil(
 
             portItems = self.modelDiverter.getPortItems()
             massFlowVariableNames = [
-                _mnames.getMassFlowVariableName(self.displayName, self.modelDiverter, portItems[0]),
-                _mnames.getMassFlowVariableName(self.displayName, self.modelDiverter, portItems[1]),
-                _mnames.getMassFlowVariableName(self.displayName, self.modelDiverter, portItems[2]),
+                _mnames.getMassFlowVariableName(
+                    self.displayName, self.modelDiverter, portItems[0]
+                ),
+                _mnames.getMassFlowVariableName(
+                    self.displayName, self.modelDiverter, portItems[1]
+                ),
+                _mnames.getMassFlowVariableName(
+                    self.displayName, self.modelDiverter, portItems[2]
+                ),
             ]
 
             unitText += "\n".join(massFlowVariableNames) + "\n"
 
             temperatureVariableNames = [
-                _cnames.getTemperatureVariableName(self.inputs[0].getConnection(), _mfn.PortItemType.STANDARD),
-                _cnames.getTemperatureVariableName(self.outputs[0].getConnection(), _mfn.PortItemType.STANDARD),
-                _cnames.getTemperatureVariableName(self.outputs[1].getConnection(), _mfn.PortItemType.STANDARD),
+                _cnames.getTemperatureVariableName(
+                    self.inputs[0].getConnection(), _mfn.PortItemType.STANDARD
+                ),
+                _cnames.getTemperatureVariableName(
+                    self.outputs[0].getConnection(), _mfn.PortItemType.STANDARD
+                ),
+                _cnames.getTemperatureVariableName(
+                    self.outputs[1].getConnection(), _mfn.PortItemType.STANDARD
+                ),
             ]
 
             unitText += "\n".join(temperatureVariableNames) + "\n"
@@ -248,8 +288,11 @@ class TVentil(
             unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
 
             unitText += "EQUATIONS 1\n"
-            temperatureVariableName = _temps.getInternalTemperatureVariableName(
-                componentDisplayName=self.displayName, nodeName=self.modelDiverter.name
+            temperatureVariableName = (
+                _temps.getInternalTemperatureVariableName(
+                    componentDisplayName=self.displayName,
+                    nodeName=self.modelDiverter.name,
+                )
             )
             unitText += f"{temperatureVariableName}= [{unitNumber},{equationConstant}]\n"
 
@@ -259,5 +302,7 @@ class TVentil(
             return lines, unitNumber
         return "", startingUnit
 
-    def mouseDoubleClickEvent(self, event) -> None:  # pylint: disable=unused-argument
+    def mouseDoubleClickEvent(
+        self, event
+    ) -> None:  # pylint: disable=unused-argument
         self.editor.showTVentilDlg(self)

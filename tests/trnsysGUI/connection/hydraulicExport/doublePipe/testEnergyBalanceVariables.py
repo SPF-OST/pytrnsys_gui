@@ -23,70 +23,126 @@ class _TestCase:
 
 
 _TEST_CASES = [
-    _TestCase(_ebv.EnergyBalanceVariables.CONVECTED, _mfn.PortItemType.COLD, "DTeeI_SCnrIColdConv"),
-    _TestCase(_ebv.EnergyBalanceVariables.PIPE_TO_GRAVEL, _mfn.PortItemType.COLD, "DTeeI_SCnrIColdDiss"),
-    _TestCase(_ebv.EnergyBalanceVariables.PIPE_INTERNAL_CHANGE, _mfn.PortItemType.COLD, "DTeeI_SCnrIColdInt"),
-    _TestCase(_ebv.EnergyBalanceVariables.CONVECTED, _mfn.PortItemType.HOT, "DTeeI_SCnrIHotConv"),
-    _TestCase(_ebv.EnergyBalanceVariables.PIPE_TO_GRAVEL, _mfn.PortItemType.HOT, "DTeeI_SCnrIHotDiss"),
-    _TestCase(_ebv.EnergyBalanceVariables.PIPE_INTERNAL_CHANGE, _mfn.PortItemType.HOT, "DTeeI_SCnrIHotInt"),
+    _TestCase(
+        _ebv.EnergyBalanceVariables.CONVECTED,
+        _mfn.PortItemType.COLD,
+        "DTeeI_SCnrIColdConv",
+    ),
+    _TestCase(
+        _ebv.EnergyBalanceVariables.PIPE_TO_GRAVEL,
+        _mfn.PortItemType.COLD,
+        "DTeeI_SCnrIColdDiss",
+    ),
+    _TestCase(
+        _ebv.EnergyBalanceVariables.PIPE_INTERNAL_CHANGE,
+        _mfn.PortItemType.COLD,
+        "DTeeI_SCnrIColdInt",
+    ),
+    _TestCase(
+        _ebv.EnergyBalanceVariables.CONVECTED,
+        _mfn.PortItemType.HOT,
+        "DTeeI_SCnrIHotConv",
+    ),
+    _TestCase(
+        _ebv.EnergyBalanceVariables.PIPE_TO_GRAVEL,
+        _mfn.PortItemType.HOT,
+        "DTeeI_SCnrIHotDiss",
+    ),
+    _TestCase(
+        _ebv.EnergyBalanceVariables.PIPE_INTERNAL_CHANGE,
+        _mfn.PortItemType.HOT,
+        "DTeeI_SCnrIHotInt",
+    ),
     _TestCase(
         _ebv.EnergyBalanceVariables.CONVECTED,
         None,
-        _res.Error("Energy balance variable `CONVECTED` is defined per single pipe."),
+        _res.Error(
+            "Energy balance variable `CONVECTED` is defined per single pipe."
+        ),
     ),
     _TestCase(
         _ebv.EnergyBalanceVariables.PIPE_TO_GRAVEL,
         None,
-        _res.Error("Energy balance variable `PIPE_TO_GRAVEL` is defined per single pipe."),
+        _res.Error(
+            "Energy balance variable `PIPE_TO_GRAVEL` is defined per single pipe."
+        ),
     ),
     _TestCase(
         _ebv.EnergyBalanceVariables.PIPE_INTERNAL_CHANGE,
         None,
-        _res.Error("Energy balance variable `PIPE_INTERNAL_CHANGE` is defined per single pipe."),
+        _res.Error(
+            "Energy balance variable `PIPE_INTERNAL_CHANGE` is defined per single pipe."
+        ),
     ),
-    _TestCase(_ebv.EnergyBalanceVariables.COLD_TO_HOT, None, "DTeeI_SCnrIExch"),
+    _TestCase(
+        _ebv.EnergyBalanceVariables.COLD_TO_HOT, None, "DTeeI_SCnrIExch"
+    ),
     _TestCase(
         _ebv.EnergyBalanceVariables.COLD_TO_HOT,
         _mfn.PortItemType.COLD,
-        _res.Error("Energy balance variable `COLD_TO_HOT` is not defined per single pipe."),
+        _res.Error(
+            "Energy balance variable `COLD_TO_HOT` is not defined per single pipe."
+        ),
     ),
     _TestCase(
         _ebv.EnergyBalanceVariables.COLD_TO_HOT,
         _mfn.PortItemType.HOT,
-        _res.Error("Energy balance variable `COLD_TO_HOT` is not defined per single pipe."),
+        _res.Error(
+            "Energy balance variable `COLD_TO_HOT` is not defined per single pipe."
+        ),
     ),
-    _TestCase(_ebv.EnergyBalanceVariables.GRAVEL_TO_SOIL, None, "DTeeI_SCnrIGrSl"),
+    _TestCase(
+        _ebv.EnergyBalanceVariables.GRAVEL_TO_SOIL, None, "DTeeI_SCnrIGrSl"
+    ),
     _TestCase(
         _ebv.EnergyBalanceVariables.GRAVEL_TO_SOIL,
         _mfn.PortItemType.COLD,
-        _res.Error("Energy balance variable `GRAVEL_TO_SOIL` is not defined per single pipe."),
+        _res.Error(
+            "Energy balance variable `GRAVEL_TO_SOIL` is not defined per single pipe."
+        ),
     ),
     _TestCase(
         _ebv.EnergyBalanceVariables.GRAVEL_TO_SOIL,
         _mfn.PortItemType.HOT,
-        _res.Error("Energy balance variable `GRAVEL_TO_SOIL` is not defined per single pipe."),
+        _res.Error(
+            "Energy balance variable `GRAVEL_TO_SOIL` is not defined per single pipe."
+        ),
     ),
-    _TestCase(_ebv.EnergyBalanceVariables.SOIL_TO_FAR_FIELD, None, "DTeeI_SCnrISlFf"),
+    _TestCase(
+        _ebv.EnergyBalanceVariables.SOIL_TO_FAR_FIELD, None, "DTeeI_SCnrISlFf"
+    ),
     _TestCase(
         _ebv.EnergyBalanceVariables.SOIL_TO_FAR_FIELD,
         _mfn.PortItemType.COLD,
-        _res.Error("Energy balance variable `SOIL_TO_FAR_FIELD` is not defined per single pipe."),
+        _res.Error(
+            "Energy balance variable `SOIL_TO_FAR_FIELD` is not defined per single pipe."
+        ),
     ),
     _TestCase(
         _ebv.EnergyBalanceVariables.SOIL_TO_FAR_FIELD,
         _mfn.PortItemType.HOT,
-        _res.Error("Energy balance variable `SOIL_TO_FAR_FIELD` is not defined per single pipe."),
+        _res.Error(
+            "Energy balance variable `SOIL_TO_FAR_FIELD` is not defined per single pipe."
+        ),
     ),
-    _TestCase(_ebv.EnergyBalanceVariables.SOIL_INTERNAL_CHANGE, None, "DTeeI_SCnrISlInt"),
+    _TestCase(
+        _ebv.EnergyBalanceVariables.SOIL_INTERNAL_CHANGE,
+        None,
+        "DTeeI_SCnrISlInt",
+    ),
     _TestCase(
         _ebv.EnergyBalanceVariables.SOIL_INTERNAL_CHANGE,
         _mfn.PortItemType.COLD,
-        _res.Error("Energy balance variable `SOIL_INTERNAL_CHANGE` is not defined per single pipe."),
+        _res.Error(
+            "Energy balance variable `SOIL_INTERNAL_CHANGE` is not defined per single pipe."
+        ),
     ),
     _TestCase(
         _ebv.EnergyBalanceVariables.SOIL_INTERNAL_CHANGE,
         _mfn.PortItemType.HOT,
-        _res.Error("Energy balance variable `SOIL_INTERNAL_CHANGE` is not defined per single pipe."),
+        _res.Error(
+            "Energy balance variable `SOIL_INTERNAL_CHANGE` is not defined per single pipe."
+        ),
     ),
 ]
 
@@ -101,48 +157,79 @@ def _getVariableName(variable: _ebv.EnergyBalanceVariables) -> str:
 
 
 class TestEnergyBalanceVariables:
-    @_pt.mark.parametrize("testCase", _PASSING_TEST_CASES, ids=_TestCase.testId)
+    @_pt.mark.parametrize(
+        "testCase", _PASSING_TEST_CASES, ids=_TestCase.testId
+    )
     def testVariableNameGenerator(self, testCase: _TestCase) -> None:
-        generator = _ebv.VariableNameGenerator("DTeeI_SCnrI", coldPipeName="Cold", hotPipeName="Hot")
+        generator = _ebv.VariableNameGenerator(
+            "DTeeI_SCnrI", coldPipeName="Cold", hotPipeName="Hot"
+        )
         name = generator.getName(testCase.variable, testCase.portItemType)
 
         assert name == testCase.name
 
-    @_pt.mark.parametrize("testCase", _FAILING_TEST_CASES, ids=_TestCase.testId)
-    def testVariableNameGeneratorInvalidArguments(self, testCase: _TestCase) -> None:
-        generator = _ebv.VariableNameGenerator("DTeeI_SCnrI", coldPipeName="Cold", hotPipeName="Hot")
+    @_pt.mark.parametrize(
+        "testCase", _FAILING_TEST_CASES, ids=_TestCase.testId
+    )
+    def testVariableNameGeneratorInvalidArguments(
+        self, testCase: _TestCase
+    ) -> None:
+        generator = _ebv.VariableNameGenerator(
+            "DTeeI_SCnrI", coldPipeName="Cold", hotPipeName="Hot"
+        )
 
         expectedErrorMessageRegexPattern = _res.error(testCase.name).message
         with _pt.raises(ValueError, match=expectedErrorMessageRegexPattern):
             generator.getName(testCase.variable, testCase.portItemType)
 
-    @_pt.mark.parametrize("variable", _ebv.EnergyBalanceVariables, ids=_getVariableName)
-    def testPortItemTypeStandardRaises(self, variable: _ebv.EnergyBalanceVariables) -> None:
+    @_pt.mark.parametrize(
+        "variable", _ebv.EnergyBalanceVariables, ids=_getVariableName
+    )
+    def testPortItemTypeStandardRaises(
+        self, variable: _ebv.EnergyBalanceVariables
+    ) -> None:
         expectedErrorMessageRegexPattern = (
-            r"^Energy balance variables are only defined for `COLD` or `HOT` port item types or `None`.$"
+            r"^Energy balance variables are only defined for"
+            r" `COLD` or `HOT` port item types or `None`.$"
         )
 
-        generator = _ebv.VariableNameGenerator("DTeeI_SCnrI", coldPipeName="Cold", hotPipeName="Hot")
+        generator = _ebv.VariableNameGenerator(
+            "DTeeI_SCnrI", coldPipeName="Cold", hotPipeName="Hot"
+        )
 
         with _pt.raises(ValueError, match=expectedErrorMessageRegexPattern):
             generator.getName(variable, _mfn.PortItemType.STANDARD)
 
     def testThatAllVariablesAreTested(self) -> None:
-        expectedPortItemTypes = {_mfn.PortItemType.COLD, _mfn.PortItemType.HOT, None}
-        expectedPortItemTypesByVariable = {v: expectedPortItemTypes for v in _ebv.EnergyBalanceVariables}
+        expectedPortItemTypes = {
+            _mfn.PortItemType.COLD,
+            _mfn.PortItemType.HOT,
+            None,
+        }
+        expectedPortItemTypesByVariable = {
+            v: expectedPortItemTypes for v in _ebv.EnergyBalanceVariables
+        }
 
-        portItemTypesByVariable = self._getPortItemTypesByVariableFromTestCases()
+        portItemTypesByVariable = (
+            self._getPortItemTypesByVariableFromTestCases()
+        )
 
         assert portItemTypesByVariable == expectedPortItemTypesByVariable
 
     @staticmethod
     def _getPortItemTypesByVariableFromTestCases() -> (
-        _cabc.Mapping[_ebv.EnergyBalanceVariables, set[_tp.Optional[_mfn.PortItemType]]]
+        _cabc.Mapping[
+            _ebv.EnergyBalanceVariables, set[_tp.Optional[_mfn.PortItemType]]
+        ]
     ):
-        portItemTypesByVariable = dict[_ebv.EnergyBalanceVariables, set[_tp.Optional[_mfn.PortItemType]]]()
+        portItemTypesByVariable = dict[
+            _ebv.EnergyBalanceVariables, set[_tp.Optional[_mfn.PortItemType]]
+        ]()
         for testCase in _TEST_CASES:
             defaultReturnIfNotFound = set[_tp.Optional[_mfn.PortItemType]]()
-            portItemTypes = portItemTypesByVariable.get(testCase.variable, defaultReturnIfNotFound)
+            portItemTypes = portItemTypesByVariable.get(
+                testCase.variable, defaultReturnIfNotFound
+            )
             portItemTypes.add(testCase.portItemType)
             portItemTypesByVariable[testCase.variable] = portItemTypes
 

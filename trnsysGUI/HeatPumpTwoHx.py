@@ -10,7 +10,9 @@ import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
-class HeatPumpTwoHx(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin):
+class HeatPumpTwoHx(
+    _bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin
+):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
@@ -35,7 +37,9 @@ class HeatPumpTwoHx(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicIt
 
     @classmethod
     @_tp.override
-    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+    def _getImageAccessor(
+        cls,
+    ) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.HP_TWO_HX_SVG
 
     def changeSize(self):
@@ -56,15 +60,35 @@ class HeatPumpTwoHx(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicIt
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.origInputsPos = [[0, delta], [w, h - delta], [w, 2 * delta]]  # inlet of [evap, cond, cond]
-        self.origOutputsPos = [[0, h - delta], [w, h - 2 * delta], [w, delta]]  # outlet of [evap, cond, cond]
+        self.origInputsPos = [
+            [0, delta],
+            [w, h - delta],
+            [w, 2 * delta],
+        ]  # inlet of [evap, cond, cond]
+        self.origOutputsPos = [
+            [0, h - delta],
+            [w, h - 2 * delta],
+            [w, delta],
+        ]  # outlet of [evap, cond, cond]
 
-        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])  # evaporator
-        self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1])  # bottom condenser
-        self.inputs[2].setPos(self.origInputsPos[2][0], self.origInputsPos[2][1])  # top condenser
-        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])  # evaporator
-        self.outputs[1].setPos(self.origOutputsPos[1][0], self.origOutputsPos[1][1])  # bottom condenser
-        self.outputs[2].setPos(self.origOutputsPos[2][0], self.origOutputsPos[2][1])  # top condenser
+        self.inputs[0].setPos(
+            self.origInputsPos[0][0], self.origInputsPos[0][1]
+        )  # evaporator
+        self.inputs[1].setPos(
+            self.origInputsPos[1][0], self.origInputsPos[1][1]
+        )  # bottom condenser
+        self.inputs[2].setPos(
+            self.origInputsPos[2][0], self.origInputsPos[2][1]
+        )  # top condenser
+        self.outputs[0].setPos(
+            self.origOutputsPos[0][0], self.origOutputsPos[0][1]
+        )  # evaporator
+        self.outputs[1].setPos(
+            self.origOutputsPos[1][0], self.origOutputsPos[1][1]
+        )  # bottom condenser
+        self.outputs[2].setPos(
+            self.origOutputsPos[2][0], self.origOutputsPos[2][1]
+        )  # top condenser
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
@@ -89,7 +113,10 @@ class HeatPumpTwoHx(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicIt
             dct["BlockDisplayName"] = self.displayName
             dct["PortsIDIn"] = portListInputs
             dct["PortsIDOut"] = portListOutputs
-            dct["HeatPumpPosition"] = (float(self.pos().x()), float(self.pos().y()))
+            dct["HeatPumpPosition"] = (
+                float(self.pos().x()),
+                float(self.pos().y()),
+            )
             dct["trnsysID"] = self.trnsysId
             dct["childIds"] = self.childIds
             dct["FlippedH"] = self.flippedH
@@ -115,7 +142,9 @@ class HeatPumpTwoHx(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicIt
             self.outputs[x].id = i["PortsIDOut"][x]
             self.logger.debug("Output at heatExchanger")
 
-        self.setPos(float(i["HeatPumpPosition"][0]), float(i["HeatPumpPosition"][1]))
+        self.setPos(
+            float(i["HeatPumpPosition"][0]), float(i["HeatPumpPosition"][1])
+        )
         self.trnsysId = i["trnsysID"]
 
         resBlockList.append(self)

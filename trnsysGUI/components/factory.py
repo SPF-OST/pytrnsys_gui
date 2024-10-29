@@ -67,12 +67,17 @@ def _getHardCodedComponents() -> _cabc.Sequence[Component]:
 def getComponents() -> _warn.ValueWithWarnings[_cabc.Sequence[Component]]:
     pluginComponentsWithWarnings = _getPluginComponents()
 
-    allComponents = [*_getHardCodedComponents(), *pluginComponentsWithWarnings.value]
+    allComponents = [
+        *_getHardCodedComponents(),
+        *pluginComponentsWithWarnings.value,
+    ]
 
     return pluginComponentsWithWarnings.withValue(allComponents)
 
 
-def _getPluginComponents() -> _warn.ValueWithWarnings[_cabc.Sequence[Component]]:
+def _getPluginComponents() -> (
+    _warn.ValueWithWarnings[_cabc.Sequence[Component]]
+):
     pluginFactory = _pfactory.Factory.createDefault()
 
     pluginComponentNames = pluginFactory.getTypeNames()
@@ -83,7 +88,9 @@ def _getPluginComponents() -> _warn.ValueWithWarnings[_cabc.Sequence[Component]]
         result = _createPluginComponent(pluginComponentName, pluginFactory)
         if _res.isError(result):
             namesOfComponentsWhichCouldntBeLoaded.append(pluginComponentName)
-            error = _res.error(result).withContext(f"Could not load component {pluginComponentName}")
+            error = _res.error(result).withContext(
+                f"Could not load component {pluginComponentName}"
+            )
             _LOGGER.error(error.message)
             continue
         pluginComponent = _res.value(result)
@@ -91,7 +98,9 @@ def _getPluginComponents() -> _warn.ValueWithWarnings[_cabc.Sequence[Component]]
         pluginComponents.append(pluginComponent)
 
     if namesOfComponentsWhichCouldntBeLoaded:
-        formattedNames = "\n".join(f"\t - {name}" for name in namesOfComponentsWhichCouldntBeLoaded)
+        formattedNames = "\n".join(
+            f"\t - {name}" for name in namesOfComponentsWhichCouldntBeLoaded
+        )
         warning = f"""\
 The following plugin components couldn't be loaded (see log file for details):
 {formattedNames}
@@ -100,11 +109,15 @@ The following plugin components couldn't be loaded (see log file for details):
     else:
         warning = None
 
-    valueWithWarnings = _warn.ValueWithWarnings.create(pluginComponents, warning)
+    valueWithWarnings = _warn.ValueWithWarnings.create(
+        pluginComponents, warning
+    )
     return valueWithWarnings
 
 
-def _createPluginComponent(pluginComponentName: str, pluginFactory: _pfactory.Factory) -> _res.Result[Component]:
+def _createPluginComponent(
+    pluginComponentName: str, pluginFactory: _pfactory.Factory
+) -> _res.Result[Component]:
     result = pluginFactory.create(pluginComponentName)
     if _res.isError(result):
         return _res.error(result)

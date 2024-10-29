@@ -22,7 +22,9 @@ class LoadDiagramWarningHelper:
         self._loadDiagramWarning = loadDiagramWarning
         self._wasWarningReceived = False
 
-    def warning(self, _, title: str, message: str) -> _qtw.QMessageBox.StandardButton:  # parent
+    def warning(
+        self, _, title: str, message: str
+    ) -> _qtw.QMessageBox.StandardButton:  # parent
         assert self._loadDiagramWarning
 
         assert not self._wasWarningReceived
@@ -62,7 +64,13 @@ class Project:
         resultsDirPath: _pl.Path | None = None,
         loadDiagramWarning: LoadDiagramWarning | None = None,
     ) -> "Project":
-        return Project(projectName, "examples", exampleDirNameToCopyFrom, resultsDirPath, loadDiagramWarning)
+        return Project(
+            projectName,
+            "examples",
+            exampleDirNameToCopyFrom,
+            resultsDirPath,
+            loadDiagramWarning,
+        )
 
     @property
     def testId(self) -> str:
@@ -75,26 +83,39 @@ class Helper:
         project: Project,
         shallComparisonsAlwaysSucceed: bool = False,
     ):
-        self._projectFolderPathInExamplesDir = self._getProjectFolderPathInExamplesDir(project)
+        self._projectFolderPathInExamplesDir = (
+            self._getProjectFolderPathInExamplesDir(project)
+        )
 
         testCasesFolderPath = DATA_DIR / project.testCasesDirName
 
         # project name is used twice because the project file must always be contained in a folder
         # of the same name
-        self.actualProjectFolderPath = testCasesFolderPath / project.projectName / project.projectName
+        self.actualProjectFolderPath = (
+            testCasesFolderPath / project.projectName / project.projectName
+        )
 
-        self.expectedProjectFolderPath = testCasesFolderPath / project.projectName / "expected"
+        self.expectedProjectFolderPath = (
+            testCasesFolderPath / project.projectName / "expected"
+        )
 
         self._shallComparisonsAlwaysSucceed = shallComparisonsAlwaysSucceed
 
     @staticmethod
-    def _getProjectFolderPathInExamplesDir(project: Project) -> _tp.Optional[_pl.Path]:
+    def _getProjectFolderPathInExamplesDir(
+        project: Project,
+    ) -> _tp.Optional[_pl.Path]:
         if not project.exampleDirNameToCopyFrom:
             return None
 
         pytrnsysGuiDir = _pl.Path(__file__).parents[3]
 
-        exampleProjectPath = pytrnsysGuiDir / "data" / project.exampleDirNameToCopyFrom / project.projectName
+        exampleProjectPath = (
+            pytrnsysGuiDir
+            / "data"
+            / project.exampleDirNameToCopyFrom
+            / project.projectName
+        )
 
         return exampleProjectPath
 
@@ -111,25 +132,40 @@ class Helper:
             else:
                 untrackedPath.unlink()
 
-    def _getUntrackedPathsInActualProjectFolder(self) -> _tp.Sequence[_pl.Path]:
-        projectFolderPathUnderVersionControl = self._getProjectFolderPathUnderVersionControl()
+    def _getUntrackedPathsInActualProjectFolder(
+        self,
+    ) -> _tp.Sequence[_pl.Path]:
+        projectFolderPathUnderVersionControl = (
+            self._getProjectFolderPathUnderVersionControl()
+        )
 
-        untrackedRelativePaths = _git.getUntrackedRelativePaths(projectFolderPathUnderVersionControl)
+        untrackedRelativePaths = _git.getUntrackedRelativePaths(
+            projectFolderPathUnderVersionControl
+        )
 
-        untrackedAbsolutePaths = [self.actualProjectFolderPath / p for p in untrackedRelativePaths]
+        untrackedAbsolutePaths = [
+            self.actualProjectFolderPath / p for p in untrackedRelativePaths
+        ]
 
         return untrackedAbsolutePaths
 
     def _getProjectFolderPathUnderVersionControl(self) -> _pl.Path:
-        return self._projectFolderPathInExamplesDir or self.actualProjectFolderPath
+        return (
+            self._projectFolderPathInExamplesDir
+            or self.actualProjectFolderPath
+        )
 
     def ensureFilesAreEqual(
-        self, fileRelativePathAsString: str, replaceInExpected: _tp.Optional[_tp.Tuple[str, str]] = None
+        self,
+        fileRelativePathAsString: str,
+        replaceInExpected: _tp.Optional[_tp.Tuple[str, str]] = None,
     ) -> None:
         if self._shallComparisonsAlwaysSucceed:
             return
 
-        actualFilePath, expectedFilePath = self._getActualAndExpectedFilePath(fileRelativePathAsString)
+        actualFilePath, expectedFilePath = self._getActualAndExpectedFilePath(
+            fileRelativePathAsString
+        )
 
         actualContent = actualFilePath.read_text()
 
@@ -138,13 +174,17 @@ class Helper:
             old, new = replaceInExpected
 
             if old not in expectedContent:
-                raise ValueError(f"Could not find string '{old}' in file '{expectedFilePath}'.")
+                raise ValueError(
+                    f"Could not find string '{old}' in file '{expectedFilePath}'."
+                )
 
             expectedContent = expectedContent.replace(old, new)
 
         assert actualContent == expectedContent
 
-    def _getActualAndExpectedFilePath(self, fileRelativePathAsString: str) -> _tp.Tuple[_pl.Path, _pl.Path]:
+    def _getActualAndExpectedFilePath(
+        self, fileRelativePathAsString: str
+    ) -> _tp.Tuple[_pl.Path, _pl.Path]:
         fileRelativePath = _pl.Path(fileRelativePathAsString)
         actualFilePath = self.actualProjectFolderPath / fileRelativePath
         expectedFilePath = self.expectedProjectFolderPath / fileRelativePath
@@ -154,10 +194,16 @@ class Helper:
         if self._shallComparisonsAlwaysSucceed:
             return
 
-        actualFilePath, expectedFilePath = self._getActualAndExpectedFilePath(fileRelativePathAsString)
+        actualFilePath, expectedFilePath = self._getActualAndExpectedFilePath(
+            fileRelativePathAsString
+        )
 
-        actualDf: _pd.DataFrame = _pd.read_csv(actualFilePath, delim_whitespace=True)
-        expectedDf: _pd.DataFrame = _pd.read_csv(expectedFilePath, delim_whitespace=True)
+        actualDf: _pd.DataFrame = _pd.read_csv(
+            actualFilePath, delim_whitespace=True
+        )
+        expectedDf: _pd.DataFrame = _pd.read_csv(
+            expectedFilePath, delim_whitespace=True
+        )
 
         _pd.testing.assert_frame_equal(actualDf, expectedDf, atol=1e-10)
 
@@ -168,4 +214,6 @@ class Helper:
         if self.actualProjectFolderPath.exists():
             _su.rmtree(self.actualProjectFolderPath)
 
-        _su.copytree(self._projectFolderPathInExamplesDir, self.actualProjectFolderPath)
+        _su.copytree(
+            self._projectFolderPathInExamplesDir, self.actualProjectFolderPath
+        )

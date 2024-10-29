@@ -20,12 +20,19 @@ class TestPlaceholders:
         qtbot.addWidget(editor)
 
         valueWithWarnings = _eph.encodeDdckPlaceHolderValuesToJson(
-            editor.projectFolder, actualJsonFilePath, editor.trnsysObj, editor.hydraulicLoops
+            editor.projectFolder,
+            actualJsonFilePath,
+            editor.trnsysObj,
+            editor.hydraulicLoops,
         )
         assert not valueWithWarnings.hasWarnings()
 
-        actualJsonText = actualJsonFilePath.read_text()  # pylint: disable=bad-option-value,unspecified-encoding
-        expectedJsonText = expectedJsonFilePath.read_text()  # pylint: disable=bad-option-value,unspecified-encoding
+        actualJsonText = (
+            actualJsonFilePath.read_text()
+        )  # pylint: disable=bad-option-value,unspecified-encoding
+        expectedJsonText = (
+            expectedJsonFilePath.read_text()
+        )  # pylint: disable=bad-option-value,unspecified-encoding
 
         assert actualJsonText == expectedJsonText
 
@@ -36,12 +43,18 @@ class TestPlaceholders:
         editor = self._createEditor(actualDirPath)
         qtbot.addWidget(editor)
 
-        blockItems = [o for o in editor.trnsysObj if isinstance(o, _biip.BlockItemHasInternalPiping)]
+        blockItems = [
+            o
+            for o in editor.trnsysObj
+            if isinstance(o, _biip.BlockItemHasInternalPiping)
+        ]
 
         ddckDirNames = [b.getDisplayName() for b in blockItems]
         ddckDirNames.remove("HP")
 
-        valueWithWarnings = _ph.getPlaceholderValues(ddckDirNames, blockItems, editor.hydraulicLoops)
+        valueWithWarnings = _ph.getPlaceholderValues(
+            ddckDirNames, blockItems, editor.hydraulicLoops
+        )
 
         actualWarning = valueWithWarnings.toWarningMessage()
         expectedWarning = """\

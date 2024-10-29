@@ -88,7 +88,9 @@ class HeatExchanger(QGraphicsItemGroup):
             self.logger.debug("p is a StorageTank")
             self.setParentItem(parent)
         else:
-            self.logger.debug("A non-Storage-Tank block is trying to set parent of heatExchanger")
+            self.logger.debug(
+                "A non-Storage-Tank block is trying to set parent of heatExchanger"
+            )
 
     def contextMenuEvent(self, event):
         menu = QMenu()
@@ -132,7 +134,9 @@ class HeatExchanger(QGraphicsItemGroup):
 
         self._drawCoils()
 
-    def setRelativeHeights(self, relativeInputHeight: float, relativeOutputHeight: float) -> None:
+    def setRelativeHeights(
+        self, relativeInputHeight: float, relativeOutputHeight: float
+    ) -> None:
         self._clearDrawing()
 
         self._setRelativeHeightsAndTankSize(
@@ -163,13 +167,15 @@ class HeatExchanger(QGraphicsItemGroup):
             line1 = QGraphicsLineItem(
                 x + sign * self.w,
                 y + i * self.COIL_HEIGHT_IN_PIXELS,
-                x + sign * (1 - self.COIL_WITH_RELATIVE_TO_TANK_WIDTH) * self.w,
+                x
+                + sign * (1 - self.COIL_WITH_RELATIVE_TO_TANK_WIDTH) * self.w,
                 y + (i + 1 / 2) * self.COIL_HEIGHT_IN_PIXELS,
                 self,
             )
 
             line2 = QGraphicsLineItem(
-                x + sign * (1 - self.COIL_WITH_RELATIVE_TO_TANK_WIDTH) * self.w,
+                x
+                + sign * (1 - self.COIL_WITH_RELATIVE_TO_TANK_WIDTH) * self.w,
                 y + (i + 1 / 2) * self.COIL_HEIGHT_IN_PIXELS,
                 x + sign * self.w,
                 y + (i + 1) * self.COIL_HEIGHT_IN_PIXELS,
@@ -230,6 +236,11 @@ class HeatExchanger(QGraphicsItemGroup):
 
     def _getPos(self):
         x = 0 if self.sSide == 0 else self._storageTankWidth
-        topPortRelativeHeight = max(self.relativeInputHeight, self.relativeOutputHeight)
-        y = self._storageTankHeight - topPortRelativeHeight * self._storageTankHeight
+        topPortRelativeHeight = max(
+            self.relativeInputHeight, self.relativeOutputHeight
+        )
+        y = (
+            self._storageTankHeight
+            - topPortRelativeHeight * self._storageTankHeight
+        )
         return x, y

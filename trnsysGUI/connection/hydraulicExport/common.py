@@ -42,7 +42,9 @@ class AdjacentHasInternalPiping:
     sharedPort: _pib.PortItemBase
 
 
-def getAdjacentConnection(port: _pib.PortItemBase) -> AdjacentHasInternalPiping:
+def getAdjacentConnection(
+    port: _pib.PortItemBase,
+) -> AdjacentHasInternalPiping:
     return AdjacentHasInternalPiping(port.getConnection(), port)
 
 

@@ -31,8 +31,12 @@ from trnsysGUI.TVentil import TVentil
 from trnsysGUI.pumpsAndTaps.tap import Tap
 from trnsysGUI.pumpsAndTaps.tapMains import TapMains
 from trnsysGUI.connection.connectors.connector import Connector
-from trnsysGUI.connection.connectors.doubleDoublePipeConnector import DoubleDoublePipeConnector
-from trnsysGUI.connection.connectors.singleDoublePipeConnector import SingleDoublePipeConnector
+from trnsysGUI.connection.connectors.doubleDoublePipeConnector import (
+    DoubleDoublePipeConnector,
+)
+from trnsysGUI.connection.connectors.singleDoublePipeConnector import (
+    SingleDoublePipeConnector,
+)
 from trnsysGUI.crystalizer import Crystalizer
 from trnsysGUI.geotherm import Geotherm
 from trnsysGUI.pumpsAndTaps.pump import Pump
@@ -91,40 +95,61 @@ _BLOCK_ITEM_CASES = [
 _BLOCK_ITEM_CASES_WITHOUT_NAME = [(x, y) for x, y, _ in _BLOCK_ITEM_CASES]
 
 
-class _DummyDdckDirFileOrDirNamesProvider(_nman.AbstractDdckDirFileOrDirNamesProvider):
+class _DummyDdckDirFileOrDirNamesProvider(
+    _nman.AbstractDdckDirFileOrDirNamesProvider
+):
     def hasFileOrDirName(self, name: str) -> bool:
         return False
 
 
 class TestGetBlockItem:
-    @_pt.mark.parametrize("componentTypeName, componentType, displayName", _BLOCK_ITEM_CASES)
+    @_pt.mark.parametrize(
+        "componentTypeName, componentType, displayName", _BLOCK_ITEM_CASES
+    )
     def testGetNewBlockItem(
-        self, componentTypeName, componentType, displayName, tmp_path, qtbot  # pylint: disable=invalid-name  # /NOSONAR
+        self,
+        componentTypeName,
+        componentType,
+        displayName,
+        tmp_path,  # pylint: disable=invalid-name  # /NOSONAR
+        qtbot,
     ) -> None:
         editorMock = self._testHelper(tmp_path, qtbot)
         namesManagerMock = self._createNamesManager()
-        blockItem = _gbi.createBlockItem(componentTypeName, editorMock, namesManagerMock, displayName)
+        blockItem = _gbi.createBlockItem(
+            componentTypeName, editorMock, namesManagerMock, displayName
+        )
         assert isinstance(blockItem, componentType)
         assert blockItem.displayName == displayName
 
-    def testGetNewStorageTank(self, tmp_path, qtbot) -> None:  # pylint: disable=invalid-name  # /NOSONAR
+    def testGetNewStorageTank(
+        self, tmp_path, qtbot  # pylint: disable=invalid-name  # /NOSONAR
+    ) -> None:
         editorMock = self._testHelper(tmp_path, qtbot)
         namesManagerMock = self._createNamesManager()
 
         displayName = "Tes"
-        blockItem = _gbi.createBlockItem("StorageTank", editorMock, namesManagerMock, displayName)
+        blockItem = _gbi.createBlockItem(
+            "StorageTank", editorMock, namesManagerMock, displayName
+        )
 
         assert isinstance(blockItem, StorageTank)
         assert blockItem.displayName == displayName
 
-    def testGetNewGraphicalItem(self, tmp_path, qtbot) -> None:  # pylint: disable=invalid-name  # /NOSONAR
+    def testGetNewGraphicalItem(
+        self, tmp_path, qtbot  # pylint: disable=invalid-name  # /NOSONAR
+    ) -> None:
         editorMock = self._testHelper(tmp_path, qtbot)
         namesManagerMock = self._createNamesManager()
 
-        blockItem = _gbi.createBlockItem("GraphicalItem", editorMock, namesManagerMock)
+        blockItem = _gbi.createBlockItem(
+            "GraphicalItem", editorMock, namesManagerMock
+        )
         assert isinstance(blockItem, GraphicalItem)
 
-    def testGetNewUnknownBlockItemRaises(self, tmp_path, qtbot) -> None:  # pylint: disable=invalid-name  # /NOSONAR
+    def testGetNewUnknownBlockItemRaises(
+        self, tmp_path, qtbot  # pylint: disable=invalid-name  # /NOSONAR
+    ) -> None:
         editorMock = self._testHelper(tmp_path, qtbot)
 
         with _pt.raises(ValueError):
@@ -132,30 +157,44 @@ class TestGetBlockItem:
 
             _gbi.createBlockItem("Blk", editorMock, namesManagerMock)
 
-    @_pt.mark.parametrize("componentTypeName, componentType", _BLOCK_ITEM_CASES_WITHOUT_NAME)
+    @_pt.mark.parametrize(
+        "componentTypeName, componentType", _BLOCK_ITEM_CASES_WITHOUT_NAME
+    )
     def testGetLoadedBlockItem(
-        self, componentTypeName, componentType, tmp_path, qtbot  # pylint: disable=invalid-name  # /NOSONAR
+        self,
+        componentTypeName,
+        componentType,
+        tmp_path,  # pylint: disable=invalid-name  # /NOSONAR
+        qtbot,
     ) -> None:
         editorMock = self._testHelper(tmp_path, qtbot)
         namesManagerMock = self._createNamesManager()
 
         displayName = f"{componentTypeName}753"
-        blockItem = _gbi.createBlockItem(componentTypeName, editorMock, namesManagerMock, displayName)
+        blockItem = _gbi.createBlockItem(
+            componentTypeName, editorMock, namesManagerMock, displayName
+        )
 
         assert isinstance(blockItem, componentType)
         assert blockItem.displayName == displayName
 
-    def testGetLoadedStorageTank(self, tmp_path, qtbot) -> None:  # pylint: disable=invalid-name  # /NOSONAR
+    def testGetLoadedStorageTank(
+        self, tmp_path, qtbot  # pylint: disable=invalid-name  # /NOSONAR
+    ) -> None:
         editorMock = self._testHelper(tmp_path, qtbot)
         namesManagerMock = self._createNamesManager()
 
         displayName = "StorageTank753"
-        blockItem = _gbi.createBlockItem("StorageTank", editorMock, namesManagerMock, displayName)
+        blockItem = _gbi.createBlockItem(
+            "StorageTank", editorMock, namesManagerMock, displayName
+        )
 
         assert isinstance(blockItem, StorageTank)
         assert blockItem.displayName == displayName
 
-    def _testHelper(self, tmp_path, bot):  # pylint: disable=invalid-name  # /NOSONAR
+    def _testHelper(
+        self, tmp_path, bot
+    ):  # pylint: disable=invalid-name  # /NOSONAR
         logger = _log.getLogger("root")
         (
             editorMock,
@@ -177,7 +216,9 @@ class TestGetBlockItem:
             existingNames.extend(f"{baseName}{i}" for i in range(2, 5))
 
         ddckDirFileOrDirNamesProvider = _DummyDdckDirFileOrDirNamesProvider()
-        namesManager = _nman.NamesManager(existingNames, ddckDirFileOrDirNamesProvider)
+        namesManager = _nman.NamesManager(
+            existingNames, ddckDirFileOrDirNamesProvider
+        )
 
         return namesManager
 

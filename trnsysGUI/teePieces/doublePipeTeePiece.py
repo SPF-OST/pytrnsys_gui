@@ -33,7 +33,9 @@ class DoublePipeTeePiece(_tpb.TeePieceBase):
 
         self._setModels()
 
-    def _createInputAndOutputPorts(self) -> _tp.Tuple[_pib.PortItemBase, _pib.PortItemBase, _pib.PortItemBase]:
+    def _createInputAndOutputPorts(
+        self,
+    ) -> _tp.Tuple[_pib.PortItemBase, _pib.PortItemBase, _pib.PortItemBase]:
         return (
             _dppi.DoublePipePortItem("i", self),
             _dppi.DoublePipePortItem("o", self),
@@ -41,19 +43,37 @@ class DoublePipeTeePiece(_tpb.TeePieceBase):
         )
 
     def _setModels(self) -> None:
-        coldInput: _mfn.PortItem = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.COLD)
-        coldOutput1: _mfn.PortItem = _mfn.PortItem("StrOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.COLD)
-        coldOutput2: _mfn.PortItem = _mfn.PortItem("OrtOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.COLD)
-        self._coldTeePiece = _mfn.TeePiece(coldInput, coldOutput1, coldOutput2, name="Cold")
+        coldInput: _mfn.PortItem = _mfn.PortItem(
+            "In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.COLD
+        )
+        coldOutput1: _mfn.PortItem = _mfn.PortItem(
+            "StrOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.COLD
+        )
+        coldOutput2: _mfn.PortItem = _mfn.PortItem(
+            "OrtOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.COLD
+        )
+        self._coldTeePiece = _mfn.TeePiece(
+            coldInput, coldOutput1, coldOutput2, name="Cold"
+        )
 
-        hotInput: _mfn.PortItem = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.HOT)
-        hotOutput1: _mfn.PortItem = _mfn.PortItem("StrOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.HOT)
-        hotOutput2: _mfn.PortItem = _mfn.PortItem("OrtOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.HOT)
-        self._hotTeePiece = _mfn.TeePiece(hotInput, hotOutput1, hotOutput2, name="Hot")
+        hotInput: _mfn.PortItem = _mfn.PortItem(
+            "In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.HOT
+        )
+        hotOutput1: _mfn.PortItem = _mfn.PortItem(
+            "StrOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.HOT
+        )
+        hotOutput2: _mfn.PortItem = _mfn.PortItem(
+            "OrtOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.HOT
+        )
+        self._hotTeePiece = _mfn.TeePiece(
+            hotInput, hotOutput1, hotOutput2, name="Hot"
+        )
 
     @classmethod
     @_tp.override
-    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+    def _getImageAccessor(
+        cls,
+    ) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.DP_TEE_PIECE_SVG
 
     def encode(self) -> _tp.Tuple[str, _dcj.JsonDict]:
@@ -95,13 +115,21 @@ class DoublePipeTeePiece(_tpb.TeePieceBase):
             self._hotTeePiece.output2: self.outputs[1],
         }
 
-        modelPortItemsToGraphicalPortItem = coldModelPortItemsToGraphicalPortItem | hotModelPortItemsToGraphicalPortItem
+        modelPortItemsToGraphicalPortItem = (
+            coldModelPortItemsToGraphicalPortItem
+            | hotModelPortItemsToGraphicalPortItem
+        )
 
-        internalPiping = _ip.InternalPiping([self._coldTeePiece, self._hotTeePiece], modelPortItemsToGraphicalPortItem)
+        internalPiping = _ip.InternalPiping(
+            [self._coldTeePiece, self._hotTeePiece],
+            modelPortItemsToGraphicalPortItem,
+        )
 
         return internalPiping
 
-    def exportPipeAndTeeTypesForTemp(self, startingUnit):  # pylint: disable=too-many-locals
+    def exportPipeAndTeeTypesForTemp(
+        self, startingUnit
+    ):  # pylint: disable=too-many-locals
         unitNumber = startingUnit
 
         coldComponentName = f"{self.displayName}{self._coldTeePiece.name}"
@@ -142,7 +170,9 @@ class DoublePipeTeePiece(_tpb.TeePieceBase):
     def _portOffset(self):
         return 30
 
-    def mouseDoubleClickEvent(self, event) -> None:  # pylint: disable=unused-argument
+    def mouseDoubleClickEvent(
+        self, event
+    ) -> None:  # pylint: disable=unused-argument
         self.editor.showDoublePipeBlockDlg(self)
 
 
@@ -161,11 +191,15 @@ class DoublePipeTeePieceModelVersion0(
     rotationN: int
 
     @classmethod
-    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+    def getSupersededClass(
+        cls,
+    ) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
         return _dpcb.DoublePipeBlockItemModelVersion0
 
     @classmethod
-    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "DoublePipeTeePieceModelVersion0":
+    def upgrade(
+        cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0
+    ) -> "DoublePipeTeePieceModelVersion0":
         assert isinstance(superseded, _dpcb.DoublePipeBlockItemModelVersion0)
 
         assert len(superseded.portsIdsIn) == 2
@@ -194,16 +228,22 @@ class DoublePipeTeePieceModelVersion0(
 
 
 @_dc.dataclass
-class DoublePipeTeePieceModel(_gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
+class DoublePipeTeePieceModel(
+    _gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin
+):
     teePieceModel: _tpbm.TeePieceBaseModel
     childTrnsysIds: _tp.Tuple[int, int]
 
     @classmethod
-    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+    def getSupersededClass(
+        cls,
+    ) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
         return DoublePipeTeePieceModelVersion0
 
     @classmethod
-    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "DoublePipeTeePieceModel":
+    def upgrade(
+        cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0
+    ) -> "DoublePipeTeePieceModel":
         assert isinstance(superseded, DoublePipeTeePieceModelVersion0)
 
         baseModel = _tpbm.createTeePieceBaseModelFromLegacyModel(superseded)

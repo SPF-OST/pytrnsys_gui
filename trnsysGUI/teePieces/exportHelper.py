@@ -89,7 +89,8 @@ def getTeePieceUnit(
     )
 
     outputTemperature = _temps.getInternalTemperatureVariableName(
-        componentDisplayName=teePiece.displayName, nodeName=massFlowNetworkNode.name
+        componentDisplayName=teePiece.displayName,
+        nodeName=massFlowNetworkNode.name,
     )
 
     unitText = _renderTeePieceUnit(
@@ -151,7 +152,14 @@ def _createPort(
     initialTemperature: str | float,
 ) -> _Port:
 
-    massFlowName = _mnames.getMassFlowVariableName(teePiece.displayName, massFlowNetworkNode, modelPortItem)
-    temperatureName = _cnames.getTemperatureVariableName(connection, portItemType)
-    port = _Port(_Variable(massFlowName, 0), _Variable(temperatureName, initialTemperature))
+    massFlowName = _mnames.getMassFlowVariableName(
+        teePiece.displayName, massFlowNetworkNode, modelPortItem
+    )
+    temperatureName = _cnames.getTemperatureVariableName(
+        connection, portItemType
+    )
+    port = _Port(
+        _Variable(massFlowName, 0),
+        _Variable(temperatureName, initialTemperature),
+    )
     return port

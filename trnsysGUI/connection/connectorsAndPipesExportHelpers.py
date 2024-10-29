@@ -11,7 +11,9 @@ import trnsysGUI.temperatures as _temps
 
 
 def getTemperatureVariableName(
-    parent: _ip.HasInternalPiping, portItem: _pib.PortItemBase, portItemType: _mfn.PortItemType
+    parent: _ip.HasInternalPiping,
+    portItem: _pib.PortItemBase,
+    portItemType: _mfn.PortItemType,
 ) -> str:
     parentInternalPiping = parent.getInternalPiping()
     node = parentInternalPiping.getNode(portItem, portItemType)

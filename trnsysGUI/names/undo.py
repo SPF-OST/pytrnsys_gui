@@ -12,7 +12,11 @@ class DeleteCommandTargetType(_enum.Enum):
 
 
 class UndoNamingHelper:
-    def __init__(self, namesManager: _nm.NamesManager, createNamingHelper: _nc.CreateNamingHelper) -> None:
+    def __init__(
+        self,
+        namesManager: _nm.NamesManager,
+        createNamingHelper: _nc.CreateNamingHelper,
+    ) -> None:
         self._namesManager = namesManager
         self._createNamingHelper = createNamingHelper
 

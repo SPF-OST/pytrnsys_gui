@@ -34,14 +34,18 @@ class SettingsVersion1(_ser.UpgradableJsonSchemaMixin):
 
     @classmethod
     def upgrade(cls, superseded: SettingsVersion0) -> "Settings":
-        trnsysBinaryPath = _pl.Path(superseded.trnsysBinaryDirPath) / "TRNExe.exe"
+        trnsysBinaryPath = (
+            _pl.Path(superseded.trnsysBinaryDirPath) / "TRNExe.exe"
+        )
         return Settings.create(trnsysBinaryPath)
 
 
 @_dc.dataclass
 class Settings(_ser.UpgradableJsonSchemaMixin):
     @staticmethod
-    def create(trnsysBinaryDirPath: _pl.Path, recentProjects: list[_pl.Path]) -> "Settings":
+    def create(
+        trnsysBinaryDirPath: _pl.Path, recentProjects: list[_pl.Path]
+    ) -> "Settings":
         return Settings(str(trnsysBinaryDirPath), list(recentProjects))
 
     _SETTINGS_FILE_NAME = "settings.json"
@@ -82,7 +86,9 @@ class Settings(_ser.UpgradableJsonSchemaMixin):
 
     @classmethod
     def _getSettingsFilePath(cls) -> _pl.Path:
-        userConfigDirPath = _pl.Path(_ad.user_config_dir("pytrnsys-gui", "SPF OST"))
+        userConfigDirPath = _pl.Path(
+            _ad.user_config_dir("pytrnsys-gui", "SPF OST")
+        )
         settingsFilePath = userConfigDirPath / cls._SETTINGS_FILE_NAME
         return settingsFilePath
 

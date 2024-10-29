@@ -9,14 +9,24 @@ from ._dialogs.edit import dialog as _gui
 from ._dialogs.edit import model as _gmodel
 
 
-def edit(hydraulicLoop: _model.HydraulicLoop, hydraulicLoops: _model.HydraulicLoops, fluids: _model.Fluids) -> None:
+def edit(
+    hydraulicLoop: _model.HydraulicLoop,
+    hydraulicLoops: _model.HydraulicLoops,
+    fluids: _model.Fluids,
+) -> None:
     guiHydraulicLoop = _createGuiLoop(hydraulicLoop)
 
-    occupiedNames = [l.name.value for l in hydraulicLoops.hydraulicLoops if l != hydraulicLoop]
+    occupiedNames = [
+        l.name.value
+        for l in hydraulicLoops.hydraulicLoops
+        if l != hydraulicLoop
+    ]
 
     _common.setConnectionsSelected(hydraulicLoop.connections, True)
 
-    okedOrCancelled = _gui.HydraulicLoopDialog.showDialog(guiHydraulicLoop, occupiedNames, fluids)
+    okedOrCancelled = _gui.HydraulicLoopDialog.showDialog(
+        guiHydraulicLoop, occupiedNames, fluids
+    )
 
     _common.setConnectionsSelected(hydraulicLoop.connections, False)
 
@@ -26,19 +36,34 @@ def edit(hydraulicLoop: _model.HydraulicLoop, hydraulicLoops: _model.HydraulicLo
     _applyModel(guiHydraulicLoop, hydraulicLoop)
 
 
-def _createGuiLoop(hydraulicLoop: _model.HydraulicLoop) -> _gmodel.HydraulicLoop:
+def _createGuiLoop(
+    hydraulicLoop: _model.HydraulicLoop,
+) -> _gmodel.HydraulicLoop:
     guiConnections = _createGuiConnections(hydraulicLoop)
 
     guiLoop = _gmodel.HydraulicLoop(
-        hydraulicLoop.name.value, hydraulicLoop.fluid, hydraulicLoop.connectionsDefinitionMode, guiConnections
+        hydraulicLoop.name.value,
+        hydraulicLoop.fluid,
+        hydraulicLoop.connectionsDefinitionMode,
+        guiConnections,
     )
     return guiLoop
 
 
 def _createGuiConnections(hydraulicLoop):
-    if hydraulicLoop.connectionsDefinitionMode == _cdm.ConnectionsDefinitionMode.INDIVIDUAL:
+    if (
+        hydraulicLoop.connectionsDefinitionMode
+        == _cdm.ConnectionsDefinitionMode.INDIVIDUAL
+    ):
         guiConnections = [
-            _gmodel.Connection(c.displayName, c.diameterInCm, c.uValueInWPerM2K, c.lengthInM, c.shallBeSimulated, c)
+            _gmodel.Connection(
+                c.displayName,
+                c.diameterInCm,
+                c.uValueInWPerM2K,
+                c.lengthInM,
+                c.shallBeSimulated,
+                c,
+            )
             for c in hydraulicLoop.connections
         ]
 
@@ -59,7 +84,10 @@ def _createGuiConnections(hydraulicLoop):
     return guiConnections
 
 
-def _applyModel(guiHydraulicLoop: _gmodel.HydraulicLoop, hydraulicLoop: _model.HydraulicLoop) -> None:
+def _applyModel(
+    guiHydraulicLoop: _gmodel.HydraulicLoop,
+    hydraulicLoop: _model.HydraulicLoop,
+) -> None:
     oldName = hydraulicLoop.name.value
     newName = guiHydraulicLoop.name
     if oldName != newName:
@@ -72,7 +100,9 @@ def _applyModel(guiHydraulicLoop: _gmodel.HydraulicLoop, hydraulicLoop: _model.H
 
     if connectionsDefinitionMode != _cdm.ConnectionsDefinitionMode.INDIVIDUAL:
         _scp.setConnectionPropertiesForDefinitionMode(
-            hydraulicLoop.connections, hydraulicLoop.name.value, hydraulicLoop.connectionsDefinitionMode
+            hydraulicLoop.connections,
+            hydraulicLoop.name.value,
+            hydraulicLoop.connectionsDefinitionMode,
         )
         return
 

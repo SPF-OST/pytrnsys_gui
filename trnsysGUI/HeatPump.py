@@ -14,7 +14,9 @@ import trnsysGUI.blockItemGraphicItemMixins as _gimx
 import trnsysGUI.blockItemHasInternalPiping as _bip
 
 
-class HeatPump(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin):
+class HeatPump(
+    _bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin
+):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
@@ -36,7 +38,9 @@ class HeatPump(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMix
 
     @classmethod
     @_tp.override
-    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+    def _getImageAccessor(
+        cls,
+    ) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.HP_SVG
 
     def changeSize(self):
@@ -58,14 +62,28 @@ class HeatPump(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMix
         self.label.setPos(lx, h)
 
         # upper left is reference
-        self.origInputsPos = [[0, delta], [w, h - delta]]  # inlet of [evap, cond]
-        self.origOutputsPos = [[0, h - delta], [w, delta]]  # outlet of [evap, cond]
+        self.origInputsPos = [
+            [0, delta],
+            [w, h - delta],
+        ]  # inlet of [evap, cond]
+        self.origOutputsPos = [
+            [0, h - delta],
+            [w, delta],
+        ]  # outlet of [evap, cond]
 
-        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])  # evaporator
-        self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1])  # condenser
+        self.inputs[0].setPos(
+            self.origInputsPos[0][0], self.origInputsPos[0][1]
+        )  # evaporator
+        self.inputs[1].setPos(
+            self.origInputsPos[1][0], self.origInputsPos[1][1]
+        )  # condenser
 
-        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
-        self.outputs[1].setPos(self.origOutputsPos[1][0], self.origOutputsPos[1][1])
+        self.outputs[0].setPos(
+            self.origOutputsPos[0][0], self.origOutputsPos[0][1]
+        )
+        self.outputs[1].setPos(
+            self.origOutputsPos[1][0], self.origOutputsPos[1][1]
+        )
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
@@ -90,7 +108,10 @@ class HeatPump(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMix
             dct["BlockDisplayName"] = self.displayName
             dct["PortsIDIn"] = portListInputs
             dct["PortsIDOut"] = portListOutputs
-            dct["HeatPumpPosition"] = (float(self.pos().x()), float(self.pos().y()))
+            dct["HeatPumpPosition"] = (
+                float(self.pos().x()),
+                float(self.pos().y()),
+            )
             dct["trnsysID"] = self.trnsysId
             dct["childIds"] = self.childIds
             dct["FlippedH"] = self.flippedH
@@ -119,7 +140,9 @@ class HeatPump(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMix
             self.outputs[x].id = i["PortsIDOut"][x]
             self.logger.debug("Output at heatExchanger")
 
-        self.setPos(float(i["HeatPumpPosition"][0]), float(i["HeatPumpPosition"][1]))
+        self.setPos(
+            float(i["HeatPumpPosition"][0]), float(i["HeatPumpPosition"][1])
+        )
         self.trnsysId = i["trnsysID"]
 
         resBlockList.append(self)

@@ -18,9 +18,13 @@ def reAddConnection(connection: _cb.ConnectionBase) -> None:
     connection.toPort.connectionList.append(connection)
 
 
-def setDisplayNameForReAdd(connection: _cb.ConnectionBase, undoNamingHelper: _nu.UndoNamingHelper) -> None:
+def setDisplayNameForReAdd(
+    connection: _cb.ConnectionBase, undoNamingHelper: _nu.UndoNamingHelper
+) -> None:
     preferredName = connection.displayName
-    alternativeName = _cnames.getDefaultConnectionNameBase(connection.fromPort, connection.toPort)
+    alternativeName = _cnames.getDefaultConnectionNameBase(
+        connection.fromPort, connection.toPort
+    )
 
     displayName = undoNamingHelper.addOrGenerateAndAddAnNonCollidingNameForAdd(
         preferredName,

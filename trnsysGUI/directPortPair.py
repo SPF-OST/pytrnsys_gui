@@ -28,15 +28,22 @@ class DirectPortPair:
         return self._toPercent(self.relativeOutputHeight)
 
     def setRelativeHeights(
-        self, relativeInputHeight: float, relativeOutputHeight: float, storageTankHeight: float
+        self,
+        relativeInputHeight: float,
+        relativeOutputHeight: float,
+        storageTankHeight: float,
     ) -> None:
         self.relativeInputHeight = relativeInputHeight
         self.relativeOutputHeight = relativeOutputHeight
 
-        inputPosY = storageTankHeight - storageTankHeight * self.relativeInputHeight
+        inputPosY = (
+            storageTankHeight - storageTankHeight * self.relativeInputHeight
+        )
         self.fromPort.setY(inputPosY)
 
-        outputPosY = storageTankHeight - storageTankHeight * self.relativeOutputHeight
+        outputPosY = (
+            storageTankHeight - storageTankHeight * self.relativeOutputHeight
+        )
         self.toPort.setY(outputPosY)
 
         self._updateModelPipe()
@@ -53,7 +60,9 @@ class DirectPortPair:
 
     def _getModelPipeName(self) -> str:
         name = (
-            f"Dp{'L' if self.side.isLeft else 'R'}{self.relativeInputHeightPercent}_{self.relativeOutputHeightPercent}"
+            f"Dp{'L' if self.side.isLeft else 'R'}"
+            f"{self.relativeInputHeightPercent}_"
+            f"{self.relativeOutputHeightPercent}"
         )
         return name
 
