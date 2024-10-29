@@ -77,15 +77,15 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
                 oldMode == _cdm.ConnectionsDefinitionMode.INDIVIDUAL
                 and newMode != _cdm.ConnectionsDefinitionMode.INDIVIDUAL
             )
-            if haveChangedAwayFromIndividualMode:
-                if (
-                    not self._doesUserSayContinueWithChangingAwayFromDefiningPipesIndividually()
-                ):
-                    self._setCurrentData(
-                        self.connectionsDefinitionModeComboBox,
-                        _cdm.ConnectionsDefinitionMode.INDIVIDUAL,
-                    )
-                    return
+            if (
+                haveChangedAwayFromIndividualMode
+                and not self._doesUserSayContinueWithChangingAwayFromDefiningPipesIndividually()
+            ):
+                self._setCurrentData(
+                    self.connectionsDefinitionModeComboBox,
+                    _cdm.ConnectionsDefinitionMode.INDIVIDUAL,
+                )
+                return
 
             self._setConnectionsDefinitionMode(newMode)
 
