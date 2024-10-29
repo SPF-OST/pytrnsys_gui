@@ -19,7 +19,7 @@ MODE_CSV_CRATED = (
     " Please rename the file and provide pump and valve values"
 )
 MODE_CSV_ALREADY_EXISTS = "modes_template.csv file already exists in your project. Would you like to overwrite?"
-ERROR_RUNNING_MODES = "Error running modes"
+ERROR_RUNNING_MODES = "Error running modes, file was not found"
 
 
 # Config

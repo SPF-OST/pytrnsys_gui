@@ -31,5 +31,5 @@ def runModes(project: prj.Project, mainWindow: mw.MainWindow):  # type: ignore[n
 
     except FileNotFoundError as e:
         MessageBox.create(
-            messageText=constants.ERROR_RUNNING_MODES, informativeText=str(e), buttons=[_qtw.QMessageBox.Ok]
+            messageText=constants.ERROR_RUNNING_MODES, informativeText=str(e.filename), buttons=[_qtw.QMessageBox.Ok]
         )
