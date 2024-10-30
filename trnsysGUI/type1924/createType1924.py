@@ -304,13 +304,13 @@ class Type1924_TesPlugFlow:
 
     def getFirst12ParVar(self, nTes):
 
-        lines = "CONSTANTS 12\n"
+        lines = "CONSTANTS #\n"
         line = "Vol=1          ! 1: m3, volume of store\n"
         lines = lines + line
-        line = "RhoWat=RhoWat  ! 2: kg/m3, density of storage media\n"
-        lines = lines + line
-        line = "CpWat=CpWat    ! 3: kJ/kgK, specific heat of storage media\n"
-        lines = lines + line
+        # line = "RhoWat=RhoWat  ! 2: kg/m3, density of storage media\n"
+        # lines = lines + line
+        # line = "CpWat=CpWat    ! 3: kJ/kgK, specific heat of storage media\n"
+        # lines = lines + line
         line = "lamZ=0.6       ! 4: W/mK, effective vertical thermal conductivity of TES\n"
         lines = lines + line
         line = "Heigh=1.       ! 5: m, storage height\n"
@@ -544,6 +544,21 @@ class Type1924_TesPlugFlow:
                 lines = lines + line
 
         line = "\n"
+        lines = lines + line
+
+        return lines
+
+
+    def getInputsFromOtherDdck(self,inputs):
+
+        lines = self.sLine + "**inputs from other ddck\n" +self.sLine
+
+        line = "CONSTANTS #\n"; lines = lines + line
+        line = "RhoWat = $RhoWat  ! kg/m3, density of storage media\n"
+        lines = lines + line
+        line = "CpWat = $CpWat  ! kJ/kgK, specific heat of storage media\n"
+        lines = lines + line
+        line = "PI = $PI \n"
         lines = lines + line
 
         return lines
@@ -819,9 +834,7 @@ class Type1924_TesPlugFlow:
             lines = lines + self.sLine + "\n"
             lines = lines + self.sLine
             lines = lines + "** outputs to energy balance in kWh\n"
-            lines = (
-                lines + "** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name\n"
-            )
+
             lines = lines + self.sLine
             lines = lines + "EQUATIONS 3\n"
 
@@ -889,20 +902,23 @@ class Type1924_TesPlugFlow:
             counter = counter + 10
 
         lines = lines + "\n"
+        lines = lines + self.getInputsFromOtherDdck(self.inputs)
 
+        lines = lines + "\n"
         lines = lines + self.getOutputsToOtherDdck(self.inputs)
+
 
         line = self.sLine + "****** Parameters of Type1924 *******\n" + self.sLine
         lines = lines + line
 
-        if nTes == 1:
-            lines = lines + "CONSTANTS 3\n"
-            line = "TRoomStore=15 ! \n"
-            lines = lines + line
-            line = "VStoreRef = 0.763\n"
-            lines = lines + line
-        else:
-            lines = lines + "CONSTANTS 1\n"
+        lines = lines + "CONSTANTS #\n"
+
+        line = "zero=0.0 ! \n"
+        lines = lines + line
+        line = "TRoomStore=15 ! \n"
+        lines = lines + line
+        line = "VStoreRef = 0.763\n"
+        lines = lines + line
         line = "ratio = Vol / VStoreRef\n"
         lines = lines + line
 

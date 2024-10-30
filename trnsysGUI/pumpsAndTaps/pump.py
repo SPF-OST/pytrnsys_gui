@@ -11,6 +11,7 @@ import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 from . import _pumpsAndTabsBase as _patb
 from . import serialization as _ser
+import trnsysGUI.massFlowSolver.names as _mnames
 
 
 class Pump(_patb.PumpsAndTabsBase):  # pylint: disable=too-many-instance-attributes
@@ -114,3 +115,24 @@ class Pump(_patb.PumpsAndTabsBase):  # pylint: disable=too-many-instance-attribu
         self.updateFlipStateV(self.flippedV)
 
         return width, height
+
+    def exportPumpPowerConsumption(self):
+
+        internalPiping = self.getInternalPiping()
+        node = _com.getSingle(internalPiping.nodes)
+        inputVariableName = _mnames.getInputVariableName(self, node)
+        canonicalMassFlowRate = self._getCanonicalMassFlowRate()
+
+        result = f"*** Pump Consumption of {inputVariableName} ***\n"
+
+        result += f"EQUATIONS #\n"
+
+        result += f"{inputVariableName}Nom = {canonicalMassFlowRate}  ! Nominal mass flow rate, kg/h.\n"
+        result += f"dpPu{inputVariableName}Nom_bar = MIN(dpmax_bar,MAX(dpmin_bar, rho * 0.1) ! Pressure-drop of loop at nominal mass flow, bar \n"
+        result += f"fr{inputVariableName} = {inputVariableName}/{inputVariableName}Nom !  Flow rate fraction of nominal flow rate \n"
+        result += f"dpPu{inputVariableName}_bar = fr{inputVariableName}^2*dpPu{inputVariableName}Nom_bar ! Pressure-drop of loop at actual mass flow, bar \n"
+        result += f"PelFlow{inputVariableName}_kW = (({inputVariableName}/3600)/ rho) * dpPu{inputVariableName}_bar*100 !required power to drive the flow in kW \n"
+        result += f"eta{inputVariableName} = MAX(1E-3,0.85*(-0.60625*fr{inputVariableName}^2+1.25*fr{inputVariableName})) ! pump efficiency (electric 85 %) \n"
+        result += f"Pel{inputVariableName} = GT({inputVariableName},0.1)*PelFlow{inputVariableName}_kW/eta{inputVariableName} !required pump electric power, kW \n"
+
+        return result
