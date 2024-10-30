@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import dataclasses as _dc
 import os as _os
 import pathlib as _pl
@@ -13,11 +15,13 @@ import pandas as _pd
 import trnsysGUI.MassFlowVisualizer as _mfv
 import trnsysGUI.TVentil as _tv
 import trnsysGUI.diagram.Editor as _de
-import trnsysGUI.mainWindow as _mw
 import trnsysGUI.pumpsAndTaps._tapBase as _tb
 import trnsysGUI.pumpsAndTaps.pump as _pump
 import trnsysGUI.pythonInterface.regimeExporter.getDesiredRegimes as _gdr
 import trnsysGUI.sourceSinkBase as _ssb
+
+if _tp.TYPE_CHECKING:
+    import trnsysGUI.mainWindow as _mw
 
 
 _BlockItems = (_pump.Pump, _tv.TVentil, _tb.TapBase, _ssb.SourceSinkBase)
@@ -44,10 +48,10 @@ class RegimeExporter:
 
     def export(
         self, onlyTheseRegimes: _tp.Optional[_tp.Sequence[str]] = None
-    ) -> None:
+    ) -> _tp.List[str]:
 
         if not onlyTheseRegimes:
-            self._makeDiagramFiles()
+            self._makeNoFlowDiagramFiles()
 
         regimeValues = _gdr.getRegimes(
             self.projectDir / self.regimesFileName, onlyTheseRegimes
@@ -55,9 +59,11 @@ class RegimeExporter:
         relevantNames = list(regimeValues.columns)
         relevantBlockItems = self.getRelevantBlockItems(relevantNames)
 
-        self._simulateAndVisualizeMassFlows(relevantBlockItems, regimeValues)
+        return self._simulateAndVisualizeMassFlows(
+            relevantBlockItems, regimeValues
+        )
 
-    def _makeDiagramFiles(self, regimeName: str = "diagram") -> None:
+    def _makeNoFlowDiagramFiles(self, regimeName: str = "diagram") -> None:
         pdfName = self.resultsDir / f"{self.projectName}_{regimeName}.pdf"
         svgName = self.resultsDir / f"{self.projectName}_{regimeName}.svg"
         self._printDiagramToPDF(pdfName)
@@ -80,8 +86,8 @@ class RegimeExporter:
         self,
         relevantBlockItems: _tp.Sequence[_BlockItem],
         regimeValues: _pd.DataFrame,
-    ) -> None:
-
+    ) -> _tp.List[str]:
+        failures = []
         for regimeName in regimeValues.index:
             regimeRow = regimeValues.loc[regimeName]
 
@@ -91,6 +97,7 @@ class RegimeExporter:
                 _exportMassFlowSolverDeckAndRunTrnsys(self.mainWindow.editor)
                 timeStep = 2
             except (FileNotFoundError, _sp.CalledProcessError):
+                failures.append(regimeName)
                 regimeName = regimeName + "_FAILED"
                 timeStep = 1
 
@@ -101,9 +108,10 @@ class RegimeExporter:
             )
             massFlowSolverVisualizer.slider.setValue(timeStep)
 
-            self._makeDiagramFiles(regimeName=regimeName)
+            self._makeNoFlowDiagramFiles(regimeName=regimeName)
 
             massFlowSolverVisualizer.close()
+        return failures
 
     @staticmethod
     def _adjustPumpsAndValves(
@@ -155,7 +163,9 @@ def _exportMassFlowSolverDeckAndRunTrnsys(editor: _de.Editor) -> None:  # type: 
 
 
 def _exportHydraulic(editor: _de.Editor, *, formatting) -> str:  # type: ignore[name-defined]
-    exportedFilePath = editor.exportHydraulics(exportTo=formatting)
+    exportedFilePath = editor.exportHydraulics(
+        exportTo=formatting, disableFileExistMsgb=True
+    )
     return exportedFilePath
 
 

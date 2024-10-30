@@ -25,7 +25,7 @@ class MessageBox:
 
         :param messageBoxTitle: Title of the message box
         :param messageText: Main message content
-        :param informativeText: More detail related to main message content
+        :param informativeText: More detail related to main message
         :param buttons: List of QMessageBox standard buttons
         :param defaultButton: QMessageBox default button
         """

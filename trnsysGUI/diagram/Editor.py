@@ -454,7 +454,9 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
         ]
         return relevantPortItems
 
-    def exportHydraulics(self, exportTo=_tp.Literal["ddck", "mfs"]):
+    def exportHydraulics(
+        self, exportTo=_tp.Literal["ddck", "mfs"], disableFileExistMsgb=False
+    ):
         assert exportTo in ["ddck", "mfs"]
 
         if not self.isHydraulicConnected():
@@ -485,7 +487,9 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
                 ddckFolder, "hydraulic", "hydraulic.ddck"
             )
 
-        if self._doesFileExistAndDontOverwrite(exportPath):
+        if self._doesFileExistAndDontOverwrite(
+            exportPath, disableFileExistMsgb
+        ):
             return None
 
         self.logger.info("Printing the TRNSYS file...")
@@ -669,7 +673,9 @@ Tcw=1
 
         return True
 
-    def _doesFileExistAndDontOverwrite(self, folderPath):
+    def _doesFileExistAndDontOverwrite(self, folderPath, ignore):
+        if ignore:
+            return
         if not _pl.Path(folderPath).exists() or self.forceOverwrite:
             return False
 

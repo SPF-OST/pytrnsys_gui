@@ -30,6 +30,7 @@ from trnsysGUI.ProcessMain import ProcessMain
 from trnsysGUI.RunMain import RunMain
 from trnsysGUI.common import cancelled as _ccl
 from trnsysGUI.diagram import Editor as _de
+from trnsysGUI.menus.hydraulicModesMenu import hydraulicModes as hm
 from trnsysGUI.messageBox import MessageBox
 from trnsysGUI.recentProjectsHandler import RecentProjectsHandler
 from trnsysGUI.storageTank.widget import StorageTank
@@ -41,7 +42,10 @@ class MainWindow(_qtw.QMainWindow):
 
         self.editor = None
 
+        # ==================================
+        # When we change to a different project the mainWindow should also be updated with that project
         self.project = project
+        # ==================================
         self.logger = logger
 
         self.labelVisState = False
@@ -196,18 +200,9 @@ class MainWindow(_qtw.QMainWindow):
         self.editMenu.addAction(toggleSnapAction)
         self.editMenu.addAction(toggleAlignModeAction)
 
-        from trnsysGUI.menus.hydraulicModesMenu import hydraulicModes as hm
-
-        self.hydraulicModesMenu = _qtw.QMenu("Hydraulic modes")
-        createModeTemplateAction = _qtw.QAction("Create modes template", self)
-        createModeTemplateAction.triggered.connect(lambda: hm.createModesTemplate(self.project))
-        self.hydraulicModesMenu.addAction(createModeTemplateAction)
-
-        runModesAction = _qtw.QAction("Run modes", self)
-        runModesAction.triggered.connect(lambda: hm.runModes(self.project, self))
-        self.hydraulicModesMenu.addAction(runModesAction)
-
-        runMassflowSolverActionMenu = _qtw.QAction("Run mass flow solver", self)
+        runMassflowSolverActionMenu = _qtw.QAction(
+            "Run mass flow solver", self
+        )
         runMassflowSolverActionMenu.triggered.connect(self.runAndVisMf)
 
         openVisualizerActionMenu = _qtw.QAction(
@@ -271,8 +266,8 @@ class MainWindow(_qtw.QMainWindow):
         self.mb = self.menuBar()
         self.mb.addMenu(self.fileMenu)
         self.mb.addMenu(self.projectMenu)
+        self.mb.addMenu(hm.getHydraulicModesMenu(self))
         self.mb.addMenu(self.editMenu)
-        self.mb.addMenu(self.hydraulicModesMenu)
         self.mb.addMenu(self.helpMenu)
         self.mb.addSeparator()
 

@@ -39,6 +39,8 @@ class MigrateProject:
 
 Project = CreateProject | LoadProject | MigrateProject
 
+CreateOrLoadProject = CreateProject | LoadProject
+
 
 def getProject() -> _ccl.MaybeCancelled[Project]:
     createOpenMaybeCancelled = StartupDialog.showDialogAndGetResult()
