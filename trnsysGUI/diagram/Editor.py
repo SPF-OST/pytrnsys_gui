@@ -605,12 +605,12 @@ Tcw=1
 
         ddckFolder = os.path.join(self.projectFolder, "ddck")
 
-        hydCtrlPath = os.path.join(ddckFolder, "control", "hydraulic_control.ddck")
+        hydCtrlPath = os.path.join(ddckFolder, "user_control", "hydraulic_control_default.ddck")
         if _pl.Path(hydCtrlPath).exists():
             qmb = _qtw.QMessageBox(self)
             qmb.setText(
                 "Warning: "
-                + "The file hydraulic_control.ddck already exists in the control folder. Do you want to overwrite it or cancel?"
+                + "The file hydraulic_control_defalut.ddck already exists in the user_control folder. Do you want to overwrite it or cancel?"
             )
             qmb.setStandardButtons(_qtw.QMessageBox.Save | _qtw.QMessageBox.Cancel)
             qmb.setDefaultButton(_qtw.QMessageBox.Cancel)
@@ -624,7 +624,7 @@ Tcw=1
                 return
 
         fullExportText += "*************************************\n"
-        fullExportText += "**BEGIN hydraulic_control.ddck\n"
+        fullExportText += "**BEGIN hydraulic_control_default.ddck\n"
         fullExportText += "*************************************\n"
 
         simulationUnit = 450
@@ -632,6 +632,7 @@ Tcw=1
         exporter = self._createExporter()
 
         fullExportText += exporter.exportMassFlows()
+        fullExportText += exporter.exportPumpPowerConsumption()
         fullExportText += exporter.exportDivSetting(simulationUnit - 10)
 
         self.logger.info("------------------------> END OF EXPORT <------------------------")
@@ -748,7 +749,7 @@ Tcw=1
         blockFolderNames.append("generic")
         blockFolderNames.append("hydraulic")
         blockFolderNames.append("weather")
-        blockFolderNames.append("control")
+        blockFolderNames.append("user_control")
 
         ddckFolder = os.path.join(self.projectFolder, "ddck")
         ddckFolders = os.listdir(ddckFolder)
@@ -949,7 +950,7 @@ Tcw=1
 
         ddckFolder = os.path.join(projectFolder, "ddck")
         weatherFolder = os.path.join(ddckFolder, "weather")
-        controlFolder = os.path.join(ddckFolder, "control")
+        controlFolder = os.path.join(ddckFolder, "user_control")
 
         if not os.path.exists(weatherFolder):
             self.logger.info("Creating " + weatherFolder)
