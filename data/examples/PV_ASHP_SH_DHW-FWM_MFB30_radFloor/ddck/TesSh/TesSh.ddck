@@ -1,5 +1,5 @@
 *************************************
-**BEGIN TesDhw.ddck
+**BEGIN TesSh.ddck
 *************************************
 
 *************************************
@@ -16,25 +16,21 @@
 ** outputs to energy balance in kWh
 *************************************
 EQUATIONS 3
-@energy(out, heat, TesDhwLoss) = QLoss
-@energy(out, heat, TesDhwAcum) = QAcum
-@energy(in, el, TesDhwAux)     = qHeatSource
+@energy(out, heat, TesShLoss) = QLoss
+@energy(out, heat, TesShAcum) = QAcum
+@energy(in, el, TesShAux)     = qHeatSource
 
 *************************************
 *** Inputs from hydraulic solver ****
 *************************************
 EQUATIONS 3
-Tdp1In = $TMixAux_TesDhw
-Mfrdp1 = $MTesDhwDpL90_10_A
-Tdp1InRev = $TTesDhw_TeeAuxRt
+Tdp1In = $TTeeSh_TesSh
+Mfrdp1 = $MTesShDpR1_99_A
+Tdp1InRev = $TTesSh_MixSh
 EQUATIONS 3
-Tdp2In = $TDivDhw_TesDhw1
-Mfrdp2 = $MTesDhwDpR1_99_A
-Tdp2InRev = $TTesDhw_DivDhwOut1
-EQUATIONS 3
-Tdp3In = $TDivDhw_TesDhw2
-Mfrdp3 = $MTesDhwDpR65_95_A
-Tdp3InRev = $TTesDhw_DivDhwOut2
+Tdp2In = $TMixAux_TesSh
+Mfrdp2 = $MTesShDpL99_35_A
+Tdp2InRev = $TTesSh_TeeAuxRt
 CONSTANTS 2
 zAux1=0.00
 qAux1=0.00
@@ -42,67 +38,57 @@ qAux1=0.00
 *************************************
 **** Outputs to hydraulic solver ****
 *************************************
-EQUATIONS 3
+EQUATIONS 2
 *** direct port outputs
-$TTesDhwDpL90_10=[50,1]
-$TTesDhwDpR1_99=[50,3]
-$TTesDhwDpR65_95=[50,5]
+$TTesShDpR1_99=[50,1]
+$TTesShDpL99_35=[50,3]
 
 *************************************
 **inputs from other ddck
 *************************************
-
-EQUATIONS #
+CONSTANTS #
 RhoWat = $RhoWat  ! kg/m3, density of storage media
-CpWat  = $CpWat   ! kJ/kgK, specific heat of storage media
-PI     = $PI
-zero   = 0.0
+CpWat = $CpWat  ! kJ/kgK, specific heat of storage media
+PI = $PI 
+
 *************************************
 **outputs to other ddck
 *************************************
 ***Temperatures at 10 equally distributed height 
 EQUATIONS #
-$TesDhw_T1 =[50,21] !temperature at 0.05 
-$TesDhw_T2 =[50,22] !temperature at 0.15 
-$TesDhw_T3 =[50,23] !temperature at 0.25 
-$TesDhw_T4 =[50,24] !temperature at 0.35 
-$TesDhw_T5 =[50,25] !temperature at 0.45 
-$TesDhw_T6 =[50,26] !temperature at 0.55 
-$TesDhw_T7 =[50,27] !temperature at 0.65 
-$TesDhw_T8 =[50,28] !temperature at 0.75 
-$TesDhw_T9 =[50,29] !temperature at 0.85 
-$TesDhw_T10 =[50,30] !temperature at 0.95 
-$TesDhw_qHeatSource = qHeatSource
-
+$TesSh_T1 =[50,21] !temperature at 0.05 
+$TesSh_T2 =[50,22] !temperature at 0.15 
+$TesSh_T3 =[50,23] !temperature at 0.25 
+$TesSh_T4 =[50,24] !temperature at 0.35 
+$TesSh_T5 =[50,25] !temperature at 0.45 
+$TesSh_T6 =[50,26] !temperature at 0.55 
+$TesSh_T7 =[50,27] !temperature at 0.65 
+$TesSh_T8 =[50,28] !temperature at 0.75 
+$TesSh_T9 =[50,29] !temperature at 0.85 
+$TesSh_T10 =[50,30] !temperature at 0.95 
+$TesSh_qHeatSource = qHeatSource 
 *************************************
 ****** Parameters of Type1924 *******
 *************************************
-
 CONSTANTS #
+zero=0.0 ! 
 TRoomStore=15 ! 
 VStoreRef = 0.763
 ratio = Vol / VStoreRef
 *********Connecting values of DIRECT PORT=1***********
 CONSTANTS 2
-zInDp1=0.90
-zOutDp1=0.10
+zInDp1=0.01
+zOutDp1=0.99
 *********Connecting values of DIRECT PORT=2***********
 CONSTANTS 2
-zInDp2=0.01
-zOutDp2=0.99
-*********Connecting values of DIRECT PORT=3***********
-CONSTANTS 2
-zInDp3=0.65
-zOutDp3=0.95
+zInDp2=0.99
+zOutDp2=0.35
 *********Constant of DIRECT PORT=1***********
 CONSTANTS 1
 Dp1Strat=0 ! 0: no forced stratification ; 1: force to stratify
 *********Constant of DIRECT PORT=2***********
 CONSTANTS 1
 Dp2Strat=0 ! 0: no forced stratification ; 1: force to stratify
-*********Constant of DIRECT PORT=3***********
-CONSTANTS 1
-Dp3Strat=0 ! 0: no forced stratification ; 1: force to stratify
 ********** HEAT EXCHANGER CONSTANTS*******
 CONSTANTS 1
 nHxUsed=0 
@@ -165,7 +151,7 @@ UAinsPlate=0 ! W/K, overall heat transfer coefficient across moveable insulation
 *************************************
 ********** TYPE DEFINITION **********
 *************************************
-UNIT 50 TYPE 1924     ! plug flow tank
+UNIT 50 TYPE 1925     ! plug flow tank
 PARAMETERS 219 
 Vol     ! 1: m3, volume of store
 RhoWat  ! 2: kg/m3, density of storage media
@@ -187,7 +173,7 @@ tMax
 0	0	0 ! 17-20 unsused parameters
 zInDp1 zOutDp1 zero Dp1Strat ! 21 - 25: zIn, zOut, cp, strat
 zInDp2 zOutDp2 zero Dp2Strat ! 26 - 30: zIn, zOut, cp, strat
-zInDp3 zOutDp3 zero Dp3Strat ! 31 - 35: zIn, zOut, cp, strat
+-1 -1 zero zero ! 31 - 35: zIn, zOut, cp, strat
 -1 -1 zero zero ! 36 - 40: zIn, zOut, cp, strat
 -1 -1 zero zero ! 41 - 45: zIn, zOut, cp, strat
 -1 -1 zero zero ! 46 - 50: zIn, zOut, cp, strat
@@ -224,7 +210,7 @@ INPUTS 69
 ************10 DIRECT PORTS INPUTS***************
 Tdp1In Mfrdp1 Tdp1InRev
 Tdp2In Mfrdp2 Tdp2InRev
-Tdp3In Mfrdp3 Tdp3InRev
+zero zero zero
 zero zero zero
 zero zero zero
 zero zero zero
@@ -252,10 +238,9 @@ zero zero zero zero zero zero zero zero zero zero
 zero zero zero zero zero zero zero zero zero zero 
 zero zero zero zero zero zero zero zero zero 
 *****************OUTPUTS****************
-EQUATIONS 3
+EQUATIONS 2
 Qdp1=[50,31] ! 
 Qdp2=[50,32] ! 
-Qdp3=[50,33] ! 
 EQUATIONS #
 TAvg = [50,180] ! Average storage temperature 
 ***Temperatures at 10 sensors user defined height
@@ -279,7 +264,7 @@ QPorts = [50,179] ! Heat Input by direct ports [kW]
 QImb   = [50,64]  ! Heat Imbalance in Tes  IMB = sumQv - sumQLoss -sumQAcum + sumQPort
 CONSTANTS 1 
 unitPrinter = 51 
-ASSIGN temp\TESTesDhw_MO.dat unitPrinter
+ASSIGN temp\TESTesSh_MO.dat unitPrinter
 UNIT 51 TYPE 46
 PARAMETERS 5
 unitPrinter ! 1: Logical unit number, -
@@ -287,9 +272,9 @@ unitPrinter ! 1: Logical unit number, -
 1 ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
 -1  ! 4: Printing & integrating interval, h. -1 for monthly integration
 0  ! 5: Number of inputs to avoid integration
-INPUTS 9
-Qv QLoss QAcum QPorts QImb Qdp1 Qdp2 Qdp3 qHeatSource 
-Qv QLoss QAcum QPorts QImb Qdp1 Qdp2 Qdp3 qHeatSource 
+INPUTS 8
+Qv QLoss QAcum QPorts QImb Qdp1 Qdp2 qHeatSource 
+Qv QLoss QAcum QPorts QImb Qdp1 Qdp2 qHeatSource 
 *************************************
 ********** Online Plotter ***********
 *************************************
@@ -314,6 +299,6 @@ T1 T2 T3 T4 T5 T6 T7 T8 T9 T10
 LABELS  3         
 Temperatures  
 MassFlows  
-TesDhw
+TesSh
 
 

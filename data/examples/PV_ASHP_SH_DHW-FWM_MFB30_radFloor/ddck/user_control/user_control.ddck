@@ -24,7 +24,7 @@
 **None
 
 ********************************************************************************************
-** Dependencies with other ddck
+** inputs from other ddck
 ********************************************************************************************
 
 ****************************************************************
@@ -51,16 +51,16 @@ myTroomSet     = $type5998_TroomSet
 myTroomRc      = $type5998_TroomRc
 
 ***************************************************************
-! outputs to hydraulic solver
-! inputs necessary for the mass flow solver from hydraulic.ddck
+** outputs to hydraulic solver
+** inputs necessary for the mass flow solver from hydraulic.ddck
 ***************************************************************
 
 EQUATIONS #
 ! Massflowrates
 $MfrPuAux  = $MfrHpPD*hpOnRc
-$MfrPuSh   = $heatDisSys_MfrBuiRdNom*PIDRadBui*BoHS
+$MfrPuSh   = $mfb_MfrBuiNom*PIDRadBui*BoHS
 $MfrWtSp   = $dhw_MfrDHWset
-$MfrPuCirc = 50
+$MfrPuCirc = 50  ! kg/h for recirculation in DHH loop when no tapping water is active
 $MfrPuDHW  = $HxDwh_MfrSrcDhwHx
 $MfrWtTp   = -$MfrWtSp
 EQUATIONS 4
@@ -75,7 +75,8 @@ $xFracDivSolarDhwSh = (AND(xFracDivSolarDhwShRc,GT(TTesDhwBotRc+15,TTesShBotRc))
 ***********************************
 
 EQUATIONS #
-$userControl_hpIsOn = hpOnRc !Recall value
+$userControl_hpIsOn    = hpOnRc !Recall value
+$userControl_PIDRadBui = PIDRadBui
 
 *************************************
 ***** Control defintion

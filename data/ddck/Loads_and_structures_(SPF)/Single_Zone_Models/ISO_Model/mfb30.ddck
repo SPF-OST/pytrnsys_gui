@@ -12,7 +12,7 @@
 
 *****************************************************************************************
 ** Description: 
-** parametrization of SPF Multi-family bulding MFB30.
+** parametrization of SPF Multi-family bulding MFB30 (30 kWh/m2 of heated surface area).
 ** Parameters were fitted to fit the IDA-ICE results
 ** To be used together with type5998.ddck
 ** The whole ddck is "global" respect to type5998 so it should be placed in the same folder as type5998.ddck
@@ -30,16 +30,17 @@ $mfb_scaleBuilding = scaleBuilding
 $mfb_PGainPer   = PGainPer
 $mfb_PGainEquip = PGainEquip
 $mfb_PGainLight = PGainLight
+$mfb_QPeak_kW   = 14.6       ! kW in Zurich (this is approx. the peak hourly demand)
+$mfb_MfrBuiNom  = MfrBuiNom  ! Nominal mass flow of heat distribution system [kg/h]
 
 ***********************************
 ** Generic variables
 ***********************************
 
 CONSTANTS #
-scaleBuilding = 1
-!PheatBuiD = 12830*scaleBuilding  ! design heating rate for building an location [kJ/h]
-Precond = 0      ! Extracted mean ground preconditioning power
-!PheatBuiD = 15*3600
+scaleBuilding   = 1
+factorMfrBuiNom = 1 !adapt this factor to achieve the nominal DeltaT you need in the dustribution loop
+MfrBuiNom       = scaleBuilding*factorMfrBuiNom*$mfb_QPeak_kW/($cpWat*($mfb_TBuiFlNom-$mfb_TBuiRtNom))*3600 ! Nominal mass flow of heat distribution system [kg/h]
 
 EQUATIONS 6	! Shading Factor (Blinds, other Buildings etc.)
 win_g = 0.45	! g-value windows
@@ -54,10 +55,8 @@ CONSTANTS 13
 ********Fitted parameters***********
 Cm = 814754369.89*scaleBuilding ! J/K Internal capacity of the building J/K, 165000*(floor surface), "moyen" / mittlere therm. Kapazität
 Am = 5446*scaleBuilding      ! m2 effective mass area, 2.5*(floor surface), "moyen" / mittlere therm. Kapazität
-**UaWin = 61.9429*scaleBuilding*0.96    ! Matia Thermal transmission coefficient of doors, windows, curtains walls and glazed walls W/K
 UaWin = 264.8*scaleBuilding    !  Igor Thermal transmission coefficient of doors, windows, curtains walls and glazed walls W/K
-**Htr_op = 532.2429*scaleBuilding*0.96 ! Mattia W/K, UA value of walls 
-Htr_op = 306.1*scaleBuilding ! Igor W/K, UA value of walls 
+Htr_op = 306.1*scaleBuilding ! Igor W/K, UA value of walls
 PGainPer = 1478*scaleBuilding	! Maximale Wärmeeintrag durch Personen [W] Mattia:1440
 PGainEquip = 7852*scaleBuilding	! Maximaler Wärmeeintrag durch Geräte [W] Mattia:7649.2
 PGainLight = 0!  7649.2*0.75	Maximaler Wärmeeintrag durch Beleuchtung [W]
@@ -66,7 +65,6 @@ VfrInfRealAHU=0* AreaBui*scaleBuilding / 3600			! Infiltration  [m3/s](from m3/h
 VfrInfRealnoAHU=0.15 * AreaBui*scaleBuilding / 3600	! Infiltration  [m3/s](from m3/hm2) for real user behavior and no AHU
 VfrInfIdealAHU=0.165* AreaBui*scaleBuilding / 3600	! Infiltration  [m3/s](from m3/hm2) for ideal user behavior and AHU
 VfrInfIdealnoAHU=0.7*0.94* AreaBui*scaleBuilding / 3600	! Infiltration  [m3/s](from m3/hm2)for ideal user behavior and no AHU
-
 VfrVent = 0.25*scaleBuilding	! Ventilation  [m3/s]
 !VfrVent = 0.33*ScaleVfrVent*scaleBuilding	! Ventilation  [m3/s] Fit Mattia
 

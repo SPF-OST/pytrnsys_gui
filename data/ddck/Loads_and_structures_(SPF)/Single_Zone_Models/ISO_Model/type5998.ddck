@@ -54,8 +54,9 @@ $type5998_TroomSet     = TroomSet     ! Setpoint for Room temperature, °C
 $type5998_TroomSetCool = TroomSetCool ! Setpoint for Room temperature for cooling, °C
 
 EQUATIONS #
-$type5998_TroomRc       = TRoomRc
-$type5998_Troom         = Troom
+$type5998_TroomRc    = TRoomRc ! TODO: DC I think recall values shold be calculated wehre necessary only and not used as global
+$type5998_Troom      = Troom
+$type5998_TroomStar  = TroomStar
 
 ***********************************
 ** Case definition

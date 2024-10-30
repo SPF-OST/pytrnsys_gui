@@ -77,7 +77,7 @@ $type888_tAmb24           = tAmb24
 
 
 CONSTANTS 12
-tavgTamb = 96  ! time for averaging of outdoor temperature for the evaluation of heating season or no heating season, h
+tavgTamb = 24  ! time for averaging of outdoor temperature for the evaluation of heating season or no heating season, h
 offsetDhw = 6  ! Usually we had it at 7.5 . This means the heat pump would need to reach TdhwSet+7.5 !!
 onsetDhw  = 2 !
 TwwStAuxOFF = tDhwSet+offsetDhw  ! Stop heating DHW if TStoreUp > TWWStAuxOFF

@@ -21,16 +21,9 @@
 ***********************************
 
 EQUATIONS #
-TRdFl       = @temp(In)
-MfrBuiRd    = @mfr(In)
-cpRadFloor  = @cp(In)
-rhoRadFloor = @rho(In) ! only used for pump consumption calculation and this part should be moved away
-
-! the radiant floor control should do that MfrBuiRd = MfrBuiRdNom*myPIDRadBui*myBoHS	! DC otherwise is keeps running in summer
-! myBoHS          = $type888_BoHS
-! myPIDRadBui     = $myConRadFloor_PIDRadBui
-! T_Set_d = MAX(@temp(Out),myTrdSet)	       ! TrdSet output from TYPE 888. Temperature set point for tempering valve used in hydraulic.
-! myTrdSet        = $type888_TrdSet
+TRdFl    = @temp(In)
+MfrBuiRd = @mfr(In)
+cp       = @cp(In)
 
 ***********************************
 ** outputs to hydraulic solver
@@ -52,31 +45,28 @@ EQUATIONS #
 ***********************************
 
 EQUATIONS #
-myAreaBui = $mfb_AreaBui
-myTroomRc = $type5998_TroomRc
+AFloor  = $mfb_AreaBui ! m2 of heated surface area
+TroomRc = $type5998_TroomRc
 
 ***********************************
 ** outputs to other ddck
 ***********************************
 
 EQUATIONS #
-
 $heatDisSys_PHeatBui_kJh = PheatBui_kW*3600  ! Heat to Building from heating distribution system: W -> kJ/h
-$heatDisSys_MfrBuiRdNom  = MfrBuiRdNom
 
 *******************************************************
 ** Definition of radiant floor ************************
 *******************************************************
 
-CONSTANTS #
-MfrBuiRdNom = 200*nParallelPipe	!  Nominal mass flow of heat distribution system [kg/h]  was adjusted because of iteration problems... realistic value would have to be double checked with a building expert
-!PheatRadNom = MfrBuiRdNom*cpRadFloor*(TBuiFlNom-TBuiRtNom)
+!CONSTANTS #
+!flowPerTube = 15                              ! kg/h per tube of LFloorPipe distance
+!MfrBuiRdNom    = flowPerTube*nParallelPipe	   ! Nominal mass flow of heat distribution system [kg/h]
 
 CONSTANTS #
-AFloor = myAreaBui									! m2 !JS it is 120, was added on config level
 dxBetweenTubes = 0.144
-LFloorPipe = 200 									! 50 m/pipe
-LFloorPipeTotal = 7*AFloor							! 6.95*AFloor
+LFloorPipe = 50 									! 50 m/pipe. If mass flow rate per tube is too small adapt this value
+LFloorPipeTotal = 7*AFloor							! m tube/m2 * m2 => 1 m / 15 cm distance = 7 m/m2
 dFloorPipe = 0.015 
 nParallelPipe = LFloorPipeTotal/LFloorPipe+1		! usually distance 10-15 cm
 indexPipeLayer = 2 									! from bottom !!!! IT SHOULD BE CHANGED !!!!!
@@ -112,9 +102,9 @@ nCvWood = 1
 epsilonDown = 0
 
 EQUATIONS #	!TRY WITH RC to see if It problems are solved
-TfloorUp = myTroomRc
-TBelowFloor = myTroomRc		!To avoid bot losses we use U=0 (adiabatic) since losses has been already included in the building model
-TviewUp = myTroomRc
+TfloorUp = TroomRc
+TBelowFloor = TroomRc		!To avoid bot losses we use U=0 (adiabatic) since losses has been already included in the building model
+TviewUp = TroomRc
 TviewDown = 0
 UBelowFloor = 0.0 			! adiabatic
 UconvUp = -1
@@ -130,7 +120,7 @@ pipeFloorWallThick		! [m] thickness of pipe wall
 lambdaFloorPipe  		! [W/m/K] heat conductivity pipe wall
 alphaMode        		! [-] Mode of forced heat transfer coefficient computation
 accelerator		 		! calculation acceleration		
-cpRadFloor            		! [kJ/K/kg] specific heat of fluid
+cp            		! [kJ/K/kg] specific heat of fluid
 nCvFloorPipe     		! [-] number of control volumes (cells) in fluid model
 TiniFloor        		! [°C] initial floor temperature
 epsilonWood      		! [-] emissivity of layer at the interface to the room
@@ -172,28 +162,24 @@ UconvUp			! upper room U value (if set to negtive value-->internal calculation)
 UBelowFloor		! room field temperature below if bocoDown=1, if bocoDown=0 UA between floor and ground (TfloorBot)	[°C]
 
 *** INITIAL INPUT VALUES     
-35 MfrBuiRdNom 21 21 21 21 -1 0
+35 MfrBuiRd 21 21 21 21 -1 0
 
 EQUATIONS #
 mFlowPerRadFloorTube = [42,2] 
-PRdIn_kW = [42,4]/1000 										! heat injected by fluid to floor W -> kW
-PtotBui_kW = [42,3]/1000      								! Heat to Building from Radiator: W --> kW
+PRdIn_kW    = [42,4]/1000 										! heat injected by fluid to floor W -> kW
+PtotBui_kW  = [42,3]/1000      								! Heat to Building from Radiator: W --> kW
 PheatBui_kW = PRdIn_kW*GT(PRdIn_kW,0)  						! total heat (without cooling)  Heat to Building from Radiator: W --> kW
 PcoolBui_kW = -PRdIn_kW*LE(PRdIn_kW,0)  					! total cooling     
-** PcoolBui_kW = MIN([42,3]/1000,0)      					! Heat to Building from Radiator: W --> kW
-QAcumRadiator = -[42,5]/1000     							! Total Accumulated Heat in Radiator, such that in+acum=out
+QAcumRadiator    = -[42,5]/1000     							! Total Accumulated Heat in Radiator, such that in+acum=out
 RadFloorLoss_kW  =  [42,6]/1000
-TWood = [42,7]
-PheatBuiRad_kW = [42,9]/1000  								! total useful
-PheatBuiConv_kW = [42,10]/1000 								! total useful
+TWood            = [42,7]
+PheatBuiRad_kW   = [42,9]/1000  								! total useful
+PheatBuiConv_kW  = [42,10]/1000 								! total useful
 PheatBuiRadBot_kW = [42,11]/1000  							! loss
 PheatBuiConvBot_kW = [42,12]/1000 							! loss
-PheatBuiBot_KW = PheatBuiRadBot_kW+PheatBuiConvBot_kW		! we assume losses below are inputs to lower flat. 
-!BoPumpShOn = GT(MfrBuiRd,0.0001)								! actual pressure-drop of space heat distribution in Pascal, Pa
+PheatBuiBot_KW     = PheatBuiRadBot_kW+PheatBuiConvBot_kW		! we assume losses below are inputs to lower flat.
 ImbRad   = PRdIn_KW+QAcumRadiator-PtotBui_kW
-!RadInImb = PRdIn_kW-cpRadFloor*MfrBuiRd*(TRdFl-@temp(Out, TRdRt))/3600
-!ratioRad = GT(PtotBui_kW,0.)*(PheatBuiRad_kW/(0.00001+PheatBuiConv_kW))
-TfloorLayerBot = [42,13]	
+TfloorLayerBot = [42,13]
  
 EQUATIONS 2
 PheatBuiRad = [42,9]*3.6		!W -> kJ/h
