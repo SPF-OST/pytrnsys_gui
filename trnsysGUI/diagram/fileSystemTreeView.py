@@ -11,7 +11,11 @@ import trnsysGUI.warningsAndErrors as _warn
 
 
 class FileSystemTreeView(_qtw.QTreeView):
-    def __init__(self, rootDirPath: _pl.Path, hasInternalPipingsProvider: _ip.HasInternalPipingsProvider) -> None:
+    def __init__(
+        self,
+        rootDirPath: _pl.Path,
+        hasInternalPipingsProvider: _ip.HasInternalPipingsProvider,
+    ) -> None:
         super().__init__(parent=None)
 
         self._ddckLoader = _ld.DdckFileLoader(hasInternalPipingsProvider)
@@ -26,7 +30,9 @@ class FileSystemTreeView(_qtw.QTreeView):
         rootModelIndex = self._model.index(rootFolder)
         self.setRootIndex(rootModelIndex)
 
-    def mouseDoubleClickEvent(self, event: _qtg.QMouseEvent) -> None:  # pylint: disable=unused-argument
+    def mouseDoubleClickEvent(  # pylint: disable=unused-argument
+        self, event: _qtg.QMouseEvent
+    ) -> None:
         self._openCurrentFileOrNoOp()
 
     def contextMenuEvent(self, event):
@@ -48,11 +54,15 @@ class FileSystemTreeView(_qtw.QTreeView):
         try:
             _os.startfile(path)
         except OSError:
-            _warn.showMessageBox("Could not open file {path}: no program is associated with its file type.")
+            _warn.showMessageBox(
+                "Could not open file {path}: no program is associated with its file type."
+            )
 
     def _loadFileIntoFolder(self) -> None:
         currentPath = self._getCurrentPath()
-        targetDirPath = currentPath if currentPath.is_dir() else currentPath.parent
+        targetDirPath = (
+            currentPath if currentPath.is_dir() else currentPath.parent
+        )
         self._ddckLoader.loadDdckFile(targetDirPath)
 
     def _deleteCurrentFile(self) -> None:

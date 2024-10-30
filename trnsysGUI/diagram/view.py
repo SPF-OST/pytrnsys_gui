@@ -39,18 +39,26 @@ class View(_qtw.QGraphicsView):
         if event.mimeData().hasFormat("component/name"):
             event.accept()
 
-    def dropEvent(self, event):  # pylint: disable=too-many-branches,too-many-statements
+    def dropEvent(
+        self, event
+    ):  # pylint: disable=too-many-branches,too-many-statements
         """Here, the dropped icons create BlockItems/GraphicalItems"""
         if not event.mimeData().hasFormat("component/name"):
             return
 
-        componentType = str(event.mimeData().data("component/name"), encoding="utf-8")
+        componentType = str(
+            event.mimeData().data("component/name"), encoding="utf-8"
+        )
         self.logger.debug("name is " + componentType)
 
-        blockItem = _gbi.createBlockItem(componentType, self._editor, self._editor.namesManager)
+        blockItem = _gbi.createBlockItem(
+            componentType, self._editor, self._editor.namesManager
+        )
 
         if _dfh.hasComponentDdckFolder(blockItem):
-            _dfh.createComponentDdckFolder(blockItem.displayName, _pl.Path(self._editor.projectFolder))
+            _dfh.createComponentDdckFolder(
+                blockItem.displayName, _pl.Path(self._editor.projectFolder)
+            )
 
         self._editor.trnsysObj.append(blockItem)
 
@@ -63,7 +71,8 @@ class View(_qtw.QGraphicsView):
         snapSize = self._editor.snapSize
         if self._editor.snapGrid:
             position = _qtc.QPoint(
-                event.pos().x() - event.pos().x() % snapSize, event.pos().y() - event.pos().y() % snapSize
+                event.pos().x() - event.pos().x() % snapSize,
+                event.pos().y() - event.pos().y() % snapSize,
             )
             scenePosition = self.mapToScene(position)
         else:
@@ -83,6 +92,10 @@ class View(_qtw.QGraphicsView):
                 self.scale(0.8, 0.8)
 
     def deleteBlockCom(self, blockItem):
-        undoNamesHelper = _nu.UndoNamingHelper.create(self._editor.namesManager)
-        command = _dbc.DeleteBlockCommand(blockItem, self._editor, undoNamesHelper)
+        undoNamesHelper = _nu.UndoNamingHelper.create(
+            self._editor.namesManager
+        )
+        command = _dbc.DeleteBlockCommand(
+            blockItem, self._editor, undoNamesHelper
+        )
         self._editor.parent().undoStack.push(command)

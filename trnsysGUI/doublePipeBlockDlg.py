@@ -8,7 +8,12 @@ import trnsysGUI.names.rename as _rename
 
 
 class DoublePipeBlockDlg(_ndialog.ChangeNameDialogBase):
-    def __init__(self, blockItem: _bi.BlockItem, renameHelper: _rename.RenameHelper, projectFolder: str) -> None:
+    def __init__(
+        self,
+        blockItem: _bi.BlockItem,
+        renameHelper: _rename.RenameHelper,
+        projectFolder: str,
+    ) -> None:
         super().__init__(blockItem, renameHelper, _pl.Path(projectFolder))
 
         self._blockItem = blockItem

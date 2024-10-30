@@ -37,7 +37,10 @@ class DeleteBlockCommand(_qtw.QUndoCommand):
         portItems = [*blockItem.inputs, *blockItem.outputs]
 
         connections = {
-            connection for p in portItems if (connection := _com.getSingleOrNone(p.connectionList)) is not None
+            connection
+            for p in portItems
+            if (connection := _com.getSingleOrNone(p.connectionList))
+            is not None
         }
 
         for connection in connections:
@@ -49,19 +52,23 @@ class DeleteBlockCommand(_qtw.QUndoCommand):
         self._blockItem.deleteBlock()
         self._undoNamingHelper.removeNameForDelete(self._blockItem.displayName)
 
-        _dfh.maybeDeleteNonEmptyComponentDdckFolder(self._blockItem, _pl.Path(self._editor.projectFolder))
+        _dfh.maybeDeleteNonEmptyComponentDdckFolder(
+            self._blockItem, _pl.Path(self._editor.projectFolder)
+        )
 
     def undo(self):
         checkDdckFolder = self._blockItem.hasDdckDirectory()
         oldName = self._blockItem.displayName
         generatedNamePrefix = self._blockItem.name
 
-        displayName = self._undoNamingHelper.addOrGenerateAndAddAnNonCollidingNameForAdd(
-            oldName,
-            _nu.DeleteCommandTargetType.COMPONENT,
-            checkDdckFolder,
-            generatedNamePrefix,
-            firstGeneratedNameHasNumber=True,
+        displayName = (
+            self._undoNamingHelper.addOrGenerateAndAddAnNonCollidingNameForAdd(
+                oldName,
+                _nu.DeleteCommandTargetType.COMPONENT,
+                checkDdckFolder,
+                generatedNamePrefix,
+                firstGeneratedNameHasNumber=True,
+            )
         )
         self._blockItem.setDisplayName(displayName)
 

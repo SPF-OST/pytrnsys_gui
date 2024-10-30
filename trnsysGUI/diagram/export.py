@@ -16,7 +16,9 @@ def export(diagramScene: _qtw.QGraphicsScene, fileName: str) -> None:
     painter.end()
 
 
-def _getPaintDevice(fileName: str, boundingRect: _qtc.QRectF) -> _qtg.QPaintDevice:
+def _getPaintDevice(
+    fileName: str, boundingRect: _qtc.QRectF
+) -> _qtg.QPaintDevice:
     extension = getExtension(fileName)
 
     if extension == "pdf":

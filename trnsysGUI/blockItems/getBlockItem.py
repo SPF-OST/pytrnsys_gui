@@ -31,8 +31,12 @@ from trnsysGUI.SaltTankHot import SaltTankHot  # type: ignore[attr-defined]
 from trnsysGUI.SteamPowerBlock import SteamPowerBlock  # type: ignore[attr-defined]
 from trnsysGUI.TVentil import TVentil  # type: ignore[attr-defined]
 from trnsysGUI.connection.connectors.connector import Connector  # type: ignore[attr-defined]
-from trnsysGUI.connection.connectors.doubleDoublePipeConnector import DoubleDoublePipeConnector
-from trnsysGUI.connection.connectors.singleDoublePipeConnector import SingleDoublePipeConnector
+from trnsysGUI.connection.connectors.doubleDoublePipeConnector import (
+    DoubleDoublePipeConnector,
+)
+from trnsysGUI.connection.connectors.singleDoublePipeConnector import (
+    SingleDoublePipeConnector,
+)
 from trnsysGUI.crystalizer import Crystalizer
 from trnsysGUI.geotherm import Geotherm
 from trnsysGUI.pumpsAndTaps.pump import Pump  # type: ignore[attr-defined]
@@ -69,8 +73,14 @@ def createBlockItem(
         "StorageTank": {"blockItem": StorageTank, "baseDisplayName": "Tes"},
         "TeePiece": {"blockItem": TeePiece, "baseDisplayName": "Tee"},
         "DPTee": {"blockItem": DoublePipeTeePiece, "baseDisplayName": "DTee"},
-        "SPCnr": {"blockItem": SingleDoublePipeConnector, "baseDisplayName": "SCnr"},
-        "DPCnr": {"blockItem": DoubleDoublePipeConnector, "baseDisplayName": "DCnr"},
+        "SPCnr": {
+            "blockItem": SingleDoublePipeConnector,
+            "baseDisplayName": "SCnr",
+        },
+        "DPCnr": {
+            "blockItem": DoubleDoublePipeConnector,
+            "baseDisplayName": "DCnr",
+        },
         "TVentil": {"blockItem": TVentil, "baseDisplayName": "Val"},
         "Pump": {"blockItem": Pump, "baseDisplayName": "Pump"},
         "Collector": {"blockItem": Collector, "baseDisplayName": "Coll"},
@@ -88,16 +98,25 @@ def createBlockItem(
         "Boiler": {"blockItem": Boiler, "baseDisplayName": "Bolr"},
         "AirSourceHP": {"blockItem": AirSourceHP, "baseDisplayName": "Ashp"},
         "PV": {"blockItem": PV, "baseDisplayName": "PV"},
-        "GroundSourceHx": {"blockItem": GroundSourceHx, "baseDisplayName": "Gshx"},
+        "GroundSourceHx": {
+            "blockItem": GroundSourceHx,
+            "baseDisplayName": "Gshx",
+        },
         "ExternalHx": {"blockItem": ExternalHx, "baseDisplayName": "Hx"},
-        "IceStorageTwoHx": {"blockItem": IceStorageTwoHx, "baseDisplayName": "IceS"},
+        "IceStorageTwoHx": {
+            "blockItem": IceStorageTwoHx,
+            "baseDisplayName": "IceS",
+        },
         "Sink": {"blockItem": Sink, "baseDisplayName": "QSnk"},
         "Source": {"blockItem": Source, "baseDisplayName": "QSrc"},
         "SourceSink": {"blockItem": SourceSink, "baseDisplayName": "QExc"},
         "Geotherm": {"blockItem": Geotherm, "baseDisplayName": "GeoT"},
         "Water": {"blockItem": Water, "baseDisplayName": "QWat"},
         "Crystalizer": {"blockItem": Crystalizer, "baseDisplayName": "Cryt"},
-        "powerBlock": {"blockItem": SteamPowerBlock, "baseDisplayName": "StPB"},
+        "powerBlock": {
+            "blockItem": SteamPowerBlock,
+            "baseDisplayName": "StPB",
+        },
         "CSP_PT": {"blockItem": ParabolicTroughField, "baseDisplayName": "PT"},
         "CSP_CR": {"blockItem": CentralReceiver, "baseDisplayName": "CR"},
         "coldSaltTank": {"blockItem": SaltTankCold, "baseDisplayName": "ClSt"},
@@ -113,9 +132,13 @@ def createBlockItem(
         baseDisplayName = parts["baseDisplayName"]
     else:
         clazz = _pcomp.PluginComponent
-        baseDisplayName = _getBaseDisplayNameForPluginComponent(componentTypeName)
+        baseDisplayName = _getBaseDisplayNameForPluginComponent(
+            componentTypeName
+        )
 
-    displayName = _addOrCreateAndAddDisplayName(displayName, clazz, baseDisplayName, namesManager)
+    displayName = _addOrCreateAndAddDisplayName(
+        displayName, clazz, baseDisplayName, namesManager
+    )
 
     blockItem = clazz(componentTypeName, editor, displayName)
 
@@ -139,7 +162,9 @@ def _addOrCreateAndAddDisplayName(
     if not displayName:
         createNamingHelper = _cname.CreateNamingHelper(namesManager)
         checkDdckFolder = (
-            blockItemClass.hasDdckDirectory() if issubclass(blockItemClass, _ip.HasInternalPiping) else False
+            blockItemClass.hasDdckDirectory()
+            if issubclass(blockItemClass, _ip.HasInternalPiping)
+            else False
         )
         displayName = createNamingHelper.generateName(
             baseDisplayName, checkDdckFolder, firstGeneratedNameHasNumber=False

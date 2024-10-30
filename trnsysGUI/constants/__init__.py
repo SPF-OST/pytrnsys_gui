@@ -2,7 +2,8 @@ import enum as _enum
 
 # Text for message box
 UNSAVED_PROGRESS_LOST = (
-    "Are you sure you want to open another project? Unsaved progress on the current one will be lost."
+    "Are you sure you want to open another project?"
+    " Unsaved progress on the current one will be lost."
 )
 SAVE_BEFORE_CLOSE = "Do you want to save the current state of the project before closing the program?"
 NO_PROPER_PROJECT_ENVIRONMENT = (

@@ -9,8 +9,15 @@ import trnsysGUI.names.dialog as _ndialog
 import trnsysGUI.names.rename as _rename
 
 
-class BlockDlg(_ndialog.ChangeNameDialogBase):  # pylint: disable=too-many-instance-attributes
-    def __init__(self, blockItem: _bi.BlockItem, renameHelper: _rename.RenameHelper, projectFolder: str) -> None:
+class BlockDlg(
+    _ndialog.ChangeNameDialogBase
+):  # pylint: disable=too-many-instance-attributes
+    def __init__(
+        self,
+        blockItem: _bi.BlockItem,
+        renameHelper: _rename.RenameHelper,
+        projectFolder: str,
+    ) -> None:
         super().__init__(blockItem, renameHelper, _pl.Path(projectFolder))
         self._blockItem = blockItem
         self._renameHelper = renameHelper

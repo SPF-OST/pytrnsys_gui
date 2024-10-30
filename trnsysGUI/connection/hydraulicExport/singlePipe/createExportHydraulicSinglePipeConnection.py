@@ -26,7 +26,9 @@ def createExportHydraulicSinglePipeConnection(
         twoNeighboursBaseModel,
     )
 
-    hydraulicExportConnection = _createFromHydraulicConnection(hydraulicConnection)
+    hydraulicExportConnection = _createFromHydraulicConnection(
+        hydraulicConnection
+    )
 
     return hydraulicExportConnection
 

@@ -49,7 +49,10 @@ def merge(
 
 class _Merger:
     def __init__(
-        self, hydraulicLoops: _model.HydraulicLoops, fluids: _tp.Sequence[_model.Fluid], defaultFluid: _model.Fluid
+        self,
+        hydraulicLoops: _model.HydraulicLoops,
+        fluids: _tp.Sequence[_model.Fluid],
+        defaultFluid: _model.Fluid,
     ) -> None:
         self._hydraulicLoops = hydraulicLoops
         self._fluids = fluids
@@ -60,7 +63,9 @@ class _Merger:
         connection: _spc.SinglePipeConnection,  # type: ignore[name-defined]
         mergedLoopSummary: _tp.Optional[_lcom.MergedLoopSummary],
     ) -> _lcom.Cancellable[_res.Result[_tp.Optional[MergeSummary]]]:
-        fromLoop, toLoop = getFromAndToLoopForNewlyCreatedConnection(self._hydraulicLoops, connection)
+        fromLoop, toLoop = getFromAndToLoopForNewlyCreatedConnection(
+            self._hydraulicLoops, connection
+        )
 
         if not fromLoop and not toLoop:
             self._createLoop(connection)
@@ -82,21 +87,32 @@ class _Merger:
         # This line is needed to help mypy along
         assert fromLoop and toLoop
 
-        return self._mergeLoops(fromLoop, toLoop, connection, mergedLoopSummary)
+        return self._mergeLoops(
+            fromLoop, toLoop, connection, mergedLoopSummary
+        )
 
     @staticmethod
     def _addConnection(connection, loop):
         loop.addConnection(connection)
-        if loop.connectionsDefinitionMode != _cdm.ConnectionsDefinitionMode.INDIVIDUAL:
-            _scp.setConnectionPropertiesForDefinitionMode([connection], loop.name.value, loop.connectionsDefinitionMode)
+        if (
+            loop.connectionsDefinitionMode
+            != _cdm.ConnectionsDefinitionMode.INDIVIDUAL
+        ):
+            _scp.setConnectionPropertiesForDefinitionMode(
+                [connection], loop.name.value, loop.connectionsDefinitionMode
+            )
 
     def _createLoop(self, connection: _spc.SinglePipeConnection) -> None:  # type: ignore[name-defined]
         name = self._hydraulicLoops.generateName()
         connections = [connection]
 
         connectionsDefinitionMode = _cdm.ConnectionsDefinitionMode.DUMMY_PIPES
-        loop = _model.HydraulicLoop(name, self._defaultFluid, connectionsDefinitionMode, connections)
-        _scp.setConnectionPropertiesForDefinitionMode([connection], loop.name.value, connectionsDefinitionMode)
+        loop = _model.HydraulicLoop(
+            name, self._defaultFluid, connectionsDefinitionMode, connections
+        )
+        _scp.setConnectionPropertiesForDefinitionMode(
+            [connection], loop.name.value, connectionsDefinitionMode
+        )
 
         self._hydraulicLoops.addLoop(loop)
 
@@ -107,7 +123,10 @@ class _Merger:
         connection: _spc.SinglePipeConnection,  # type: ignore[name-defined]
         mergedLoopSummary: _tp.Optional[_lcom.MergedLoopSummary],
     ) -> _lcom.Cancellable[_res.Result[MergeSummary]]:
-        if fromLoop.connectionsDefinitionMode != toLoop.connectionsDefinitionMode:
+        if (
+            fromLoop.connectionsDefinitionMode
+            != toLoop.connectionsDefinitionMode
+        ):
             return _res.Error(
                 "Cannot merge two loops with different connections definition modes. "
                 "Change the loops so that their settings match and try again."
@@ -118,23 +137,37 @@ class _Merger:
         _lcom.setConnectionsSelected(connections, True)
 
         if not mergedLoopSummary:
-            mergedLoopSummary = self._askUserForMergedLoopSummaryOrNone(fromLoop, toLoop)
+            mergedLoopSummary = self._askUserForMergedLoopSummaryOrNone(
+                fromLoop, toLoop
+            )
 
         _lcom.setConnectionsSelected(connections, False)
 
         if not mergedLoopSummary:
             return "cancelled"
 
-        mergedConnections = [*fromLoop.connections, *toLoop.connections, connection]
+        mergedConnections = [
+            *fromLoop.connections,
+            *toLoop.connections,
+            connection,
+        ]
         mergedConnections.sort(key=lambda c: c.displayName)
 
         mergedName = mergedLoopSummary.name
 
-        if mergedConnectionsDefinitionMode == _cdm.ConnectionsDefinitionMode.LOOP_WIDE_DEFAULTS:
-            _scp.setConnectionPropertiesForLoopWideDefaults(mergedConnections, mergedName.value)
+        if (
+            mergedConnectionsDefinitionMode
+            == _cdm.ConnectionsDefinitionMode.LOOP_WIDE_DEFAULTS
+        ):
+            _scp.setConnectionPropertiesForLoopWideDefaults(
+                mergedConnections, mergedName.value
+            )
 
         mergedLoop = _model.HydraulicLoop(
-            mergedName, mergedLoopSummary.fluid, mergedConnectionsDefinitionMode, mergedConnections
+            mergedName,
+            mergedLoopSummary.fluid,
+            mergedConnectionsDefinitionMode,
+            mergedConnections,
         )
 
         self._hydraulicLoops.removeLoop(fromLoop)
@@ -156,14 +189,18 @@ class _Merger:
         allNames = {l.name.value for l in self._hydraulicLoops.hydraulicLoops}
         occupiedNames = allNames - {loop1.name.value, loop2.name.value}
 
-        cancellable = _md.MergeLoopsDialog.showDialogAndGetResult(loop1, loop2, occupiedNames, self._fluids)
+        cancellable = _md.MergeLoopsDialog.showDialogAndGetResult(
+            loop1, loop2, occupiedNames, self._fluids
+        )
         if cancellable == "cancelled":
             return None
         mergedLoopSummary = cancellable
 
         return mergedLoopSummary
 
-    def _getMergedNameOrNone(self, name1: _model.Name, name2: _model.Name) -> _tp.Optional[_model.Name]:
+    def _getMergedNameOrNone(
+        self, name1: _model.Name, name2: _model.Name
+    ) -> _tp.Optional[_model.Name]:
         if name1.isUserDefined and not name2.isUserDefined:
             return name1
 
@@ -178,7 +215,9 @@ class _Merger:
 
 def getFromAndToLoopForNewlyCreatedConnection(
     hydraulicLoops: _model.HydraulicLoops, connection: _spc.SinglePipeConnection  # type: ignore[name-defined]
-) -> _tp.Tuple[_tp.Optional[_model.HydraulicLoop], _tp.Optional[_model.HydraulicLoop]]:
+) -> _tp.Tuple[
+    _tp.Optional[_model.HydraulicLoop], _tp.Optional[_model.HydraulicLoop]
+]:
     fromPort, toPort = _helpers.getFromAndToPort(connection)
 
     fromLoop = _getLoopIgnoringConnection(fromPort, connection, hydraulicLoops)
@@ -192,10 +231,14 @@ def _getLoopIgnoringConnection(
     connection: _spc.SinglePipeConnection,  # type: ignore[name-defined]
     hydraulicLoops: _model.HydraulicLoops,
 ) -> _tp.Optional[_model.HydraulicLoop]:
-    connections = search.getReachableConnections(portItem, ignoreConnections={connection})
+    connections = search.getReachableConnections(
+        portItem, ignoreConnections={connection}
+    )
     if not connections:
         return None
 
-    loops = {hydraulicLoops.getLoopForExistingConnection(c) for c in connections}
+    loops = {
+        hydraulicLoops.getLoopForExistingConnection(c) for c in connections
+    }
     loop = _com.getSingle(loops)
     return loop

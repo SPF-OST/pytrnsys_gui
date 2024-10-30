@@ -38,7 +38,9 @@ class DckBuilder(_rcm.GetConfigMixin):  # type: ignore[name-defined]
         self.inputs["HOME$"] = None
         self.inputs["trnsysVersion"] = "TRNSYS_EXE"
         self.inputs["trnsysExePath"] = "enviromentalVariable"
-        self.inputs["copyBuildingData"] = False  # activate when Type 55 is used or change the path to the source
+        self.inputs["copyBuildingData"] = (
+            False  # activate when Type 55 is used or change the path to the source
+        )
         self.inputs["addResultsFolder"] = False
         self.inputs["rerunFailedCases"] = False
         self.inputs["scaling"] = False
@@ -49,7 +51,9 @@ class DckBuilder(_rcm.GetConfigMixin):  # type: ignore[name-defined]
         self.inputs["runType"] = "runFromConfig"
         self.inputs["outputLevel"] = "INFO"
 
-    def buildTrnsysDeck(self) -> _res.Result[_warn.ValueWithWarnings[str | None]]:
+    def buildTrnsysDeck(
+        self,
+    ) -> _res.Result[_warn.ValueWithWarnings[str | None]]:
         """
         It builds a TRNSYS Deck from a listDdck with pathDdck using the BuildingTrnsysDeck Class.
         it reads the Deck list and writes a deck file. Afterwards it checks that the deck looks fine
@@ -93,7 +97,9 @@ class DckBuilder(_rcm.GetConfigMixin):  # type: ignore[name-defined]
 
         self.overwriteForcedByUser = deck.overwriteForcedByUser
 
-        result = deck.checkTrnsysDeck(deck.nameDeck, check=self.inputs["checkDeck"])
+        result = deck.checkTrnsysDeck(
+            deck.nameDeck, check=self.inputs["checkDeck"]
+        )
         if _res.isError(result):
             return _res.error(result)
 
@@ -139,6 +145,8 @@ class DckBuilder(_rcm.GetConfigMixin):  # type: ignore[name-defined]
         try:
             self._outputDirPath.mkdir(parents=True, exist_ok=True)
         except FileNotFoundError:
-            return _res.Error(f"Could not create directory: {self._outputDirPath}")
+            return _res.Error(
+                f"Could not create directory: {self._outputDirPath}"
+            )
 
         return None

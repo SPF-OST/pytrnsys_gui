@@ -103,7 +103,12 @@ class ImageAccessorBase(_abc.ABC):
     def getFileExtension(self):
         return self._dataLoader.getExtension()
 
-    def pixmap(self, *, width: _tp.Optional[int] = None, height: _tp.Optional[int] = None) -> _qtg.QPixmap:
+    def pixmap(
+        self,
+        *,
+        width: _tp.Optional[int] = None,
+        height: _tp.Optional[int] = None,
+    ) -> _qtg.QPixmap:
         image = self.image(width=width, height=height)
         return _qtg.QPixmap(image)
 
@@ -112,14 +117,24 @@ class ImageAccessorBase(_abc.ABC):
         return _qtg.QIcon(pixmap)
 
     @_abc.abstractmethod
-    def image(self, *, width: _tp.Optional[int] = None, height: _tp.Optional[int] = None) -> _qtg.QImage:
+    def image(
+        self,
+        *,
+        width: _tp.Optional[int] = None,
+        height: _tp.Optional[int] = None,
+    ) -> _qtg.QImage:
         raise NotImplementedError()
 
     def _loadBytes(self) -> bytes:
         return self._dataLoader.loadData()
 
     @staticmethod
-    def _getSize(defaultSize: _qtc.QSize, *, width: _tp.Optional[int], height: _tp.Optional[int]) -> _qtc.QSize:
+    def _getSize(
+        defaultSize: _qtc.QSize,
+        *,
+        width: _tp.Optional[int],
+        height: _tp.Optional[int],
+    ) -> _qtc.QSize:
         width = width if width else defaultSize.width()
         height = height if height else defaultSize.height()
 
@@ -133,7 +148,12 @@ class PngImageAccessor(ImageAccessorBase):
 
         super().__init__(dataLoader)
 
-    def image(self, *, width: _tp.Optional[int] = None, height: _tp.Optional[int] = None) -> _qtg.QImage:
+    def image(
+        self,
+        *,
+        width: _tp.Optional[int] = None,
+        height: _tp.Optional[int] = None,
+    ) -> _qtg.QImage:
         imageBytes = self._loadBytes()
         image = _qtg.QImage.fromData(imageBytes)
 
@@ -152,7 +172,12 @@ class SvgImageAccessor(ImageAccessorBase):
 
         self._renderer: _qsvg.QSvgRenderer | None = None
 
-    def image(self, *, width: _tp.Optional[int] = None, height: _tp.Optional[int] = None) -> _qtg.QImage:
+    def image(
+        self,
+        *,
+        width: _tp.Optional[int] = None,
+        height: _tp.Optional[int] = None,
+    ) -> _qtg.QImage:
         defaultSize = self.renderer.defaultSize()
         size = self._getSize(defaultSize, width=width, height=height)
 
@@ -178,18 +203,24 @@ class SvgImageAccessor(ImageAccessorBase):
 _T_co = _tp.TypeVar("_T_co", covariant=True, bound=ImageAccessorBase)
 
 
-def createForPackageResource(clazz: _tp.Type[_T_co], resourcePath: str, logger: _log.Logger = _logger) -> _T_co:
+def createForPackageResource(
+    clazz: _tp.Type[_T_co], resourcePath: str, logger: _log.Logger = _logger
+) -> _T_co:
     dataLoader = _PackageResourceDataLoader(resourcePath, logger)
     return clazz(dataLoader)
 
 
-def createForFile(filePath: _pl.Path, logger: _log.Logger = _logger) -> ImageAccessorBase:
+def createForFile(
+    filePath: _pl.Path, logger: _log.Logger = _logger
+) -> ImageAccessorBase:
     dataLoader = _FileDataLoader(filePath, logger)
     imageAccessor = _createFromDataLoader(dataLoader)
     return imageAccessor
 
 
-def createFromResourcePath(resourcePath: str, logger: _log.Logger = _logger) -> ImageAccessorBase:
+def createFromResourcePath(
+    resourcePath: str, logger: _log.Logger = _logger
+) -> ImageAccessorBase:
     dataLoader = _createDataLoaderFromResourcePath(resourcePath, logger)
     imageAccessor = _createFromDataLoader(dataLoader)
     return imageAccessor
@@ -206,7 +237,9 @@ def _createFromDataLoader(dataLoader: _DataLoaderBase) -> ImageAccessorBase:
             raise ValueError("Unknown extension.", extension)
 
 
-def _createDataLoaderFromResourcePath(resourcePath: str, logger: _log.Logger) -> _DataLoaderBase:
+def _createDataLoaderFromResourcePath(
+    resourcePath: str, logger: _log.Logger
+) -> _DataLoaderBase:
     if resourcePath.startswith(_PackageResourceDataLoader.PATH_PREFIX):
         path = resourcePath[len(_PackageResourceDataLoader.PATH_PREFIX) :]
         return _PackageResourceDataLoader(path, logger)
@@ -215,5 +248,8 @@ def _createDataLoaderFromResourcePath(resourcePath: str, logger: _log.Logger) ->
         path = resourcePath[len(_FileDataLoader.PATH_PREFIX) :]
         return _FileDataLoader(_pl.Path(path), logger)
 
-    logger.warning("Found legacy resource path %s: assuming it's a package resource.", resourcePath)
+    logger.warning(
+        "Found legacy resource path %s: assuming it's a package resource.",
+        resourcePath,
+    )
     return _PackageResourceDataLoader(resourcePath, logger)

@@ -11,7 +11,9 @@ class HydraulicDoublePipeConnection(_com.HydraulicConnectionBase):
     hotModelPipe: _mfn.Pipe
 
 
-def createModel(hydraulicConnection: HydraulicDoublePipeConnection) -> _hedpc.ExportHydraulicDoublePipeConnection:
+def createModel(
+    hydraulicConnection: HydraulicDoublePipeConnection,
+) -> _hedpc.ExportHydraulicDoublePipeConnection:
     (
         coldInputTemperature,
         coldMassFlowRate,
@@ -55,7 +57,9 @@ def createModel(hydraulicConnection: HydraulicDoublePipeConnection) -> _hedpc.Ex
     )
 
     exportHydraulicConnection = _hedpc.ExportHydraulicDoublePipeConnection(
-        hydraulicConnection.displayName, coldHydraulicExportPipe, hotHydraulicExportPipe
+        hydraulicConnection.displayName,
+        coldHydraulicExportPipe,
+        hotHydraulicExportPipe,
     )
 
     return exportHydraulicConnection

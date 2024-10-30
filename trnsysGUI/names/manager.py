@@ -20,7 +20,9 @@ class DdckDirFileOrDirNamesProvider(AbstractDdckDirFileOrDirNamesProvider):
 
     @_tp.override
     def hasFileOrDirName(self, name: str) -> bool:
-        childNamesInLowerCase = [c.name.lower() for c in self._ddckDirPath.iterdir()]
+        childNamesInLowerCase = [
+            c.name.lower() for c in self._ddckDirPath.iterdir()
+        ]
         nameInLowerCase = name.lower()
 
         hasFileOrDirName = nameInLowerCase in childNamesInLowerCase
@@ -37,7 +39,9 @@ class NamesManager:
         self._existingNamesInLowerCase = {n.lower() for n in existingNames}
         self._ddckDirFileOrDirNamesProvider = ddckDirFileOrDirNamesProvider
 
-    def validateName(self, newName: str, checkDdckFolder: bool) -> _res.Result[None]:
+    def validateName(
+        self, newName: str, checkDdckFolder: bool
+    ) -> _res.Result[None]:
         if newName == "":
             return _res.Error("Please enter a name.")
 
@@ -49,9 +53,14 @@ class NamesManager:
             return _res.Error(errorMessage)
 
         if self._doesNameExist(newName):
-            return _res.Error("Name already exist (note: names are case insensitive).")
+            return _res.Error(
+                "Name already exist (note: names are case insensitive)."
+            )
 
-        if checkDdckFolder and self._ddckDirFileOrDirNamesProvider.hasFileOrDirName(newName):
+        if (
+            checkDdckFolder
+            and self._ddckDirFileOrDirNamesProvider.hasFileOrDirName(newName)
+        ):
             message = (
                 f'There exists a file or folder named "{newName}" in the ddck folder. '
                 f'Please delete it first before using "{newName}" as a name.'
@@ -85,7 +94,9 @@ class NamesManager:
         if self._doesContainOnlyNumbers(nameWithoutUnderscores):
             return True
 
-        return not self._doesContainOnlyLettersAndNumbers(nameWithoutUnderscores)
+        return not self._doesContainOnlyLettersAndNumbers(
+            nameWithoutUnderscores
+        )
 
     @staticmethod
     def _removeUnderscores(name: str) -> str:

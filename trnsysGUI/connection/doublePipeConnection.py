@@ -24,7 +24,9 @@ if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
 
 
-class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-instance-attributes
+class DoublePipeConnection(
+    _cb.ConnectionBase
+):  # pylint: disable=too-many-instance-attributes
     def __init__(
         self,
         displayName: str,
@@ -73,8 +75,12 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         rad = 4
         return rad
 
-    def createDeleteUndoCommand(self, parentCommand: _tp.Optional[_qtw.QUndoCommand] = None) -> _qtw.QUndoCommand:
-        undoNamingHelper = _nu.UndoNamingHelper.create(self._editor.namesManager)
+    def createDeleteUndoCommand(
+        self, parentCommand: _tp.Optional[_qtw.QUndoCommand] = None
+    ) -> _qtw.QUndoCommand:
+        undoNamingHelper = _nu.UndoNamingHelper.create(
+            self._editor.namesManager
+        )
 
         undoCommand = _ddpcc.DeleteDoublePipeConnectionCommand(
             self, undoNamingHelper, self._editor.diagramScene, parentCommand
@@ -84,10 +90,16 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
     def encode(self):
         if len(self.segments) > 0:
             labelPos = self._label.pos().x(), self._label.pos().y()
-            labelMassPos = self.massFlowLabel.pos().x(), self.massFlowLabel.pos().y()
+            labelMassPos = (
+                self.massFlowLabel.pos().x(),
+                self.massFlowLabel.pos().y(),
+            )
         else:
             self.logger.debug("This connection has no segment")
-            defaultPos = self.fromPort.pos().x(), self.fromPort.pos().y()  # pylint: disable = duplicate-code # 1
+            defaultPos = (
+                self.fromPort.pos().x(),
+                self.fromPort.pos().y(),
+            )  # pylint: disable = duplicate-code # 1
             labelPos = defaultPos
             labelMassPos = defaultPos
 
@@ -142,16 +154,26 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
             self.hotModelPipe.toPort: self.toPort,
         }
 
-        modelPortItemsToGraphicalPortItem = coldModelPortItemsToGraphicalPortItem | hotModelPortItemsToGraphicalPortItem
-        return _ip.InternalPiping([self.coldModelPipe, self.hotModelPipe], modelPortItemsToGraphicalPortItem)
+        modelPortItemsToGraphicalPortItem = (
+            coldModelPortItemsToGraphicalPortItem
+            | hotModelPortItemsToGraphicalPortItem
+        )
+        return _ip.InternalPiping(
+            [self.coldModelPipe, self.hotModelPipe],
+            modelPortItemsToGraphicalPortItem,
+        )
 
-    def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
+    def exportPipeAndTeeTypesForTemp(
+        self, startingUnit: int
+    ) -> _tp.Tuple[str, int]:
         unitNumber = startingUnit
 
         exportModel = self._getHydraulicExportConnectionModel()
         return _he.export(exportModel, unitNumber)
 
-    def _getHydraulicExportConnectionModel(self) -> _hedpc.ExportDoublePipeConnection:
+    def _getHydraulicExportConnectionModel(
+        self,
+    ) -> _hedpc.ExportDoublePipeConnection:
         hydraulicConnection = _cehc.HydraulicDoublePipeConnection(
             self.displayName,
             _hecom.getAdjacentBlockItem(self.fromPort),
@@ -171,13 +193,27 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         return exportConnection
 
     def _setModels(self):
-        self.coldModelPipe, self.hotModelPipe = _cmnp.createMassFlowSolverNetworkPipes()
+        self.coldModelPipe, self.hotModelPipe = (
+            _cmnp.createMassFlowSolverNetworkPipes()
+        )
 
     def setMassFlowAndTemperature(
-        self, coldMassFlow: float, coldTemperature: float, hotMassFlow: float, hotTemperature: float
+        self,
+        coldMassFlow: float,
+        coldTemperature: float,
+        hotMassFlow: float,
+        hotTemperature: float,
     ) -> None:
-        formattedColdMassFlowAndTemperature = _mfl.getFormattedMassFlowAndTemperature(coldMassFlow, coldTemperature)
-        formattedHotMassFlowAndTemperature = _mfl.getFormattedMassFlowAndTemperature(hotMassFlow, hotTemperature)
+        formattedColdMassFlowAndTemperature = (
+            _mfl.getFormattedMassFlowAndTemperature(
+                coldMassFlow, coldTemperature
+            )
+        )
+        formattedHotMassFlowAndTemperature = (
+            _mfl.getFormattedMassFlowAndTemperature(
+                hotMassFlow, hotTemperature
+            )
+        )
         labelText = f"""\
 Cold: {formattedColdMassFlowAndTemperature}
 Hot: {formattedHotMassFlowAndTemperature}

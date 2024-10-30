@@ -25,7 +25,9 @@ class TeePiece(_tpb.TeePieceBase):
 
         self.changeSize()
 
-    def _createInputAndOutputPorts(self) -> _tp.Tuple[_pib.PortItemBase, _pib.PortItemBase, _pib.PortItemBase]:
+    def _createInputAndOutputPorts(
+        self,
+    ) -> _tp.Tuple[_pib.PortItemBase, _pib.PortItemBase, _pib.PortItemBase]:
         return (
             _cspi.createSinglePipePortItem("i", self),
             _cspi.createSinglePipePortItem("o", self),
@@ -34,13 +36,21 @@ class TeePiece(_tpb.TeePieceBase):
 
     def _setModels(self) -> None:
         inputPortItem = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
-        output1PortItem = _mfn.PortItem("StrOut", _mfn.PortItemDirection.OUTPUT)
-        output2PortItem = _mfn.PortItem("OrtOut", _mfn.PortItemDirection.OUTPUT)
-        self._modelTeePiece = _mfn.TeePiece(inputPortItem, output1PortItem, output2PortItem)
+        output1PortItem = _mfn.PortItem(
+            "StrOut", _mfn.PortItemDirection.OUTPUT
+        )
+        output2PortItem = _mfn.PortItem(
+            "OrtOut", _mfn.PortItemDirection.OUTPUT
+        )
+        self._modelTeePiece = _mfn.TeePiece(
+            inputPortItem, output1PortItem, output2PortItem
+        )
 
     @classmethod
     @_tp.override
-    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+    def _getImageAccessor(
+        cls,
+    ) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.TEE_PIECE_SVG
 
     def getInternalPiping(self) -> _ip.InternalPiping:
@@ -49,7 +59,9 @@ class TeePiece(_tpb.TeePieceBase):
             self._modelTeePiece.output1: self.outputs[0],
             self._modelTeePiece.output2: self.outputs[1],
         }
-        internalPiping = _ip.InternalPiping([self._modelTeePiece], modelPortItemsToGraphicalPortItem)
+        internalPiping = _ip.InternalPiping(
+            [self._modelTeePiece], modelPortItemsToGraphicalPortItem
+        )
 
         return internalPiping
 
@@ -96,7 +108,9 @@ class TeePiece(_tpb.TeePieceBase):
 
 
 @_dc.dataclass
-class TeePieceModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
+class TeePieceModelVersion1(
+    _ser.UpgradableJsonSchemaMixin
+):  # pylint: disable=too-many-instance-attributes
     BlockName: str  # pylint: disable=invalid-name
     BlockDisplayName: str  # pylint: disable=invalid-name
     blockPosition: _tp.Tuple[float, float]
@@ -113,7 +127,9 @@ class TeePieceModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=
         return _bim.BlockItemModelVersion1
 
     @classmethod
-    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "TeePieceModelVersion1":
+    def upgrade(
+        cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0
+    ) -> "TeePieceModelVersion1":
         assert isinstance(superseded, _bim.BlockItemModelVersion1)
 
         assert len(superseded.portsIdsIn) == 2
@@ -141,7 +157,9 @@ class TeePieceModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=
 
 
 @_dc.dataclass
-class TeePieceModel(_gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
+class TeePieceModel(
+    _gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin
+):
     teePieceModel: _tpbm.TeePieceBaseModel
 
     @classmethod
@@ -149,12 +167,16 @@ class TeePieceModel(_gser.BlockItemUpgradableJsonSchemaMixin, _gser.RequiredDeco
         return TeePieceModelVersion1
 
     @classmethod
-    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "TeePieceModel":
+    def upgrade(
+        cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0
+    ) -> "TeePieceModel":
         assert isinstance(superseded, TeePieceModelVersion1)
 
         baseModel = _tpbm.createTeePieceBaseModelFromLegacyModel(superseded)
 
-        return TeePieceModel(superseded.BlockName, superseded.BlockDisplayName, baseModel)
+        return TeePieceModel(
+            superseded.BlockName, superseded.BlockDisplayName, baseModel
+        )
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:

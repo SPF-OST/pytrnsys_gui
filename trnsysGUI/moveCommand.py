@@ -4,7 +4,12 @@ import PyQt5.QtWidgets as _qtw
 
 class MoveCommand(_qtw.QUndoCommand):
     def __init__(
-        self, graphicsItem: _qtw.QGraphicsItem, *, oldScenePos: _qtc.QPointF, newScenePos: _qtc.QPointF, descr: str
+        self,
+        graphicsItem: _qtw.QGraphicsItem,
+        *,
+        oldScenePos: _qtc.QPointF,
+        newScenePos: _qtc.QPointF,
+        descr: str
     ) -> None:
         super().__init__(descr)
         self._oldScenePos = oldScenePos

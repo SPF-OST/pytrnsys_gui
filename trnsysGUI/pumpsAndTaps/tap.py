@@ -10,7 +10,9 @@ from . import _tapBase
 
 class Tap(_tapBase.TapBase):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
-        super().__init__(trnsysType, editor, _mfn.PortItemDirection.INPUT, displayName)
+        super().__init__(
+            trnsysType, editor, _mfn.PortItemDirection.INPUT, displayName
+        )
 
     @classmethod
     @_tp.override
@@ -19,14 +21,20 @@ class Tap(_tapBase.TapBase):
 
     @classmethod
     @_tp.override
-    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+    def _getImageAccessor(
+        cls,
+    ) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.TAP_SVG
 
     def _getCanonicalMassFlowRate(self) -> float:
         return -self.massFlowRateInKgPerH
 
-    def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
-        fromAdjacentHasPiping = _hecom.getAdjacentConnection(self._graphicalPortItem)
+    def exportPipeAndTeeTypesForTemp(
+        self, startingUnit: int
+    ) -> _tp.Tuple[str, int]:
+        fromAdjacentHasPiping = _hecom.getAdjacentConnection(
+            self._graphicalPortItem
+        )
 
         inputTemperature = _ehelpers.getTemperatureVariableName(
             fromAdjacentHasPiping.hasInternalPiping,
@@ -49,4 +57,6 @@ EQUATIONS 1
 
     def _setUnFlippedPortPos(self, delta: int) -> None:
         self.origInputsPos = [[0, delta]]
-        self._graphicalPortItem.setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
+        self._graphicalPortItem.setPos(
+            self.origInputsPos[0][0], self.origInputsPos[0][1]
+        )

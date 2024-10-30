@@ -9,7 +9,7 @@ import pytrnsys.rsim.runParallelTrnsys as runTrnsys
 
 import os
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     pathConfig = os.getcwd()
     configFile = "run.config"

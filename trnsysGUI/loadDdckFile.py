@@ -18,14 +18,18 @@ class DdckFileLoader:
     hasInternalPipingsProvider: _ip.HasInternalPipingsProvider
 
     def loadDdckFile(self, targetDirPath: _pl.Path) -> None:
-        sourceFilePathString, _ = _qtw.QFileDialog.getOpenFileName(None, "Load file")
+        sourceFilePathString, _ = _qtw.QFileDialog.getOpenFileName(
+            None, "Load file"
+        )
         if not sourceFilePathString:
             return
 
         sourceFilePath = _pl.Path(sourceFilePathString)
 
         isSourceProformaFile = self._isProformaFilePath(sourceFilePath)
-        targetSuffix = ".ddck" if isSourceProformaFile else sourceFilePath.suffix
+        targetSuffix = (
+            ".ddck" if isSourceProformaFile else sourceFilePath.suffix
+        )
 
         targetFilePathStem = targetDirPath / sourceFilePath.stem
         targetFilePath = targetFilePathStem.with_suffix(targetSuffix)
@@ -41,8 +45,13 @@ class DdckFileLoader:
             message = f"""\
                     A file of the name `{targetFilePath.name}` already exists. Do you want to overwrite it?"""
 
-            standardButton = _qtw.QMessageBox.question(None, "Overwrite file?", message)
-            if standardButton != _qtw.QMessageBox.StandardButton.Yes:  # pylint: disable=no-member
+            standardButton = _qtw.QMessageBox.question(
+                None, "Overwrite file?", message
+            )
+            if (
+                standardButton
+                != _qtw.QMessageBox.StandardButton.Yes  # pylint: disable=no-member
+            ):
                 return
 
         targetContainingDirPath = targetFilePath.parent
@@ -64,11 +73,17 @@ class DdckFileLoader:
             _su.copy(sourceFilePath, targetFilePath)
             return
 
-        self._convertAndLoadProformaFileIntoFolder(sourceFilePath, targetFilePath)
+        self._convertAndLoadProformaFileIntoFolder(
+            sourceFilePath, targetFilePath
+        )
 
-    def _convertAndLoadProformaFileIntoFolder(self, sourceFilePath: _pl.Path, targetFilePath: _pl.Path) -> None:
+    def _convertAndLoadProformaFileIntoFolder(
+        self, sourceFilePath: _pl.Path, targetFilePath: _pl.Path
+    ) -> None:
         hasInternalPipingsWithDdckPlaceholders = [
-            hip for hip in self.hasInternalPipingsProvider.getInternalPipings() if hip.hasDdckPlaceHolders()
+            hip
+            for hip in self.hasInternalPipingsProvider.getInternalPipings()
+            if hip.hasDdckPlaceHolders()
         ]
 
         dialogMaybeCancelled = _pcd.ConvertDialog.showDialogAndGetResults(
@@ -78,7 +93,11 @@ class DdckFileLoader:
             return
         dialogResult = _cancel.value(dialogMaybeCancelled)
 
-        createConnectionsResult = _pcmc.createModelConnectionsFromInternalPiping(dialogResult.internalPiping)
+        createConnectionsResult = (
+            _pcmc.createModelConnectionsFromInternalPiping(
+                dialogResult.internalPiping
+            )
+        )
         if _res.isError(createConnectionsResult):
             _warn.showMessageBox(_res.error(createConnectionsResult).message)
             return

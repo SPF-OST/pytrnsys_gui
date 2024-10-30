@@ -39,7 +39,9 @@ class PortIds:
     outputId: int
 
 
-class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin):
+class StorageTank(
+    _bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin
+):
     # pylint: disable=too-many-instance-attributes,too-many-public-methods
     HEAT_EXCHANGER_WIDTH = 40
 
@@ -87,7 +89,12 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
         return self._getDirectPortPairPortItems(_sd.Side.RIGHT)
 
     def _getDirectPortPairPortItems(self, side: _sd.Side):
-        return [p for dpp in self.directPortPairs if dpp.side == side for p in [dpp.fromPort, dpp.toPort]]
+        return [
+            p
+            for dpp in self.directPortPairs
+            if dpp.side == side
+            for p in [dpp.fromPort, dpp.toPort]
+        ]
 
     @classmethod
     @_tp.override
@@ -114,8 +121,12 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
         storageTankHeight: float,
         portIds: _tp.Optional[PortIds] = None,
     ):
-        inputPort = self._createPort("i", relativeInputHeight, storageTankHeight, side)
-        outputPort = self._createPort("o", relativeOutputHeight, storageTankHeight, side)
+        inputPort = self._createPort(
+            "i", relativeInputHeight, storageTankHeight, side
+        )
+        outputPort = self._createPort(
+            "o", relativeOutputHeight, storageTankHeight, side
+        )
 
         randomInt = int(_rnd.uniform(20, 200))
         randomColor = _qtg.QColor(randomInt, randomInt, randomInt)
@@ -141,7 +152,11 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
         self.outputs = [*self.outputs, directPortPair.toPort]
 
     def _createPort(
-        self, name: str, relativeHeight: float, storageTankHeight: float, side: _sd.Side
+        self,
+        name: str,
+        relativeHeight: float,
+        storageTankHeight: float,
+        side: _sd.Side,
     ) -> SinglePipePortItem:
         portItem = _cspi.createSinglePipePortItem(name, self)
         portItem.setZValue(100)
@@ -151,11 +166,15 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
         return portItem
 
     @staticmethod
-    def _setPortColor(portItem: SinglePipePortItem, color: _qtg.QColor) -> None:
+    def _setPortColor(
+        portItem: SinglePipePortItem, color: _qtg.QColor
+    ) -> None:
         portItem.innerCircle.setBrush(color)
         portItem.visibleColor = color
 
-    def addHeatExchanger(self, name, trnsysId, side, relativeInputHeight, relativeOutputHeight):
+    def addHeatExchanger(
+        self, name, trnsysId, side, relativeInputHeight, relativeOutputHeight
+    ):
         heatExchanger = HeatExchanger(
             trnsysId=trnsysId,
             sideNr=side.toSideNr(),
@@ -183,13 +202,20 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
         self._updatePortItemPositionsAfterTankSizeChange(deltaW, deltaH)
         self._updateHeatExchangersAfterTankSizeChange()
 
-    def _updatePortItemPositionsAfterTankSizeChange(self, deltaW: int, deltaH: int) -> None:
+    def _updatePortItemPositionsAfterTankSizeChange(
+        self, deltaW: int, deltaH: int
+    ) -> None:
         for portItem in self.inputs + self.outputs:
             oldRelativeHeight = portItem.pos().y() / self.h
             if portItem.side == 0:
-                portItem.setPos(portItem.pos().x(), oldRelativeHeight * (self.h + deltaH))
+                portItem.setPos(
+                    portItem.pos().x(), oldRelativeHeight * (self.h + deltaH)
+                )
             else:
-                portItem.setPos(portItem.pos().x() + deltaW, oldRelativeHeight * (self.h + deltaH))
+                portItem.setPos(
+                    portItem.pos().x() + deltaW,
+                    oldRelativeHeight * (self.h + deltaH),
+                )
 
     def _updateHeatExchangersAfterTankSizeChange(self):
         for heatExchanger in self.heatExchangers:
@@ -223,11 +249,17 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
         for directPort in self.directPortPairs:
             side = _sd.Side.createFromSideNr(directPort.fromPort.side)
 
-            inputPortModel = _model.Port(directPort.fromPort.id, directPort.relativeInputHeight)
+            inputPortModel = _model.Port(
+                directPort.fromPort.id, directPort.relativeInputHeight
+            )
 
-            outputPortModel = _model.Port(directPort.toPort.id, directPort.relativeOutputHeight)
+            outputPortModel = _model.Port(
+                directPort.toPort.id, directPort.relativeOutputHeight
+            )
 
-            portPairModel = _model.PortPair(side, directPort.trnsysId, inputPortModel, outputPortModel)
+            portPairModel = _model.PortPair(
+                side, directPort.trnsysId, inputPortModel, outputPortModel
+            )
 
             directPortPairModel = _model.DirectPortPair(portPairModel)
 
@@ -250,10 +282,15 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
                 heatExchanger.relativeOutputHeight,
             )
 
-            portPair = _model.PortPair(side, heatExchanger.trnsysId, inputPort, outputPort)
+            portPair = _model.PortPair(
+                side, heatExchanger.trnsysId, inputPort, outputPort
+            )
 
             heatExchangerModel = _model.HeatExchanger(
-                portPair, heatExchanger.displayName, heatExchanger.w, heatExchanger.id
+                portPair,
+                heatExchanger.displayName,
+                heatExchanger.w,
+                heatExchanger.id,
             )
 
             heatExchangerModels.append(heatExchangerModel)
@@ -304,7 +341,11 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
             portIds=portIds,
         )
 
-    def _decodeHeatExchanger(self, heatExchangerModel: _model.HeatExchanger, shallSetNamesAndIDs: bool):
+    def _decodeHeatExchanger(
+        self,
+        heatExchangerModel: _model.HeatExchanger,
+        shallSetNamesAndIDs: bool,
+    ):
         portPair = heatExchangerModel.portPair
 
         nameSuffix = "" if shallSetNamesAndIDs else "New"
@@ -335,14 +376,24 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
             if directPortPair.trnsysId == generator.UNINITIALIZED_ID:
                 directPortPair.trnsysId = generator.getTrnsysID()
 
-    def _getHeatExchangerForPortItem(self, portItem: SinglePipePortItem) -> _tp.Optional[HeatExchanger]:
-        heatExchanger = self._getSingleOrNone(hx for hx in self.heatExchangers if portItem in [hx.port1, hx.port2])
+    def _getHeatExchangerForPortItem(
+        self, portItem: SinglePipePortItem
+    ) -> _tp.Optional[HeatExchanger]:
+        heatExchanger = self._getSingleOrNone(
+            hx
+            for hx in self.heatExchangers
+            if portItem in [hx.port1, hx.port2]
+        )
 
         return heatExchanger
 
-    def _getDirectPortPairForPortItemOrNone(self, portItem: SinglePipePortItem) -> _tp.Optional[DirectPortPair]:
+    def _getDirectPortPairForPortItemOrNone(
+        self, portItem: SinglePipePortItem
+    ) -> _tp.Optional[DirectPortPair]:
         directPortPair = self._getSingleOrNone(
-            dpp for dpp in self.directPortPairs if portItem in [dpp.fromPort, dpp.toPort]
+            dpp
+            for dpp in self.directPortPairs
+            if portItem in [dpp.fromPort, dpp.toPort]
         )
 
         return directPortPair
@@ -372,7 +423,9 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
         self, event: _qtw.QGraphicsSceneMouseEvent, isTest=False
     ) -> (_tp.Optional)[ConfigureStorageDialog]:
         renameHelper = _rename.RenameHelper(self.editor.namesManager)
-        dialog = ConfigureStorageDialog(self, self.editor, renameHelper, self.editor.projectFolder)
+        dialog = ConfigureStorageDialog(
+            self, self.editor, renameHelper, self.editor.projectFolder
+        )
         if isTest:
             return dialog
         dialog.exec()
@@ -399,11 +452,15 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
         }
 
         nodes = [*heatExchangerNodes, *portPairNodes]
-        modelPortItemsToGraphicalPortItem = heatExchangerPortItems | portPairsPortItems
+        modelPortItemsToGraphicalPortItem = (
+            heatExchangerPortItems | portPairsPortItems
+        )
 
         return _ip.InternalPiping(nodes, modelPortItemsToGraphicalPortItem)
 
-    def exportDck(self) -> None:  # pylint: disable=too-many-locals,too-many-statements
+    def exportDck(
+        self,
+    ) -> None:  # pylint: disable=too-many-locals,too-many-statements
         if not self._areAllPortsConnected():
             msgb = _qtw.QMessageBox()
             msgb.setText("Please connect all ports before exporting!")
@@ -414,7 +471,9 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
         if not success:
             qmb = _qtw.QMessageBox()
             qmb.setText("Ignore connection errors and continue with export?")
-            qmb.setStandardButtons(_qtw.QMessageBox.Save | _qtw.QMessageBox.Cancel)
+            qmb.setStandardButtons(
+                _qtw.QMessageBox.Save | _qtw.QMessageBox.Cancel
+            )
             qmb.setDefaultButton(_qtw.QMessageBox.Cancel)
             ret = qmb.exec()
             if ret == _qtw.QMessageBox.Save:
@@ -443,10 +502,14 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
 
         auxiliaryPorts = self._getAuxiliaryPortForExport(inputs)
 
-        tool.setInputs(inputs, directPairsPorts, heatExchangerPorts, auxiliaryPorts)
+        tool.setInputs(
+            inputs, directPairsPorts, heatExchangerPorts, auxiliaryPorts
+        )
 
         projectDirPath = _pl.Path(self.editor.projectFolder)
-        ddckDirPath = _dfh.getComponentDdckDirPath(self.displayName, projectDirPath)
+        ddckDirPath = _dfh.getComponentDdckDirPath(
+            self.displayName, projectDirPath
+        )
 
         if not ddckDirPath.is_dir():
             _qtw.QMessageBox.information(
@@ -463,10 +526,14 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
         directPairsPorts = []
         for directPortPair in self.directPortPairs:
             incomingConnection = directPortPair.fromPort.getConnection()
-            inputTemperatureName = _cnames.getTemperatureVariableName(incomingConnection, _mfn.PortItemType.STANDARD)
+            inputTemperatureName = _cnames.getTemperatureVariableName(
+                incomingConnection, _mfn.PortItemType.STANDARD
+            )
 
             modelPipe = directPortPair.modelPipe
-            massFlowRateName = _mnames.getMassFlowVariableName(self.displayName, modelPipe, modelPipe.fromPort)
+            massFlowRateName = _mnames.getMassFlowVariableName(
+                self.displayName, modelPipe, modelPipe.fromPort
+            )
 
             outgoingConnection = directPortPair.toPort.getConnection()
             reverseInputTemperatureName = _cnames.getTemperatureVariableName(
@@ -495,21 +562,31 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
     def _getHeatExchangerPortsForExport(self):
         heatExchangerPorts = []
         for heatExchanger in self.heatExchangers:
-            heatExchangerPort = self._getHeatExchangerPortForExport(heatExchanger)
+            heatExchangerPort = self._getHeatExchangerPortForExport(
+                heatExchanger
+            )
 
             heatExchangerPorts.append(heatExchangerPort)
         return heatExchangerPorts
 
-    def _getHeatExchangerPortForExport(self, heatExchanger):  # pylint: disable=too-many-locals
+    def _getHeatExchangerPortForExport(
+        self, heatExchanger
+    ):  # pylint: disable=too-many-locals
         heatExchangerName = heatExchanger.displayName
 
         incomingConnection = heatExchanger.port1.getConnection()
-        inputTemperatureName = _cnames.getTemperatureVariableName(incomingConnection, _mfn.PortItemType.STANDARD)
+        inputTemperatureName = _cnames.getTemperatureVariableName(
+            incomingConnection, _mfn.PortItemType.STANDARD
+        )
         modelPipe = heatExchanger.modelPipe
-        massFlowRateName = _mnames.getMassFlowVariableName(self.displayName, modelPipe, modelPipe.fromPort)
+        massFlowRateName = _mnames.getMassFlowVariableName(
+            self.displayName, modelPipe, modelPipe.fromPort
+        )
 
         outgoingConnection = heatExchanger.port2.getConnection()
-        reverseInputTemperatureName = _cnames.getTemperatureVariableName(outgoingConnection, _mfn.PortItemType.STANDARD)
+        reverseInputTemperatureName = _cnames.getTemperatureVariableName(
+            outgoingConnection, _mfn.PortItemType.STANDARD
+        )
 
         inputPos = heatExchanger.relativeInputHeight
         outputPos = heatExchanger.relativeOutputHeight
@@ -518,7 +595,9 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
             componentDisplayName=self.displayName, nodeName=modelPipe.name
         )
 
-        loop = self._hydraulicLoops.getLoopForExistingConnection(incomingConnection)
+        loop = self._hydraulicLoops.getLoopForExistingConnection(
+            incomingConnection
+        )
         loopName = loop.name.value
 
         heatExchangerPort = {
@@ -560,7 +639,9 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
                 errorConnList = errorConnList + connName2 + "\n"
         if errorConnList != "":
             msgBox = _qtw.QMessageBox()
-            msgBox.setText(f"{errorConnList} is connected wrongly, right click StorageTank to invert connection.")
+            msgBox.setText(
+                f"{errorConnList} is connected wrongly, right click StorageTank to invert connection."
+            )
             msgBox.exec()
             noError = False
         else:

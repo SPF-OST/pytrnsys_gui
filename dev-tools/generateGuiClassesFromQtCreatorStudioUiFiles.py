@@ -57,13 +57,18 @@ def _generatePythonCodeFromQrcFiles():
         print("done.")
 
 
-def _getGeneratedFilePath(inputFilePath: _pl.Path, typePrefix: str) -> _pl.Path:
+def _getGeneratedFilePath(
+    inputFilePath: _pl.Path, typePrefix: str
+) -> _pl.Path:
     underscoreOrEmpty = "_" if inputFilePath.name.startswith("_") else ""
 
-    inputFilePathWithoutLeadingUnderscore = inputFilePath.parent / inputFilePath.name.lstrip("_")
+    inputFilePathWithoutLeadingUnderscore = (
+        inputFilePath.parent / inputFilePath.name.lstrip("_")
+    )
 
     generatedFileName = (
-        f"{underscoreOrEmpty}{typePrefix}_{inputFilePathWithoutLeadingUnderscore.with_suffix('').name}_generated.py"
+        f"{underscoreOrEmpty}{typePrefix}"
+        f"_{inputFilePathWithoutLeadingUnderscore.with_suffix('').name}_generated.py"
     )
     generatedFilePath = inputFilePath.with_name(generatedFileName)
     return generatedFilePath

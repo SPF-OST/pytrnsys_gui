@@ -13,9 +13,12 @@ import trnsysGUI.temperatures as _temps
 import trnsysGUI.placeHolderNames as _phn
 
 PlaceHolders = _tp.NewType("PlaceHolders", _tp.Mapping[str, str])
-PlaceHoldersByQualifiedPortName = _tp.NewType("PlaceHoldersByQualifiedPortName", _tp.Mapping[str, PlaceHolders])
+PlaceHoldersByQualifiedPortName = _tp.NewType(
+    "PlaceHoldersByQualifiedPortName", _tp.Mapping[str, PlaceHolders]
+)
 PlaceHoldersByComponentName = _tp.NewType(
-    "PlaceHoldersByComponentName", _tp.Mapping[str, PlaceHoldersByQualifiedPortName]
+    "PlaceHoldersByComponentName",
+    _tp.Mapping[str, PlaceHoldersByQualifiedPortName],
 )
 
 
@@ -37,11 +40,15 @@ def getPlaceholderValues(
         placeholdersForComponent: dict[str, PlaceHolders] = {}
         internalPiping = blockItem.getInternalPiping()
         for node in internalPiping.nodes:
-            placeHoldersForNode = _getPlaceHoldersForNode(node, componentName, internalPiping, hydraulicLoops)
+            placeHoldersForNode = _getPlaceHoldersForNode(
+                node, componentName, internalPiping, hydraulicLoops
+            )
 
             placeholdersForComponent |= placeHoldersForNode
 
-        allPlaceholders[componentName] = PlaceHoldersByQualifiedPortName(placeholdersForComponent)
+        allPlaceholders[componentName] = PlaceHoldersByQualifiedPortName(
+            placeholdersForComponent
+        )
 
     warning: str | None = None
     if namesOfComponentsWithoutCorrespondingDdckDir:
@@ -56,17 +63,24 @@ for that particular component - or it could indicate a missing ddck file.
 """
 
     placeHoldersByComponentName = PlaceHoldersByComponentName(allPlaceholders)
-    allPlaceholdersWithWarnings = _warn.ValueWithWarnings.create(placeHoldersByComponentName, warning)
+    allPlaceholdersWithWarnings = _warn.ValueWithWarnings.create(
+        placeHoldersByComponentName, warning
+    )
 
     return allPlaceholdersWithWarnings
 
 
 def _getPlaceHoldersForNode(
-    node: _mfn.Node, componentName: str, internalPiping: _ip.InternalPiping, hydraulicLoops: _hlm.HydraulicLoops
+    node: _mfn.Node,
+    componentName: str,
+    internalPiping: _ip.InternalPiping,
+    hydraulicLoops: _hlm.HydraulicLoops,
 ) -> PlaceHoldersByQualifiedPortName:
     placeHoldersForNode = {}
     for modelPortItem in node.getPortItems():
-        qualifiedPortName = _phn.getQualifiedPortName(node.name, modelPortItem.name)
+        qualifiedPortName = _phn.getQualifiedPortName(
+            node.name, modelPortItem.name
+        )
 
         placeholdersForPort = _getPlaceholdersForPort(
             hydraulicLoops, componentName, internalPiping, node, modelPortItem
@@ -85,10 +99,14 @@ def _getPlaceholdersForPort(
     modelPortItem: _mfn.PortItem,
 ) -> PlaceHolders:
     if modelPortItem.direction == _mfn.PortItemDirection.OUTPUT:
-        outputTemperatureVariableName = _temps.getInternalTemperatureVariableName(
-            componentDisplayName=displayName, nodeName=node.name
+        outputTemperatureVariableName = (
+            _temps.getInternalTemperatureVariableName(
+                componentDisplayName=displayName, nodeName=node.name
+            )
         )
-        reverseInputTemperatureVariableName = _getTemperatureOfPipeConnectedAt(internalPiping, modelPortItem)
+        reverseInputTemperatureVariableName = _getTemperatureOfPipeConnectedAt(
+            internalPiping, modelPortItem
+        )
 
         placeholdersForPort = _createOutputPlaceholdersDict(
             outputTemperatureVariableName, reverseInputTemperatureVariableName
@@ -97,33 +115,51 @@ def _getPlaceholdersForPort(
         return placeholdersForPort
 
     if modelPortItem.direction == _mfn.PortItemDirection.INPUT:
-        inputTemperatureVariableName = _getTemperatureOfPipeConnectedAt(internalPiping, modelPortItem)
-        inputMfrVariableName = _mnames.getMassFlowVariableName(displayName, node, modelPortItem)
+        inputTemperatureVariableName = _getTemperatureOfPipeConnectedAt(
+            internalPiping, modelPortItem
+        )
+        inputMfrVariableName = _mnames.getMassFlowVariableName(
+            displayName, node, modelPortItem
+        )
 
         inputConnection = _getConnectionAt(internalPiping, modelPortItem)
         loop = _getLoop(hydraulicLoops, inputConnection)
 
-        placeholdersForPort = _createInputPlaceholdersDict(inputMfrVariableName, inputTemperatureVariableName, loop)
+        placeholdersForPort = _createInputPlaceholdersDict(
+            inputMfrVariableName, inputTemperatureVariableName, loop
+        )
 
         return placeholdersForPort
 
-    raise AssertionError(f"Unknown {_mfn.PortItemDirection.__name__}: {modelPortItem.direction}")
+    raise AssertionError(
+        f"Unknown {_mfn.PortItemDirection.__name__}: {modelPortItem.direction}"
+    )
 
 
-def _getTemperatureOfPipeConnectedAt(internalPiping: _ip.InternalPiping, modelPortItem: _mfn.PortItem) -> str:
+def _getTemperatureOfPipeConnectedAt(
+    internalPiping: _ip.InternalPiping, modelPortItem: _mfn.PortItem
+) -> str:
     inputConnection = _getConnectionAt(internalPiping, modelPortItem)
-    inputTemperatureVariableName = _cnames.getTemperatureVariableName(inputConnection, modelPortItem.type)
+    inputTemperatureVariableName = _cnames.getTemperatureVariableName(
+        inputConnection, modelPortItem.type
+    )
     return inputTemperatureVariableName
 
 
-def _getConnectionAt(internalPiping: _ip.InternalPiping, modelPortItem: _mfn.PortItem) -> _cb.ConnectionBase:
-    graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[modelPortItem]
+def _getConnectionAt(
+    internalPiping: _ip.InternalPiping, modelPortItem: _mfn.PortItem
+) -> _cb.ConnectionBase:
+    graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[
+        modelPortItem
+    ]
     connection = graphicalPortItem.getConnection()
     return connection
 
 
 def _createInputPlaceholdersDict(
-    inputMfrVariableName: str, inputTemperatureVariableName: str, loop: _tp.Optional[_hlm.HydraulicLoop]
+    inputMfrVariableName: str,
+    inputTemperatureVariableName: str,
+    loop: _tp.Optional[_hlm.HydraulicLoop],
 ) -> PlaceHolders:
     if not loop:
         return PlaceHolders(
@@ -146,9 +182,13 @@ def _createInputPlaceholdersDict(
 
 
 def _createOutputPlaceholdersDict(
-    outputTemperatureVariableName: str, reverseInputTemperatureVariableName: str
+    outputTemperatureVariableName: str,
+    reverseInputTemperatureVariableName: str,
 ) -> PlaceHolders:
-    placeholdersForPort = {"@temp": outputTemperatureVariableName, "@revtemp": reverseInputTemperatureVariableName}
+    placeholdersForPort = {
+        "@temp": outputTemperatureVariableName,
+        "@revtemp": reverseInputTemperatureVariableName,
+    }
     return PlaceHolders(placeholdersForPort)
 
 
@@ -158,5 +198,7 @@ def _getLoop(
     if not isinstance(inputConnection, _spc.SinglePipeConnection):
         return None
 
-    hydraulicLoop = hydraulicLoops.getLoopForExistingConnection(inputConnection)
+    hydraulicLoop = hydraulicLoops.getLoopForExistingConnection(
+        inputConnection
+    )
     return hydraulicLoop

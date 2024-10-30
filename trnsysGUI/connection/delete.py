@@ -11,7 +11,8 @@ def deleteGraphicsItem(item: _qtw.QGraphicsItem) -> None:
 
 
 def deleteChildGraphicsItems(
-    item: _qtw.QGraphicsItem, exclude: _tp.Optional[_tp.Sequence[_qtw.QGraphicsItem]] = None
+    item: _qtw.QGraphicsItem,
+    exclude: _tp.Optional[_tp.Sequence[_qtw.QGraphicsItem]] = None,
 ) -> None:
     if not exclude:
         exclude = []

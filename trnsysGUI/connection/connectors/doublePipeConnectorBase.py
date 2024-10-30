@@ -13,7 +13,9 @@ import trnsysGUI.blockItemGraphicItemMixins as _gimx
 import trnsysGUI.blockItemHasInternalPiping as _bip
 
 
-class DoublePipeConnectorBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin):
+class DoublePipeConnectorBase(
+    _bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin
+):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
@@ -39,7 +41,9 @@ class DoublePipeConnectorBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockIte
 
     @classmethod
     @_tp.override
-    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+    def _getImageAccessor(  # pylint: disable=arguments-differ
+        cls,
+    ) -> _img.SvgImageAccessor:
         raise NotImplementedError()
 
     def rotateBlockCW(self):
@@ -61,7 +65,12 @@ class DoublePipeConnectorBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockIte
         outputPortIds = [p.id for p in self.outputs]
 
         connectorModel = DoublePipeBlockItemModel(
-            self.name, self.displayName, blockItemModel, inputPortIds, outputPortIds, self.childIds
+            self.name,
+            self.displayName,
+            blockItemModel,
+            inputPortIds,
+            outputPortIds,
+            self.childIds,
         )
 
         dictName = "Block-"
@@ -74,7 +83,10 @@ class DoublePipeConnectorBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockIte
 
         blockItemModel = model.blockItemModel
 
-        self.setPos(float(blockItemModel.blockPosition[0]), float(blockItemModel.blockPosition[1]))
+        self.setPos(
+            float(blockItemModel.blockPosition[0]),
+            float(blockItemModel.blockPosition[1]),
+        )
         self.trnsysId = blockItemModel.trnsysId
         self.childIds = model.childIds
 
@@ -104,7 +116,9 @@ class DoublePipeConnectorBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockIte
         elif angle == 270:
             self.updateFlipStateV(False)
 
-    def mouseDoubleClickEvent(self, event) -> None:  # pylint: disable=unused-argument
+    def mouseDoubleClickEvent(
+        self, event
+    ) -> None:  # pylint: disable=unused-argument
         self.editor.showDoublePipeBlockDlg(self)
 
 
@@ -130,7 +144,9 @@ class DoublePipeBlockItemModelVersion0(
 
 
 @_dc.dataclass
-class DoublePipeBlockItemModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
+class DoublePipeBlockItemModel(
+    _ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin
+):
     blockItemModel: _bim.BlockItemBaseModel
     inputPortIds: _tp.List[int]
     outputPortIds: _tp.List[int]
@@ -145,7 +161,9 @@ class DoublePipeBlockItemModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDec
         schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> "DoublePipeBlockItemModel":
         data.pop(".__BlockDict__")
-        doublePipeBlockItemModel = super().from_dict(data, validate, validate_enums, schema_type)
+        doublePipeBlockItemModel = super().from_dict(
+            data, validate, validate_enums, schema_type
+        )
         return _tp.cast(DoublePipeBlockItemModel, doublePipeBlockItemModel)
 
     def to_dict(
@@ -155,20 +173,30 @@ class DoublePipeBlockItemModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDec
         validate_enums: bool = True,  # /NOSONAR
         schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums, schema_type)  # pylint: disable=duplicate-code
+        data = super().to_dict(
+            omit_none, validate, validate_enums, schema_type
+        )  # pylint: disable=duplicate-code
         data[".__BlockDict__"] = True
         return data
 
     @classmethod
-    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+    def getSupersededClass(
+        cls,
+    ) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
         return DoublePipeBlockItemModelVersion0
 
     @classmethod
-    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "DoublePipeBlockItemModel":
+    def upgrade(
+        cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0
+    ) -> "DoublePipeBlockItemModel":
         if not isinstance(superseded, DoublePipeBlockItemModelVersion0):
-            raise ValueError(f"`superseded` is not of type {DoublePipeBlockItemModelVersion0.__name__}")
+            raise ValueError(
+                f"`superseded` is not of type {DoublePipeBlockItemModelVersion0.__name__}"
+            )
 
-        blockItemModel = _bim.createBlockItemBaseModelFromLegacyModel(superseded)
+        blockItemModel = _bim.createBlockItemBaseModelFromLegacyModel(
+            superseded
+        )
 
         return DoublePipeBlockItemModel(
             superseded.BlockName,

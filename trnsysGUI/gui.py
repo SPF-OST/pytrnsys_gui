@@ -15,7 +15,9 @@ def main():
     arguments = _args.getArgsOrExit()
 
     logFilePath = _getLogFilePath()
-    logger = _ulog.getOrCreateCustomLogger("root", arguments.logLevel, logFilePath)
+    logger = _ulog.getOrCreateCustomLogger(
+        "root", arguments.logLevel, logFilePath
+    )
 
     _registerExceptionHook(logger)
 
@@ -32,14 +34,14 @@ def main():
         return
 
     import trnsysGUI.common.cancelled as _ccl  # pylint: disable=import-outside-toplevel
-    import trnsysGUI.mainWindow as _mw  # pylint: disable=import-outside-toplevel
     import trnsysGUI.project as _prj  # pylint: disable=import-outside-toplevel
-    import trnsysGUI.tracing as trc  # pylint: disable=import-outside-toplevel
 
     maybeCancelled = _prj.getProject()
     if _ccl.isCancelled(maybeCancelled):
         return
     project = _ccl.value(maybeCancelled)
+
+    import trnsysGUI.mainWindow as _mw  # pylint: disable=import-outside-toplevel
 
     mainWindow = _mw.MainWindow(logger, project)
     mainWindow.start()
@@ -55,6 +57,8 @@ def main():
         mainWindow.ensureSettingsExist()
         mainWindow.loadTrnsysPath()
 
+        import trnsysGUI.tracing as trc  # pylint: disable=import-outside-toplevel
+
         tracer = trc.createTracer(arguments.shallTrace)
         tracer.run(app.exec)
     finally:
@@ -67,7 +71,9 @@ def _getLogFilePath():
 
 def _registerExceptionHook(logger: _log.Logger) -> None:
     def exceptionHook(exceptionType, value, traceback):
-        logger.critical("Uncaught exception", exc_info=(exceptionType, value, traceback))
+        logger.critical(
+            "Uncaught exception", exc_info=(exceptionType, value, traceback)
+        )
 
         for handler in logger.handlers:
             handler.flush()

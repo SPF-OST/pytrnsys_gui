@@ -4,11 +4,20 @@ import dataclasses_jsonschema as _dcj
 
 from trnsysGUI import createSinglePipePortItem as _cspi, internalPiping as _ip
 from trnsysGUI.massFlowSolver import networkModel as _mfn
-from trnsysGUI.pumpsAndTaps import _pumpsAndTabsBase as _ptb, serialization as _ser
+from trnsysGUI.pumpsAndTaps import (
+    _pumpsAndTabsBase as _ptb,
+    serialization as _ser,
+)
 
 
 class TapBase(_ptb.PumpsAndTabsBase):
-    def __init__(self, trnsysType: str, editor, direction: _mfn.PortItemDirection, displayName: str) -> None:
+    def __init__(
+        self,
+        trnsysType: str,
+        editor,
+        direction: _mfn.PortItemDirection,
+        displayName: str,
+    ) -> None:
         super().__init__(trnsysType, editor, displayName)
 
         self._modelTerminal: _mfn.TerminalWithPrescribedFlowBase
@@ -17,12 +26,16 @@ class TapBase(_ptb.PumpsAndTabsBase):
             self._graphicalPortItem = _cspi.createSinglePipePortItem("o", self)
             self.outputs.append(self._graphicalPortItem)
             modelPortItem = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
-            self._modelTerminal = _mfn.TerminalWithPrescribedPosFlow(modelPortItem)
+            self._modelTerminal = _mfn.TerminalWithPrescribedPosFlow(
+                modelPortItem
+            )
         elif direction == _mfn.PortItemDirection.INPUT:
             self._graphicalPortItem = _cspi.createSinglePipePortItem("i", self)
             self.inputs.append(self._graphicalPortItem)
             modelPortItem = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
-            self._modelTerminal = _mfn.TerminalWithPrescribedNegFlow(modelPortItem)
+            self._modelTerminal = _mfn.TerminalWithPrescribedNegFlow(
+                modelPortItem
+            )
         else:
             raise AssertionError("Shouldn't get here.")
 
@@ -30,13 +43,16 @@ class TapBase(_ptb.PumpsAndTabsBase):
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         internalPiping = _ip.InternalPiping(
-            [self._modelTerminal], {self._modelTerminal.portItem: self._graphicalPortItem}
+            [self._modelTerminal],
+            {self._modelTerminal.portItem: self._graphicalPortItem},
         )
 
         return internalPiping
 
     def encode(self) -> _tp.Tuple[str, _dcj.JsonDict]:
-        blockItemWithPrescribedMassFlowModel = self._createBlockItemWithPrescribedMassFlowForEncode()
+        blockItemWithPrescribedMassFlowModel = (
+            self._createBlockItemWithPrescribedMassFlowForEncode()
+        )
 
         terminalModel = _ser.TerminalWithPrescribedMassFlowModel(
             self.name,
@@ -54,7 +70,9 @@ class TapBase(_ptb.PumpsAndTabsBase):
 
         self.setDisplayName(model.BlockDisplayName)
         self._graphicalPortItem.id = model.portId
-        self._applyBlockItemModelWithPrescribedMassFlowForDecode(model.blockItemWithPrescribedMassFlow)
+        self._applyBlockItemModelWithPrescribedMassFlowForDecode(
+            model.blockItemWithPrescribedMassFlow
+        )
 
         resBlockList.append(self)
 

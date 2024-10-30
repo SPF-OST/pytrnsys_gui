@@ -29,11 +29,17 @@ class MergeLoopsDialog(_qtw.QDialog, _uigen.Ui_mergeLoopsDialog):
         self._occupiedNames = occupiedNames
         self._fluids = fluids
 
-        self.mergeSummary: _common.Cancellable[_common.MergedLoopSummary] = "cancelled"
+        self.mergeSummary: _common.Cancellable[_common.MergedLoopSummary] = (
+            "cancelled"
+        )
 
         needsDifferingFluidsWarning = self._loop1.fluid != self._loop2.fluid
-        self.differingFluidsWarningWidget.setVisible(needsDifferingFluidsWarning)
-        self.differingFluidsWarningLabel.setVisible(needsDifferingFluidsWarning)
+        self.differingFluidsWarningWidget.setVisible(
+            needsDifferingFluidsWarning
+        )
+        self.differingFluidsWarningLabel.setVisible(
+            needsDifferingFluidsWarning
+        )
 
         self._configureNameComboBox()
         self._configureFluidComboBox()
@@ -51,7 +57,11 @@ class MergeLoopsDialog(_qtw.QDialog, _uigen.Ui_mergeLoopsDialog):
                 or self._loop2.name.isUserDefined
                 or nameValue not in [self._loop1.name and self._loop2.name]
             )
-            name = _model.UserDefinedName(nameValue) if isUserDefined else _model.AutomaticallyGeneratedName(nameValue)
+            name = (
+                _model.UserDefinedName(nameValue)
+                if isUserDefined
+                else _model.AutomaticallyGeneratedName(nameValue)
+            )
 
             fluid = self.fluidComboBox.currentData()
 
@@ -70,7 +80,9 @@ class MergeLoopsDialog(_qtw.QDialog, _uigen.Ui_mergeLoopsDialog):
 
     def _configureNameComboBox(self) -> None:
         def onCurrentTextChanged(newName: str) -> None:
-            self._setWarningsAndApplyEnabledForValues(newName, self.fluidComboBox.currentData())
+            self._setWarningsAndApplyEnabledForValues(
+                newName, self.fluidComboBox.currentData()
+            )
 
         self.nameComboBox.currentTextChanged.connect(onCurrentTextChanged)
 
@@ -81,7 +93,11 @@ class MergeLoopsDialog(_qtw.QDialog, _uigen.Ui_mergeLoopsDialog):
     def _configureFluidComboBox(self) -> None:
         def onCurrentIndexChanged(newIndex: int) -> None:
             name = self.nameComboBox.currentText()
-            _fluid = self.fluidComboBox.itemData(newIndex) if newIndex >= 0 else None
+            _fluid = (
+                self.fluidComboBox.itemData(newIndex)
+                if newIndex >= 0
+                else None
+            )
             self._setWarningsAndApplyEnabledForValues(name, _fluid)
 
         self.fluidComboBox.currentIndexChanged.connect(onCurrentIndexChanged)
@@ -91,7 +107,9 @@ class MergeLoopsDialog(_qtw.QDialog, _uigen.Ui_mergeLoopsDialog):
         areFluidsSame = fluid1 == fluid2
         if areFluidsSame:
             fluid = fluid1
-            self._addLoopFluidItemToComboBox(fluid, [self._loop1.name.value, self._loop2.name.value])
+            self._addLoopFluidItemToComboBox(
+                fluid, [self._loop1.name.value, self._loop2.name.value]
+            )
         else:
             self.fluidComboBox.addItem("", None)
             self._addLoopFluidItemToComboBox(fluid1, [self._loop1.name.value])
@@ -102,13 +120,17 @@ class MergeLoopsDialog(_qtw.QDialog, _uigen.Ui_mergeLoopsDialog):
         for fluid in sortedOtherFluids:
             self.fluidComboBox.addItem(fluid.name, fluid)
 
-    def _setWarningsAndApplyEnabledForValues(self, name: str, fluid: _tp.Optional[_model.Fluid]) -> None:
+    def _setWarningsAndApplyEnabledForValues(
+        self, name: str, fluid: _tp.Optional[_model.Fluid]
+    ) -> None:
         isNameTaken = name in self._occupiedNames
         isNameEmpty = not name
         if isNameEmpty:
             self.invalidNameWarningWidget.setToolTip("You must specify a name")
         elif isNameTaken:
-            self.invalidNameWarningWidget.setToolTip("This name is already in use")
+            self.invalidNameWarningWidget.setToolTip(
+                "This name is already in use"
+            )
 
         isNameValid = not isNameEmpty and not isNameTaken
         self.invalidNameWarningWidget.setVisible(not isNameValid)
@@ -120,7 +142,9 @@ class MergeLoopsDialog(_qtw.QDialog, _uigen.Ui_mergeLoopsDialog):
         isApplyEnabled = isNameValid and isAFluidSelected
         self.applyButton.setEnabled(isApplyEnabled)
 
-    def _addLoopFluidItemToComboBox(self, fluid: _model.Fluid, loopNamesWithFluid: _tp.Sequence[str]) -> None:
+    def _addLoopFluidItemToComboBox(
+        self, fluid: _model.Fluid, loopNamesWithFluid: _tp.Sequence[str]
+    ) -> None:
         sortedNames = sorted(loopNamesWithFluid)
         text = f"{fluid.name} ({', '.join(sortedNames)})"
         self.fluidComboBox.addItem(text, fluid)

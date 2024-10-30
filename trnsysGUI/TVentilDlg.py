@@ -18,7 +18,12 @@ import trnsysGUI.names.rename as _rename
 
 
 class TVentilDlg(_ndialog.ChangeNameDialogBase):
-    def __init__(self, ventil: _vnt.TVentil, renameHelper: _rename.RenameHelper, projectFolder: str) -> None:
+    def __init__(
+        self,
+        ventil: _vnt.TVentil,
+        renameHelper: _rename.RenameHelper,
+        projectFolder: str,
+    ) -> None:
         super().__init__(ventil, renameHelper, _pl.Path(projectFolder))
 
         self._blockItem = ventil
@@ -49,7 +54,9 @@ class TVentilDlg(_ndialog.ChangeNameDialogBase):
         flipLayout.addWidget(self.complexDiv)
 
         textLayout = QHBoxLayout()
-        self.warningLabel = QLabel("<b>Selecting tempering valve will always set Valve Position to 0.</b>")
+        self.warningLabel = QLabel(
+            "<b>Selecting tempering valve will always set Valve Position to 0.</b>"
+        )
         textLayout.addWidget(self.warningLabel)
 
         buttonLayout = QHBoxLayout()
@@ -70,7 +77,9 @@ class TVentilDlg(_ndialog.ChangeNameDialogBase):
         self.positionMassFlowSolver.setSingleStep(0.1)
         self.positionMassFlowSolver.setProperty("value", self.valvePosition)
         self.positionMassFlowSolver.setRange(0, 1.0)
-        self.positionMassFlowSolver.valueChanged.connect(self.positionMassFlowSolverChanged)
+        self.positionMassFlowSolver.valueChanged.connect(
+            self.positionMassFlowSolverChanged
+        )
         positionLayout.addWidget(self.positionMassFlowSolverLabel)
         positionLayout.addWidget(self.positionMassFlowSolver)
 
@@ -102,7 +111,9 @@ class TVentilDlg(_ndialog.ChangeNameDialogBase):
 
     def setNewComplexState(self, state):
         self._blockItem.setComplexDiv(state)
-        self._blockItem.posLabel.setPlainText(str(self._blockItem.positionForMassFlowSolver))
+        self._blockItem.posLabel.setPlainText(
+            str(self._blockItem.positionForMassFlowSolver)
+        )
 
     def positionMassFlowSolverChanged(self, value):
         if self._blockItem.isTempering:

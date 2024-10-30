@@ -25,7 +25,9 @@ class _VersionedPackage:
     def create(cls, serializedVersionedPackage: str) -> "_VersionedPackage":
         match = cls._VERSIONED_PACKAGE_REGEX.match(serializedVersionedPackage)
         if not match:
-            raise ValueError(f'Not a package version specification: "{serializedVersionedPackage}"')
+            raise ValueError(
+                f'Not a package version specification: "{serializedVersionedPackage}"'
+            )
 
         name = match.group(1)
         version = match.group(2)
@@ -68,7 +70,9 @@ def _isDeveloperInstall() -> _res.Result[bool]:
     version = _res.value(versionResult)
     localVersionPart = version.local
 
-    isDeveloperInstall = localVersionPart.endswith("dev") if localVersionPart else False
+    isDeveloperInstall = (
+        localVersionPart.endswith("dev") if localVersionPart else False
+    )
 
     return isDeveloperInstall
 
@@ -78,12 +82,16 @@ def _getPytrnsysVersion() -> _res.Result[_pver.Version]:
     try:
         return _pver.parse(serializedVersion)
     except _pver.InvalidVersion as invalidVersion:
-        error = _res.error(f"Could not parse version of `pytrnsys-gui`:\n\t{invalidVersion}")
+        error = _res.error(
+            f"Could not parse version of `pytrnsys-gui`:\n\t{invalidVersion}"
+        )
         return error
 
 
 def _checkRequirements() -> _res.Result[None]:
-    release3rdPartyTxtFilePath = _BASE_DIRECTORY / "requirements" / "release-3rd-party.txt"
+    release3rdPartyTxtFilePath = (
+        _BASE_DIRECTORY / "requirements" / "release-3rd-party.txt"
+    )
 
     requiredVersions = _getRequiredVersions(release3rdPartyTxtFilePath)
 
@@ -94,7 +102,9 @@ def _checkRequirements() -> _res.Result[None]:
 
     missingVersions = requiredVersions - installedVersions
     if missingVersions:
-        formattedMissingVersions = "\n".join(f"\t{v}" for v in sorted(missingVersions))
+        formattedMissingVersions = "\n".join(
+            f"\t{v}" for v in sorted(missingVersions)
+        )
         errorMessage = f"""\
 The following packages are required but not installed:
 {formattedMissingVersions}
@@ -121,15 +131,24 @@ followed by
     return None
 
 
-def _getInstalledNonEditableVersions() -> _res.Result[_tp.Set[_VersionedPackage]]:
+def _getInstalledNonEditableVersions() -> (
+    _res.Result[_tp.Set[_VersionedPackage]]
+):
     args = [_sys.executable, "-m", "pip", "freeze", "--no-color"]
-    completedPipFreezeProcess = _sp.run(args, capture_output=True, text=True, check=True)
+    completedPipFreezeProcess = _sp.run(
+        args, capture_output=True, text=True, check=True
+    )
     serializedInstalledVersions = completedPipFreezeProcess.stdout.split("\n")
     serializedNonEditableInstalledVersions = [
-        v for v in serializedInstalledVersions if v.strip() and not v.startswith("-e")
+        v
+        for v in serializedInstalledVersions
+        if v.strip() and not v.startswith("-e")
     ]
     try:
-        installedVersions = {_VersionedPackage.create(v) for v in serializedNonEditableInstalledVersions}
+        installedVersions = {
+            _VersionedPackage.create(v)
+            for v in serializedNonEditableInstalledVersions
+        }
     except ValueError as valueError:
         errorMessage = f"""\
 Could not parse `pip` freeze output:
@@ -145,7 +164,9 @@ Please try updating `pip` from within your virtual environment like so:
     return installedVersions
 
 
-def _getRequiredVersions(release3rdPartyTxtFilePath: _pl.Path) -> _tp.Set[_VersionedPackage]:
+def _getRequiredVersions(
+    release3rdPartyTxtFilePath: _pl.Path,
+) -> _tp.Set[_VersionedPackage]:
     lines = release3rdPartyTxtFilePath.read_text().split()
 
     requiredVersions = set()
@@ -161,7 +182,9 @@ def _getRequiredVersions(release3rdPartyTxtFilePath: _pl.Path) -> _tp.Set[_Versi
 
 def _generateCodeFromQtCreatorUiFiles():
     uiGenerateFilePath = (
-        _pl.Path(__file__).parent.parent / "dev-tools" / "generateGuiClassesFromQtCreatorStudioUiFiles.py"
+        _pl.Path(__file__).parent.parent
+        / "dev-tools"
+        / "generateGuiClassesFromQtCreatorStudioUiFiles.py"
     )
     cmd = [_sys.executable, uiGenerateFilePath]
     _sp.run(cmd, check=True)

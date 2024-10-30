@@ -14,7 +14,9 @@ import trnsysGUI.blockItemGraphicItemMixins as _gimx
 import trnsysGUI.blockItemHasInternalPiping as _bip
 
 
-class GroundSourceHx(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin):
+class GroundSourceHx(
+    _bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin
+):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
@@ -31,7 +33,9 @@ class GroundSourceHx(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicI
 
     @classmethod
     @_tp.override
-    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+    def _getImageAccessor(
+        cls,
+    ) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.GROUND_SOURCE_HX_SVG
 
     def changeSize(self):
@@ -56,8 +60,12 @@ class GroundSourceHx(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicI
 
         self.origInputsPos = [[w - delta, 0]]
         self.origOutputsPos = [[delta, 0]]
-        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
-        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
+        self.inputs[0].setPos(
+            self.origInputsPos[0][0], self.origInputsPos[0][1]
+        )
+        self.outputs[0].setPos(
+            self.origOutputsPos[0][0], self.origOutputsPos[0][1]
+        )
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
@@ -69,4 +77,6 @@ class GroundSourceHx(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicI
         outputPort = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
         pipe = _mfn.Pipe(inputPort, outputPort)
 
-        return trnsysGUI.internalPiping.InternalPiping([pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]})
+        return trnsysGUI.internalPiping.InternalPiping(
+            [pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]}
+        )

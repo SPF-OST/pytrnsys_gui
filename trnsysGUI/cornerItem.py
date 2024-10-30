@@ -35,7 +35,9 @@ class CornerItem(_qtw.QGraphicsEllipseItem):
         if change != self.ItemScenePositionHasChanged:
             return super().itemChange(change, value)
 
-        segmentBefore, segmentAfter = self._connection.getPreviousAndNextSegment(self.node)
+        segmentBefore, segmentAfter = (
+            self._connection.getPreviousAndNextSegment(self.node)
+        )
 
         beforeFromPos, afterToPos = self._getBeforeFromPosAndAfterToPos()
 
@@ -47,16 +49,28 @@ class CornerItem(_qtw.QGraphicsEllipseItem):
 
         return value
 
-    def _getBeforeFromPosAndAfterToPos(self) -> _tp.Tuple[_qtc.QPointF, _qtc.QPointF]:
+    def _getBeforeFromPosAndAfterToPos(
+        self,
+    ) -> _tp.Tuple[_qtc.QPointF, _qtc.QPointF]:
         fromPort = self._connection.fromPort
         toPort = self._connection.toPort
 
-        segmentBefore, segmentAfter = self._connection.getPreviousAndNextSegment(self.node)
+        segmentBefore, segmentAfter = (
+            self._connection.getPreviousAndNextSegment(self.node)
+        )
 
         previousNode = self.node.prevN()
         nextNode = self.node.nextN()
 
-        beforeFromPos = fromPort.scenePos() if segmentBefore.isFirstSegment() else previousNode.parent.scenePos()
-        afterToPos = toPort.scenePos() if segmentAfter.isLastSegment() else nextNode.parent.scenePos()
+        beforeFromPos = (
+            fromPort.scenePos()
+            if segmentBefore.isFirstSegment()
+            else previousNode.parent.scenePos()
+        )
+        afterToPos = (
+            toPort.scenePos()
+            if segmentAfter.isLastSegment()
+            else nextNode.parent.scenePos()
+        )
 
         return beforeFromPos, afterToPos

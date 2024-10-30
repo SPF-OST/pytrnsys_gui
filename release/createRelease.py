@@ -27,7 +27,10 @@ BUILD_DIR_PATH = RELEASE_DIR_PATH / "build"
 DIST_DIR_PATH = BUILD_DIR_PATH / "pytrnsys"
 SITE_PACKAGES_DIR_PATH = DIST_DIR_PATH / "site-packages"
 
-PACKAGE_DATA_DIR_NAMES_TO_COPY_TO_DIST_DIR = ["pytrnsys_data", "pytrnsys_gui_data"]
+PACKAGE_DATA_DIR_NAMES_TO_COPY_TO_DIST_DIR = [
+    "pytrnsys_data",
+    "pytrnsys_gui_data",
+]
 
 RELEASE_FILE_NAMES_TO_COPY_TO_DIST_DIR = [
     "pytrnsys.bat",
@@ -69,7 +72,9 @@ def _downloadAndExtractEmbeddablePythonDist() -> _pl.Path:
     embeddableZipFilePath = BUILD_DIR_PATH / embeddableZipFileName
 
     response: _htc.HTTPResponse
-    with _urlreq.urlopen(url) as response, embeddableZipFilePath.open("bw") as embeddableZipFile:
+    with _urlreq.urlopen(url) as response, embeddableZipFilePath.open(
+        "bw"
+    ) as embeddableZipFile:
         embeddableZipFile.write(response.read())
 
     DIST_DIR_PATH.mkdir()
@@ -81,13 +86,23 @@ def _downloadAndExtractEmbeddablePythonDist() -> _pl.Path:
     return embeddablePythonDistDirPath
 
 
-def _copyTkTclLibsToEmbeddablePythonDistDir(embeddablePythonDistDirPath) -> None:
-    for relativeFileOrDirPathToCopy in RELATIVE_TK_TCL_FILE_OR_DIR_PATHS_TO_COPY:
-        absoluteSourceFileOrDirPath = PYTHON_312_DIST_DIR_PATH / relativeFileOrDirPathToCopy
-        absoluteTargetFileOrDirPath = embeddablePythonDistDirPath / relativeFileOrDirPathToCopy.name
+def _copyTkTclLibsToEmbeddablePythonDistDir(
+    embeddablePythonDistDirPath,
+) -> None:
+    for (
+        relativeFileOrDirPathToCopy
+    ) in RELATIVE_TK_TCL_FILE_OR_DIR_PATHS_TO_COPY:
+        absoluteSourceFileOrDirPath = (
+            PYTHON_312_DIST_DIR_PATH / relativeFileOrDirPathToCopy
+        )
+        absoluteTargetFileOrDirPath = (
+            embeddablePythonDistDirPath / relativeFileOrDirPathToCopy.name
+        )
 
         if absoluteSourceFileOrDirPath.is_dir():
-            _sh.copytree(absoluteSourceFileOrDirPath, absoluteTargetFileOrDirPath)
+            _sh.copytree(
+                absoluteSourceFileOrDirPath, absoluteTargetFileOrDirPath
+            )
         else:
             containingDirPath = absoluteTargetFileOrDirPath.parent
             containingDirPath.mkdir(parents=True, exist_ok=True)

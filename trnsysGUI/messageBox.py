@@ -3,7 +3,10 @@ from typing import Optional, List
 
 from PyQt5.QtWidgets import QMessageBox
 
-from trnsysGUI.constants import DEFAULT_MESSAGE_BOX_TITLE, DEFAULT_MESSAGE_BOX_MESSAGE
+from trnsysGUI.constants import (
+    DEFAULT_MESSAGE_BOX_TITLE,
+    DEFAULT_MESSAGE_BOX_MESSAGE,
+)
 
 
 class MessageBox:

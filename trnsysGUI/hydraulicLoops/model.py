@@ -55,13 +55,17 @@ class HydraulicLoop:
 
     def addConnection(self, connection: _spc.SinglePipeConnection) -> None:  # type: ignore[name-defined]
         if self.containsConnection(connection):
-            raise ValueError(f"Connection '{connection.displayName}' already part of hydraulic loop '{self.name}'.")
+            raise ValueError(
+                f"Connection '{connection.displayName}' already part of hydraulic loop '{self.name}'."
+            )
 
         self.connections.append(connection)
 
     def removeConnection(self, connection: _spc.SinglePipeConnection) -> None:  # type: ignore[name-defined]
         if not self.containsConnection(connection):
-            raise ValueError(f"Connection '{connection.displayName}' does not belong to hydraulic loop {self.name}.")
+            raise ValueError(
+                f"Connection '{connection.displayName}' does not belong to hydraulic loop {self.name}."
+            )
 
         self.connections.remove(connection)
 
@@ -92,7 +96,9 @@ class HydraulicLoops:
 
         loops = []
         for serializedLoop in serializedLoops:
-            loop = cls._createLoop(serializedLoop, connectionsByTrnsysId, fluids)
+            loop = cls._createLoop(
+                serializedLoop, connectionsByTrnsysId, fluids
+            )
             loops.append(loop)
 
         return HydraulicLoops(loops)
@@ -109,9 +115,14 @@ class HydraulicLoops:
         fluid = fluids.getFluid(serializedLoop.fluidName)
         assert fluid, f"Unknown fluid {serializedLoop.fluidName}"
 
-        connections = [connectionsByTrnsysId[i] for i in serializedLoop.connectionsTrnsysId]
+        connections = [
+            connectionsByTrnsysId[i]
+            for i in serializedLoop.connectionsTrnsysId
+        ]
 
-        loop = HydraulicLoop(name, fluid, serializedLoop.connectionsDefinitionMode, connections)
+        loop = HydraulicLoop(
+            name, fluid, serializedLoop.connectionsDefinitionMode, connections
+        )
         return loop
 
     def toJson(self) -> _tp.Sequence[_tp.Dict]:
@@ -134,7 +145,11 @@ class HydraulicLoops:
     def _createName(serializedLoop: _ser.HydraulicLoop) -> Name:
         isUserDefinedName = serializedLoop.hasUserDefinedName
         nameValue = serializedLoop.name
-        name = UserDefinedName(nameValue) if isUserDefinedName else AutomaticallyGeneratedName(nameValue)
+        name = (
+            UserDefinedName(nameValue)
+            if isUserDefinedName
+            else AutomaticallyGeneratedName(nameValue)
+        )
         return name
 
     def getLoopForExistingConnection(
@@ -145,12 +160,16 @@ class HydraulicLoops:
         return loop
 
     def getLoop(self, name: str) -> _tp.Optional[HydraulicLoop]:
-        loop = _getSingleOrNone(l for l in self.hydraulicLoops if l.name.value == name)
+        loop = _getSingleOrNone(
+            l for l in self.hydraulicLoops if l.name.value == name
+        )
         return loop
 
     def addLoop(self, loop: HydraulicLoop) -> None:
         if self.getLoop(loop.name.value):
-            raise ValueError(f"Loop with name '{loop.name.value}' already exists.")
+            raise ValueError(
+                f"Loop with name '{loop.name.value}' already exists."
+            )
 
         self.hydraulicLoops.append(loop)
 
@@ -171,8 +190,16 @@ class HydraulicLoops:
 
 
 class Fluids:
-    WATER = _ser.Fluid("water", specificHeatCapacityInJPerKgK=Variable("CPWAT_SI"), densityInKgPerM3=Variable("RHOWAT"))
-    BRINE = _ser.Fluid("brine", specificHeatCapacityInJPerKgK=Variable("CPBRI_SI"), densityInKgPerM3=Variable("RHOBRI"))
+    WATER = _ser.Fluid(
+        "water",
+        specificHeatCapacityInJPerKgK=Variable("CPWAT_SI"),
+        densityInKgPerM3=Variable("RHOWAT"),
+    )
+    BRINE = _ser.Fluid(
+        "brine",
+        specificHeatCapacityInJPerKgK=Variable("CPBRI_SI"),
+        densityInKgPerM3=Variable("RHOBRI"),
+    )
 
     def __init__(self, fluids: _tp.Sequence[_ser.Fluid]) -> None:
         duplicateNames = _getDuplicates(f.name for f in fluids)
@@ -221,19 +248,25 @@ class _SupportsLessThan(_tp.Protocol):
 _SupportsLessThanT = _tp.TypeVar("_SupportsLessThanT", bound=_SupportsLessThan)
 
 
-def _getDuplicates(values: _tp.Iterable[_SupportsLessThanT]) -> _tp.Sequence[_SupportsLessThanT]:
+def _getDuplicates(
+    values: _tp.Iterable[_SupportsLessThanT],
+) -> _tp.Sequence[_SupportsLessThanT]:
     sortedValues = sorted(values)
     groupedValues = _it.groupby(sortedValues)
     duplicateValues = [k for k, g in groupedValues if len(list(g)) > 1]
     return duplicateValues
 
 
-def _getSingleOrNone(values: _tp.Iterable[_TValue_co]) -> _tp.Optional[_TValue_co]:
+def _getSingleOrNone(
+    values: _tp.Iterable[_TValue_co],
+) -> _tp.Optional[_TValue_co]:
     valuesList = [*values]
     if not valuesList:
         return None
 
     numberOfValues = len(valuesList)
-    assert numberOfValues == 1, f"Expected 0 or 1 value, but got {numberOfValues}."
+    assert (
+        numberOfValues == 1
+    ), f"Expected 0 or 1 value, but got {numberOfValues}."
 
     return valuesList[0]

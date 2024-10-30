@@ -8,7 +8,9 @@ import trnsysGUI.blockItemGraphicItemMixins as _gimx
 import trnsysGUI.blockItemHasInternalPiping as _bip
 
 
-class Crystalizer(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin):
+class Crystalizer(
+    _bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin
+):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
@@ -25,7 +27,9 @@ class Crystalizer(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
 
     @classmethod
     @_tp.override
-    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+    def _getImageAccessor(  # pylint: disable=arguments-differ
+        cls,
+    ) -> _img.SvgImageAccessor:
         return _img.CRYSTALIZER_SVG
 
     def changeSize(self):
@@ -35,8 +39,12 @@ class Crystalizer(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
         self.origOutputsPos = [[120, 20]]
 
         # pylint: disable=duplicate-code  # 2
-        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
-        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
+        self.inputs[0].setPos(
+            self.origInputsPos[0][0], self.origInputsPos[0][1]
+        )
+        self.outputs[0].setPos(
+            self.origOutputsPos[0][0], self.origOutputsPos[0][1]
+        )
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
@@ -46,5 +54,10 @@ class Crystalizer(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
         outputPort = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
 
         crystalizer = _mfn.Pipe(inputPort, outputPort)
-        modelPortItemsToGraphicalPortItem = {inputPort: self.inputs[0], outputPort: self.outputs[0]}
-        return _ip.InternalPiping([crystalizer], modelPortItemsToGraphicalPortItem)
+        modelPortItemsToGraphicalPortItem = {
+            inputPort: self.inputs[0],
+            outputPort: self.outputs[0],
+        }
+        return _ip.InternalPiping(
+            [crystalizer], modelPortItemsToGraphicalPortItem
+        )

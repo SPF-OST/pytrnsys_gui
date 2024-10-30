@@ -42,12 +42,16 @@ class RegimeExporter:
         temperaturesPintFileName = f"{self.projectName}_T.prt"
         return self.projectDir / temperaturesPintFileName
 
-    def export(self, onlyTheseRegimes: _tp.Optional[_tp.Sequence[str]] = None) -> None:
+    def export(
+        self, onlyTheseRegimes: _tp.Optional[_tp.Sequence[str]] = None
+    ) -> None:
 
         if not onlyTheseRegimes:
             self._makeDiagramFiles()
 
-        regimeValues = _gdr.getRegimes(self.projectDir / self.regimesFileName, onlyTheseRegimes)
+        regimeValues = _gdr.getRegimes(
+            self.projectDir / self.regimesFileName, onlyTheseRegimes
+        )
         relevantNames = list(regimeValues.columns)
         relevantBlockItems = self.getRelevantBlockItems(relevantNames)
 
@@ -59,17 +63,23 @@ class RegimeExporter:
         self._printDiagramToPDF(pdfName)
         self._printDiagramToSVG(svgName)
 
-    def getRelevantBlockItems(self, relevantNames: _tp.Sequence[str]) -> _tp.Sequence[_BlockItem]:
+    def getRelevantBlockItems(
+        self, relevantNames: _tp.Sequence[str]
+    ) -> _tp.Sequence[_BlockItem]:
         blockItemsAndConnections = self.mainWindow.editor.trnsysObj
 
         pumpsAndValvesAndTaps = [
-            b for b in blockItemsAndConnections if isinstance(b, _BlockItems) and b.displayName in relevantNames
+            b
+            for b in blockItemsAndConnections
+            if isinstance(b, _BlockItems) and b.displayName in relevantNames
         ]
 
         return pumpsAndValvesAndTaps
 
     def _simulateAndVisualizeMassFlows(
-        self, relevantBlockItems: _tp.Sequence[_BlockItem], regimeValues: _pd.DataFrame
+        self,
+        relevantBlockItems: _tp.Sequence[_BlockItem],
+        regimeValues: _pd.DataFrame,
     ) -> None:
 
         for regimeName in regimeValues.index:
@@ -96,14 +106,20 @@ class RegimeExporter:
             massFlowSolverVisualizer.close()
 
     @staticmethod
-    def _adjustPumpsAndValves(relevantBlockItems: _tp.Sequence[_BlockItem], regimeRow: _pd.Series) -> None:
+    def _adjustPumpsAndValves(
+        relevantBlockItems: _tp.Sequence[_BlockItem], regimeRow: _pd.Series
+    ) -> None:
 
         for blockItem in relevantBlockItems:
             blockItemName = blockItem.displayName
             desiredValue = regimeRow[blockItemName]
 
             match blockItem:
-                case _pump.Pump() | _tb.TapBase() | _ssb.SourceSinkBase() as hasMassFlowRate:
+                case (
+                    _pump.Pump()
+                    | _tb.TapBase()
+                    | _ssb.SourceSinkBase() as hasMassFlowRate
+                ):
                     hasMassFlowRate.massFlowRateInKgPerH = desiredValue
                 case _tv.TVentil() as valve:
                     valve.positionForMassFlowSolver = desiredValue

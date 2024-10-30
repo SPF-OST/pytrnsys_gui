@@ -23,5 +23,7 @@ class TestGetDoublePipeEnergyBalanceEquations:
         assert equations == ""
 
     def testMixing(self):
-        equations = _ge.getDoublePipeEnergyBalanceEquations([SIMULATED_PIPE, DUMMY_PIPE])
+        equations = _ge.getDoublePipeEnergyBalanceEquations(
+            [SIMULATED_PIPE, DUMMY_PIPE]
+        )
         assert equations == SIMULATED_EQUATIONS
