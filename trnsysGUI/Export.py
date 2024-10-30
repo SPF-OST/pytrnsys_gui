@@ -23,6 +23,7 @@ import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.temperatures as _temps
 import trnsysGUI.temperatures.hydraulic as _thyd
 import trnsysGUI.pumpsAndTaps.pump as _pump
+import trnsysGUI.common as _com
 
 _UNUSED_INDEX = 0
 
@@ -187,8 +188,17 @@ ddTcwOffset = 36 ! Days of minimum surface temperature
         f += "************************\n"
 
         pumps = [ip for ip in self._hasInternalPipings if isinstance(ip, _pump.Pump)]
+
         for pump in pumps:
-            f += pump.exportPumpPowerConsumption()
+
+            inputPort = _com.getSingle(pump.inputs)
+            connection = inputPort.getConnectionOrNone()
+            if not connection:
+                # error: can only export pump powers if diagram fully connected
+                pass
+            loop = _com.getSingle(l for l in self._hydraulicLoops if connection in l.connections)
+
+            f += pump.exportPumpPowerConsumption(loop)
 
         return f
 

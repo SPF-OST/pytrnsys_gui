@@ -632,7 +632,7 @@ Tcw=1
         exporter = self._createExporter()
 
         fullExportText += exporter.exportMassFlows()
-        fullExportText += exporter.exportPumpPowerConsumption()
+        fullExportText += exporter.exportPumpConsumption()
         fullExportText += exporter.exportDivSetting(simulationUnit - 10)
 
         self.logger.info("------------------------> END OF EXPORT <------------------------")
