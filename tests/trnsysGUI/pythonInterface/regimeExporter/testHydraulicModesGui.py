@@ -10,6 +10,9 @@ import trnsysGUI.mainWindow as mw
 import trnsysGUI.menus.hydraulicModesMenu.hydraulicModes as hm
 import trnsysGUI.project as prj
 from trnsysGUI import constants
+from trnsysGUI.pythonInterface.regimeExporter.renderDiagramOnPDFfromPython import (
+    RegimeExporter,
+)
 from trnsysGUI.recentProjectsHandler import RecentProjectsHandler
 
 
@@ -38,6 +41,11 @@ class TestHydraulicModesGui:
             _qtw.QFileDialog,
             "getOpenFileName",
             lambda caption, filter, directory: (csv, "*.csv"),
+        )
+        monkeypatch.setattr(
+            RegimeExporter,
+            "_makeDiagramFiles",
+            lambda *args, **kwargs: None,
         )
         logger = _ulog.getOrCreateCustomLogger("root", "INFO")
         mainWindow = mw.MainWindow(logger, project)  # type: ignore[attr-defined]

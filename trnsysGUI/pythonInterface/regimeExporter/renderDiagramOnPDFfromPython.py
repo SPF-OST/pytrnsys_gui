@@ -51,7 +51,7 @@ class RegimeExporter:
     ) -> _tp.List[str]:
 
         if not onlyTheseRegimes:
-            self._makeNoFlowDiagramFiles()
+            self._makeDiagramFiles()
 
         regimeValues = _gdr.getRegimes(
             self.projectDir / self.regimesFileName, onlyTheseRegimes
@@ -63,7 +63,7 @@ class RegimeExporter:
             relevantBlockItems, regimeValues
         )
 
-    def _makeNoFlowDiagramFiles(self, regimeName: str = "diagram") -> None:
+    def _makeDiagramFiles(self, regimeName: str = "diagram") -> None:
         pdfName = self.resultsDir / f"{self.projectName}_{regimeName}.pdf"
         svgName = self.resultsDir / f"{self.projectName}_{regimeName}.svg"
         self._printDiagramToPDF(pdfName)
@@ -108,7 +108,7 @@ class RegimeExporter:
             )
             massFlowSolverVisualizer.slider.setValue(timeStep)
 
-            self._makeNoFlowDiagramFiles(regimeName=regimeName)
+            self._makeDiagramFiles(regimeName=regimeName)
 
             massFlowSolverVisualizer.close()
         return failures

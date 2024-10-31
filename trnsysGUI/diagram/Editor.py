@@ -490,7 +490,7 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
         if self._doesFileExistAndDontOverwrite(
             exportPath, disableFileExistMsgb
         ):
-            return None
+            return
 
         self.logger.info("Printing the TRNSYS file...")
 

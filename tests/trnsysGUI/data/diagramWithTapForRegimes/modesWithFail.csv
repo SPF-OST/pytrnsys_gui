@@ -1,4 +1,4 @@
 regimeName,Pump5,WtSp1,WtTp3
 dummy_regime,500.0,500.0,500.0
 other_regime,600.0,600.0,600.0
-failure, 300.0, 200.0, 400.0
+failure,300.0,200.0,400.0
