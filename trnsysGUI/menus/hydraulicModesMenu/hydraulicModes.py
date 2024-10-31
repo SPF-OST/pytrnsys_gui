@@ -19,12 +19,12 @@ def createModesTemplate(project: prj.CreateOrLoadProject):
     modesTemplateFile = (
         f"{project.jsonFilePath.parent}/{constants.MODES_TEMPLATE_FILE_NAME}"
     )
-    if _pl.Path(modesTemplateFile).exists():
-        if (
-            MessageBox.create(messageText=constants.MODE_CSV_ALREADY_EXISTS)
-            == _qtw.QMessageBox.Cancel
-        ):
-            return
+    if (
+        _pl.Path(modesTemplateFile).exists()
+        and MessageBox.create(messageText=constants.MODE_CSV_ALREADY_EXISTS)
+        == _qtw.QMessageBox.Cancel
+    ):
+        return
     er.exportRegimeTemplate(project.jsonFilePath, modesTemplateFile)
     MessageBox.create(
         messageText=constants.MODES_CSV_CREATED,
