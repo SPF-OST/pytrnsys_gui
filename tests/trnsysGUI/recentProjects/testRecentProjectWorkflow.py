@@ -1,15 +1,15 @@
 from collections import deque as _deque
 
-import pytrnsys.utils.log as _ulog
 from PyQt5 import QtWidgets as _qtw
 
+import pytrnsys.utils.log as _ulog
 import trnsysGUI.common.cancelled as _ccl
+import trnsysGUI.dialogs.startup.dialog as _sd
 import trnsysGUI.mainWindow as mw
-from tests.trnsysGUI import constants
-from trnsysGUI.dialogs.startupDialog import StartupDialog
-from trnsysGUI.messageBox import MessageBox
-from trnsysGUI.project import getProject
-from trnsysGUI.recentProjectsHandler import RecentProjectsHandler
+import trnsysGUI.messageBox as _mb
+import trnsysGUI.project as _proj
+import trnsysGUI.recentProjectsHandler as _rph
+from .. import constants as _consts
 
 
 class TestRecentProjectWorkflow:
@@ -17,19 +17,19 @@ class TestRecentProjectWorkflow:
     def testIfRecentProjectsAreShownInDialog(self, monkeypatch, qtbot):
         """Tests if the startup dialog displays recent projects as expected"""
         monkeypatch.setattr(
-            RecentProjectsHandler,
-            RecentProjectsHandler.initWithExistingRecentProjects.__name__,
+            _rph.RecentProjectsHandler,
+            _rph.RecentProjectsHandler.initWithExistingRecentProjects.__name__,
             lambda: None,
         )
 
-        RecentProjectsHandler.recentProjects = _deque(
+        _rph.RecentProjectsHandler.recentProjects = _deque(
             [
-                constants.PATH_TO_PROJECT_3,
-                constants.PATH_TO_PROJECT_2,
-                constants.PATH_TO_PROJECT_1,
+                _consts.PATH_TO_PROJECT_3,
+                _consts.PATH_TO_PROJECT_2,
+                _consts.PATH_TO_PROJECT_1,
             ]
         )
-        startupDialog = StartupDialog()
+        startupDialog = _sd.StartupDialog()
         qtbot.addWidget(startupDialog)
         startupDialog.show()
         firstProjectInList = startupDialog.listWidget.item(0)
@@ -39,15 +39,15 @@ class TestRecentProjectWorkflow:
         assert startupDialog.isVisible()
         assert (
             firstProjectInList.text()
-            == f"{constants.PATH_TO_PROJECT_3.stem} {constants.PATH_TO_PROJECT_3}"
+            == f"{_consts.PATH_TO_PROJECT_3.stem} {_consts.PATH_TO_PROJECT_3}"
         )
         assert (
             secondProjectInList.text()
-            == f"{constants.PATH_TO_PROJECT_2.stem} {constants.PATH_TO_PROJECT_2}"
+            == f"{_consts.PATH_TO_PROJECT_2.stem} {_consts.PATH_TO_PROJECT_2}"
         )
         assert (
             thirdProjectInList.text()
-            == f"{constants.PATH_TO_PROJECT_1.stem} {constants.PATH_TO_PROJECT_1}"
+            == f"{_consts.PATH_TO_PROJECT_1.stem} {_consts.PATH_TO_PROJECT_1}"
         )
 
     def testIfRecenProjectsAreShownCorrectlyInMainWindow(
@@ -57,34 +57,34 @@ class TestRecentProjectWorkflow:
         Then opens another recent projects and checks if it's still display correctly
         """
         monkeypatch.setattr(
-            RecentProjectsHandler,
-            RecentProjectsHandler.initWithExistingRecentProjects.__name__,
+            _rph.RecentProjectsHandler,
+            _rph.RecentProjectsHandler.initWithExistingRecentProjects.__name__,
             lambda: None,
         )
         monkeypatch.setattr(
-            RecentProjectsHandler,
-            RecentProjectsHandler.save.__name__,
+            _rph.RecentProjectsHandler,
+            _rph.RecentProjectsHandler.save.__name__,
             lambda: None,
         )
         monkeypatch.setattr(
-            MessageBox,
-            MessageBox.create.__name__,
+            _mb.MessageBox,
+            _mb.MessageBox.create.__name__,
             lambda messageText: _qtw.QMessageBox.Yes,
         )
         monkeypatch.setattr(
-            StartupDialog,
-            StartupDialog.showDialogAndGetResult.__name__,
-            lambda: constants.PATH_TO_PROJECT_1,
+            _sd.StartupDialog,
+            _sd.StartupDialog.showDialogAndGetResult.__name__,
+            lambda: _consts.PATH_TO_PROJECT_1,
         )
 
-        RecentProjectsHandler.recentProjects = _deque(
+        _rph.RecentProjectsHandler.recentProjects = _deque(
             [
-                constants.PATH_TO_PROJECT_3,
-                constants.PATH_TO_PROJECT_2,
-                constants.PATH_TO_PROJECT_1,
+                _consts.PATH_TO_PROJECT_3,
+                _consts.PATH_TO_PROJECT_2,
+                _consts.PATH_TO_PROJECT_1,
             ]
         )
-        getProjectResult = getProject()
+        getProjectResult = _proj.getProject()
         logger = _ulog.getOrCreateCustomLogger("root", "INFO")
         mainWindow = mw.MainWindow(logger, _ccl.value(getProjectResult))
         qtbot.addWidget(mainWindow)
@@ -98,11 +98,11 @@ class TestRecentProjectWorkflow:
         assert mainWindow.editor.isVisible()
         assert (
             action1.text()
-            == f"{constants.PATH_TO_PROJECT_3.stem} {constants.PATH_TO_PROJECT_3}"
+            == f"{_consts.PATH_TO_PROJECT_3.stem} {_consts.PATH_TO_PROJECT_3}"
         )
         assert (
             action2.text()
-            == f"{constants.PATH_TO_PROJECT_2.stem} {constants.PATH_TO_PROJECT_2}"
+            == f"{_consts.PATH_TO_PROJECT_2.stem} {_consts.PATH_TO_PROJECT_2}"
         )
 
         mainWindow.openRecentFile(action1)
@@ -111,9 +111,9 @@ class TestRecentProjectWorkflow:
 
         assert (
             action1.text()
-            == f"{constants.PATH_TO_PROJECT_1.stem} {constants.PATH_TO_PROJECT_1}"
+            == f"{_consts.PATH_TO_PROJECT_1.stem} {_consts.PATH_TO_PROJECT_1}"
         )
         assert (
             action2.text()
-            == f"{constants.PATH_TO_PROJECT_2.stem} {constants.PATH_TO_PROJECT_2}"
+            == f"{_consts.PATH_TO_PROJECT_2.stem} {_consts.PATH_TO_PROJECT_2}"
         )

@@ -3,34 +3,34 @@ from collections import deque as _deque
 import PyQt5.QtCore as _qtc
 import PyQt5.QtWidgets as _qtw
 
-from tests.trnsysGUI.constants import (
-    PATH_TO_PROJECT_1,
-    PATH_TO_PROJECT_2,
-    PATH_TO_PROJECT_3,
-)
-from trnsysGUI.dialogs.startupDialog import StartupDialog
-from trnsysGUI.recentProjectsHandler import RecentProjectsHandler
+import trnsysGUI.dialogs.startup.dialog as _sd
+import trnsysGUI.recentProjectsHandler as _rph
+
+from .. import constants as _consts
 
 
 class TestStartupDialog:
-
     def testStartupDialogRecentSetup(self, monkeypatch, qtbot):
         monkeypatch.setattr(
-            RecentProjectsHandler,
-            RecentProjectsHandler.initWithExistingRecentProjects.__name__,
+            _rph.RecentProjectsHandler,
+            _rph.RecentProjectsHandler.initWithExistingRecentProjects.__name__,
             lambda: None,
         )
-        RecentProjectsHandler.recentProjects = _deque(
-            [PATH_TO_PROJECT_1, PATH_TO_PROJECT_2, PATH_TO_PROJECT_3]
+        _rph.RecentProjectsHandler.recentProjects = _deque(
+            [
+                _consts.PATH_TO_PROJECT_1,
+                _consts.PATH_TO_PROJECT_2,
+                _consts.PATH_TO_PROJECT_3,
+            ]
         )
-        startupDialog = StartupDialog()
+        startupDialog = _sd.StartupDialog()
         qtbot.addWidget(startupDialog)
         recentClicked = _qtw.QListWidgetItem(
-            f"{PATH_TO_PROJECT_1.stem}: {PATH_TO_PROJECT_1}"
+            f"{_consts.PATH_TO_PROJECT_1.stem}: {_consts.PATH_TO_PROJECT_1}"
         )
-        recentClicked.setData(_qtc.Qt.UserRole, PATH_TO_PROJECT_1)
+        recentClicked.setData(_qtc.Qt.UserRole, _consts.PATH_TO_PROJECT_1)
 
         startupDialog.clickButtonHandler(recentClicked)
 
-        assert startupDialog.signal == PATH_TO_PROJECT_1
+        assert startupDialog.signal == _consts.PATH_TO_PROJECT_1
         assert startupDialog.listWidget.count() == 3

@@ -15,10 +15,10 @@ import typing as _tp
 import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.common.cancelled as _ccl
+import trnsysGUI.constants as _consts
+import trnsysGUI.dialogs.startup.dialog as _sd
 import trnsysGUI.messageBox as mb
-from trnsysGUI import constants
-from trnsysGUI.dialogs.startupDialog import StartupDialog
-from trnsysGUI.recentProjectsHandler import RecentProjectsHandler
+import trnsysGUI.recentProjectsHandler as _rph
 
 
 @_dc.dataclass
@@ -41,7 +41,7 @@ Project = CreateProject | LoadProject | MigrateProject
 
 
 def getProject() -> _ccl.MaybeCancelled[Project]:
-    createOpenMaybeCancelled = StartupDialog.showDialogAndGetResult()
+    createOpenMaybeCancelled = _sd.StartupDialog.showDialogAndGetResult()
 
     while not _ccl.isCancelled(createOpenMaybeCancelled):
         createOpen = _ccl.value(createOpenMaybeCancelled)
@@ -50,33 +50,33 @@ def getProject() -> _ccl.MaybeCancelled[Project]:
             loadRecentProject(createOpen)
             if isinstance(createOpen, _pl.Path)
             else _getProjectInternal(
-                constants.CreateNewOrOpenExisting(createOpen)
+                _consts.CreateNewOrOpenExisting(createOpen)
             )
         )
         if not _ccl.isCancelled(projectMaybeCancelled):
             project = _ccl.value(projectMaybeCancelled)
             assert isinstance(project, (CreateProject, LoadProject))
-            RecentProjectsHandler.addProject(project.jsonFilePath)
+            _rph.RecentProjectsHandler.addProject(project.jsonFilePath)
             return _tp.cast(
                 Project, project
             )  # Don't know why mypy requires this cast
 
-        createOpenMaybeCancelled = StartupDialog.showDialogAndGetResult()
+        createOpenMaybeCancelled = _sd.StartupDialog.showDialogAndGetResult()
 
     return _ccl.CANCELLED
 
 
 def _getProjectInternal(
-    createOrOpenExisting: "constants.CreateNewOrOpenExisting",
+    createOrOpenExisting: _consts.CreateNewOrOpenExisting,
 ) -> _ccl.MaybeCancelled[Project]:
-    if createOrOpenExisting == constants.CreateNewOrOpenExisting.OPEN_EXISTING:
+    if createOrOpenExisting == _consts.CreateNewOrOpenExisting.OPEN_EXISTING:
         return getLoadOrMigrateProject()
 
-    if createOrOpenExisting == constants.CreateNewOrOpenExisting.CREATE_NEW:
+    if createOrOpenExisting == _consts.CreateNewOrOpenExisting.CREATE_NEW:
         return getCreateProject()
 
     raise AssertionError(
-        f"Unknown value for enum {constants.CreateNewOrOpenExisting}: {createOrOpenExisting}"
+        f"Unknown value for enum {_consts.CreateNewOrOpenExisting}: {createOrOpenExisting}"
     )
 
 
@@ -112,7 +112,7 @@ def getExistingEmptyDirectory(
             return selectedDirectoryPath
 
         mb.MessageBox.create(
-            messageText=constants.DIRECTORY_MUST_BE_EMPTY,
+            messageText=_consts.DIRECTORY_MUST_BE_EMPTY,
             buttons=[_qtw.QMessageBox.Ok],
         )
 
@@ -145,12 +145,12 @@ def loadRecentProject(
         if not projectPath.exists():
             if (
                 mb.MessageBox.create(
-                    messageText=constants.RECENT_MOVED_OR_DELETED,
+                    messageText=_consts.RECENT_MOVED_OR_DELETED,
                     buttons=[_qtw.QMessageBox.Ok],
                 )
                 == _qtw.QMessageBox.Ok
             ):
-                RecentProjectsHandler.removeProject(projectPath)
+                _rph.RecentProjectsHandler.removeProject(projectPath)
                 return _ccl.CANCELLED
         else:
             return checkIfProjectEnviromentIsValid(
@@ -159,7 +159,7 @@ def loadRecentProject(
     except TypeError:
         if (
             mb.MessageBox.create(
-                messageText=constants.NO_RECENT_AVAILABLE,
+                messageText=_consts.NO_RECENT_AVAILABLE,
                 buttons=[_qtw.QMessageBox.Ok],
             )
             == _qtw.QMessageBox.Ok
@@ -179,7 +179,7 @@ def checkIfProjectEnviromentIsValid(
         oldJsonFilePath = jsonFilePath
         if (
             mb.MessageBox.create(
-                messageText=constants.NO_PROPER_PROJECT_ENVIRONMENT
+                messageText=_consts.NO_PROPER_PROJECT_ENVIRONMENT
             )
             == _qtw.QMessageBox.Cancel
         ):
