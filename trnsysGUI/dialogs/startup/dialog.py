@@ -11,7 +11,7 @@ import trnsysGUI.recentProjectsHandler as _rph
 
 _dlgs.assertThatLocalGeneratedUIModuleAndResourcesExist(__name__)
 
-import trnsysGUI.dialogs.startup._UI_dialog_generated as _gen
+import trnsysGUI.dialogs.startup._UI_dialog_generated as _gen  # type: ignore[import]  # pylint: disable=wrong-import-position
 
 
 class StartupDialog(_qtw.QDialog, _gen.Ui_startupDialog):
