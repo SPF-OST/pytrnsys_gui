@@ -15,10 +15,10 @@ import typing as _tp
 import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.common.cancelled as _ccl
+import trnsysGUI.constants as constants
+import trnsysGUI.dialogs.startup.dialog as _sd
 import trnsysGUI.messageBox as mb
-from trnsysGUI import constants
-from trnsysGUI.dialogs.startupDialog import StartupDialog
-from trnsysGUI.recentProjectsHandler import RecentProjectsHandler
+import trnsysGUI.recentProjectsHandler as _rph
 
 
 @_dc.dataclass
@@ -41,7 +41,7 @@ Project = CreateProject | LoadProject | MigrateProject
 
 
 def getProject() -> _ccl.MaybeCancelled[Project]:
-    createOpenMaybeCancelled = StartupDialog.showDialogAndGetResult()
+    createOpenMaybeCancelled = _sd.StartupDialog.showDialogAndGetResult()
 
     while not _ccl.isCancelled(createOpenMaybeCancelled):
         createOpen = _ccl.value(createOpenMaybeCancelled)
@@ -56,12 +56,12 @@ def getProject() -> _ccl.MaybeCancelled[Project]:
         if not _ccl.isCancelled(projectMaybeCancelled):
             project = _ccl.value(projectMaybeCancelled)
             assert isinstance(project, (CreateProject, LoadProject))
-            RecentProjectsHandler.addProject(project.jsonFilePath)
+            _rph.RecentProjectsHandler.addProject(project.jsonFilePath)
             return _tp.cast(
                 Project, project
             )  # Don't know why mypy requires this cast
 
-        createOpenMaybeCancelled = StartupDialog.showDialogAndGetResult()
+        createOpenMaybeCancelled = _sd.StartupDialog.showDialogAndGetResult()
 
     return _ccl.CANCELLED
 
@@ -150,7 +150,7 @@ def loadRecentProject(
                 )
                 == _qtw.QMessageBox.Ok
             ):
-                RecentProjectsHandler.removeProject(projectPath)
+                _rph.RecentProjectsHandler.removeProject(projectPath)
                 return _ccl.CANCELLED
         else:
             return checkIfProjectEnviromentIsValid(

@@ -5,13 +5,17 @@ import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.common.cancelled as _ccl
-import trnsysGUI.dialogs._UI_startupDialog_generated as _gen
-from trnsysGUI import constants
-from trnsysGUI.recentProjectsHandler import RecentProjectsHandler
+import trnsysGUI.constants as _consts
+import trnsysGUI.dialogs as _dlgs
+import trnsysGUI.recentProjectsHandler as _rph
+
+_dlgs.assertThatLocalGeneratedUIModuleAndResourcesExist(__name__)
+
+import trnsysGUI.dialogs.startup._UI_dialog_generated as _gen
 
 
 class StartupDialog(_qtw.QDialog, _gen.Ui_startupDialog):
-    signal: _ccl.MaybeCancelled[constants.CreateNewOrOpenExisting | _pl.Path]
+    signal: _ccl.MaybeCancelled[_consts.CreateNewOrOpenExisting | _pl.Path]
 
     def __init__(self) -> None:
         super().__init__()
@@ -19,12 +23,12 @@ class StartupDialog(_qtw.QDialog, _gen.Ui_startupDialog):
         self.buttonGroup.buttonClicked.connect(self.clickButtonHandler)
         # ===============================================================================
         # Must be monospaced font to ensure paths align nicely.
-        self.listWidget.setFont(_qtg.QFont(constants.DEFAULT_MONOSPACED_FONT))
+        self.listWidget.setFont(_qtg.QFont(_consts.DEFAULT_MONOSPACED_FONT))
         # ===============================================================================
         self.listWidget.itemDoubleClicked.connect(self.clickButtonHandler)
-        RecentProjectsHandler.initWithExistingRecentProjects()
-        maxLength = RecentProjectsHandler.getLengthOfLongestFileName()
-        for recentProject in RecentProjectsHandler.recentProjects:
+        _rph.RecentProjectsHandler.initWithExistingRecentProjects()
+        maxLength = _rph.RecentProjectsHandler.getLengthOfLongestFileName()
+        for recentProject in _rph.RecentProjectsHandler.recentProjects:
             # Padding name to the longest name to nicely align paths.
             formattedFileName = recentProject.stem.ljust(maxLength)
             _qtw.QListWidgetItem(
@@ -36,9 +40,9 @@ class StartupDialog(_qtw.QDialog, _gen.Ui_startupDialog):
         if clickedItem is self.cancelButton:
             self.signal = _ccl.CANCELLED
         if clickedItem is self.createButton:
-            self.signal = constants.CreateNewOrOpenExisting.CREATE_NEW
+            self.signal = _consts.CreateNewOrOpenExisting.CREATE_NEW
         if clickedItem is self.openButton:
-            self.signal = constants.CreateNewOrOpenExisting.OPEN_EXISTING
+            self.signal = _consts.CreateNewOrOpenExisting.OPEN_EXISTING
         if isinstance(clickedItem, _qtw.QListWidgetItem):
             self.signal = clickedItem.data(_qtc.Qt.UserRole)
         self.close()
@@ -74,7 +78,7 @@ class StartupDialog(_qtw.QDialog, _gen.Ui_startupDialog):
 
     @staticmethod
     def showDialogAndGetResult() -> (
-        _ccl.MaybeCancelled[constants.CreateNewOrOpenExisting | _pl.Path]
+        _ccl.MaybeCancelled[_consts.CreateNewOrOpenExisting | _pl.Path]
     ):
         dialog = StartupDialog()
         dialog.exec()
