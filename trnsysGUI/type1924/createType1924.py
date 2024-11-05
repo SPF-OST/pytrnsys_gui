@@ -133,16 +133,17 @@ class Type1924_TesPlugFlow:
         line = "CONSTANTS 15\n"
         lines = lines + line
 
-        line = "dInHx%d=0.05 ! m only if modHx%d=1\n" % (idHx,  idHx)
+        line = "dInHx%d=0.05 ! m only if modHx%d=0\n" % (idHx,  idHx)
         lines = lines + line
-        line = "dOutHx%d=0.06 ! m only if modHx%d=1\n" % (idHx, idHx)
+        line = "dOutHx%d=0.06 ! m only if modHx%d=0\n" % (idHx, idHx)
         lines = lines + line
-
-        line = "LHx%d=20 ! m only if modHx%d=1\n" % (idHx, idHx)
+        line = "scaleHX%d=13 ! m only if modHx%d=0\n" % (idHx, idHx)
         lines = lines + line
-        line = "LamHx%d=50 ! W/mK only if modHx%d=1\n" % (idHx, idHx)
+        line = "LHx%d = scaleHX%d * Vol / (2 * $PI * 0.0333) ! m only if modHx%d=0\n" % (idHx, idHx, idHx)
         lines = lines + line
-        line = "brineConcHx%d=30 ! [0-100] only if modHx%d=1\n" % (idHx, idHx)
+        line = "LamHx%d=50 ! W/mK only if modHx%d=0\n" % (idHx, idHx)
+        lines = lines + line
+        line = "brineConcHx%d=0 ! [0-100] only if modHx%d=0 TO BE MODIFIED IF GLYCOL USED\n" % (idHx, idHx)
         lines = lines + line
 
         line = "VHx%d=0. \n" % (idHx)
@@ -150,23 +151,22 @@ class Type1924_TesPlugFlow:
         line = "nCvHx%d=20 \n" % (idHx)
         lines = lines + line
 
-        line = "modHx%d=1 ! modHX1, 0 = physical model, 1 = Drueck-model (Multiport)\n" % (idHx)
+        line = "modHx%d=0 ! modHX1, 0 = physical model, 1 = Drueck-model (Multiport)\n" % (idHx)
         lines = lines + line
-        line = "nNuHx%d=0.5 !  only if modHx%d=1\n" % (idHx, idHx)
+        line = "nNuHx%d=0.5 !  only if modHx%d=0\n" % (idHx, idHx)
         lines = lines + line
-        line = "cNuHx%d=0.25 !  only if modHx%d=1\n" % (idHx, idHx)
-        lines = lines + line
-
-        line = "dUaMfrHx%d=0.375 ! only if modHx%d=0\n" % (idHx, idHx)
-        lines = lines + line
-        line = "dUadTHx%d=0.0 ! only if modHx%d=0\n" % (idHx, idHx)
-        lines = lines + line
-        line = "dUaTHx%d=0.458 ! only if modHx%d=0\n" % (idHx, idHx)
-        lines = lines + line
-        line = "UaHx%d=1105*ratio ! kJ/hK only if modHx%d=0\n" % (idHx, idHx)
+        line = "cNuHx%d=0.25 !  only if modHx%d=0\n" % (idHx, idHx)
         lines = lines + line
 
-        line = "startUpHx%d=0. ! only if modHx%d=0\n" % (idHx, idHx)
+        line = "dUaMfrHx%d=0.375 ! only if modHx%d=1\n" % (idHx, idHx)
+        lines = lines + line
+        line = "dUadTHx%d=0.0 ! only if modHx%d=1\n" % (idHx, idHx)
+        lines = lines + line
+        line = "dUaTHx%d=0.458 ! only if modHx%d=1\n" % (idHx, idHx)
+        lines = lines + line
+        line = "UaHx%d=1105*ratio ! kJ/hK only if modHx%d=1\n" % (idHx, idHx)
+        lines = lines + line
+        line = "startUpHx%d=0. ! only if modHx%d=1\n" % (idHx, idHx)
         lines = lines + line
 
         return lines
