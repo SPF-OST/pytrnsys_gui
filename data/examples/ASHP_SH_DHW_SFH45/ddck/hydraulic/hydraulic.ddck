@@ -29,11 +29,6 @@ TRadH=TRad
 CONSTANTS 1
 spTIni = 20
 
-! Modified by DC WtSp
-CONSTANTS #
-TWtSp = weather_TcwAvg
-TRoomStore=15
-
 UNIT 450 TYPE 9352
 PARAMETERS 152
 mfrSolverAbsTol
@@ -408,7 +403,9 @@ PTesSh_Tee2Conv_kW = [460,4]/3600 ! Convected heat [kW]
 PTesSh_Tee2Int_kJ = [460,5] ! Accumulated internal energy since start of simulation [kJ]
 MTesSh_Tee2 = MTesSh_Tee2_A
 
-
+! WtSp
+EQUATIONS 1
+TWtSp = Tcw
 
 EQUATIONS 1
 TWtTp = TVal2_WtTp
