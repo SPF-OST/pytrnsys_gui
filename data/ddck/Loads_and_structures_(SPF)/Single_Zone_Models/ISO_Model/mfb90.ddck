@@ -32,10 +32,19 @@ $mfb_PGainEquip = PGainEquip
 $mfb_PGainLight = PGainLight
 $mfb_QPeak_kW   = 36.2      ! kW in Zurich (this is approx. the peak hourly demand)
 $mfb_MfrBuiNom  = MfrBuiNom ! Nominal mass flow of heat distribution system [kg/h]
+$mfb_TroomSet     = TroomSet   ! Setpoint for Room temperature in heating mode, °C
+$mfb_TroomSetCool = TroomSetCool ! Setpoint for Room temperature in cooling mode, °C
 
 ***********************************
-** Generic variables
+** Case definition
 ***********************************
+
+CONSTANTS 4
+realUserBehaviour = 1 !User behaviour for window ventialtion and shading, 1 means realistic, 0 means ideal
+useAHU            = 0 !Air handling unit (1 means with, 0 wihtout AHU)
+TroomSet          = 23*realUserBehaviour + 21*NOT(realUserBehaviour)     ! Setpoint for Room temperature, °C
+TroomSetCool      = 24.00                                                ! Setpoint for Room temperature for cooling, °C
+
 
 CONSTANTS #
 scaleBuilding   = 1

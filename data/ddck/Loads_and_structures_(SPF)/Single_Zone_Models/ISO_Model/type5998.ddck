@@ -12,7 +12,7 @@
 
 *******************************************************************************************************
 ** Description: 
-** Building demands using the ISO model from the standard model.
+** Building demands using the model used in ISO-standard
 ** This ddck needs the data from mfb30.ddck or alike and both files should be placed in the same folder
 ** Otherwise the names used here will not be found
 *******************************************************************************************************
@@ -27,7 +27,7 @@
 ** None
 
 ***********************************
-** Dependencies with other ddck
+** inputs from other ddck
 ***********************************
 
 EQUATIONS #
@@ -42,31 +42,20 @@ time      = $Time
 !myScaleBuilding = $mfb_scaleBuilding not necessary since mfb must be in same folder or use same name in config to chares all names.
 
 EQUATIONS #
-myPheatBui_kJh    = $heatDisSys_PHeatBui_kJh
-myPBuiIntGain_kJh = $intGains_PbuiIntGain_kJh !from internal gains calculation
+PheatBui_kJh    = $heatDisSys_PHeatBui_kJh
+PBuiIntGain_kJh = $intGains_PbuiIntGain_kJh !from internal gains calculation
 
 ***********************************
 ** outputs to other ddck
 ***********************************
 
-CONSTANTS #
-$type5998_TroomSet     = TroomSet     ! Setpoint for Room temperature, °C
-$type5998_TroomSetCool = TroomSetCool ! Setpoint for Room temperature for cooling, °C
+!CONSTANTS  # !defined in mbf_30.ddck
+!$type5998_TroomSet     = TroomSet     ! Setpoint for Room temperature, °C
+!$type5998_TroomSetCool = TroomSetCool ! Setpoint for Room temperature for cooling, °C
 
 EQUATIONS #
-$type5998_TroomRc    = TRoomRc ! TODO: DC I think recall values shold be calculated wehre necessary only and not used as global
-$type5998_Troom      = Troom
-$type5998_TroomStar  = TroomStar
-
-***********************************
-** Case definition
-***********************************
-
-CONSTANTS 4
-realUserBehaviour = 1 !User behaviour for window ventialtion and shading, 1 means realistic, 0 means ideal
-useAHU            = 1 !Air handling unit (1 means with, 0 wihtout AHU)
-TroomSet          = 23*realUserBehaviour + 21*NOT(realUserBehaviour)     ! Setpoint for Room temperature, °C
-TroomSetCool      = 24.00                                                ! Setpoint for Room temperature for cooling, °C
+$buiModel_Troom      = Troom
+$buiModel_TroomStar  = TroomStar
 
 ***********************************
 ** Body of ddck
@@ -324,7 +313,7 @@ Tint_Cset = 26
 EpsilonWindow = 0.9
 
 EQUATIONS 5
-PGainISO = myPbuiIntGain_kJh   ! Internal Gains [kJ/h]
+PGainISO = PbuiIntGain_kJh   ! Internal Gains [kJ/h]
 PlossInfr_N = 0!.67*10^-8*((TroomRc+273.15)^4-(buiTamb+273.15)^4)*AsolN
 PlossInfr_S = 0!5.67*10^-8*((TroomRc+273.15)^4-(buiTamb+273.15)^4)*AsolS
 PlossInfr_W = 0!5.67*10^-8*((TroomRc+273.15)^4-(buiTamb+273.15)^4)*AsolW
@@ -351,7 +340,7 @@ Tinitial
 INPUTS 23
 buiTamb		! EQU_Weather:Tamb ->Text
 TairSup		! EQU_Weather:Tamb ->Tsup
-myPheatBui_kJh		! kJ/h, heating power from heating system
+PheatBui_kJh		! kJ/h, heating power from heating system
 PGainISO		! kJ/h, internal heat gains (voir ISO 13790-2008 : 10.2)
 HveISO		! W/K, ventilation heat loss coefficient (voir ISO 13790-2008 : ANNEXE A)
 Htr_op		! [unconnected] W/K, overall heat transfer coefficient of outside walls and roof (voir ISO 13790-2008 : ANNEXE 
@@ -391,20 +380,10 @@ PBuiSol_kW = [56,5]/3600
 PBuiGains_kW = ([56,6]+[56,7]+[56,8]-[56,5]+[56,9])/3600
 TroomStar = [56,3]
 TroomOp = [56,4]
-PBuiIntGain_kW = myPBuiIntGain_kJh/3600
+PBuiIntGain_kW = PBuiIntGain_kJh/3600
 PBuiGrd_kW  = 0
 
 
-UNIT 57 TYPE 993 !CHANGED DC     ! Input value recall (element RcB)
-PARAMETERS 1     
-2     ! 1: number of variables to be remembered
-INPUTS 2
-Troom TRoomStar
-20 20
-     
-EQUATIONS 2    ! outputs of Input Value Recall
-TRoomRc         = [57,1]
-TRoomStarRc     = [57,2]
 
 EQUATIONS 7     ! penalty calculation for space haeting / cooling according to Task 26 and Task 32
 X = 2     ! exponent for penalty calculation

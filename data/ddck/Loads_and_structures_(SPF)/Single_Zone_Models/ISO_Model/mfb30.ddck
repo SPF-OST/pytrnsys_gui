@@ -32,15 +32,23 @@ $mfb_PGainEquip = PGainEquip
 $mfb_PGainLight = PGainLight
 $mfb_QPeak_kW   = 14.6       ! kW in Zurich (this is approx. the peak hourly demand)
 $mfb_MfrBuiNom  = MfrBuiNom  ! Nominal mass flow of heat distribution system [kg/h]
+$mfb_TroomSet   = 23*realUserBehaviour + 21*NOT(realUserBehaviour)     ! Setpoint for Room temperature, °C
+$mfb_TroomSet   = 24 ! Setpoint for Room temperature in cooling mode, °C
 
 ***********************************
-** Generic variables
+** Case definition
 ***********************************
+
+CONSTANTS #
+realUserBehaviour = 1 !User behaviour for window ventialtion and shading, 1 means realistic, 0 means ideal
+useAHU            = 1 !Air handling unit (1 means with, 0 wihtout AHU)
+
 
 CONSTANTS #
 scaleBuilding   = 1
 factorMfrBuiNom = 1 !adapt this factor to achieve the nominal DeltaT you need in the dustribution loop
 MfrBuiNom       = scaleBuilding*factorMfrBuiNom*$mfb_QPeak_kW/($cpWat*($mfb_TBuiFlNom-$mfb_TBuiRtNom))*3600 ! Nominal mass flow of heat distribution system [kg/h]
+
 
 EQUATIONS 6	! Shading Factor (Blinds, other Buildings etc.)
 win_g = 0.45	! g-value windows

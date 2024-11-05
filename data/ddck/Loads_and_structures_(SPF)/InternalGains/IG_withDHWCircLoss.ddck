@@ -1,17 +1,19 @@
 *******************************
-**BEGIN internal_gains.ddck 
+**BEGIN IG_withDHWCircLoss_gains.ddck
 *******************************
     
 *****************************************
 ** Contact person : D. Carbonell   
 ** Creation date  : 30.09.2016 
-** Last changes   : 16.04.20, DC 
+** Last changes   : 16.04.20, DC
+**                : 10.24 DC udpates for defaultVisibility "local"
 *****************************************
 
 ***************************************************************************
-** Description: 
-** internal gains reader ussing Type 9 for building models
-** TODO: 
+** Description: internal gains reader using Type 9 for building models
+** Source no external type(s) are used
+** This ddck considers that part of the recirculation losses of the DHW loop for
+** the multy-family buildings (MFB) are considered as internal gains.
 ***************************************************************************
 
 ***********************************
@@ -42,9 +44,9 @@ EQUATIONS #
 qCircLoss_kW    = $PPiTeeCirc1_PuCirc_kW + $PPiPuCirc_TeeCirc2_kW + $PTeeCirc2_HxDhw_kW + $PHxDhw_TeeCirc1_kW
 HeatingSeasonOn = $type888_BoHS
 scaleBuiSize    = $mfb_scaleBuilding
-PGainPer   = $mfb_PGainPer
-PGainEquip = $mfb_PGainEquip
-PGainLight = $mfb_PGainPer
+PGainPer        = $mfb_PGainPer
+PGainEquip      = $mfb_PGainEquip
+PGainLight      = $mfb_PGainPer
 
 ***********************************
 ** outputs to other ddck
