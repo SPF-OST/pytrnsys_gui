@@ -183,11 +183,33 @@ ddTcwOffset = 36 ! Days of minimum surface temperature
 
     def exportPumpConsumption(self):  # What the controller should give
 
-        f =  "************************\n"
-        f += "*** Pump consumption ***\n"
-        f += "************************\n"
-
         pumps = [ip for ip in self._hasInternalPipings if isinstance(ip, _pump.Pump)]
+
+        f ="""
+*******************************************
+*** Energy Balance
+*******************************************
+"""
+        f2=""
+        i=0
+        for pump in pumps:
+            if(i>0):
+                f2 +=" + "
+            f2 += pump.exportPumpConsumptionName()
+            i +=1
+
+        f += "EQUATIONS 1\n"
+        f += f"@energy(out, el, PuElTotal) = " + f2 + "\n"
+
+        f += """
+*******************************************
+*** Calculation of pump consumption
+*******************************************
+CONSTANTS 2
+dpmin_bar = 0.1 ! minimal pressure-drop of loop at nominal mass flow, bar
+dpmax_bar = 15  ! maximum pressure-drop of loop at nominal mass flow, bar
+"""
+
 
         for pump in pumps:
 

@@ -90,11 +90,11 @@ class TestStorageTank:
 
         storageTank.exportDck()
 
-        actualDdckFilePath = actualComponentDdckDirPath / "TesDhw.ddck"
+        actualDdckFilePath = actualComponentDdckDirPath / "TesDhw.ddck.ok.exp"
         actualDdckContent = actualDdckFilePath.read_text()
         print(actualDdckContent)
 
-        expectedDdckContent = (self.EXPECTED_DIR_PATH / "TesDhw.ddck").read_text()
+        expectedDdckContent = (self.EXPECTED_DIR_PATH / "TesDhw.ddck.ok.exp").read_text()
 
         assert actualDdckContent == expectedDdckContent
 

@@ -319,7 +319,7 @@ class TestEditor:
         return exportedFilePath
 
     @_pt.mark.tool
-    @_pt.mark.skip("This test is really a script to be run by the user from the IDE to update the expected files.")
+    @_pt.mark.skip("This test is really a script to be run by the user from the IDE to update the expected buifiles.")
     @_pt.mark.parametrize("testProject", TEST_CASES)
     def testToolUpdateExportDeckExpectedFiles(self, testProject: _th.Project, qtbot, monkeypatch) -> None:
         shallComparisonsAlwaysSucceed = True
@@ -328,7 +328,7 @@ class TestEditor:
         self._updateExpectedFiles(testProject)
 
     @_pt.mark.tool
-    @_pt.mark.skip("This test is really a script to be run by the user from the IDE to update the expected files.")
+    @_pt.mark.skip("This test is really a script to be run by the user from the IDE to update the expected buifiles.")
     @_pt.mark.parametrize("testProject", TEST_CASES)
     def testToolUpdateMassFlowSolverExpectedFiles(self, testProject: _th.Project, qtbot, monkeypatch) -> None:
         shallComparisonsAlwaysSucceed = True

@@ -78,10 +78,11 @@ class MainWindow(_qtw.QMainWindow):
 
         exportHydCtrlAction = _qtw.QAction(
             _img.EXPORT_HYDRAULIC_CONTROL_PNG.icon(),
-            "Export hydraulic_control_default.ddck",
+            "Export hydraulic_control_default.ddck and pump_consumption_file.ddck",
             self,
         )
         exportHydCtrlAction.triggered.connect(self.exportHydraulicControl)
+        exportHydCtrlAction.triggered.connect(self.exportPumpConsumptionFile)
 
         exportDckAction = _qtw.QAction(_img.EXPORT_DCK_PNG.icon(), "Export dck", self)
         exportDckAction.triggered.connect(self.exportDck)
@@ -174,8 +175,9 @@ class MainWindow(_qtw.QMainWindow):
         exportHydraulicsActionMenu = _qtw.QAction("Export hydraulic.ddck", self)
         exportHydraulicsActionMenu.triggered.connect(self.exportHydraulicsDdck)
 
-        exportHydCtrlActionMenu = _qtw.QAction("Export hydraulic_control_default.ddck", self)
+        exportHydCtrlActionMenu = _qtw.QAction("Export hydraulic_control_default.ddck and pump_consumption_file.ddck", self)
         exportHydCtrlActionMenu.triggered.connect(self.exportHydraulicControl)
+        exportHydCtrlActionMenu.triggered.connect(self.exportPumpConsumptionFile)
 
         exportDdckPlaceHolderValuesJsonFileActionMenu = _qtw.QAction("Export ddck placeholder values JSON file", self)
         exportDdckPlaceHolderValuesJsonFileActionMenu.triggered.connect(self.exportDdckPlaceHolderValuesJson)
@@ -517,6 +519,9 @@ class MainWindow(_qtw.QMainWindow):
     def exportHydraulicControl(self):
         self.editor.exportHydraulicControl()
 
+    def exportPumpConsumptionFile(self):
+        self.editor.exportPumpConsumptionFile()
+
     def exportDck(self):
         jsonResult = _eph.exportDdckPlaceHolderValuesJsonFile(self.editor)
         if _res.isError(jsonResult):
@@ -580,7 +585,7 @@ class MainWindow(_qtw.QMainWindow):
 
     def exportDiagram(self):
         fileName, _ = _qtw.QFileDialog.getSaveFileName(
-            self, "Export PDF", None, "PDF files (*.pdf);;SVG files (*.svg);;All Files (*)", "PDF files (*.svg)"
+            self, "Export PDF", None, "PDF buifiles (*.pdf);;SVG buifiles (*.svg);;All Files (*)", "PDF buifiles (*.svg)"
         )
         if fileName == "":
             return

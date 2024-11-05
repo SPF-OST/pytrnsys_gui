@@ -632,8 +632,74 @@ Tcw=1
         exporter = self._createExporter()
 
         fullExportText += exporter.exportMassFlows()
-        fullExportText += exporter.exportPumpConsumption()
         fullExportText += exporter.exportDivSetting(simulationUnit - 10)
+
+        self.logger.info("------------------------> END OF EXPORT <------------------------")
+
+        if fullExportText[:1] == "\n":
+            fullExportText = fullExportText[1:]
+        controlFolder = os.path.split(hydCtrlPath)[0]
+        if not (os.path.isdir(controlFolder)):
+            os.makedirs(controlFolder)
+        f = open(str(hydCtrlPath), "w")
+        f.truncate(0)
+        f.write(fullExportText)
+        f.close()
+
+        return hydCtrlPath
+
+    def exportPumpConsumptionFile(self):
+        self.logger.info("------------------------> START OF EXPORT <------------------------")
+
+        self.sortTrnsysObj()
+
+        fullExportText = ""
+
+        ddckFolder = os.path.join(self.projectFolder, "ddck")
+
+        hydCtrlPath = os.path.join(ddckFolder, "user_control", "pump_consumption_default.ddck")
+        if _pl.Path(hydCtrlPath).exists():
+            qmb = _qtw.QMessageBox(self)
+            qmb.setText(
+                "Warning: "
+                + "The file pump_consumption_default.ddck already exists in the user_control folder. Do you want to overwrite it or cancel?"
+            )
+            qmb.setStandardButtons(_qtw.QMessageBox.Save | _qtw.QMessageBox.Cancel)
+            qmb.setDefaultButton(_qtw.QMessageBox.Cancel)
+            ret = qmb.exec()
+            if ret == _qtw.QMessageBox.Save:
+                self.canceled = False
+                self.logger.info("Overwriting")
+            else:
+                self.canceled = True
+                self.logger.info("Canceling")
+                return
+
+
+        fullExportText = """
+**************************************
+**BEGIN pump_consumption_default.ddck
+**************************************
+
+*****************************
+** Author:  exported by GUI
+************************************
+
+***************************************************************************
+** Description: electrical consumption of circulation pumps
+** Source: no type(s) used
+** The nominal mass flow rates are taken from GUI,if not precise adapt here
+****************************************************************************
+"""
+
+        exporter = self._createExporter()
+
+        fullExportText += exporter.exportPumpConsumption()
+        fullExportText += """
+**************************************
+**END pump_consumption_default.ddck
+**************************************
+"""
 
         self.logger.info("------------------------> END OF EXPORT <------------------------")
 

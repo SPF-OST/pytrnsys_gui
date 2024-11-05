@@ -116,6 +116,14 @@ class Pump(_patb.PumpsAndTabsBase):  # pylint: disable=too-many-instance-attribu
 
         return width, height
 
+    def exportPumpConsumptionName(self):
+
+        internalPiping = self.getInternalPiping()
+        node = _com.getSingle(internalPiping.nodes)
+        inputVariableName = _mnames.getInputVariableName(self, node)
+
+        return f"Pel{inputVariableName}"
+
     def exportPumpPowerConsumption(self,loop):
 
         internalPiping = self.getInternalPiping()
@@ -123,13 +131,15 @@ class Pump(_patb.PumpsAndTabsBase):  # pylint: disable=too-many-instance-attribu
         inputVariableName = _mnames.getInputVariableName(self, node)
         canonicalMassFlowRate = self._getCanonicalMassFlowRate()
 
-        result = f"*** Pump Consumption of {inputVariableName} ***\n"
+        result  = f"***********************************************\n"
+        result += f"*** Pump Consumption of {inputVariableName} ***\n"
+        result += f"***********************************************\n"
 
         result += f"EQUATIONS #\n"
-
+        result += f"{inputVariableName}=${inputVariableName} ! Comment this is the file is global\n"
         result += f"{inputVariableName}Nom = {canonicalMassFlowRate}  ! Nominal mass flow rate, kg/h.\n"
-        densityLoop = _names.getDensityName(loop.name.value)
-        result += f"dpPu{inputVariableName}Nom_bar = MIN(dpmax_bar,MAX(dpmin_bar, {densityLoop} * 0.1) ! Pressure-drop of loop at nominal mass flow, bar \n"
+        densityLoop = f"${_names.getDensityName(loop.name.value)}"
+        result += f"dpPu{inputVariableName}Nom_bar = MIN(dpmax_bar,MAX(dpmin_bar, {densityLoop} * 0.1)) ! Pressure-drop of loop at nominal mass flow, bar \n"
         result += f"fr{inputVariableName} = {inputVariableName}/{inputVariableName}Nom !  Flow rate fraction of nominal flow rate \n"
         result += f"dpPu{inputVariableName}_bar = fr{inputVariableName}^2*dpPu{inputVariableName}Nom_bar ! Pressure-drop of loop at actual mass flow, bar \n"
         result += f"PelFlow{inputVariableName}_kW = (({inputVariableName}/3600)/ {densityLoop}) * dpPu{inputVariableName}_bar*100 !required power to drive the flow in kW \n"

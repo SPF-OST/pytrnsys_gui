@@ -118,9 +118,9 @@ class Type1924_TesPlugFlow:
         lines = lines + line
         line = "zOuthx%d=%.2f\n" % (idHx, connectHx[idHx - 1]["zOut"])
         lines = lines + line
-        line = "Cphx%d=%s\n" % (idHx,  connectHx[idHx - 1]["cp"])
+        line = "Cphx%d=$%s\n" % (idHx,  connectHx[idHx - 1]["cp"])
         lines = lines + line
-        line = "Rhohx%d=%s\n" % (idHx,  connectHx[idHx - 1]["rho"])
+        line = "Rhohx%d=$%s\n" % (idHx,  connectHx[idHx - 1]["rho"])
         lines = lines + line
 
         return lines
@@ -163,10 +163,10 @@ class Type1924_TesPlugFlow:
         lines = lines + line
         line = "dUaTHx%d=0.458 ! only if modHx%d=0\n" % (idHx, idHx)
         lines = lines + line
-        line = "UaHx%d=1105*ratioTes%d ! kJ/hK only if modHx%d=0\n" % (idHx, nTes, idHx)
+        line = "UaHx%d=1105*ratio ! kJ/hK only if modHx%d=0\n" % (idHx, idHx)
         lines = lines + line
 
-        line = "startUpHx%d=0. ! only if modHx%d=0\n" % (idHx, nTes, idHx)
+        line = "startUpHx%d=0. ! only if modHx%d=0\n" % (idHx, idHx)
         lines = lines + line
 
         return lines
@@ -806,7 +806,7 @@ class Type1924_TesPlugFlow:
         lines = lines + self.getInputs(inputs)
         lines = lines + self.getOutputs(inputs)
         lines = lines + self.getMonthyPrinter(nTes, nUnit, inputs)
-        lines = lines + self.getOnlinePlotter(nTes)
+        # lines = lines + self.getOnlinePlotter(nTes)
         return lines
 
     def getHead(self):
@@ -897,7 +897,7 @@ class Type1924_TesPlugFlow:
         counter = 102
         for hx in self.connectorsHx:
             outputTemperature = hx["Tout"]
-            line = f"{outputTemperature}=[{nUnit},{counter}]\n"
+            line = f"${outputTemperature}=[{nUnit},{counter}]\n"
             lines = lines + line
             counter = counter + 10
 
