@@ -1,4 +1,59 @@
 
+**************************************
+**BEGIN type985.ddck
+**************************************
+
+*********************************************************************
+** Contact person : Daniel Carbonell
+** Creation date  : 30.09.2016
+**                  10.24 DC udpates for defaultVisibility "local"
+*********************************************************************
+
+*******************************************************************************************************
+** Description: Ground coupling for type 56 model as defined in IEA Task 44
+** Source: SPF ddck for Type56
+*******************************************************************************************************
+
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+** None
+***********************************
+** outputs to hydraulic solver
+***********************************
+** None
+
+***********************************
+** inputs from other ddck
+***********************************
+
+EQUATIONS #
+TambAvg    = $city_TambAvg      ! Average ambient temperature over the year (C)
+tTambShift = $city_tTambShift   ! time shift for coldest average temp. according to sine-curve fit (h)
+dTambAmpl  = $city_dTambAmpl    ! amplitude of sine-curve that fits ambient temp. over the year (K)
+TambD      = $city_TambD
+Tamb       = $weather_Tamb
+TBuiFlNom  = $bui_TBuiFlNom
+TBuiRtNom  = $bui_TBuiFlNom
+UGrFloor   = $bui_UGrFloor
+m_Rd       = $bui_m_Rd
+***********************************
+** outputs to other ddck
+***********************************
+
+EQUATIONS #
+$type985_PBuiGrd_kJh = PBuiGrd_kJh
+$type985_PBuiGrd_kW  = PBuiGrd_kW
+
+******************************************************************************************
+** outputs to energy balance in kWh
+******************************************************************************************
+
+***********************************
+** type definition
+***********************************
+
 EQUATIONS 6     ! Inputs for building coupling to ground calculation
 lamGroundBui = 7.2     ! thermal conductivity of ground below building, kJ/hmK
 cpGroundBui = 0.8     ! cp of ground below building, kJ/kgK
@@ -26,7 +81,7 @@ Psi = 0     ! Linear thermal transmittance associated with wall/floor junction (
 
 EQUATIONS 3     ! Determine TiAvg and dTi for floor heating
 TiMax =20+  ((TBuiFlNom + TBuiRtNom)/2-20)/(20-TambD)*(20-(TambAvg-dTambAmpl))     ! Maximum floor temperature average in coldest time of the year (�C)
-TiAvg = LT(m_Rd,1.2)*(TiMax+20)/2+GT(m_Rd,1.2)*20     ! Average of floor temperature over the year (�C)
+TiAvg = LT(m_Rd,1.2)*(TiMax+20)/2+GT(m_Rd,1.2)*20   ! Average of floor temperature over the year (�C)
 dTi = LT(m_Rd,1.2)*(TiMax-TiAvg)+GT(m_Rd,1.2)*0     ! amplitude of floor temperature sine-curve (K)
 
 UNIT 55 TYPE 985     ! Undisturbed Ground Temperature and Ground Coupling
@@ -48,20 +103,20 @@ bFl     ! 14: width of building floor in contact with ground (m)
 w     ! 15: width of sidewalls of floor (m)
 RGrTot     ! 16: total thermal resistance of floor (Km2/W)
 Psi     ! 17: Linear thermal transmittance associated with wall/floor junction (W/mK)
-*** No variables for this Type
+! No inputs for this Type
 
 
-EQUATIONS 13
+EQUATIONS #
 Tgrd1 = [55,1]
 Tgrd2 = [55,2]
 Tgrd5 = [55,3]
-PBuiGrd = [55,4]     ! positive values are gains from the ground, negative ones are losses [kJ/h]
-delGrd = [55,5]
-dt = [55,6]
-alpha = [55,7]
-beta = [55,8]
-Ploss1 = [55,9]
-Ploss2 = [55,10]
-Ploss3 = [55,11]
-PBuiGrd_kW = PBuiGrd/3600     ! gains are positive, losses are negative [kW]
-dTi_out = dTi
+PBuiGrd_kJh = [55,4]     ! positive values are gains from the ground, negative ones are losses [kJ/h]
+!delGrd = [55,5]
+!dt = [55,6]
+!alpha = [55,7]
+!beta = [55,8]
+!Ploss1 = [55,9]
+!Ploss2 = [55,10]
+!Ploss3 = [55,11]
+PBuiGrd_kW = PBuiGrd_kJh*$kJhTokW     ! gains are positive, losses are negative [kW]
+!dTi_out = dTi

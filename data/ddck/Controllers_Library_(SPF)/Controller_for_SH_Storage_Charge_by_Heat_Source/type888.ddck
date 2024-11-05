@@ -42,12 +42,11 @@ EQUATIONS #
 TTesDhwAuxOn  = $userControl_TTesDhwHpOn
 TTesDhwAuxOff = $userControl_TTesDhwHpOff
 TsensorTesSh  = $userControl_TsensorTesSh
-tRoomSet      = $type5998_tRoomSet
-TBuiFlNom     = $mfb_TBuiFlNom
-TBuiRtNom     = $mfb_TBuiRtNom
-TreturnSH     = $tHpCondIn !to be check
+tRoomSet      = $bui_tRoomSet
+TBuiFlNom     = $bui_TBuiFlNom
+TBuiRtNom     = $bui_TBuiRtNom
+TreturnSH     = $tHpCondIn               !to be check
 tDhwSet       = $dhw_TdhwSet
-
 
 
 EQUATIONS #
@@ -64,7 +63,7 @@ $type888_BoHS             = [2,1]!*NOT(isSummer)     ! Boolean for heating seaso
 $type888_isSummer         = GE(MOD(time,8760),4344)*LE(MOD(time,8760),5832)!
 $type888_HpForDHWIsNeeded = [2,2]
 $type888_HpForSHIsNeeded  = [2,3]
-$type888_TRdSet           = Max([2,4],$type5998_Troom) !CHANGED DC      ! space heating flow setpoint,  �C
+$type888_TRdSet           = Max([2,4],$buiModel_Troom) !CHANGED DC      ! space heating flow setpoint,  �C
 $type888_tScSet           = [2,5]
 $type888_TSetSh           = [2,7]
 $type888_PelContr_kW      = PelContr_kW

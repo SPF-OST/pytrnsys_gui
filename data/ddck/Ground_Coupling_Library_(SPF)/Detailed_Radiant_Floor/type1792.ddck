@@ -45,23 +45,38 @@ EQUATIONS #
 ***********************************
 
 EQUATIONS #
-AFloor  = $mfb_AreaBui ! m2 of heated surface area
-TroomRc = $type5998_TroomRc
+AFloor  = $bui_AreaBui ! m2 of heated surface area
+Troom   = $buiModel_Troom
 
 ***********************************
 ** outputs to other ddck
 ***********************************
 
 EQUATIONS #
-$heatDisSys_PHeatBui_kJh = PheatBui_kW*3600  ! Heat to Building from heating distribution system: W -> kJ/h
-
-*******************************************************
-** Definition of radiant floor ************************
-*******************************************************
+$heatDisSys_PHeatBui_kJh      = PheatBui_kW*$kWTokJh      ! Heat to Building from heating distribution system: kW -> kJ/h
+$heatDisSys_PheatBuiRad_kJh   = PheatBuiRad_kW*$kWTokJh   ! total useful radiation
+$heatDisSys_PheatBuiConv_kJh  = PheatBuiConv_kW*$kWTokJh  ! total useful convection
 
 !CONSTANTS #
 !flowPerTube = 15                              ! kg/h per tube of LFloorPipe distance
 !MfrBuiRdNom    = flowPerTube*nParallelPipe	   ! Nominal mass flow of heat distribution system [kg/h]
+
+***************************************************************
+** recall values for control
+***************************************************************
+
+UNIT 45 TYPE 993
+PARAMETERS 1
+1   ! 1: number of variables to be remembered
+INPUTS 1
+Troom
+0.0
+EQUATIONS #   ! outputs of Input Value Recall
+TroomRc = [45,1]
+
+*******************************************************
+** Definition of radiant floor ************************
+*******************************************************
 
 CONSTANTS #
 dxBetweenTubes = 0.144
@@ -166,19 +181,19 @@ UBelowFloor		! room field temperature below if bocoDown=1, if bocoDown=0 UA betw
 
 EQUATIONS #
 mFlowPerRadFloorTube = [42,2] 
-PRdIn_kW    = [42,4]/1000 										! heat injected by fluid to floor W -> kW
-PtotBui_kW  = [42,3]/1000      								! Heat to Building from Radiator: W --> kW
-PheatBui_kW = PRdIn_kW*GT(PRdIn_kW,0)  						! total heat (without cooling)  Heat to Building from Radiator: W --> kW
-PcoolBui_kW = -PRdIn_kW*LE(PRdIn_kW,0)  					! total cooling     
-QAcumRadiator    = -[42,5]/1000     							! Total Accumulated Heat in Radiator, such that in+acum=out
+PRdIn_kW    = [42,4]/1000 					! heat injected by fluid to floor W -> kW
+PtotBui_kW  = [42,3]/1000      				! Heat to Building from radiant floor: W --> kW
+PheatBui_kW = PRdIn_kW*GT(PRdIn_kW,0)  		! total heat (without cooling)  Heat to Building from Radiator: W --> kW
+PcoolBui_kW = -PRdIn_kW*LE(PRdIn_kW,0)  	! total cooling
+QAcumRadiator    = -[42,5]/1000     		! Total Accumulated Heat in radiant floor, such that in+acum=out
 RadFloorLoss_kW  =  [42,6]/1000
 TWood            = [42,7]
-PheatBuiRad_kW   = [42,9]/1000  								! total useful
-PheatBuiConv_kW  = [42,10]/1000 								! total useful
-PheatBuiRadBot_kW = [42,11]/1000  							! loss
-PheatBuiConvBot_kW = [42,12]/1000 							! loss
+PheatBuiRad_kW   = [42,9]/1000  			! total useful radiation
+PheatBuiConv_kW  = [42,10]/1000 			! total useful convection
+PheatBuiRadBot_kW = [42,11]/1000  			! loss
+PheatBuiConvBot_kW = [42,12]/1000 			! loss
 PheatBuiBot_KW     = PheatBuiRadBot_kW+PheatBuiConvBot_kW		! we assume losses below are inputs to lower flat.
-ImbRad   = PRdIn_KW+QAcumRadiator-PtotBui_kW
+ImbRad             = PRdIn_KW+QAcumRadiator-PtotBui_kW
 TfloorLayerBot = [42,13]
  
 EQUATIONS 2

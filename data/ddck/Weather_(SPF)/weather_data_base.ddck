@@ -34,7 +34,7 @@ CONSTANTS #    ! Turn the North,South,East and West orientations with "TURN"
 TURN = 0.0
 AA_N = 180.0 + TURN
 AA_S = TURN
-AA_E = 270.0
+AA_E = 270.0 + TURN
 AA_W = 90.0 + TURN
 groundRef = 0.2
 slope90 = 90.0
@@ -222,13 +222,13 @@ $weather_pamb_atm ! Ambient pressure [atm]
 20 50 1      
 **
 
-EQUATIONS 6     
+EQUATIONS #
 $weather_tAmb_Met = [33,7]
 $weather_tAmbDewPoint = [33,8]     ! dew point temp. [°C]
 $weather_RHamb_100 = [33,6]      ! Relative humidity [0..100]
 $weather_tAmb = $weather_Tamb_Met     ! Psychrometrics:Dry bulb temperature
 $weather_RHamb_1 = $weather_RHamb_100/100
-$weather_Tcw = MAX($weather_TcwAvg,0.1)     !  Temperature shift cold water, K . We avoid below 0 °C
+!$weather_Tcw = MAX($weather_TcwAvg,0.1)     !  Temperature shift cold water, K . We avoid below 0 °C
 
 ***************************************
 ** SKY TEMPERATURE
