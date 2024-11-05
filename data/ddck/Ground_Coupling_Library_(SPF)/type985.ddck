@@ -1,0 +1,67 @@
+
+EQUATIONS 6     ! Inputs for building coupling to ground calculation
+lamGroundBui = 7.2     ! thermal conductivity of ground below building, kJ/hmK
+cpGroundBui = 0.8     ! cp of ground below building, kJ/kgK
+rhoGroundBui = 2500     ! density of ground below building, kg/m3
+zGr1 = 1     ! bottom of first ground layer, m
+zGr2 = 10     ! bottom of second ground layer, m
+Aground = 70     ! surface of ground-building contact, m2
+
+
+EQUATIONS 4     ! Ground Properties
+lamGrd = 2      ! Thermal ground conductivity (W/mK)
+RhoGrd = 2500   ! Density of the ground (kg/m3)
+CpGrd = 0.8     ! specific heat of the ground (kJ/kgK)
+Gt = 0.025      ! Geothermal gradient (K/m)
+
+EQUATIONS 8     ! Inputs for Undisturbed Ground temperature calculation and ground coupling losses
+zGrd1 = 1     ! depth 1 for evaluation of undisturbed ground temperature (m)
+zGrd2 = 2     ! depth 2 for evaluation of undisturbed ground temperature (m)
+zGrd5 = 5     ! depth 3 for evaluation of undisturbed ground temperature (m)
+lFl = 10     ! lenght of building floor in contact with ground (m)
+bFl = 7     ! width of building floor in contact with ground (m)
+w = 0.4     ! width of sidewalls of floor (m)
+RGrTot = 1/UGrFloor     ! total thermal resistance of floor (Km2/W)
+Psi = 0     ! Linear thermal transmittance associated with wall/floor junction (W/mK)
+
+EQUATIONS 3     ! Determine TiAvg and dTi for floor heating
+TiMax =20+  ((TBuiFlNom + TBuiRtNom)/2-20)/(20-TambD)*(20-(TambAvg-dTambAmpl))     ! Maximum floor temperature average in coldest time of the year (�C)
+TiAvg = LT(m_Rd,1.2)*(TiMax+20)/2+GT(m_Rd,1.2)*20     ! Average of floor temperature over the year (�C)
+dTi = LT(m_Rd,1.2)*(TiMax-TiAvg)+GT(m_Rd,1.2)*0     ! amplitude of floor temperature sine-curve (K)
+
+UNIT 55 TYPE 985     ! Undisturbed Ground Temperature and Ground Coupling
+PARAMETERS 17
+TambAvg      ! 1: Average ambient temperature over the year (�C)
+dTambAmpl     ! 2: amplitude of sine-curve that fits ambient temp. over the year (K)
+tTambShift     ! 3: time shift for coldest average temp. according to sine-curve fit (h)
+lamGrd     ! 4: Thermal ground conductivity (W/mK)
+RhoGrd     ! 5: Density of the ground (kg/m3)
+CpGrd     ! 6: specific heat of the ground (kJ/kgK)
+Gt     ! 7: Geothermal gradient (K/m)
+zGrd1     ! 8: depth 1 for evaluation of undisturbed ground temperature (m)
+zGrd2     ! 9: depth 2 for evaluation of undisturbed ground temperature (m)
+zGrd5     ! 10: depth 3 for evaluation of undisturbed ground temperature (m)
+TiAvg     ! 11: average inside temperature over the year (�C)
+dTi     ! 12: amplitude of sine-curve that fits inside temp. over the year (K)
+lFl     ! 13: lenght of building floor in contact with ground (m)
+bFl     ! 14: width of building floor in contact with ground (m)
+w     ! 15: width of sidewalls of floor (m)
+RGrTot     ! 16: total thermal resistance of floor (Km2/W)
+Psi     ! 17: Linear thermal transmittance associated with wall/floor junction (W/mK)
+*** No variables for this Type
+
+
+EQUATIONS 13
+Tgrd1 = [55,1]
+Tgrd2 = [55,2]
+Tgrd5 = [55,3]
+PBuiGrd = [55,4]     ! positive values are gains from the ground, negative ones are losses [kJ/h]
+delGrd = [55,5]
+dt = [55,6]
+alpha = [55,7]
+beta = [55,8]
+Ploss1 = [55,9]
+Ploss2 = [55,10]
+Ploss3 = [55,11]
+PBuiGrd_kW = PBuiGrd/3600     ! gains are positive, losses are negative [kW]
+dTi_out = dTi

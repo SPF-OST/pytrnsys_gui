@@ -1,0 +1,15 @@
+*******************************
+**BEGIN sfh_Task44.ddck
+*******************************
+
+***************************************************************************
+** Description: Domestic hot water demand definition
+***************************************************************************
+
+CONSTANTS 1
+$dhw_unitReadDhw=21
+ASSIGN PATH$\Loads_and_structures\DHW\Profiles\T44A38_DHW_load_year_V3.txt unitReadDhw   ! water draw profile JS: Changed from V2 to V3, V3 has always the same temperature
+
+*******************************
+**END sfh_task44.ddck
+*******************************
