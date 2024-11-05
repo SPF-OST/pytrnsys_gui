@@ -4,7 +4,7 @@
 EQUATIONS 9
 *** Massflowrates
 xFracDivDhw = 1.0
-MfrWtTp = -1000.0
+MfrWtTp = -1000.0 
 MfrWtSp = 1000.0
 MfrPuCirc = 500.0
 MfrPuDhw = 500.0
@@ -12,6 +12,7 @@ xFracDivDhwOut = 1.0
 MfrPuSh = 500.0
 xFracMixAux = 0.0
 MfrPuAux = 500.0
+
 
 CONSTANTS 1
 T_set_MixSh=50

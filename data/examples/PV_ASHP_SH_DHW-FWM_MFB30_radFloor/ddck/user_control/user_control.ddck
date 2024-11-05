@@ -42,13 +42,13 @@ $userControl_TsensorTesSh = $TesSh_T8
 
 EQUATIONS 3
 !dependencies from type888 control
-BoHS           = $type888_BoHS !heating season
+BoHS             = $type888_BoHS !heating season
 HpForDHWIsNeeded = $type888_HpForDhwIsNeeded
 HpForSHIsNeeded  = $type888_HpForSHIsNeeded
 
 EQUATIONS #
-myTroomSet     = $type5998_TroomSet
-myTroomRc      = $type5998_TroomRc
+myTroomSet     = $mfb_TroomSet
+myTroomRc      = $mfb_TroomRc
 
 ***************************************************************
 ** outputs to hydraulic solver
@@ -63,12 +63,12 @@ $MfrWtSp   = $dhw_MfrDHWset
 $MfrPuCirc = 50  ! kg/h for recirculation in DHH loop when no tapping water is active
 $MfrPuDHW  = $HxDwh_MfrSrcDhwHx
 $MfrWtTp   = -$MfrWtSp
-EQUATIONS 4
+EQUATIONS #
 ! mixing valves
 $xFracMixAux        = HpForDHWIsNRc
 $xFracDivDhw        = NOT(GT($MfrWtSp,0))
 $xFracDivDhwOut     = NOT(GT($MfrWtSp,0))
-$xFracDivSolarDhwSh = (AND(xFracDivSolarDhwShRc,GT(TTesDhwBotRc+15,TTesShBotRc))+NOT(xFracDivSolarDhwShRc)*LT(TTesShBotRc,TTesDhwBotRc))*BoHS
+!$xFracDivSolarDhwSh = (AND(xFracDivSolarDhwShRc,GT(TTesDhwBotRc+15,TTesShBotRc))+NOT(xFracDivSolarDhwShRc)*LT(TTesShBotRc,TTesDhwBotRc))*BoHS
 
 ***********************************
 ** outputs to other ddck
