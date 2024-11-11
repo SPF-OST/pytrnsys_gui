@@ -11,7 +11,7 @@ import PyQt5.QtWidgets as _qtw
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.sideNrs as _snrs
 
-if _tp.TYPE_CHECKING:
+if _tp.TYPE_CHECKING:  # pragma: no cover
     import trnsysGUI.connection.connectionBase as _cb
 
 

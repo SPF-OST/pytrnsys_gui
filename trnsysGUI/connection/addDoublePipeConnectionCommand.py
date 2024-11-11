@@ -8,7 +8,7 @@ import trnsysGUI.connection.doublePipeConnection as _dpc
 import trnsysGUI.connection.undo as _cundo
 import trnsysGUI.names.undo as _nu
 
-if _tp.TYPE_CHECKING:
+if _tp.TYPE_CHECKING:  # pragma: no cover
     import trnsysGUI.diagram.Editor as _ed
 
 

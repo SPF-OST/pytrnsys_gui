@@ -5,7 +5,7 @@ import typing as _tp
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.names.undo as _nu
 
-if _tp.TYPE_CHECKING:
+if _tp.TYPE_CHECKING:  # pragma: no cover
     import trnsysGUI.connection.connectionBase as _cb
     import trnsysGUI.diagram.Editor as _ed
 

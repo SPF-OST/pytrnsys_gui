@@ -9,7 +9,7 @@ import PyQt5.QtWidgets as _qtw
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.warningsAndErrors as _werrors
 
-if _tp.TYPE_CHECKING:
+if _tp.TYPE_CHECKING:  # pragma: no cover
     import trnsysGUI.BlockItem as _bi
 
 

@@ -11,7 +11,7 @@ import trnsysGUI.common as _com
 import trnsysGUI.components.ddckFolderHelpers as _dfh
 import trnsysGUI.names.undo as _nu
 
-if _tp.TYPE_CHECKING:
+if _tp.TYPE_CHECKING:  # pragma: no cover
     import trnsysGUI.diagram.Editor as _ed
 
 

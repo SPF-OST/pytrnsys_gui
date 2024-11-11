@@ -12,7 +12,7 @@ import trnsysGUI.deleteBlockCommand as _dbc
 import trnsysGUI.names.undo as _nu
 import trnsysGUI.components.ddckFolderHelpers as _dfh
 
-if _tp.TYPE_CHECKING:
+if _tp.TYPE_CHECKING:  # pragma: no cover
     import trnsysGUI.diagram.Editor as _ed
 
 

@@ -12,7 +12,7 @@ import trnsysGUI.hydraulicLoops.split as _hlsplit
 import trnsysGUI.names.undo as _nu
 import trnsysGUI.warningsAndErrors as _werrors
 
-if _tp.TYPE_CHECKING:
+if _tp.TYPE_CHECKING:  # pragma: no cover
     import trnsysGUI.diagram.Editor as _ed
 
 

@@ -9,7 +9,7 @@ import trnsysGUI.internalPiping as _ip
 
 from . import graphics as _graphics
 
-if _tp.TYPE_CHECKING:
+if _tp.TYPE_CHECKING:  # pragma: no cover
     import trnsysGUI.BlockItem as _bi
     import trnsysGUI.PortItemBase as _pib
 

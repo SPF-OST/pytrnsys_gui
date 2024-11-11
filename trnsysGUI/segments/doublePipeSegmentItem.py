@@ -14,7 +14,7 @@ from trnsysGUI.segments import _common
 _LINE_PEN_WIDTH = 3
 
 # This is needed to avoid a circular import but still be able to type check
-if _tp.TYPE_CHECKING:
+if _tp.TYPE_CHECKING:  # pragma: no cover
     import trnsysGUI.connection.doublePipeConnection as _dpc
 
 

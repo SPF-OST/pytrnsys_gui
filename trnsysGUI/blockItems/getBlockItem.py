@@ -54,7 +54,7 @@ import trnsysGUI.components.pluginComponent as _pcomp
 import trnsysGUI.components.plugin.factory as _pfactory
 
 
-if _tp.TYPE_CHECKING:
+if _tp.TYPE_CHECKING:  # pragma: no cover
     import trnsysGUI.diagram.Editor as _ed
 
 

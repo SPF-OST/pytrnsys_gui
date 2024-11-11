@@ -11,7 +11,7 @@ import trnsysGUI.cornerItem as _ci
 import trnsysGUI.segments.node as _node
 
 # This is needed to avoid a circular import but still be able to type check
-if _tp.TYPE_CHECKING:
+if _tp.TYPE_CHECKING:  # pragma: no cover
     import trnsysGUI.connection.connectionBase as _cib
 
 

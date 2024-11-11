@@ -6,7 +6,7 @@ from trnsysGUI.hydraulicLoops import search
 
 import trnsysGUI.singlePipePortItem as _spc
 
-if _tp.TYPE_CHECKING:
+if _tp.TYPE_CHECKING:  # pragma: no cover
     import trnsysGUI.BlockItem as _bi
 
 

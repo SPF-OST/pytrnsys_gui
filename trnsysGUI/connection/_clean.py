@@ -9,7 +9,7 @@ import trnsysGUI.cornerItem as _ci
 import trnsysGUI.segments.node as _node
 import trnsysGUI.segments.segmentItemBase as _sib
 
-if _tp.TYPE_CHECKING:
+if _tp.TYPE_CHECKING:  # pragma: no cover
     import trnsysGUI.connection.connectionBase as _cb
 
 

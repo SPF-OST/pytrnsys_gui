@@ -6,7 +6,7 @@ import collections.abc as _cabc
 
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
-if _tp.TYPE_CHECKING:
+if _tp.TYPE_CHECKING:  # pragma: no cover
     import trnsysGUI.PortItemBase as _pi
 
 

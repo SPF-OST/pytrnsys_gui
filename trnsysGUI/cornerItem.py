@@ -8,7 +8,7 @@ import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.segments.node as _node
 
-if _tp.TYPE_CHECKING:
+if _tp.TYPE_CHECKING:  # pragma: no cover
     import trnsysGUI.connection.connectionBase as _cb
 
 

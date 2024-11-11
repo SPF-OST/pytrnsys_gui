@@ -4,7 +4,7 @@ import typing as _tp
 
 import trnsysGUI.PortItemBase as _pi
 
-if _tp.TYPE_CHECKING:
+if _tp.TYPE_CHECKING:  # pragma: no cover
     import trnsysGUI.BlockItem as _bi
     import trnsysGUI.connection.singlePipeConnection as _spc
 

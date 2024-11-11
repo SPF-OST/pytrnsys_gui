@@ -20,7 +20,7 @@ import trnsysGUI.names.undo as _nu
 import trnsysGUI.segments.doublePipeSegmentItem as _dpsi
 from . import _massFlowLabels as _mfl
 
-if _tp.TYPE_CHECKING:
+if _tp.TYPE_CHECKING:  # pragma: no cover
     import trnsysGUI.diagram.Editor as _ed
 
 

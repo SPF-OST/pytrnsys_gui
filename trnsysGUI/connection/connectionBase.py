@@ -20,7 +20,7 @@ import trnsysGUI.segments.node as _node
 import trnsysGUI.segments.segmentItemBase as _sib
 from . import _clean
 
-if _tp.TYPE_CHECKING:
+if _tp.TYPE_CHECKING:  # pragma: no cover
     import trnsysGUI.diagram.Editor as _ed
 
 

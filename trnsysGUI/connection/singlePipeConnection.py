@@ -24,7 +24,7 @@ import trnsysGUI.singlePipePortItem as _sppi
 import trnsysGUI.temperatures as _temps
 from . import _massFlowLabels as _mfl
 
-if _tp.TYPE_CHECKING:
+if _tp.TYPE_CHECKING:  # pragma: no cover
     import trnsysGUI.diagram.Editor as _ed
 
 
