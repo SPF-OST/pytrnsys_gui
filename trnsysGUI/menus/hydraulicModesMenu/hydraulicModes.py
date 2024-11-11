@@ -11,7 +11,7 @@ from trnsysGUI import project as prj
 from trnsysGUI.messageBox import MessageBox
 from trnsysGUI.pythonInterface.regimeExporter import exportRegimes as er
 
-if _tp.TYPE_CHECKING:
+if _tp.TYPE_CHECKING:  # pragma: no cover
     import trnsysGUI.mainWindow as mw
 
 

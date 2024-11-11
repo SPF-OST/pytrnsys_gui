@@ -20,7 +20,7 @@ import trnsysGUI.pumpsAndTaps.pump as _pump
 import trnsysGUI.pythonInterface.regimeExporter.getDesiredRegimes as _gdr
 import trnsysGUI.sourceSinkBase as _ssb
 
-if _tp.TYPE_CHECKING:
+if _tp.TYPE_CHECKING:  # pragma: no cover
     import trnsysGUI.mainWindow as _mw
 
 
