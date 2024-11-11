@@ -131,8 +131,8 @@ class RegimeExporter:
                     hasMassFlowRate.massFlowRateInKgPerH = desiredValue
                 case _tv.TVentil() as valve:
                     valve.positionForMassFlowSolver = desiredValue
-                case _:
-                    _tp.assert_never(blockItem)
+                case _:  # pragma: no cover
+                    _tp.assert_never(blockItem)  # pragma: no cover
 
     def _printDiagramToPDF(self, fileName: _pl.Path) -> None:
         printer = _qtp.QPrinter(_qtp.QPrinter.HighResolution)
@@ -174,11 +174,11 @@ def _getTrnExePath() -> _pl.PureWindowsPath:
     if isRunDuringCi:
         return _pl.PureWindowsPath(r"C:\CI-Progams\TRNSYS18\Exe\TrnEXE.exe")
 
-    return _pl.PureWindowsPath(r"C:\TRNSYS18\Exe\TrnEXE.exe")
+    return _pl.PureWindowsPath(r"C:\TRNSYS18\Exe\TrnEXE.exe")  # pragma: no cover
 
 
 def runDck(cmd: str, dckName: str) -> None:
     if not _os.path.isfile(dckName):
-        raise FileNotFoundError("File not found: " + dckName)
+        raise FileNotFoundError("File not found: " + dckName)  # pragma: no cover
 
     _sp.run([cmd, dckName, "/H"], shell=True, check=True)
