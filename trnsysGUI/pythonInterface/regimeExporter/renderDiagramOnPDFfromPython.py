@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import dataclasses as _dc
 import os as _os
 import pathlib as _pl
@@ -13,11 +15,13 @@ import pandas as _pd
 import trnsysGUI.MassFlowVisualizer as _mfv
 import trnsysGUI.TVentil as _tv
 import trnsysGUI.diagram.Editor as _de
-import trnsysGUI.mainWindow as _mw
 import trnsysGUI.pumpsAndTaps._tapBase as _tb
 import trnsysGUI.pumpsAndTaps.pump as _pump
 import trnsysGUI.pythonInterface.regimeExporter.getDesiredRegimes as _gdr
 import trnsysGUI.sourceSinkBase as _ssb
+
+if _tp.TYPE_CHECKING:  # pragma: no cover
+    import trnsysGUI.mainWindow as _mw
 
 
 _BlockItems = (_pump.Pump, _tv.TVentil, _tb.TapBase, _ssb.SourceSinkBase)
@@ -44,7 +48,7 @@ class RegimeExporter:
 
     def export(
         self, onlyTheseRegimes: _tp.Optional[_tp.Sequence[str]] = None
-    ) -> None:
+    ) -> _tp.List[str]:
 
         if not onlyTheseRegimes:
             self._makeDiagramFiles()
@@ -55,7 +59,9 @@ class RegimeExporter:
         relevantNames = list(regimeValues.columns)
         relevantBlockItems = self.getRelevantBlockItems(relevantNames)
 
-        self._simulateAndVisualizeMassFlows(relevantBlockItems, regimeValues)
+        return self._simulateAndVisualizeMassFlows(
+            relevantBlockItems, regimeValues
+        )
 
     def _makeDiagramFiles(self, regimeName: str = "diagram") -> None:
         pdfName = self.resultsDir / f"{self.projectName}_{regimeName}.pdf"
@@ -80,8 +86,8 @@ class RegimeExporter:
         self,
         relevantBlockItems: _tp.Sequence[_BlockItem],
         regimeValues: _pd.DataFrame,
-    ) -> None:
-
+    ) -> _tp.List[str]:
+        failures = []
         for regimeName in regimeValues.index:
             regimeRow = regimeValues.loc[regimeName]
 
@@ -91,6 +97,7 @@ class RegimeExporter:
                 _exportMassFlowSolverDeckAndRunTrnsys(self.mainWindow.editor)
                 timeStep = 2
             except (FileNotFoundError, _sp.CalledProcessError):
+                failures.append(regimeName)
                 regimeName = regimeName + "_FAILED"
                 timeStep = 1
 
@@ -104,6 +111,7 @@ class RegimeExporter:
             self._makeDiagramFiles(regimeName=regimeName)
 
             massFlowSolverVisualizer.close()
+        return failures
 
     @staticmethod
     def _adjustPumpsAndValves(
@@ -123,8 +131,8 @@ class RegimeExporter:
                     hasMassFlowRate.massFlowRateInKgPerH = desiredValue
                 case _tv.TVentil() as valve:
                     valve.positionForMassFlowSolver = desiredValue
-                case _:
-                    _tp.assert_never(blockItem)
+                case _:  # pragma: no cover
+                    _tp.assert_never(blockItem)  # pragma: no cover
 
     def _printDiagramToPDF(self, fileName: _pl.Path) -> None:
         printer = _qtp.QPrinter(_qtp.QPrinter.HighResolution)
@@ -155,7 +163,9 @@ def _exportMassFlowSolverDeckAndRunTrnsys(editor: _de.Editor) -> None:  # type: 
 
 
 def _exportHydraulic(editor: _de.Editor, *, formatting) -> str:  # type: ignore[name-defined]
-    exportedFilePath = editor.exportHydraulics(exportTo=formatting)
+    exportedFilePath = editor.exportHydraulics(
+        exportTo=formatting, disableFileExistMsgb=True
+    )
     return exportedFilePath
 
 
@@ -164,11 +174,15 @@ def _getTrnExePath() -> _pl.PureWindowsPath:
     if isRunDuringCi:
         return _pl.PureWindowsPath(r"C:\CI-Progams\TRNSYS18\Exe\TrnEXE.exe")
 
-    return _pl.PureWindowsPath(r"C:\TRNSYS18\Exe\TrnEXE.exe")
+    return _pl.PureWindowsPath(
+        r"C:\TRNSYS18\Exe\TrnEXE.exe"
+    )  # pragma: no cover
 
 
 def runDck(cmd: str, dckName: str) -> None:
     if not _os.path.isfile(dckName):
-        raise FileNotFoundError("File not found: " + dckName)
+        raise FileNotFoundError(
+            "File not found: " + dckName
+        )  # pragma: no cover
 
     _sp.run([cmd, dckName, "/H"], shell=True, check=True)

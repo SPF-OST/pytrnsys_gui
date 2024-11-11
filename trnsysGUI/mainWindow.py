@@ -30,6 +30,7 @@ from trnsysGUI.ProcessMain import ProcessMain
 from trnsysGUI.RunMain import RunMain
 from trnsysGUI.common import cancelled as _ccl
 from trnsysGUI.diagram import Editor as _de
+from trnsysGUI.menus.hydraulicModesMenu import hydraulicModes as hm
 from trnsysGUI.messageBox import MessageBox
 from trnsysGUI.recentProjectsHandler import RecentProjectsHandler
 from trnsysGUI.storageTank.widget import StorageTank
@@ -41,7 +42,10 @@ class MainWindow(_qtw.QMainWindow):
 
         self.editor = None
 
-        self.jsonPath = None
+        # ==================================
+        # When we change to a different project the mainWindow should also be updated with that project
+        self.project = project
+        # ==================================
         self.logger = logger
 
         self.labelVisState = False
@@ -262,6 +266,7 @@ class MainWindow(_qtw.QMainWindow):
         self.mb = self.menuBar()
         self.mb.addMenu(self.fileMenu)
         self.mb.addMenu(self.projectMenu)
+        self.mb.addMenu(hm.getHydraulicModesMenu(self))
         self.mb.addMenu(self.editMenu)
         self.mb.addMenu(self.helpMenu)
         self.mb.addSeparator()
@@ -539,12 +544,12 @@ class MainWindow(_qtw.QMainWindow):
         maybeCancelled = _prj.getLoadOrMigrateProject()
         if _ccl.isCancelled(maybeCancelled):
             return
-        project = _ccl.value(maybeCancelled)
-        RecentProjectsHandler.addProject(project.jsonFilePath)
-        self.updateRecentFileMenu(project.jsonFilePath)
-        self._resetEditor(project)
+        self.project = _ccl.value(maybeCancelled)
+        RecentProjectsHandler.addProject(self.project.jsonFilePath)
+        self.updateRecentFileMenu(self.project.jsonFilePath)
+        self._resetEditor(self.project)
 
-        if isinstance(project, _prj.MigrateProject):
+        if isinstance(self.project, _prj.MigrateProject):
             self.editor.saveProject()
 
     def openRecentFile(self, actionClicked: QAction):
@@ -559,10 +564,10 @@ class MainWindow(_qtw.QMainWindow):
             self.recentProjectsMenu.removeAction(actionClicked)
             return
 
-        project = _ccl.value(maybeCancelled)
-        RecentProjectsHandler.addProject(project.jsonFilePath)
-        self.updateRecentFileMenu(project.jsonFilePath)
-        self._resetEditor(project)
+        self.project = _ccl.value(maybeCancelled)
+        RecentProjectsHandler.addProject(self.project.jsonFilePath)
+        self.updateRecentFileMenu(self.project.jsonFilePath)
+        self._resetEditor(self.project)
 
     def _resetEditor(self, project):
         wasRunning = self.editor and self.editor.isRunning()
