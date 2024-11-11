@@ -174,11 +174,15 @@ def _getTrnExePath() -> _pl.PureWindowsPath:
     if isRunDuringCi:
         return _pl.PureWindowsPath(r"C:\CI-Progams\TRNSYS18\Exe\TrnEXE.exe")
 
-    return _pl.PureWindowsPath(r"C:\TRNSYS18\Exe\TrnEXE.exe")  # pragma: no cover
+    return _pl.PureWindowsPath(
+        r"C:\TRNSYS18\Exe\TrnEXE.exe"
+    )  # pragma: no cover
 
 
 def runDck(cmd: str, dckName: str) -> None:
     if not _os.path.isfile(dckName):
-        raise FileNotFoundError("File not found: " + dckName)  # pragma: no cover
+        raise FileNotFoundError(
+            "File not found: " + dckName
+        )  # pragma: no cover
 
     _sp.run([cmd, dckName, "/H"], shell=True, check=True)
