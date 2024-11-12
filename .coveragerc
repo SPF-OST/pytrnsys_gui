@@ -9,4 +9,4 @@ exclude_also =
     @_abc\.abstractmethod
 
     # leave out code that is only there for mypy checks.
-    if TYPE_CHECKING:
+    if _tp.TYPE_CHECKING:
