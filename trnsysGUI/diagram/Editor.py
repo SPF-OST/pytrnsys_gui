@@ -487,8 +487,8 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
                 ddckFolder, "hydraulic", "hydraulic.ddck"
             )
 
-        if self._doesFileExistAndDontOverwrite(
-            exportPath, disableFileExistMsgb
+        if not disableFileExistMsgb and self._doesFileExistAndDontOverwrite(
+            exportPath,
         ):
             return
 
@@ -673,9 +673,7 @@ Tcw=1
 
         return True
 
-    def _doesFileExistAndDontOverwrite(self, folderPath, ignore):
-        if ignore:
-            return
+    def _doesFileExistAndDontOverwrite(self, folderPath):
         if not _pl.Path(folderPath).exists() or self.forceOverwrite:
             return False
 

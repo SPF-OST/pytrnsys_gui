@@ -417,18 +417,16 @@ class StorageTank(
         exportDdckAction = contextMenu.addAction("Export ddck")
         exportDdckAction.triggered.connect(self.exportDck)
 
-    @_tp.no_type_check
-    # pylint: disable=inconsistent-return-statements
-    def mouseDoubleClickEvent(
-        self, event: _qtw.QGraphicsSceneMouseEvent, isTest=False
-    ) -> (_tp.Optional)[ConfigureStorageDialog]:
+    def mouseDoubleClickEvent(self, event: _qtw.QGraphicsSceneMouseEvent):
+        dialog = self.createStorageDialog()
+        dialog.exec()
+
+    def createStorageDialog(self) -> ConfigureStorageDialog:
         renameHelper = _rename.RenameHelper(self.editor.namesManager)
         dialog = ConfigureStorageDialog(
             self, self.editor, renameHelper, self.editor.projectFolder
         )
-        if isTest:
-            return dialog
-        dialog.exec()
+        return dialog
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         heatExchangerNodes = [hx.modelPipe for hx in self.heatExchangers]

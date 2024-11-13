@@ -48,8 +48,6 @@ class ConfigureStorageDialog(
     )
     NO_SIDE_SELECTED_ERROR_MESSAGE = "No side selected for heat exchanger."
 
-    isTest = False
-
     def __init__(
         self,
         storage: _st.StorageTank,
@@ -599,5 +597,4 @@ class ConfigureStorageDialog(
 
     def _openMessageBox(self, text):
         self.msgb.setText(text)
-        if not self.isTest:
-            self.msgb.exec_()
+        self.msgb.exec()

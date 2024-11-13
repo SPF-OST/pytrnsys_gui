@@ -57,6 +57,11 @@ def runModes(project: prj.CreateOrLoadProject, mainWindow: mw.MainWindow):  # ty
                 informativeText=constants.ERROR_RUNNING_MODES_TRNSYS_ADDITIONAL,
                 buttons=[_qtw.QMessageBox.Ok],
             )
+        else:
+            MessageBox.create(
+                messageText=f"{constants.SUCCESS_RUNNING_MODES}{','.join(failures)}",
+                buttons=[_qtw.QMessageBox.Ok],
+            )
 
     except FileNotFoundError as e:
         MessageBox.create(
