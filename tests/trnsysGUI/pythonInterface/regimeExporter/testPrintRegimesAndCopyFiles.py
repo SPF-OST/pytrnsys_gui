@@ -18,6 +18,9 @@ _RESULTS_DIR_NAME = "results"
 _RESULTS_DIR_NAME_2 = "resultsReducedUsage"
 _REGIMES_FILENAME = "regimes.csv"
 
+# TODO: add test for tempering valve
+# TODO: cleanup parent ".."
+
 
 @_dc.dataclass
 class PathFinder:  # pylint: disable=too-many-instance-attributes
@@ -326,6 +329,68 @@ class TestPrintRegimesAndCopyFiles:
                 expectedName2Path,
                 expectedName3Path,
                 expectedName4Path,
+            ],
+        }
+
+        errors = []
+        for i, newFile in enumerate(filesToCompare["new_file"]):
+            try:
+                self._fileExistsAndIsCorrect(
+                    newFile, filesToCompare["expected_file"][i]
+                )
+            except AssertionError as currentError:
+                errors.append(currentError)
+
+        if errors:
+            raise ExceptionGroup("multiple errors", errors)
+
+    def testUsingQtBotForDiagramWithTemperingValve(self, qtbot):
+        projectName = "diagramWithTemperingValve"
+
+        pathFinder2 = PathFinder(
+            projectName,
+            _BASE_FOLDER_FILE_PATH,
+            _EXPECTED_FILES_PATH,
+            _RESULTS_DIR_NAME,
+            _RESULTS_DIR_NAME_2,
+        )
+        dataDir = pathFinder2.projectDir
+        resultsDir = pathFinder2.resultsDir
+
+        _ensureDirExists(resultsDir)
+
+        mainWindow = _createMainWindow(dataDir, projectName, qtbot)
+        regimeExporter = _rdopfp.RegimeExporter(
+            projectName,
+            dataDir,
+            resultsDir,
+            _REGIMES_FILENAME,
+            mainWindow,
+        )
+        regimeExporter.export()
+
+        pathFinder2.setFileEnding("_diagram")
+        expectedDiagramPath = pathFinder2.expectedPdfPath
+        newDiagramPath = pathFinder2.newPdfPath
+
+        pathFinder2.setFileEnding("_name1")
+        expectedName1Path = pathFinder2.expectedPdfPath
+        newName1Path = pathFinder2.newPdfPath
+
+        pathFinder2.setFileEnding("_name2")
+        expectedName2Path = pathFinder2.expectedPdfPath
+        newName2Path = pathFinder2.newPdfPath
+
+        filesToCompare = {
+            "new_file": [
+                newDiagramPath,
+                newName1Path,
+                newName2Path,
+            ],
+            "expected_file": [
+                expectedDiagramPath,
+                expectedName1Path,
+                expectedName2Path,
             ],
         }
 
