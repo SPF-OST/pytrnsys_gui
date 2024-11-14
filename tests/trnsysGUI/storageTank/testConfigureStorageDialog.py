@@ -18,9 +18,7 @@ class TestConfigureStorageDialog:
     storageTank = None
 
     @_pt.fixture()
-    def storageDialog(
-        self, qtbot, monkeypatch
-    ) -> ConfigureStorageDialog:
+    def storageDialog(self, qtbot, monkeypatch) -> ConfigureStorageDialog:
         monkeypatch.setattr(QMessageBox, "exec", lambda qbox: QMessageBox.Ok)
 
         mainWindow = utils.createMainWindow(_PROJECT_DIR, _PROJECT_NAME)

@@ -417,7 +417,9 @@ class StorageTank(
         exportDdckAction = contextMenu.addAction("Export ddck")
         exportDdckAction.triggered.connect(self.exportDck)
 
-    def mouseDoubleClickEvent(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:
+    def mouseDoubleClickEvent(
+        self, event: _qtw.QGraphicsSceneMouseEvent
+    ) -> None:
         dialog = self.createStorageDialog()
         dialog.exec()
 
