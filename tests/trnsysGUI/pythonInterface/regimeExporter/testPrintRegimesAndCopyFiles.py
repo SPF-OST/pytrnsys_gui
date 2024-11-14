@@ -257,7 +257,7 @@ class TestPrintRegimesAndCopyFiles:
 
         # check no tempering valves show up
         try:
-            assert 0 == len(regimeExporter.tempering_valves)
+            assert 0 == len(regimeExporter.temperingValves)
         except AssertionError as currentError:
             errors.append(currentError)
 
@@ -347,6 +347,7 @@ class TestPrintRegimesAndCopyFiles:
         if errors:
             raise ExceptionGroup("multiple errors", errors)
 
+    # pylint: disable=too-many-locals
     def testUsingQtBotForDiagramWithTemperingValve(self, qtbot):
         projectName = "diagramWithTemperingValve"
 
@@ -362,38 +363,37 @@ class TestPrintRegimesAndCopyFiles:
 
         _ensureDirExists(resultsDir)
 
-        mainWindow = _createMainWindow(dataDir, projectName, qtbot)
         regimeExporter = _rdopfp.RegimeExporter(
             projectName,
             dataDir,
             resultsDir,
             _REGIMES_FILENAME,
-            mainWindow,
+            _createMainWindow(dataDir, projectName, qtbot),
         )
         regimeExporter.export()
 
         pathFinder2.setFileEnding("_diagram")
-        expectedDiagramPath = pathFinder2.expectedPdfPath
-        newDiagramPath = pathFinder2.newPdfPath
+        expectedDiagramPath2 = pathFinder2.expectedPdfPath
+        newDiagramPath2 = pathFinder2.newPdfPath
 
         pathFinder2.setFileEnding("_name1")
-        expectedName1Path = pathFinder2.expectedPdfPath
-        newName1Path = pathFinder2.newPdfPath
+        expectedName1Path2 = pathFinder2.expectedPdfPath
+        newName1Path2 = pathFinder2.newPdfPath
 
         pathFinder2.setFileEnding("_name2")
-        expectedName2Path = pathFinder2.expectedPdfPath
-        newName2Path = pathFinder2.newPdfPath
+        expectedName2Path2 = pathFinder2.expectedPdfPath
+        newName2Path2 = pathFinder2.newPdfPath
 
         filesToCompare = {
             "new_file": [
-                newDiagramPath,
-                newName1Path,
-                newName2Path,
+                newDiagramPath2,
+                newName1Path2,
+                newName2Path2,
             ],
             "expected_file": [
-                expectedDiagramPath,
-                expectedName1Path,
-                expectedName2Path,
+                expectedDiagramPath2,
+                expectedName1Path2,
+                expectedName2Path2,
             ],
         }
 
@@ -408,8 +408,8 @@ class TestPrintRegimesAndCopyFiles:
 
         # check whether valves are tempering valves again
         try:
-            assert 1 == len(regimeExporter.tempering_valves)
-            valve = regimeExporter.tempering_valves[0]
+            assert 1 == len(regimeExporter.temperingValves)
+            valve = regimeExporter.temperingValves[0]
             assert valve.isTempering
         except AssertionError as currentError:
             errors.append(currentError)

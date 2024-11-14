@@ -30,14 +30,14 @@ _BlockItem = _pump.Pump | _tv.TVentil | _tb.TapBase | _ssb.SourceSinkBase
 
 
 @_dc.dataclass
-class RegimeExporter:
+class RegimeExporter:  # pylint: disable=too-many-instance-attributes
     projectName: str
     projectDir: _pl.Path
     resultsDir: _pl.Path
     regimesFileName: str
     mainWindow: _mw.MainWindow  # type: ignore[name-defined]
-    tempering_valve_was_true: bool = False
-    tempering_valves: _abc.Sequence[_tv.TVentil] = _dc.field(
+    temperingValveWasTrue: bool = False
+    temperingValves: _abc.Sequence[_tv.TVentil] = _dc.field(
         init=False, default_factory=list
     )
 
@@ -117,7 +117,7 @@ class RegimeExporter:
 
             massFlowSolverVisualizer.close()
 
-        self._reset_tempering_valves()
+        self._resetTemperingValves()
         return failures
 
     def _adjustPumpsAndValves(
@@ -141,9 +141,9 @@ class RegimeExporter:
                 case _tv.TVentil() as valve:
                     valve.positionForMassFlowSolver = desiredValue
                     if valve.isTempering:
-                        self.tempering_valve_was_true = True
+                        self.temperingValveWasTrue = True
                         valve.isTempering = False
-                        self.tempering_valves.append(valve)
+                        self.temperingValves.append(valve)
                 case _:  # pragma: no cover
                     _tp.assert_never(blockItem)  # pragma: no cover
 
@@ -166,14 +166,14 @@ class RegimeExporter:
         self.mainWindow.editor.diagramScene.render(painter)
         painter.end()
 
-    def _reset_tempering_valves(self):
-        if not self.tempering_valves:
+    def _resetTemperingValves(self):
+        if not self.temperingValves:
             return
 
-        for valve in self.tempering_valves:
+        for valve in self.temperingValves:
             valve.isTempering = True
 
-        self.tempering_valve_was_true = False
+        self.temperingValveWasTrue = False
 
 
 def _exportMassFlowSolverDeckAndRunTrnsys(editor: _de.Editor) -> None:  # type: ignore[name-defined]
