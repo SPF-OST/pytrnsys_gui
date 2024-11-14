@@ -19,8 +19,7 @@ MODES_CSV_CREATED = (
     "modes_template.csv has been created in your project directory"
 )
 MODES_CSV_CREATED_ADDITIONAL = (
-    "Please rename (e.g. modes.csv), "
-    "make sure to deselect any mixing valves and provide pump and valve values"
+    "Please rename (e.g. modes.csv), and provide pump and valve values"
 )
 MODE_CSV_ALREADY_EXISTS = "modes_template.csv file already exists in your project. Would you like to overwrite?"
 ERROR_RUNNING_MODES = "Error running modes: "
