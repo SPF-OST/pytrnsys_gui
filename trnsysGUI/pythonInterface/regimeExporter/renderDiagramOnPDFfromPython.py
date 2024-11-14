@@ -36,8 +36,10 @@ class RegimeExporter:
     resultsDir: _pl.Path
     regimesFileName: str
     mainWindow: _mw.MainWindow  # type: ignore[name-defined]
-    tempering_valve_was_true: bool = _dc.field(init=False)
-    tempering_valves: _abc.Sequence[_tv.TVentil] = _dc.field(init=False, default_factory=list)
+    tempering_valve_was_true: bool = False
+    tempering_valves: _abc.Sequence[_tv.TVentil] = _dc.field(
+        init=False, default_factory=list
+    )
 
     @property
     def massFlowRatesPrintFilePath(self) -> _pl.Path:
@@ -118,8 +120,10 @@ class RegimeExporter:
         self._reset_tempering_valves()
         return failures
 
-    def _adjustPumpsAndValves(self,
-        relevantBlockItems: _tp.Sequence[_BlockItem], regimeRow: _pd.Series
+    def _adjustPumpsAndValves(
+        self,
+        relevantBlockItems: _tp.Sequence[_BlockItem],
+        regimeRow: _pd.Series,
     ) -> None:
         # TODO: refactor into separate lists first. Then no branches needed.  # pylint: disable=fixme
 
