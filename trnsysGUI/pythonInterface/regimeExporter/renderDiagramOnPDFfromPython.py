@@ -143,7 +143,10 @@ class RegimeExporter:  # pylint: disable=too-many-instance-attributes
                     if valve.isTempering:
                         self.temperingValveWasTrue = True
                         valve.isTempering = False
-                        self.temperingValves.append(valve)
+                        # ============================================
+                        # issue with Sequence: https://github.com/python/mypy/issues/13948
+                        self.temperingValves.append(valve)  # type: ignore
+                        # ============================================
                 case _:  # pragma: no cover
                     _tp.assert_never(blockItem)  # pragma: no cover
 
