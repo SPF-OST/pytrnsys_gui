@@ -5,6 +5,7 @@ import os as _os
 import pathlib as _pl
 import subprocess as _sp
 import typing as _tp
+import collections.abc as _abc
 
 import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
@@ -20,7 +21,7 @@ import trnsysGUI.pumpsAndTaps.pump as _pump
 import trnsysGUI.pythonInterface.regimeExporter.getDesiredRegimes as _gdr
 import trnsysGUI.sourceSinkBase as _ssb
 
-if _tp.TYPE_CHECKING:  # pragma: no cover
+if _tp.TYPE_CHECKING:
     import trnsysGUI.mainWindow as _mw
 
 
@@ -35,6 +36,8 @@ class RegimeExporter:
     resultsDir: _pl.Path
     regimesFileName: str
     mainWindow: _mw.MainWindow  # type: ignore[name-defined]
+    tempering_valve_was_true: bool = _dc.field(init=False)
+    tempering_valves: _abc.Sequence[_tv.TVentil] = _dc.field(init=False, default_factory=list)
 
     @property
     def massFlowRatesPrintFilePath(self) -> _pl.Path:
@@ -111,12 +114,14 @@ class RegimeExporter:
             self._makeDiagramFiles(regimeName=regimeName)
 
             massFlowSolverVisualizer.close()
+
+            self._reset_tempering_valves()
         return failures
 
-    @staticmethod
-    def _adjustPumpsAndValves(
+    def _adjustPumpsAndValves(self,
         relevantBlockItems: _tp.Sequence[_BlockItem], regimeRow: _pd.Series
     ) -> None:
+        # TODO: refactor into separate lists first. Then no branches needed.  # pylint: disable=fixme
 
         for blockItem in relevantBlockItems:
             blockItemName = blockItem.displayName
@@ -131,6 +136,10 @@ class RegimeExporter:
                     hasMassFlowRate.massFlowRateInKgPerH = desiredValue
                 case _tv.TVentil() as valve:
                     valve.positionForMassFlowSolver = desiredValue
+                    if valve.isTempering:
+                        self.tempering_valve_was_true = True
+                        valve.isTempering = False
+                        self.tempering_valves.append(valve)
                 case _:  # pragma: no cover
                     _tp.assert_never(blockItem)  # pragma: no cover
 
@@ -152,6 +161,13 @@ class RegimeExporter:
         painter = _qtg.QPainter(generator)
         self.mainWindow.editor.diagramScene.render(painter)
         painter.end()
+
+    def _reset_tempering_valves(self):
+        if not self.tempering_valves:
+            return
+
+        for valve in self.tempering_valves:
+            valve.isTempering = True
 
 
 def _exportMassFlowSolverDeckAndRunTrnsys(editor: _de.Editor) -> None:  # type: ignore[name-defined]
