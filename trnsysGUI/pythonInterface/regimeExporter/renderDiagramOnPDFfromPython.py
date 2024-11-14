@@ -115,7 +115,7 @@ class RegimeExporter:
 
             massFlowSolverVisualizer.close()
 
-            self._reset_tempering_valves()
+        self._reset_tempering_valves()
         return failures
 
     def _adjustPumpsAndValves(self,
@@ -168,6 +168,8 @@ class RegimeExporter:
 
         for valve in self.tempering_valves:
             valve.isTempering = True
+
+        self.tempering_valve_was_true = False
 
 
 def _exportMassFlowSolverDeckAndRunTrnsys(editor: _de.Editor) -> None:  # type: ignore[name-defined]

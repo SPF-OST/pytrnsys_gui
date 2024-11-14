@@ -18,8 +18,10 @@ _RESULTS_DIR_NAME = "results"
 _RESULTS_DIR_NAME_2 = "resultsReducedUsage"
 _REGIMES_FILENAME = "regimes.csv"
 
+
 # TODO: add test for tempering valve
 # TODO: cleanup parent ".."
+# TODO: add no tempering valve assert to other example
 
 
 @_dc.dataclass
@@ -36,9 +38,9 @@ class PathFinder:  # pylint: disable=too-many-instance-attributes
     @property
     def projectDir(self):
         return (
-            _pl.Path(_GUI.__file__).parent
-            / self.baseFolderRelativePath
-            / self.projectName
+                _pl.Path(_GUI.__file__).parent
+                / self.baseFolderRelativePath
+                / self.projectName
         )
 
     @property
@@ -402,6 +404,14 @@ class TestPrintRegimesAndCopyFiles:
                 )
             except AssertionError as currentError:
                 errors.append(currentError)
+
+        # check whether valves are tempering valves again
+        try:
+            assert 1 == len(regimeExporter.tempering_valves)
+            valve = regimeExporter.tempering_valves[0]
+            assert valve.isTempering
+        except AssertionError as currentError:
+            errors.append(currentError)
 
         if errors:
             raise ExceptionGroup("multiple errors", errors)
