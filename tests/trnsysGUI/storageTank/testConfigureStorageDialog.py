@@ -1,6 +1,6 @@
 import pathlib as _pl
 
-import pytest
+import pytest as _pt
 from PyQt5.QtWidgets import QMessageBox
 
 import trnsysGUI.storageTank.widget as stw
@@ -17,7 +17,7 @@ _PROJECT_NAME = "diagramForConfigStorageDialog"
 class TestConfigureStorageDialog:
     storageTank = None
 
-    @pytest.fixture()
+    @_pt.fixture()
     def triggerStorageDialog(
         self, qtbot, monkeypatch
     ) -> ConfigureStorageDialog:
