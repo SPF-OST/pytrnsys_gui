@@ -18,7 +18,7 @@ class TestConfigureStorageDialog:
     storageTank = None
 
     @_pt.fixture()
-    def triggerStorageDialog(
+    def storageDialog(
         self, qtbot, monkeypatch
     ) -> ConfigureStorageDialog:
         monkeypatch.setattr(QMessageBox, "exec", lambda qbox: QMessageBox.Ok)
@@ -32,13 +32,13 @@ class TestConfigureStorageDialog:
         qtbot.addWidget(configureStorageDialog)
         return configureStorageDialog
 
-    def testAddHxSuccess(self, triggerStorageDialog):
+    def testAddHxSuccess(self, storageDialog):
         hxInput = "90"
         hxOutput = "50"
         hxName = "Test hx"
         errors = []
 
-        configureStorageDialog = triggerStorageDialog
+        configureStorageDialog = storageDialog
 
         try:
             assert len(self.storageTank.heatExchangers) == 1
@@ -64,11 +64,11 @@ class TestConfigureStorageDialog:
         if errors:
             raise ExceptionGroup(f"Found {len(errors)} issues.", errors)
 
-    def testAddHxMissingNameFailure(self, triggerStorageDialog):
+    def testAddHxMissingNameFailure(self, storageDialog):
         hxInput = "90"
         hxOutput = "50"
 
-        configureStorageDialog = triggerStorageDialog
+        configureStorageDialog = storageDialog
         configureStorageDialog.offsetLeI.setText(hxInput)
         configureStorageDialog.offsetLeO.setText(hxOutput)
         configureStorageDialog.rButton.setChecked(True)
@@ -79,11 +79,11 @@ class TestConfigureStorageDialog:
             == configureStorageDialog.MISSING_NAME_ERROR_MESSAGE
         )
 
-    def testAddHxInvalidRangeFailure(self, triggerStorageDialog):
+    def testAddHxInvalidRangeFailure(self, storageDialog):
         hxInput = "90"
         hxOutput = "90"
 
-        configureStorageDialog = triggerStorageDialog
+        configureStorageDialog = storageDialog
         configureStorageDialog.offsetLeI.setText(hxInput)
         configureStorageDialog.offsetLeO.setText(hxOutput)
         configureStorageDialog.addHx()
@@ -95,8 +95,8 @@ class TestConfigureStorageDialog:
 
         assert configureStorageDialog.msgb.text() == expectedErrorMessage
 
-    def testRemoveHxSuccess(self, triggerStorageDialog):
-        configureStorageDialog = triggerStorageDialog
+    def testRemoveHxSuccess(self, storageDialog):
+        configureStorageDialog = storageDialog
         assert len(self.storageTank.heatExchangers) == 1
         configureStorageDialog.leftHeatExchangersItemListWidget.item(
             0
@@ -105,11 +105,11 @@ class TestConfigureStorageDialog:
 
         assert len(self.storageTank.heatExchangers) == 0
 
-    def testAddPortPairSuccess(self, triggerStorageDialog):
+    def testAddPortPairSuccess(self, storageDialog):
         portPairInput = "1"
         portPairOutput = "99"
 
-        configureStorageDialog = triggerStorageDialog
+        configureStorageDialog = storageDialog
         configureStorageDialog.manPortLeI.setText(portPairInput)
         configureStorageDialog.manPortLeO.setText(portPairOutput)
         configureStorageDialog.manlButton.setChecked(True)
@@ -117,11 +117,11 @@ class TestConfigureStorageDialog:
 
         assert len(self.storageTank.directPortPairs) == 2
 
-    def testAddPortPairHeightFailure(self, triggerStorageDialog):
+    def testAddPortPairHeightFailure(self, storageDialog):
         portPairInput = "-1"
         portPairOutput = "100"
 
-        configureStorageDialog = triggerStorageDialog
+        configureStorageDialog = storageDialog
         configureStorageDialog.manPortLeI.setText(portPairInput)
         configureStorageDialog.manPortLeO.setText(portPairOutput)
         configureStorageDialog.manlButton.setChecked(True)
@@ -132,11 +132,11 @@ class TestConfigureStorageDialog:
             == configureStorageDialog.PORT_HEIGHT_ERROR_MESSAGE
         )
 
-    def testAddPortPairNoSideSelectedFailure(self, triggerStorageDialog):
+    def testAddPortPairNoSideSelectedFailure(self, storageDialog):
         portPairInput = "9"
         portPairOutput = "42"
 
-        configureStorageDialog = triggerStorageDialog
+        configureStorageDialog = storageDialog
         configureStorageDialog.manPortLeI.setText(portPairInput)
         configureStorageDialog.manPortLeO.setText(portPairOutput)
         configureStorageDialog.addPortPair()
@@ -147,8 +147,8 @@ class TestConfigureStorageDialog:
             == configureStorageDialog.NO_SIDE_SELECTED_ERROR_MESSAGE
         )
 
-    def testRemovePortPairSuccess(self, triggerStorageDialog):
-        configureStorageDialog = triggerStorageDialog
+    def testRemovePortPairSuccess(self, storageDialog):
+        configureStorageDialog = storageDialog
         assert len(self.storageTank.directPortPairs) == 1
         configureStorageDialog.rightDirectPortPairsItemListWidget.item(
             0
