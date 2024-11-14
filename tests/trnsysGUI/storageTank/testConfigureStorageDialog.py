@@ -9,8 +9,8 @@ from tests.trnsysGUI import (
 )  # pylint complains when using .utils as utils.
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 
-_CURRENT_DIR = _pl.Path(__file__).parent
-_PROJECT_DIR = _CURRENT_DIR / ".." / "data" / "diagramForConfigStorageDialog"
+_CURRENT_DIR = _pl.Path(__file__).parents[1]
+_PROJECT_DIR = _CURRENT_DIR / "data/diagramForConfigStorageDialog"
 _PROJECT_NAME = "diagramForConfigStorageDialog"
 
 
@@ -21,7 +21,7 @@ class TestConfigureStorageDialog:
     def triggerStorageDialog(
         self, qtbot, monkeypatch
     ) -> ConfigureStorageDialog:
-        monkeypatch.setattr(QMessageBox, "exec", lambda self: QMessageBox.Ok)
+        monkeypatch.setattr(QMessageBox, "exec", lambda qbox: QMessageBox.Ok)
 
         mainWindow = utils.createMainWindow(_PROJECT_DIR, _PROJECT_NAME)
         qtbot.addWidget(mainWindow)
