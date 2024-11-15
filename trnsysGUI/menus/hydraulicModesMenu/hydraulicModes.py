@@ -11,7 +11,7 @@ from trnsysGUI import project as prj
 from trnsysGUI.messageBox import MessageBox
 from trnsysGUI.pythonInterface.regimeExporter import exportRegimes as er
 
-if _tp.TYPE_CHECKING:  # pragma: no cover
+if _tp.TYPE_CHECKING:
     import trnsysGUI.mainWindow as mw
 
 
@@ -55,6 +55,11 @@ def runModes(project: prj.CreateOrLoadProject, mainWindow: mw.MainWindow):  # ty
             MessageBox.create(
                 messageText=f"{constants.ERROR_RUNNING_MODES}{','.join(failures)}",
                 informativeText=constants.ERROR_RUNNING_MODES_TRNSYS_ADDITIONAL,
+                buttons=[_qtw.QMessageBox.Ok],
+            )
+        else:
+            MessageBox.create(
+                messageText=f"{constants.SUCCESS_RUNNING_MODES}{','.join(failures)}",
                 buttons=[_qtw.QMessageBox.Ok],
             )
 

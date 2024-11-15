@@ -12,7 +12,7 @@ import trnsysGUI.project as _prj
 import trnsysGUI.pythonInterface.regimeExporter.renderDiagramOnPDFfromPython as _rdopfp
 
 _PROJECT_NAME = "diagramForRegimes"
-_BASE_FOLDER_FILE_PATH = "..\\tests\\trnsysGUI\\data\\"
+_BASE_FOLDER_FILE_PATH = "tests/trnsysGUI/data/"
 _EXPECTED_FILES_PATH = "expectedPDFs"
 _RESULTS_DIR_NAME = "results"
 _RESULTS_DIR_NAME_2 = "resultsReducedUsage"
@@ -33,7 +33,7 @@ class PathFinder:  # pylint: disable=too-many-instance-attributes
     @property
     def projectDir(self):
         return (
-            _pl.Path(_GUI.__file__).parent
+            _pl.Path(_GUI.__file__).parents[1]
             / self.baseFolderRelativePath
             / self.projectName
         )
@@ -255,6 +255,12 @@ class TestPrintRegimesAndCopyFiles:
         except AssertionError as currentError:
             errors.append(currentError)
 
+        # check no tempering valves show up
+        try:
+            assert 0 == len(regimeExporter.temperingValves)
+        except AssertionError as currentError:
+            errors.append(currentError)
+
         if errors:
             raise ExceptionGroup("multiple errors", errors)
 
@@ -337,6 +343,76 @@ class TestPrintRegimesAndCopyFiles:
                 )
             except AssertionError as currentError:
                 errors.append(currentError)
+
+        if errors:
+            raise ExceptionGroup("multiple errors", errors)
+
+    # pylint: disable=too-many-locals
+    def testUsingQtBotForDiagramWithTemperingValve(self, qtbot):
+        projectName = "diagramWithTemperingValve"
+
+        pathFinder2 = PathFinder(
+            projectName,
+            _BASE_FOLDER_FILE_PATH,
+            _EXPECTED_FILES_PATH,
+            _RESULTS_DIR_NAME,
+            _RESULTS_DIR_NAME_2,
+        )
+        dataDir = pathFinder2.projectDir
+        resultsDir = pathFinder2.resultsDir
+
+        _ensureDirExists(resultsDir)
+
+        regimeExporter = _rdopfp.RegimeExporter(
+            projectName,
+            dataDir,
+            resultsDir,
+            _REGIMES_FILENAME,
+            _createMainWindow(dataDir, projectName, qtbot),
+        )
+        regimeExporter.export()
+
+        pathFinder2.setFileEnding("_diagram")
+        expectedDiagramPath2 = pathFinder2.expectedPdfPath
+        newDiagramPath2 = pathFinder2.newPdfPath
+
+        pathFinder2.setFileEnding("_name1")
+        expectedName1Path2 = pathFinder2.expectedPdfPath
+        newName1Path2 = pathFinder2.newPdfPath
+
+        pathFinder2.setFileEnding("_name2")
+        expectedName2Path2 = pathFinder2.expectedPdfPath
+        newName2Path2 = pathFinder2.newPdfPath
+
+        filesToCompare = {
+            "new_file": [
+                newDiagramPath2,
+                newName1Path2,
+                newName2Path2,
+            ],
+            "expected_file": [
+                expectedDiagramPath2,
+                expectedName1Path2,
+                expectedName2Path2,
+            ],
+        }
+
+        errors = []
+        for i, newFile in enumerate(filesToCompare["new_file"]):
+            try:
+                self._fileExistsAndIsCorrect(
+                    newFile, filesToCompare["expected_file"][i]
+                )
+            except AssertionError as currentError:
+                errors.append(currentError)
+
+        # check whether valves are tempering valves again
+        try:
+            assert 1 == len(regimeExporter.temperingValves)
+            valve = regimeExporter.temperingValves[0]
+            assert valve.isTempering
+        except AssertionError as currentError:
+            errors.append(currentError)
 
         if errors:
             raise ExceptionGroup("multiple errors", errors)
