@@ -5,7 +5,6 @@ import os as _os
 import pathlib as _pl
 import subprocess as _sp
 import typing as _tp
-import collections.abc as _abc
 
 import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
@@ -37,7 +36,7 @@ class RegimeExporter:  # pylint: disable=too-many-instance-attributes
     regimesFileName: str
     mainWindow: _mw.MainWindow  # type: ignore[name-defined]
     temperingValveWasTrue: bool = False
-    temperingValves: _abc.Sequence[_tv.TVentil] = _dc.field(
+    temperingValves: list[_tv.TVentil] = _dc.field(
         init=False, default_factory=list
     )
 
@@ -125,7 +124,6 @@ class RegimeExporter:  # pylint: disable=too-many-instance-attributes
         relevantBlockItems: _tp.Sequence[_BlockItem],
         regimeRow: _pd.Series,
     ) -> None:
-        # TODO: refactor into separate lists first. Then no branches needed.  # pylint: disable=fixme
 
         for blockItem in relevantBlockItems:
             blockItemName = blockItem.displayName
@@ -143,10 +141,7 @@ class RegimeExporter:  # pylint: disable=too-many-instance-attributes
                     if valve.isTempering:
                         self.temperingValveWasTrue = True
                         valve.isTempering = False
-                        # ============================================
-                        # issue with Sequence: https://github.com/python/mypy/issues/13948
-                        self.temperingValves.append(valve)  # type: ignore
-                        # ============================================
+                        self.temperingValves.append(valve)
                 case _:  # pragma: no cover
                     _tp.assert_never(blockItem)  # pragma: no cover
 
