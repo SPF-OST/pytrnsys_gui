@@ -1,0 +1,9 @@
+defaultName: chillerHP
+description: Air Source Heat Pump in Chiller mode
+connections:
+  - name: Standard
+    input:
+      position: [120, 20]
+    output:
+      position: [120, 100]
+size: [120, 120]
