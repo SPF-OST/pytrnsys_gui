@@ -3,22 +3,20 @@
 
 import datetime as _dt
 import itertools as _it
-import numpy as _np
 import typing as _tp
-
-import pandas as _pd
 
 import PyQt5.QtCore as _qtc
 import PyQt5.QtWidgets as _qtw
-
+import numpy as _np
+import pandas as _pd
 import trnsysGUI.TVentil as _tv
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.doublePipeConnection as _dpc
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.connection.singlePipeConnection as _spc
-import trnsysGUI.warningsAndErrors as _werrors
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.warningsAndErrors as _werrors
 
 _MAX_HEADER_LENGTH = 25
 
@@ -225,136 +223,132 @@ class MassFlowVisualizer(_qtw.QDialog):
             self.logger.debug("reached end of data, returning")
             self.qtm.stop()
 
-        if self.loadedFile:
-            i = 0
-            for t in self.parent.editor.trnsysObj:
-                if isinstance(t, _spc.SinglePipeConnection):
-                    mfrVariableName = _mnames.getCanonicalMassFlowVariableName(
-                        componentDisplayName=t.getDisplayName(),
-                        pipeName=t.modelPipe.name,
-                    )
-                    temperatureVariableName = (
-                        _cnames.getTemperatureVariableName(
-                            t, _mfn.PortItemType.STANDARD
-                        )
-                    )
-
-                    if (
-                        mfrVariableName in self.massFlowData.columns
-                        and temperatureVariableName in self.tempMassFlowData
-                    ):
-                        massFlow = self._getMassFlow(
-                            mfrVariableName, self.timeStep
-                        )
-                        temperature = self._getTemperature(
-                            temperatureVariableName, self.timeStep
-                        )
-
-                        t.setMassFlowAndTemperature(massFlow, temperature)
-                        thickValue = self.getThickness(massFlow)
-                        self.logger.debug("Thickvalue: " + str(thickValue))
-                        if (
-                            self.massFlowData[mfrVariableName].iloc[
-                                self.timeStep
-                            ]
-                            == 0
-                        ):
-                            t.setColor(thickValue, mfr="ZeroMfr")
-                        elif round(abs(temperature)) == self.maxValue:
-                            t.setColor(thickValue, mfr="max")
-                        elif round(abs(temperature)) == self.minValue:
-                            t.setColor(thickValue, mfr="min")
-                        elif (
-                            self.minValue
-                            < round(abs(temperature))
-                            <= self.lowerQuarter
-                        ):
-                            t.setColor(thickValue, mfr="minTo25")
-                        elif (
-                            self.lowerQuarter
-                            < round(abs(temperature))
-                            <= self.medianValue
-                        ):
-                            t.setColor(thickValue, mfr="25To50")
-                        elif (
-                            self.medianValue
-                            < round(abs(temperature))
-                            <= self.upperQuarter
-                        ):
-                            t.setColor(thickValue, mfr="50To75")
-                        elif (
-                            self.upperQuarter
-                            < round(abs(temperature))
-                            < self.maxValue
-                        ):
-                            t.setColor(thickValue, mfr="75ToMax")
-                        else:
-                            t.setColor(thickValue, mfr="test")
-                        i += 1
-                if isinstance(t, _dpc.DoublePipeConnection):
-                    coldMassFlowVariableName = (
-                        _mnames.getCanonicalMassFlowVariableName(
-                            componentDisplayName=t.displayName,
-                            pipeName=t.coldModelPipe.name,
-                        )
-                    )
-                    coldTemperatureVariableName = (
-                        _cnames.getTemperatureVariableName(
-                            t, _mfn.PortItemType.COLD
-                        )
-                    )
-
-                    hotMassFlowVariableName = (
-                        _mnames.getCanonicalMassFlowVariableName(
-                            componentDisplayName=t.displayName,
-                            pipeName=t.hotModelPipe.name,
-                        )
-                    )
-                    hotTemperatureVariableName = (
-                        _cnames.getTemperatureVariableName(
-                            t, _mfn.PortItemType.HOT
-                        )
-                    )
-
-                    coldMassFlow = self._getMassFlow(
-                        coldMassFlowVariableName, self.timeStep
-                    )
-                    coldTemperature = self._getTemperature(
-                        coldTemperatureVariableName, self.timeStep
-                    )
-
-                    hotMassFlow = self._getMassFlow(
-                        hotMassFlowVariableName, self.timeStep
-                    )
-                    hotTemperature = self._getTemperature(
-                        hotTemperatureVariableName, self.timeStep
-                    )
-
-                    t.setMassFlowAndTemperature(
-                        coldMassFlow,
-                        coldTemperature,
-                        hotMassFlow,
-                        hotTemperature,
-                    )
-
-                elif isinstance(t, _tv.TVentil):
-                    valvePositionVariableName = _mnames.getInputVariableName(
-                        t, t.modelDiverter
-                    )
-                    if valvePositionVariableName in self.massFlowData.columns:
-                        valvePosition = str(
-                            self.massFlowData[valvePositionVariableName].iloc[
-                                self.timeStep
-                            ]
-                        )
-                        t.setPositionForMassFlowSolver(valvePosition)
-                        t.posLabel.setPlainText(valvePosition)
-                        self.logger.debug(
-                            "valve position: " + str(valvePosition)
-                        )
-
-        else:
+        if not self.loadedFile:
             return
+
+        for t in self.parent.editor.trnsysObj:
+            if isinstance(t, _spc.SinglePipeConnection):
+                mfrVariableName = _mnames.getCanonicalMassFlowVariableName(
+                    componentDisplayName=t.getDisplayName(),
+                    pipeName=t.modelPipe.name,
+                )
+                temperatureVariableName = _cnames.getTemperatureVariableName(
+                    t, _mfn.PortItemType.STANDARD
+                )
+
+                if not self._haveTruncatedColumns(
+                    mfrVariableName, temperatureVariableName
+                ):
+                    continue
+
+                massFlow = self._getMassFlow(mfrVariableName, self.timeStep)
+                temperature = self._getTemperature(
+                    temperatureVariableName, self.timeStep
+                )
+
+                t.setMassFlowAndTemperature(massFlow, temperature)
+                thickValue = self.getThickness(massFlow)
+                self.logger.debug("Thickvalue: " + str(thickValue))
+                if massFlow == 0:
+                    t.setColor(thickValue, mfr="ZeroMfr")
+                elif round(abs(temperature)) == self.maxValue:
+                    t.setColor(thickValue, mfr="max")
+                elif round(abs(temperature)) == self.minValue:
+                    t.setColor(thickValue, mfr="min")
+                elif (
+                    self.minValue
+                    < round(abs(temperature))
+                    <= self.lowerQuarter
+                ):
+                    t.setColor(thickValue, mfr="minTo25")
+                elif (
+                    self.lowerQuarter
+                    < round(abs(temperature))
+                    <= self.medianValue
+                ):
+                    t.setColor(thickValue, mfr="25To50")
+                elif (
+                    self.medianValue
+                    < round(abs(temperature))
+                    <= self.upperQuarter
+                ):
+                    t.setColor(thickValue, mfr="50To75")
+                elif (
+                    self.upperQuarter < round(abs(temperature)) < self.maxValue
+                ):
+                    t.setColor(thickValue, mfr="75ToMax")
+                else:
+                    t.setColor(thickValue, mfr="test")
+
+            if isinstance(t, _dpc.DoublePipeConnection):
+                coldMassFlowVariableName = (
+                    _mnames.getCanonicalMassFlowVariableName(
+                        componentDisplayName=t.displayName,
+                        pipeName=t.coldModelPipe.name,
+                    )
+                )
+                coldTemperatureVariableName = (
+                    _cnames.getTemperatureVariableName(
+                        t, _mfn.PortItemType.COLD
+                    )
+                )
+
+                hotMassFlowVariableName = (
+                    _mnames.getCanonicalMassFlowVariableName(
+                        componentDisplayName=t.displayName,
+                        pipeName=t.hotModelPipe.name,
+                    )
+                )
+                hotTemperatureVariableName = (
+                    _cnames.getTemperatureVariableName(
+                        t, _mfn.PortItemType.HOT
+                    )
+                )
+
+                if not self._haveTruncatedColumns(
+                    coldMassFlowVariableName, coldTemperatureVariableName
+                ) or not self._haveTruncatedColumns(
+                    hotMassFlowVariableName, hotTemperatureVariableName
+                ):
+                    continue
+
+                coldMassFlow = self._getMassFlow(
+                    coldMassFlowVariableName, self.timeStep
+                )
+                coldTemperature = self._getTemperature(
+                    coldTemperatureVariableName, self.timeStep
+                )
+
+                hotMassFlow = self._getMassFlow(
+                    hotMassFlowVariableName, self.timeStep
+                )
+                hotTemperature = self._getTemperature(
+                    hotTemperatureVariableName, self.timeStep
+                )
+
+                t.setMassFlowAndTemperature(
+                    coldMassFlow,
+                    coldTemperature,
+                    hotMassFlow,
+                    hotTemperature,
+                )
+
+            elif isinstance(t, _tv.TVentil):
+                valvePositionVariableName = _mnames.getInputVariableName(
+                    t, t.modelDiverter
+                )
+                if not self._haveTruncatedColumn(
+                    self.massFlowData, valvePositionVariableName
+                ):
+                    continue
+
+                valvePosition = str(
+                    self.massFlowData[valvePositionVariableName].iloc[
+                        self.timeStep
+                    ]
+                )
+                t.setPositionForMassFlowSolver(valvePosition)
+                t.posLabel.setPlainText(valvePosition)
 
     def _getMassFlow(self, mfrVariableName: str, timeStep: int) -> float:
         truncatedMfrVariableName = _truncateName(mfrVariableName)
@@ -604,6 +598,28 @@ class MassFlowVisualizer(_qtw.QDialog):
         elif e.key() == _qtc.Qt.Key_Down:
             self.logger.debug("Down is pressed")
             self.decreaseValue()
+
+    def _haveTruncatedColumns(
+        self, mfrVariableName: str, temperatureVariableName: str
+    ) -> bool:
+        haveMassFlowColumn = self._haveTruncatedColumn(
+            self.massFlowData, mfrVariableName
+        )
+        haveTemperatureColumn = self._haveTruncatedColumn(
+            self.tempMassFlowData, temperatureVariableName
+        )
+
+        haveColumns = haveMassFlowColumn and haveTemperatureColumn
+
+        return haveColumns
+
+    @staticmethod
+    def _haveTruncatedColumn(
+        dataFrame: _pd.DataFrame, variableName: str
+    ) -> bool:
+        truncatedName = _truncateName(variableName)
+        haveColumn = truncatedName in dataFrame.columns
+        return haveColumn
 
 
 def _truncateColumnNames(df: _pd.DataFrame) -> None:
