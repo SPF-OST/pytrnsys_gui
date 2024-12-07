@@ -191,27 +191,17 @@ class TestPrintRegimesAndCopyFiles:
         )
         regimeExporter.export()
 
-        filesToCompare = {
-            "new_file": [
-                _NEW_DIAGRAM_PATH,
-                _NEW_NAME1_PATH,
-                _NEW_NAME1_SVG_PATH,
-                _NEW_NAME2_PATH,
-            ],
-            "expected_file": [
-                _EXPECTED_DIAGRAM_PATH,
-                _EXPECTED_NAME1_PATH,
-                _EXPECTED_NAME1_SVG_PATH,
-                _EXPECTED_NAME2_PATH,
-            ],
-        }
+        filesToCompare = [
+            (_NEW_DIAGRAM_PATH, _EXPECTED_DIAGRAM_PATH),
+            (_NEW_NAME1_PATH, _EXPECTED_NAME1_PATH),
+            (_NEW_NAME1_SVG_PATH, _EXPECTED_NAME1_SVG_PATH),
+            (_NEW_NAME2_PATH, _EXPECTED_NAME2_PATH),
+        ]
 
         errors = []
-        for i, newFile in enumerate(filesToCompare["new_file"]):
+        for actualFile, expectedFile in filesToCompare:
             try:
-                self._fileExistsAndIsCorrect(
-                    newFile, filesToCompare["expected_file"][i]
-                )
+                self._fileExistsAndIsCorrect(actualFile, expectedFile)
             except AssertionError as currentError:
                 errors.append(currentError)
 
@@ -219,10 +209,12 @@ class TestPrintRegimesAndCopyFiles:
             raise ExceptionGroup("multiple errors", errors)
 
     @staticmethod
-    def _fileExistsAndIsCorrect(producedFile, expectedFile):
-        assert producedFile.is_file()
+    def _fileExistsAndIsCorrect(
+        actualFile: _pl.Path, expectedFile: _pl.Path
+    ) -> None:
+        assert actualFile.is_file()
         result = _mpltc.compare_images(
-            str(producedFile), str(expectedFile), 0.001, in_decorator=False
+            str(expectedFile), str(actualFile), 0.001, in_decorator=False
         )
         assert result is None
 

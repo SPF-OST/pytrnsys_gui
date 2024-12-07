@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import collections.abc as _cabc
 import dataclasses as _dc
 import os as _os
 import pathlib as _pl
@@ -29,16 +30,16 @@ _BlockItem = _pump.Pump | _tv.TVentil | _tb.TapBase | _ssb.SourceSinkBase
 
 
 @_dc.dataclass
-class RegimeExporter:  # pylint: disable=too-many-instance-attributes
+class RegimeExporter:
     projectName: str
     projectDir: _pl.Path
     resultsDir: _pl.Path
     regimesFileName: str
     mainWindow: _mw.MainWindow  # type: ignore[name-defined]
     temperingValveWasTrue: bool = False
-    temperingValves: list[_tv.TVentil] = _dc.field(
-        init=False, default_factory=list
-    )
+
+    def __post_init__(self) -> None:
+        self._temperingValves: list[_tv.TVentil] = []
 
     @property
     def massFlowRatesPrintFilePath(self) -> _pl.Path:
@@ -49,6 +50,10 @@ class RegimeExporter:  # pylint: disable=too-many-instance-attributes
     def temperaturesPrintFilePath(self) -> _pl.Path:
         temperaturesPintFileName = f"{self.projectName}_T.prt"
         return self.projectDir / temperaturesPintFileName
+
+    @property
+    def temperingValves(self) -> _cabc.Sequence[_tv.TVentil]:
+        return self._temperingValves
 
     def export(
         self, onlyTheseRegimes: _tp.Optional[_tp.Sequence[str]] = None
@@ -124,7 +129,6 @@ class RegimeExporter:  # pylint: disable=too-many-instance-attributes
         relevantBlockItems: _tp.Sequence[_BlockItem],
         regimeRow: _pd.Series,
     ) -> None:
-
         for blockItem in relevantBlockItems:
             blockItemName = blockItem.displayName
             desiredValue = regimeRow[blockItemName]
@@ -141,9 +145,9 @@ class RegimeExporter:  # pylint: disable=too-many-instance-attributes
                     if valve.isTempering:
                         self.temperingValveWasTrue = True
                         valve.isTempering = False
-                        self.temperingValves.append(valve)
-                case _:  # pragma: no cover
-                    _tp.assert_never(blockItem)  # pragma: no cover
+                        self._temperingValves.append(valve)
+                case _:
+                    _tp.assert_never(blockItem)
 
     def _printDiagramToPDF(self, fileName: _pl.Path) -> None:
         printer = _qtp.QPrinter(_qtp.QPrinter.HighResolution)
@@ -164,7 +168,7 @@ class RegimeExporter:  # pylint: disable=too-many-instance-attributes
         self.mainWindow.editor.diagramScene.render(painter)
         painter.end()
 
-    def _resetTemperingValves(self):
+    def _resetTemperingValves(self) -> None:
         if not self.temperingValves:
             return
 
