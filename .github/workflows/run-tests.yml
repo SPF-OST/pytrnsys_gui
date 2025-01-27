@@ -136,23 +136,37 @@ jobs:
         # Use always() to always run this step to publish test results when there are test failures
         if: ${{always()}}
 
-  build-release-pytrnsys-dependency-changed:
-    # Can't access `env` context here, so need to copy/paste
-    if: ${{github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed'}}
-    needs: test
-    uses: ./.github/workflows/build-release.yml
-    with:
-      pytrnsys_ref: ${{github.ref}}
-      pytrnsys_gui_ref: 'master'
-      create: ${{github.ref == 'master' && 'pre-release' || 'artifacts'}}
+  create-pre-release-for-pytrnsys-gui-push:
+    - if: ${{github.event_name != 'workflow_call' && github.ref == 'master'}}
+      name: Build pre-release for change to `pytrnsys_gui` `master`
+      needs: test
+      uses: ./.github/workflows/build-release.yml
+      with:
+        pytrnsys_ref: master
+        pytrnsys_gui_ref: master
+        create: pre-release
           
-  build-release:
-    # Can't access `env` context here, so need to copy/paste
-    if: ${{github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed'}}
+  create-pre-release-for-pytrnsys-changed:
+    - if: ${{github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed' && github.ref == 'master'}}
+      name: Build pre-release for change to `pytrnsys` `master`
+      needs: test
+      uses: peter-evans/repository-dispatch@v3
+      with:
+        repository: SPF-OST/pytrnsys_gui
+        token: ${{secrets.GITHUB_TOKEN}}
+        event-type: build-release-pytrnsys-changed
+        client-payload:
+          pytrnsys_ref: master
+          pytrnsys_gui_ref: master
+          create: pre-release
+          
+  build-release-artifacts:
+    if: ${{github.ref != 'master'}}
     needs: test
     uses: ./.github/workflows/build-release.yml
     with:
-      pytrnsys_ref: 'master'
-      pytrnsys_gui_ref: ${{github.ref}}
-      create: ${{github.ref == 'master' && 'pre-release' || 'artifacts'}}
+      pytrnsys_ref: ${{github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed' && github.ref || 'master'}}
+      pytrnsys_gui_ref: ${{github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed' && 'master' || github.ref}}
+      create: artifact
+          
   

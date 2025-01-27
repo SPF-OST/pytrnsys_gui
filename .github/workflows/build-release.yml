@@ -4,6 +4,9 @@ on:
   push:
     tags:
       - v*
+  repository_dispatch:
+    types:
+      - build-release-pytrnsys-changed
   workflow_call:
     inputs:
       pytrnsys_ref:
@@ -21,9 +24,30 @@ jobs:
     runs-on: [self-hosted, etna]
     
     env:
-      PYTRNSYS_REF: ${{ github.event_name == 'workflow_call' && inputs.pytrnsys_ref || 'master' }}
-      PYTRNSYS_GUI_REF: ${{ github.event_name == 'workflow_call' && inputs.pytrnsys_gui_ref || github.ref }}
-      CREATE: ${{ github.event_name == 'workflow_call' && inputs.create || 'release' }}
+      PYTRNSYS_REF: |
+        ${{
+          (
+            github.event_name == 'workflow_call' && inputs.pytrnsys_ref
+            || github.event_name == 'repository_dispatch' && github.event.client_payload.pytrnsys_ref
+          )
+          || 'master'
+        }}
+      PYTRNSYS_GUI_REF: |
+        ${{
+          (
+            github.event_name == 'workflow_call' && inputs.pytrnsys_gui_ref
+            || github.event_name == 'repository_dispatch' && github.event.client_payload.pytrnsys_gui_ref
+          )
+          || github.ref
+        }}
+      CREATE: |
+        ${{
+          (
+            github.event_name == 'workflow_call' && inputs.create
+            || github.event_name == 'repository_dispatch' && github.event.client_payload.create
+          )
+          || 'release'
+        }}
       
     defaults:
       run:
