@@ -127,7 +127,7 @@ jobs:
       - name: Post coverage report to Coveralls
         uses: coverallsapp/github-action@v2
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{secrets.GITHUB_TOKEN}}
           path-to-lcov: test-results/coverage.lcov
 
       - name: Upload test results and coverage reports
@@ -136,23 +136,23 @@ jobs:
           name: test-results-and-coverage-report-windows
           path: test-results
         # Use always() to always run this step to publish test results when there are test failures
-        if: ${{ always() }}
+        if: ${{always()}}
 
   build-release-pytrnsys-dependency-changed:
-    if: env.PYTRNSYS_DEPENDENCY_CHANGED == 'true'
+    if: ${{env.PYTRNSYS_DEPENDENCY_CHANGED == 'true'}}
     needs: test
     uses: ./.github/workflows/build-release.yml
     with:
-      pytrnsys_ref: ${{ github.ref }}
+      pytrnsys_ref: ${{github.ref}}
       pytrnsys_gui_ref: 'master'
-      create: ${{ github.ref == 'master' && 'pre-release' || 'artifacts'}}
+      create: ${{github.ref == 'master' && 'pre-release' || 'artifacts'}}
           
   build-release:
-    if: env.PYTRNSYS_DEPENDENCY_CHANGED == 'false'
+    if: ${{env.PYTRNSYS_DEPENDENCY_CHANGED == 'false'}}
     needs: test
     uses: ./.github/workflows/build-release.yml
     with:
       pytrnsys_ref: 'master'
-      pytrnsys_gui_ref: ${{ github.ref }}
-      create: ${{ github.ref == 'master' && 'pre-release' || 'artifacts'}}
+      pytrnsys_gui_ref: ${{github.ref}}
+      create: ${{github.ref == 'master' && 'pre-release' || 'artifacts'}}
   

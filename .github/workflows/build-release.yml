@@ -33,13 +33,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: SPF-OST/pytrnsys
-          ref: ${{inputs.pytrnsys_ref}}
+          ref: ${{env.PYTRNSYS_REF}}
           path: build_release/pytrnsys
           
       - uses: actions/checkout@v4
         with:
           repository: SPF-OST/pytrnsys_gui
-          ref: ${{inputs.pytrnsys_gui_ref}}
+          ref: ${{env.PYTRNSYS_GUI_REF}}
           path: build_release/pytrnsys_gui
       
       - name: Report github.event_name and event_type
@@ -83,7 +83,7 @@ jobs:
       - name: Create zip file
         run: mv release\build\pytrnsys.zip ${{steps.fn.outputs.file_name_base}}.zip
       
-      - if: inputs.create == 'pre-release'
+      - if: ${{ env.CREATE == 'pre-release'}}
         name: Release artifacts (bleeding-edge)
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -94,7 +94,7 @@ jobs:
           # ATTENTION: `action-automatic-releases` *needs* forward slashes in the paths given to `files`.
           files: ${{steps.fn.outputs.file_name_base}}.zip
       
-      - if: inputs.create == 'release'
+      - if: ${{ env.CREATE == 'release'}}
         name: Release artifacts (proper release)
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -104,7 +104,7 @@ jobs:
           # ATTENTION: `action-automatic-releases` *needs* forward slashes in the paths given to `files`.
           files: ${{steps.fn.outputs.file_name_base}}.zip
           
-      - if: inputs.create == 'artifacts'
+      - if: ${{ env.CREATE == 'artifacts'}}
         name: Upload release as artifact
         uses: actions/upload-artifact@v4
         with:
