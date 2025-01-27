@@ -138,11 +138,21 @@ jobs:
         # Use always() to always run this step to publish test results when there are test failures
         if: ${{ always() }}
 
-      - if: github.event_name == 'push' || env.PYTRNSYS_DEPENDENCY_CHANGED == 'true'
-        name: Trigger build of executable for push
-        uses: peter-evans/repository-dispatch@v3
-        with:
-          repository: SPF-OST/pytrnsys_gui
-          token: ${{ secrets.GITHUB_TOKEN }}
-          event-type: build-executable-push
-          client-payload: '{"type": "build-executable-push"}'
+  build-release-pytrnsys-dependency-changed:
+    if: env.PYTRNSYS_DEPENDENCY_CHANGED == 'true'
+    needs: test
+    uses: .github/workflows/build-release.yml
+    with:
+      pytrnsys_ref: ${{ github.ref }}
+      pytrnsys_gui_ref: 'master'
+      create: ${{ github.ref == 'master' && 'pre-release' || 'artifacts'}}
+          
+  build-release:
+    if: env.PYTRNSYS_DEPENDENCY_CHANGED == 'false'
+    needs: test
+    uses: .github/workflows/build-release.yml
+    with:
+      pytrnsys_ref: 'master'
+      pytrnsys_gui_ref: ${{ github.ref }}
+      create: ${{ github.ref == 'master' && 'pre-release' || 'artifacts'}}
+  
