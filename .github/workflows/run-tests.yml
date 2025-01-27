@@ -137,7 +137,8 @@ jobs:
         if: ${{always()}}
 
   build-release-pytrnsys-dependency-changed:
-    if: ${{env.PYTRNSYS_DEPENDENCY_CHANGED == 'true'}}
+    # Can't access `env` context here, so need to copy/paste
+    if: ${{github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed'}}
     needs: test
     uses: ./.github/workflows/build-release.yml
     with:
@@ -146,7 +147,8 @@ jobs:
       create: ${{github.ref == 'master' && 'pre-release' || 'artifacts'}}
           
   build-release:
-    if: ${{env.PYTRNSYS_DEPENDENCY_CHANGED == 'false'}}
+    # Can't access `env` context here, so need to copy/paste
+    if: ${{github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed'}}
     needs: test
     uses: ./.github/workflows/build-release.yml
     with:
