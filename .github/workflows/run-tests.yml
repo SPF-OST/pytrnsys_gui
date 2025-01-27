@@ -7,9 +7,11 @@ on:
   pull_request:
     branches:
       - '*'
-  repository_dispatch:
-    types:
-      - run-tests-and-build-executable
+  workflow_call:
+    inputs:
+      reason:
+        required: true
+        type: string
 
 jobs:
   developer-install:
@@ -60,7 +62,7 @@ jobs:
     
     env:
       PY_COLORS: "1"
-      PYTRNSYS_DEPENDENCY_CHANGED: ${{github.event_name == 'repository_dispatch' && github.event.client_payload.type == 'run-tests-and-build-executable'}}
+      PYTRNSYS_DEPENDENCY_CHANGED: ${{github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed'}}
 
     steps:
       - uses: actions/checkout@v4
