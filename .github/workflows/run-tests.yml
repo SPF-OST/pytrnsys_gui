@@ -141,7 +141,7 @@ jobs:
   build-release-pytrnsys-dependency-changed:
     if: env.PYTRNSYS_DEPENDENCY_CHANGED == 'true'
     needs: test
-    uses: .github/workflows/build-release.yml
+    uses: ./.github/workflows/build-release.yml
     with:
       pytrnsys_ref: ${{ github.ref }}
       pytrnsys_gui_ref: 'master'
@@ -150,7 +150,7 @@ jobs:
   build-release:
     if: env.PYTRNSYS_DEPENDENCY_CHANGED == 'false'
     needs: test
-    uses: .github/workflows/build-release.yml
+    uses: ./.github/workflows/build-release.yml
     with:
       pytrnsys_ref: 'master'
       pytrnsys_gui_ref: ${{ github.ref }}
