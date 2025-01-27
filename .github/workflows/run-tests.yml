@@ -13,13 +13,15 @@ on:
         required: true
         type: string
 
-jobs:
+env:
+  PYTRNSYS_DEPENDENCY_CHANGED: ${{github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed'}}
+  PY_COLORS: "1"
+
+
+jobs:    
   developer-install:
     runs-on: [ self-hosted, etna ]
     
-    env:
-      PYTRNSYS_DEPENDENCY_CHANGED: ${{github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed'}}
-      
     defaults: 
       run:
         working-directory: dev_install/pytrnsys_gui
@@ -66,10 +68,6 @@ jobs:
 
   test:
     runs-on: [self-hosted, etna]
-    
-    env:
-      PYTRNSYS_DEPENDENCY_CHANGED: ${{github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed'}}
-      PY_COLORS: "1"
 
     defaults: 
       run:
