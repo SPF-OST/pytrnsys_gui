@@ -16,7 +16,12 @@ on:
 jobs:
   developer-install:
     runs-on: [ self-hosted, etna ]
-
+    
+    env:
+      PYTRNSYS_DEPENDENCY_CHANGED: ${{github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed'}}
+      PYTRNSYS_REF: ${{env.PYTRNSYS_DEPENDENCY_CHANGED == 'true' && github.ref || 'master'}}
+      PYTRNSYS_GUI_REF: ${{env.PYTRNSYS_DEPENDENCY_CHANGED == 'true' && 'master' || github.ref}}
+      
     defaults: 
       run:
         working-directory: dev_install/pytrnsys_gui
@@ -24,11 +29,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          repository: SPF-OST/pytrnsys_gui
+          ref: $${env.PYTRNSYS_GUI_REF}}
           path: dev_install/pytrnsys_gui
-          
+      
+      
       - uses: actions/checkout@v4
         with:
           repository: SPF-OST/pytrnsys
+          ref: $${env.PYTRNSYS_REF}}
           path: dev_install/pytrnsys
 
       - name: Remove old venv
@@ -61,11 +70,28 @@ jobs:
     runs-on: [self-hosted, etna]
     
     env:
-      PY_COLORS: "1"
       PYTRNSYS_DEPENDENCY_CHANGED: ${{github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed'}}
+      PYTRNSYS_REF: ${{env.PYTRNSYS_DEPENDENCY_CHANGED == 'true' && github.ref || 'master'}}
+      PYTRNSYS_GUI_REF: ${{env.PYTRNSYS_DEPENDENCY_CHANGED == 'true' && 'master' || github.ref}}
+      PY_COLORS: "1"
+
+    defaults: 
+      run:
+        working-directory: test/pytrnsys_gui
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          repository: SPF-OST/pytrnsys_gui
+          ref: $${env.PYTRNSYS_GUI_REF}}
+          path: test/pytrnsys_gui
+      
+      - uses: actions/checkout@v4
+        with:
+          repository: SPF-OST/pytrnsys
+          ref: $${env.PYTRNSYS_REF}}
+          path: test/pytrnsys
+          
       - name: Add Inkscape to the path
         run: echo "C:\CI-Progams\Inkscape\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
