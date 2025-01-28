@@ -71,7 +71,7 @@ jobs:
           echo "Event name: ${{github.event_name}}"
           echo "Event type (via client payload): ${{github.event.client_payload.type}}"
           echo "Event type (via event_type): ${{github.event.event_type}}"
-          echo "GitHub ref: $${github.ref}}"
+          echo "GitHub ref: ${{github.ref}}"
 
       - name: Remove old venv
         run: |
