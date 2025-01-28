@@ -29,11 +29,12 @@ jobs:
 
     steps:
       - name: Remove old working directory
-        working-directory: ./
+        working-directory: ${{github.workspace}}
         run: |
           if (Test-Path -LiteralPath dev_install) {
             Remove-Item -LiteralPath dev_install -Recurse
           }
+          New-Item -Name "dev_install" -ItemType "directory"
           
       - uses: actions/checkout@v4
         with:
@@ -76,11 +77,13 @@ jobs:
 
     steps:
       - name: Remove old working directory
-        working-directory: ./
+        working-directory: ${{github.workspace}}
         run: |
           if (Test-Path -LiteralPath test) {
             Remove-Item -LiteralPath test -Recurse
           }
+          New-Item -Name "test" -ItemType "directory"
+
       
       - uses: actions/checkout@v4
         with:
