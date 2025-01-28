@@ -66,11 +66,12 @@ jobs:
           ref: ${{env.PYTRNSYS_GUI_REF}}
           path: build_release/pytrnsys_gui
       
-      - name: Report github.event_name and event_type
+      - name: Report some variable values
         run: |
           echo "Event name: ${{github.event_name}}"
           echo "Event type (via client payload): ${{github.event.client_payload.type}}"
           echo "Event type (via event_type): ${{github.event.event_type}}"
+          echo "GitHub ref: $${github.ref}}"
 
       - name: Remove old venv
         run: |
@@ -84,7 +85,7 @@ jobs:
       - name: Compute pytrnsys git SHA
         id: sha
         run: |
-          $pytrnsys_sha=$(venv\Scripts\python release\getPytrnsysGitSha.py https://github.com/SPF-OST/pytrnsys.git {{env.PYTRNSYS_REF}})
+          $pytrnsys_sha=$(venv\Scripts\python release\getGitSha.py https://github.com/SPF-OST/pytrnsys.git {{env.PYTRNSYS_REF}})
           echo "pytrnsys_sha=${pytrnsys_sha}" >> $env:GITHUB_OUTPUT
 
       - name: Install dependencies
@@ -101,7 +102,7 @@ jobs:
       - name: Compute file name
         id: fn
         run: |
-          $pytrnsys_gui_sha=$(venv\Scripts\python release\getPytrnsysGitSha.py https://github.com/SPF-OST/pytrnsys_gui.git {{env.PYTRNSYS_REF}})
+          $pytrnsys_gui_sha=$(venv\Scripts\python release\getGitSha.py https://github.com/SPF-OST/pytrnsys_gui.git {{env.PYTRNSYS_REF}})
           $ref_name="${{env.PYTRNSYS_GUI_REF}}".replace("/","-")
           $date = $(venv\Scripts\python -c "import datetime; print(datetime.datetime.now(datetime.UTC).isoformat(timespec='seconds').replace(':','_'))")
           echo "file_name_base=pytrnsys-gui-${ref_name}-gui_${pytrnsys_gui_sha}-pytrnsys_${{steps.sha.outputs.pytrnsys_sha}}-${date}" >> $env:GITHUB_OUTPUT
