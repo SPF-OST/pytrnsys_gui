@@ -28,6 +28,13 @@ jobs:
         working-directory: dev_install/pytrnsys_gui
 
     steps:
+      - name: Remove old working directory
+        working-directory: ./
+        run: |
+          if (Test-Path -LiteralPath dev_install) {
+            Remove-Item -LiteralPath dev_install -Recurse
+          }
+          
       - uses: actions/checkout@v4
         with:
           repository: SPF-OST/pytrnsys
@@ -39,12 +46,6 @@ jobs:
           repository: SPF-OST/pytrnsys_gui
           ref: ${{env.PYTRNSYS_GUI_REF}}
           path: dev_install/pytrnsys_gui
-
-      - name: Remove old venv
-        run: |
-          if (Test-Path -LiteralPath venv) {
-            Remove-Item -LiteralPath venv -Recurse
-          }
 
       - name: Create virtual environment
         run: py -3.12 -m venv venv
@@ -74,6 +75,13 @@ jobs:
         working-directory: test/pytrnsys_gui
 
     steps:
+      - name: Remove old working directory
+        working-directory: ./
+        run: |
+          if (Test-Path -LiteralPath test) {
+            Remove-Item -LiteralPath test -Recurse
+          }
+      
       - uses: actions/checkout@v4
         with:
           repository: SPF-OST/pytrnsys_gui
@@ -82,12 +90,6 @@ jobs:
           
       - name: Add Inkscape to the path
         run: echo "C:\CI-Progams\Inkscape\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-
-      - name: Remove old venv
-        run: |
-          if (Test-Path -LiteralPath venv) {
-            Remove-Item -LiteralPath venv -Recurse
-          }
 
       - name: Create virtual environment
         run: py -3.12 -m venv venv
