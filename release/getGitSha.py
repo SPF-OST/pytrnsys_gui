@@ -6,7 +6,7 @@ def main() -> None:
     if len(_sys.argv) != 3:
         print(f"ERROR: Usage: {_sys.argv[0]} <repo url> <git ref>")
         _sys.exit(-1)
-    
+
     url = _sys.argv[1]
     gitRef = _sys.argv[2]
 
