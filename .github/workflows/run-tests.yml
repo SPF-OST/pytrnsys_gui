@@ -153,10 +153,12 @@ jobs:
         repository: SPF-OST/pytrnsys_gui
         token: ${{secrets.GITHUB_TOKEN}}
         event-type: build-release-pytrnsys-changed
-        client-payload:
-          pytrnsys_ref: master
-          pytrnsys_gui_ref: master
-          create: pre-release
+        client-payload: |
+          '{
+            "pytrnsys_ref": "master",
+            "pytrnsys_gui_ref": "master",
+            "create": "pre-release",
+          }'
           
   build-release-artifacts:
     if: ${{github.ref != 'master'}}
