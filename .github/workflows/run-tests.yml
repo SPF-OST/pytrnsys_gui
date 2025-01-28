@@ -166,6 +166,6 @@ jobs:
     needs: test
     uses: ./.github/workflows/build-release.yml
     with:
-      pytrnsys_ref: ${{env.PYTRNSYS_REF}}
-      pytrnsys_gui_ref: ${{env.PYTRNSYS_GUI_REF}}
+      pytrnsys_ref: ${{github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed' && github.ref_name || 'master'}}
+      pytrnsys_gui_ref: ${{github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed' && 'master' || github.ref_name}}
       create: artifact
