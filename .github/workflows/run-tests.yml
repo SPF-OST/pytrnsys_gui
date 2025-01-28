@@ -133,13 +133,13 @@ jobs:
         uses: coverallsapp/github-action@v2
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
-          path-to-lcov: test-results/coverage.lcov
+          path-to-lcov: test/pytrnsys_gui/test-results/coverage.lcov
 
       - name: Upload test results and coverage reports
         uses: actions/upload-artifact@v4
         with:
           name: test-results-and-coverage-report-windows
-          path: test-results
+          path: test/pytrnsys_gui/test-results
         # Use always() to always run this step to publish test results when there are test failures
         if: ${{always()}}
 

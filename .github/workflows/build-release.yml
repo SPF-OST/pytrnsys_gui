@@ -122,7 +122,7 @@ jobs:
           prerelease: true
           title: "Development Build"
           # ATTENTION: `action-automatic-releases` *needs* forward slashes in the paths given to `files`.
-          files: ${{steps.fn.outputs.file_name_base}}.zip
+          files: build_release/pytrnsys_gui/${{steps.fn.outputs.file_name_base}}.zip
       
       - if: ${{ env.CREATE == 'release'}}
         name: Release artifacts (proper release)
@@ -132,11 +132,11 @@ jobs:
           title: "Release"
           prerelease: false
           # ATTENTION: `action-automatic-releases` *needs* forward slashes in the paths given to `files`.
-          files: ${{steps.fn.outputs.file_name_base}}.zip
+          files: build_release/pytrnsys_gui/${{steps.fn.outputs.file_name_base}}.zip
           
       - if: ${{ env.CREATE == 'artifacts'}}
         name: Upload release as artifact
         uses: actions/upload-artifact@v4
         with:
           name: Release zip
-          path: ${{steps.fn.outputs.file_name_base}}.zip
+          path: build_release/pytrnsys_gui/${{steps.fn.outputs.file_name_base}}.zip
