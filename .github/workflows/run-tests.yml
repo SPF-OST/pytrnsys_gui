@@ -145,6 +145,7 @@ jobs:
   create-pre-release-for-pytrnsys-changed:
     if: ${{github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed' && github.ref == 'master'}}
     name: Build pre-release for change to `pytrnsys` `master`
+    runs-on: [self-hosted, etna]
     needs: test
     steps:
     - uses: peter-evans/repository-dispatch@v3
