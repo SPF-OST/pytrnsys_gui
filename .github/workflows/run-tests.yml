@@ -146,15 +146,16 @@ jobs:
     if: ${{github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed' && github.ref == 'master'}}
     name: Build pre-release for change to `pytrnsys` `master`
     needs: test
-    uses: peter-evans/repository-dispatch@v3
-    with:
-      repository: SPF-OST/pytrnsys_gui
-      token: ${{secrets.GITHUB_TOKEN}}
-      event-type: build-release-pytrnsys-changed
-      client-payload:
-        pytrnsys_ref: master
-        pytrnsys_gui_ref: master
-        create: pre-release
+    steps:
+    - uses: peter-evans/repository-dispatch@v3
+      with:
+        repository: SPF-OST/pytrnsys_gui
+        token: ${{secrets.GITHUB_TOKEN}}
+        event-type: build-release-pytrnsys-changed
+        client-payload:
+          pytrnsys_ref: master
+          pytrnsys_gui_ref: master
+          create: pre-release
           
   build-release-artifacts:
     if: ${{github.ref != 'master'}}
