@@ -23,13 +23,19 @@ jobs:
   developer-install:
     runs-on: [ self-hosted, etna ]
     
-    defaults: 
-      run:
-        working-directory: dev_install/pytrnsys_gui
+#    defaults: 
+#      run:
+#        working-directory: dev_install/pytrnsys_gui
 
     steps:
+      - name: Report some variable values
+        run: |
+          echo "GitHub ref: ${{github.ref}}"
+          echo "GitHub ref_name: ${{github.ref_name}}"
+          echo "GitHub workspace: ${{github.workspace}}"       
+
       - name: Remove old working directory
-        working-directory: ${{github.workspace}}
+#        working-directory: ${{github.workspace}}
         run: |
           if (Test-Path -LiteralPath dev_install) {
             Remove-Item -LiteralPath dev_install -Recurse
@@ -71,13 +77,13 @@ jobs:
   test:
     runs-on: [self-hosted, etna]
 
-    defaults: 
-      run:
-        working-directory: test/pytrnsys_gui
+#    defaults: 
+#      run:
+#        working-directory: test/pytrnsys_gui
 
     steps:
       - name: Remove old working directory
-        working-directory: ${{github.workspace}}
+#        working-directory: ${{github.workspace}}
         run: |
           if (Test-Path -LiteralPath test) {
             Remove-Item -LiteralPath test -Recurse
