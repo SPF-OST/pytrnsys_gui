@@ -14,7 +14,8 @@ on:
         type: string
 
 env:
-  PYTRNSYS_DEPENDENCY_CHANGED: ${{github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed'}}
+  PYTRNSYS_REF: ${{(github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed') && github.ref || 'master'}}
+  PYTRNSYS_GUI_REF: ${{(github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed') && 'master' || github.ref}}
   PY_COLORS: "1"
 
 
@@ -29,16 +30,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          repository: SPF-OST/pytrnsys_gui
-          ref: ${{env.PYTRNSYS_DEPENDENCY_CHANGED == 'true' && 'master' || github.ref}}
-          path: dev_install/pytrnsys_gui
-      
+          repository: SPF-OST/pytrnsys
+          ref: ${{env.PYTRNSYS_REF}}
+          path: dev_install/pytrnsys
       
       - uses: actions/checkout@v4
         with:
-          repository: SPF-OST/pytrnsys
-          ref: ${{env.PYTRNSYS_DEPENDENCY_CHANGED == 'true' && github.ref || 'master'}}
-          path: dev_install/pytrnsys
+          repository: SPF-OST/pytrnsys_gui
+          ref: ${{env.PYTRNSYS_GUI_REF}}
+          path: dev_install/pytrnsys_gui
 
       - name: Remove old venv
         run: |
@@ -77,14 +77,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: SPF-OST/pytrnsys_gui
-          ref: ${{env.PYTRNSYS_DEPENDENCY_CHANGED == 'true' && 'master' || github.ref}}
+          ref: ${{env.PYTRNSYS_GUI_REF}}
           path: test/pytrnsys_gui
-      
-      - uses: actions/checkout@v4
-        with:
-          repository: SPF-OST/pytrnsys
-          ref: ${{env.PYTRNSYS_DEPENDENCY_CHANGED == 'true' && github.ref || 'master'}}
-          path: test/pytrnsys
           
       - name: Add Inkscape to the path
         run: echo "C:\CI-Progams\Inkscape\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
@@ -103,6 +97,8 @@ jobs:
           venv\Scripts\python -m pip install --upgrade pip
           venv\Scripts\python -m pip install wheel
           venv\Scripts\python -m pip install -r requirements/test.txt
+          # Override required `pytrnsys` ref
+          venv\Scripts\python -m pip install git+https://github.com/SPF-OST/pytrnsys.git@${{env.PYTRNSYS_REF}}
 
       - name: Generate UI code from Qt Creator Studio .ui files
         run: venv\Scripts\python dev-tools/generateGuiClassesFromQtCreatorStudioUiFiles.py
@@ -137,28 +133,28 @@ jobs:
         if: ${{always()}}
 
   create-pre-release-for-pytrnsys-gui-push:
-    - if: ${{github.event_name != 'workflow_call' && github.ref == 'master'}}
-      name: Build pre-release for change to `pytrnsys_gui` `master`
-      needs: test
-      uses: ./.github/workflows/build-release.yml
-      with:
+    if: ${{github.event_name != 'workflow_call' && github.ref == 'master'}}
+    name: Build pre-release for change to `pytrnsys_gui` `master`
+    needs: test
+    uses: ./.github/workflows/build-release.yml
+    with:
+      pytrnsys_ref: master
+      pytrnsys_gui_ref: master
+      create: pre-release
+          
+  create-pre-release-for-pytrnsys-changed:
+    if: ${{github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed' && github.ref == 'master'}}
+    name: Build pre-release for change to `pytrnsys` `master`
+    needs: test
+    uses: peter-evans/repository-dispatch@v3
+    with:
+      repository: SPF-OST/pytrnsys_gui
+      token: ${{secrets.GITHUB_TOKEN}}
+      event-type: build-release-pytrnsys-changed
+      client-payload:
         pytrnsys_ref: master
         pytrnsys_gui_ref: master
         create: pre-release
-          
-  create-pre-release-for-pytrnsys-changed:
-    - if: ${{github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed' && github.ref == 'master'}}
-      name: Build pre-release for change to `pytrnsys` `master`
-      needs: test
-      uses: peter-evans/repository-dispatch@v3
-      with:
-        repository: SPF-OST/pytrnsys_gui
-        token: ${{secrets.GITHUB_TOKEN}}
-        event-type: build-release-pytrnsys-changed
-        client-payload:
-          pytrnsys_ref: master
-          pytrnsys_gui_ref: master
-          create: pre-release
           
   build-release-artifacts:
     if: ${{github.ref != 'master'}}
@@ -168,5 +164,3 @@ jobs:
       pytrnsys_ref: ${{github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed' && github.ref || 'master'}}
       pytrnsys_gui_ref: ${{github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed' && 'master' || github.ref}}
       create: artifact
-          
-  

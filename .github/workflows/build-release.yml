@@ -84,7 +84,7 @@ jobs:
       - name: Compute pytrnsys git SHA
         id: sha
         run: |
-          $pytrnsys_sha=$(venv\Scripts\python release\getPytrnsysMasterGitSha.py)
+          $pytrnsys_sha=$(venv\Scripts\python release\getPytrnsysGitSha.py https://github.com/SPF-OST/pytrnsys.git {{env.PYTRNSYS_REF}})
           echo "pytrnsys_sha=${pytrnsys_sha}" >> $env:GITHUB_OUTPUT
 
       - name: Install dependencies
@@ -92,15 +92,17 @@ jobs:
           venv\Scripts\python -m pip install --upgrade pip
           venv\Scripts\python -m pip install wheel
           venv\Scripts\python -m pip install -r requirements/release.txt
-        
+          # Override required `pytrnsys` ref
+          venv\Scripts\python -m pip install git+https://github.com/SPF-OST/pytrnsys.git@${{env.PYTRNSYS_REF}}#egg=pytrnsys
+
       - name: Build executable
         run: venv\Scripts\python dev-tools/devTools.py -r
       
       - name: Compute file name
         id: fn
         run: |
-          $pytrnsys_gui_sha=$(git rev-parse --short HEAD)
-          $ref_name="${{github.ref_name}}".replace("/","-")
+          $pytrnsys_gui_sha=$(venv\Scripts\python release\getPytrnsysGitSha.py https://github.com/SPF-OST/pytrnsys_gui.git {{env.PYTRNSYS_REF}})
+          $ref_name="${{env.PYTRNSYS_GUI_REF}}".replace("/","-")
           $date = $(venv\Scripts\python -c "import datetime; print(datetime.datetime.now(datetime.UTC).isoformat(timespec='seconds').replace(':','_'))")
           echo "file_name_base=pytrnsys-gui-${ref_name}-gui_${pytrnsys_gui_sha}-pytrnsys_${{steps.sha.outputs.pytrnsys_sha}}-${date}" >> $env:GITHUB_OUTPUT
       
