@@ -14,8 +14,8 @@ on:
         type: string
 
 env:
-  PYTRNSYS_REF: ${{(github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed') && github.ref || 'master'}}
-  PYTRNSYS_GUI_REF: ${{(github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed') && 'master' || github.ref}}
+  PYTRNSYS_REF: ${{(github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed') && github.ref_name || 'master'}}
+  PYTRNSYS_GUI_REF: ${{(github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed') && 'master' || github.ref_name}}
   PY_COLORS: "1"
 
 
@@ -133,7 +133,7 @@ jobs:
         if: ${{always()}}
 
   create-pre-release-for-pytrnsys-gui-push:
-    if: ${{github.event_name != 'workflow_call' && github.ref == 'master'}}
+    if: ${{github.event_name != 'workflow_call' && github.ref_name == 'master'}}
     name: Build pre-release for change to `pytrnsys_gui` `master`
     needs: test
     uses: ./.github/workflows/build-release.yml
@@ -143,7 +143,7 @@ jobs:
       create: pre-release
           
   create-pre-release-for-pytrnsys-changed:
-    if: ${{github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed' && github.ref == 'master'}}
+    if: ${{github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed' && github.ref_name == 'master'}}
     name: Build pre-release for change to `pytrnsys` `master`
     runs-on: [self-hosted, etna]
     needs: test
@@ -161,11 +161,11 @@ jobs:
           }'
           
   build-release-artifacts:
-    if: ${{github.ref != 'master'}}
+    if: ${{github.ref_name != 'master'}}
     name: Build release artifacts for change to pull request
     needs: test
     uses: ./.github/workflows/build-release.yml
     with:
-      pytrnsys_ref: ${{github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed' && github.ref || 'master'}}
-      pytrnsys_gui_ref: ${{github.event_name == 'workflow_call' && inputs.reason == 'pytrnsys-changed' && 'master' || github.ref}}
+      pytrnsys_ref: ${{env.PYTRNSYS_REF}}
+      pytrnsys_gui_ref: ${{env.PYTRNSYS_GUI_REF}}
       create: artifact

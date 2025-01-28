@@ -38,7 +38,7 @@ jobs:
             github.event_name == 'workflow_call' && inputs.pytrnsys_gui_ref
             || github.event_name == 'repository_dispatch' && github.event.client_payload.pytrnsys_gui_ref
           )
-          || github.ref
+          || github.ref_name
         }}
       CREATE: |
         ${{
@@ -72,6 +72,7 @@ jobs:
           echo "Event type (via client payload): ${{github.event.client_payload.type}}"
           echo "Event type (via event_type): ${{github.event.event_type}}"
           echo "GitHub ref: ${{github.ref}}"
+          echo "GitHub ref_name: ${{github.ref_name}}"
 
       - name: Remove old venv
         run: |
