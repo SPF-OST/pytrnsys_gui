@@ -54,6 +54,14 @@ jobs:
         working-directory: build_release/pytrnsys_gui
 
     steps:
+      - name: Remove old working directory
+        working-directory: ${{github.workspace}}
+        run: |
+          if (Test-Path -LiteralPath build_release) {
+            Remove-Item -LiteralPath build_release -Recurse -Force
+          }
+          New-Item -Name "build_release" -ItemType "directory"
+
       - uses: actions/checkout@v4
         with:
           repository: SPF-OST/pytrnsys
@@ -73,12 +81,6 @@ jobs:
           echo "Event type (via event_type): ${{github.event.event_type}}"
           echo "GitHub ref: ${{github.ref}}"
           echo "GitHub ref_name: ${{github.ref_name}}"
-
-      - name: Remove old venv
-        run: |
-          if (Test-Path -LiteralPath venv) {
-            Remove-Item -LiteralPath venv -Recurse
-          }
 
       - name: Create virtual environment
         run: py -3.12 -m venv venv
