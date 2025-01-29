@@ -6,81 +6,28 @@ on:
       - v*
   repository_dispatch:
     types:
-      - build-release-pytrnsys-changed
-  workflow_call:
-    inputs:
-      pytrnsys_ref:
-        required: true
-        type: string
-      pytrnsys_gui_ref:
-        required: true
-        type: string
-      create:
-        required: true
-        type: string
-        
+      - build-executable-push
+
 jobs:
   build-release:
     runs-on: [self-hosted, etna]
-    
     env:
-      PYTRNSYS_REF: |
-        ${{
-          (
-            github.event_name == 'workflow_call' && inputs.pytrnsys_ref
-            || github.event_name == 'repository_dispatch' && github.event.client_payload.pytrnsys_ref
-          )
-          || 'master'
-        }}
-      PYTRNSYS_GUI_REF: |
-        ${{
-          (
-            github.event_name == 'workflow_call' && inputs.pytrnsys_gui_ref
-            || github.event_name == 'repository_dispatch' && github.event.client_payload.pytrnsys_gui_ref
-          )
-          || github.ref_name
-        }}
-      CREATE: |
-        ${{
-          (
-            github.event_name == 'workflow_call' && inputs.create
-            || github.event_name == 'repository_dispatch' && github.event.client_payload.create
-          )
-          || 'release'
-        }}
-      
-    defaults:
-      run:
-        working-directory: build_release/pytrnsys_gui
-
+      NORMAL_PUSH_TO_MASTER: ${{github.event_name == 'repository_dispatch' && github.event.client_payload.type == 'build-executable-push'}}
+      TAG_PUSH_TO_MASTER: ${{github.event_name == 'push'}}
     steps:
-      - name: Remove old working directory
-        working-directory: ${{github.workspace}}
-        run: |
-          if (Test-Path -LiteralPath build_release) {
-            Remove-Item -LiteralPath build_release -Recurse -Force
-          }
-          New-Item -Name "build_release" -ItemType "directory"
-
       - uses: actions/checkout@v4
-        with:
-          repository: SPF-OST/pytrnsys
-          ref: ${{env.PYTRNSYS_REF}}
-          path: build_release/pytrnsys
-          
-      - uses: actions/checkout@v4
-        with:
-          repository: SPF-OST/pytrnsys_gui
-          ref: ${{env.PYTRNSYS_GUI_REF}}
-          path: build_release/pytrnsys_gui
       
-      - name: Report some variable values
+      - name: Report github.event_name and event_type
         run: |
           echo "Event name: ${{github.event_name}}"
           echo "Event type (via client payload): ${{github.event.client_payload.type}}"
           echo "Event type (via event_type): ${{github.event.event_type}}"
-          echo "GitHub ref: ${{github.ref}}"
-          echo "GitHub ref_name: ${{github.ref_name}}"
+
+      - name: Remove old venv
+        run: |
+          if (Test-Path -LiteralPath venv) {
+            Remove-Item -LiteralPath venv -Recurse
+          }
 
       - name: Create virtual environment
         run: py -3.12 -m venv venv
@@ -88,7 +35,7 @@ jobs:
       - name: Compute pytrnsys git SHA
         id: sha
         run: |
-          $pytrnsys_sha=$(venv\Scripts\python release\getGitSha.py https://github.com/SPF-OST/pytrnsys.git {{env.PYTRNSYS_REF}})
+          $pytrnsys_sha=$(venv\Scripts\python release\getPytrnsysMasterGitSha.py)
           echo "pytrnsys_sha=${pytrnsys_sha}" >> $env:GITHUB_OUTPUT
 
       - name: Install dependencies
@@ -96,24 +43,23 @@ jobs:
           venv\Scripts\python -m pip install --upgrade pip
           venv\Scripts\python -m pip install wheel
           venv\Scripts\python -m pip install -r requirements/release.txt
-          # Override required `pytrnsys` ref
-          venv\Scripts\python -m pip install git+https://github.com/SPF-OST/pytrnsys.git@${{env.PYTRNSYS_REF}}#egg=pytrnsys
-
+        
       - name: Build executable
         run: venv\Scripts\python dev-tools/devTools.py -r
       
       - name: Compute file name
         id: fn
         run: |
-          $pytrnsys_gui_sha=$(venv\Scripts\python release\getGitSha.py https://github.com/SPF-OST/pytrnsys_gui.git {{env.PYTRNSYS_REF}})
-          $ref_name="${{env.PYTRNSYS_GUI_REF}}".replace("/","-")
+          $pytrnsys_gui_sha=$(git rev-parse --short HEAD)
+          $ref_name="${{github.ref_name}}".replace("/","-")
           $date = $(venv\Scripts\python -c "import datetime; print(datetime.datetime.now(datetime.UTC).isoformat(timespec='seconds').replace(':','_'))")
           echo "file_name_base=pytrnsys-gui-${ref_name}-gui_${pytrnsys_gui_sha}-pytrnsys_${{steps.sha.outputs.pytrnsys_sha}}-${date}" >> $env:GITHUB_OUTPUT
       
-      - name: Create zip file
+      - if: env.TAG_PUSH_TO_MASTER == 'true' || env.NORMAL_PUSH_TO_MASTER == 'true'
+        name: Create zip file
         run: mv release\build\pytrnsys.zip ${{steps.fn.outputs.file_name_base}}.zip
       
-      - if: ${{ env.CREATE == 'pre-release'}}
+      - if: env.NORMAL_PUSH_TO_MASTER == 'true'
         name: Release artifacts (bleeding-edge)
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -122,9 +68,9 @@ jobs:
           prerelease: true
           title: "Development Build"
           # ATTENTION: `action-automatic-releases` *needs* forward slashes in the paths given to `files`.
-          files: build_release/pytrnsys_gui/${{steps.fn.outputs.file_name_base}}.zip
+          files: ${{steps.fn.outputs.file_name_base}}.zip
       
-      - if: ${{ env.CREATE == 'release'}}
+      - if: env.TAG_PUSH_TO_MASTER == 'true'
         name: Release artifacts (proper release)
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -132,11 +78,4 @@ jobs:
           title: "Release"
           prerelease: false
           # ATTENTION: `action-automatic-releases` *needs* forward slashes in the paths given to `files`.
-          files: build_release/pytrnsys_gui/${{steps.fn.outputs.file_name_base}}.zip
-          
-      - if: ${{ env.CREATE == 'artifacts'}}
-        name: Upload release as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Release zip
-          path: build_release/pytrnsys_gui/${{steps.fn.outputs.file_name_base}}.zip
+          files: ${{steps.fn.outputs.file_name_base}}.zip
