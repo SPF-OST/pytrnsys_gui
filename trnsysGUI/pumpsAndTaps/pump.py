@@ -122,7 +122,7 @@ class Pump(_patb.PumpsAndTabsBase):  # pylint: disable=too-many-instance-attribu
         node = _com.getSingle(internalPiping.nodes)
         inputVariableName = _mnames.getInputVariableName(self, node)
 
-        return f"Pel{inputVariableName}"
+        return f"Pel{inputVariableName}_kW"
 
     def exportPumpPowerConsumption(self,loop):
 
@@ -131,19 +131,19 @@ class Pump(_patb.PumpsAndTabsBase):  # pylint: disable=too-many-instance-attribu
         inputVariableName = _mnames.getInputVariableName(self, node)
         canonicalMassFlowRate = self._getCanonicalMassFlowRate()
 
-        result  = f"***********************************************\n"
+        result  = f"\n***********************************************\n"
         result += f"*** Pump Consumption of {inputVariableName} ***\n"
-        result += f"***********************************************\n"
+        result += f"***********************************************\n\n"
 
         result += f"EQUATIONS #\n"
         result += f"{inputVariableName}=${inputVariableName} ! Comment this is the file is global\n"
         result += f"{inputVariableName}Nom = {canonicalMassFlowRate}  ! Nominal mass flow rate, kg/h.\n"
         densityLoop = f"${_names.getDensityName(loop.name.value)}"
-        result += f"dpPu{inputVariableName}Nom_bar = MIN(dpmax_bar,MAX(dpmin_bar, {densityLoop} * 0.1)) ! Pressure-drop of loop at nominal mass flow, bar \n"
+        result += f"dpPu{inputVariableName}Nom_bar = MIN(dpmax_bar,MAX(dpmin_bar,{inputVariableName}Nom/{densityLoop} * 0.1)) ! Pressure-drop of loop at nominal mass flow, bar \n"
         result += f"fr{inputVariableName} = {inputVariableName}/{inputVariableName}Nom !  Flow rate fraction of nominal flow rate \n"
         result += f"dpPu{inputVariableName}_bar = fr{inputVariableName}^2*dpPu{inputVariableName}Nom_bar ! Pressure-drop of loop at actual mass flow, bar \n"
         result += f"PelFlow{inputVariableName}_kW = (({inputVariableName}/3600)/ {densityLoop}) * dpPu{inputVariableName}_bar*100 !required power to drive the flow in kW \n"
         result += f"eta{inputVariableName} = MAX(1E-3,0.85*(-0.60625*fr{inputVariableName}^2+1.25*fr{inputVariableName})) ! pump efficiency (electric 85 %) \n"
-        result += f"Pel{inputVariableName} = GT({inputVariableName},0.1)*PelFlow{inputVariableName}_kW/eta{inputVariableName} !required pump electric power, kW \n"
+        result += f"Pel{inputVariableName}_kW = GT({inputVariableName},0.1)*PelFlow{inputVariableName}_kW/eta{inputVariableName} !required pump electric power, kW \n"
 
         return result

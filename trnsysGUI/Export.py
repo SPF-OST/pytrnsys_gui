@@ -205,6 +205,7 @@ ddTcwOffset = 36 ! Days of minimum surface temperature
 *******************************************
 *** Calculation of pump consumption
 *******************************************
+
 CONSTANTS 2
 dpmin_bar = 0.1 ! minimal pressure-drop of loop at nominal mass flow, bar
 dpmax_bar = 15  ! maximum pressure-drop of loop at nominal mass flow, bar
