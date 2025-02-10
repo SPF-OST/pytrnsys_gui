@@ -24,15 +24,15 @@ $bui_UGrFloor = 0.183   ! U-Value of Ground floor, W/m2K
 
 CONSTANTS #
 $bui_PheatBuiD    = 12830  ! design heating rate for building an location [kJ/h]
-$bui_TBuiFlNom    = 35     ! Design flow temp. heating syst. [�C]
-$bui_TBuiRtNom    = 30     ! Design return temp. heating syst. [�C]
+$bui_TBuiFlNom    = 35     ! Design flow temp. heating syst. [ºC]
+$bui_TBuiRtNom    = 30     ! Design return temp. heating syst. [ºC]
 $bui_AreaBui      = 120
 $bui_TroomSetCool = 24
-$bui_TroomSet     = 21.00     ! Setpoint for Room temperature, �C
+$bui_TroomSet     = 21.00     ! Setpoint for Room temperature, [ºC]
 $bui_m_Rd         = 1.3
 
 CONSTANTS #
-factorMfrBuiNom = 1 !adapt this factor to achieve the nominal DeltaT you need in the dustribution loop
+factorMfrBuiNom = 1 !adapt this factor to achieve the nominal DeltaT you need in the distribution loop
 $bui_QPeak_kW   = 5
 $bui_MfrBuiNom  = factorMfrBuiNom*$bui_QPeak_kW/($cpWat*($bui_TBuiFlNom-$bui_TBuiRtNom))*3600 ! Nominal mass flow of heat distribution system [kg/h]
 

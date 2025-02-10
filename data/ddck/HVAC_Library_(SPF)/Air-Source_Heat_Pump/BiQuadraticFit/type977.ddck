@@ -47,16 +47,15 @@ EQUATIONS 4
 **********************************
 
 EQUATIONS 2
-myHpIsOn  = $userControl_hpIsOn		! control signal for the heat pump. this is coming from the control file PvAshpDhwShMFh_controller.ddck
-myRHamb_1 = $weather_RHamb_1
+HpIsOn  = $userControl_hpIsOn		! control signal for the heat pump. this is coming from the control file PvAshpDhwShMFh_controller.ddck
+RHamb_1 = $weather_RHamb_1
 
 ***********************************
 ** outputs to other ddck
 ***********************************
 
-EQUATIONS 2
-$MfrHpPD   = MfrPD
-$tHpCondIn = tCondIn
+!EQUATIONS #
+!$tHpCondIn = tCondIn should not be global sicne we might have more than one !!!
 
 ***********************************
 ** Definition of Heat pump type
@@ -78,49 +77,6 @@ Ualoss = 0
 frCOP = 1     
 frCond = 1
 
-*************************************
-** Begin PD CONTROLLER
-*************************************
-CONSTANTS 5
-MfrHpCondMin = MfrHpCondNom*0.4		! chosen without any knowledge of actual system
-MfrHpCondMax = MfrHpCondNom			! chosen without any knowledge of actual system
-dMfrHpCondInc = 4*MfrHpCondNom
-dMfrHpCondDec = -dMfrHpCondInc
-dtSetHp = 5
-
-EQUATIONS 1
-dTProPID= myHpIsOn*(@temp(Out)-TCondIn)+NOT(myHpIsOn)*5 !$HpIsOn from control
-
-! CONTROL OF ASHP MASSFLOW.
-UNIT 157 TYPE 889		! Adapted PD-controller
-PARAMETERS 9
-1					! 1: mode of timesteps: 1= use previous value, 0 = use current value
-MfrHpCondMin		! 2: lowest possible output value
-MfrHpCondMax		! 3: highest possible output value
--1					! 4: mode of action: 1 = positive, (increase in manipulated value causes increase in process variable), -1 = negative
-MfrHpCondNom		! 5: By how much shall the manipulated variable be changed per hour if the process variable is 1 unit off?
-4					! 6: A high value for D counteracts overshoot / counteracts high rates of increase or decrease in the process variable.
-120					! 7: maximum rate of setpoint change per hour
-dMfrHpCondInc		! 8: maximum rate of increase of the manipulated variable (positive value)
-dMfrHpCondDec		! 9: maximum rate of decrease of the manipulated variable (negative value)
-INPUTS 5
-dTProPID		! 1: process variable
-dtSetHp			! 2: setpoint
-0,0				! 3: freeze manipulated variable (1) or let act (0)
-0,0			    ! 4: Manual (1) or automatic (0) manipulated variable
-0,0				! 5: manual manipulated variable
-*** INITIAL INPUT VALUES
-0.0   0.0   0.0   0.0    0.0
-*** OUTUPUTS
-** 1: manipulated variable, 2: current setpoint, 3: current deviation
-
-EQUATIONS 6		! ASHP ON-Signal and mass flow
-MfrPDNew = [157,1]
-SetpPD = [157,2]
-DevPD = [157,3]
-MfrPuHpPD = myHpIsOn*MfrPD
-relaxMfrPD = 1
-MfrPD = MfrPDNew*relaxMFrPD + (1-relaxMFrPD)*MfrPDRc
 
 CONSTANTS 6
 tauWPstart = 10
@@ -168,8 +124,8 @@ TEvapIn		! 1: tevap,in, �C
 MfrEvapIn		! 2: Mfr,evap,in, kg/h
 TCondIn		! 3: tcond,in, �C
 MfrCondIn		! DC LET IS AS IT WAS BEFORE (CHECK) MfrHpCond !      ! 4: Mfr,cond,in, kg/h
-myHpIsOn		! 5: gamma_ON, -
-myRHamb_1		! 6: RH_air_in
+HpIsOn		! 5: gamma_ON, -
+RHamb_1		! 6: RH_air_in
 tAmbHp			! 7
 frCond			! 8
 frCOP			! 9
@@ -209,23 +165,22 @@ BrineTooColdTimer = [163,1]
       
 UNIT 82 TYPE 993		! Input value recall (element RcA) DC CHANGED
 PARAMETERS 1     
-4		! 1: number of variables to be remembered
-INPUTS 4    
-HpIsBlock @temp(Out)  myHpIsOn MfrPD !ImbHpOnErr_kWh EImbPPiShHot_kWh ImbHpDhwOnErr_kWh     
-0 0  0 0		!0 0 0  
+3		! 1: number of variables to be remembered
+INPUTS 3
+HpIsBlock @temp(Out)  HpIsOn  !ImbHpOnErr_kWh EImbPPiShHot_kWh ImbHpDhwOnErr_kWh
+0 0  0 		!0 0 0
      
-EQUATIONS 6   
-BoHpStart = myHpIsOn*NOT(myHpIsOnRc)     
+EQUATIONS #
+BoHpStart = HpIsOn*NOT(HpIsOnRc)
 HpStartPerH = BoHpStart/$dtsim
-HpIsBlockRc = [82,1]     
-THpOutRc = [82,2]  
-myHpIsOnRc = [82,3]
-MfrPDRc = [82,4]
-  
+HpIsBlockRc = [82,1]
+THpOutRc = [82,2]
+HpIsOnRc = [82,3]
+
 
 EQUATIONS 2
 dtEvap = TEvapIn-TEvapOut
-dtCond = @temp(Out)-TCondIn
+dtCond = TCondOut-TCondIn
 
 ***********************************
 ** Monthly printer
@@ -288,10 +243,10 @@ $nPlotsPerSim		! 7: Number of plots per simulation
 0					! 11: Output file units
 0					! 12: Output file delimiter
 INPUTS 14
-TEvapIn TEvapOut TCondIn @temp(Out) myHpIsOn HpIsBlock
+TEvapIn TEvapOut TCondIn @temp(Out) HpIsOn HpIsBlock
 MfrEvapIn MfrCondIn PauxEvap_kW PauxCond_kW   frCond dtEvap dtCond PAuxLossStart_kW
 **
-TEvapIn TEvapOut TCondIn @temp(Out) myHpIsOn HpIsBlock
+TEvapIn TEvapOut TCondIn @temp(Out) HpIsOn HpIsBlock
 MfrEvapIn MfrCondIn PauxEvap_kW PauxCond_kW   frCond dtEvap dtCond PAuxLossStart_kW
 LABELS  3     
 Temperatures     
