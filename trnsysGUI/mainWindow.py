@@ -78,7 +78,7 @@ class MainWindow(_qtw.QMainWindow):
 
         exportHydCtrlAction = _qtw.QAction(
             _img.EXPORT_HYDRAULIC_CONTROL_PNG.icon(),
-            "Export hydraulic_control_default.ddck and pump_consumption_file.ddck",
+            "Export ddck: hydraulic_control and pump_consumption",
             self,
         )
         exportHydCtrlAction.triggered.connect(self.exportHydraulicControl)
@@ -175,7 +175,7 @@ class MainWindow(_qtw.QMainWindow):
         exportHydraulicsActionMenu = _qtw.QAction("Export hydraulic.ddck", self)
         exportHydraulicsActionMenu.triggered.connect(self.exportHydraulicsDdck)
 
-        exportHydCtrlActionMenu = _qtw.QAction("Export hydraulic_control_default.ddck and pump_consumption_file.ddck", self)
+        exportHydCtrlActionMenu = _qtw.QAction("Export ddck user_control and pump_consumption", self)
         exportHydCtrlActionMenu.triggered.connect(self.exportHydraulicControl)
         exportHydCtrlActionMenu.triggered.connect(self.exportPumpConsumptionFile)
 

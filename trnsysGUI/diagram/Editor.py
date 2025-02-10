@@ -492,6 +492,8 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             return None
 
         fullExportText += blackBoxText
+
+        fullExportText += "CONSTANTS 1\nTRoomStore=15\n" #Now we need this always since TEs do not export it
         if exportTo == "mfs":
             fullExportText += exporter.exportMassFlows()
             fullExportText += exporter.exportDivSetting(simulationUnit - 10)
@@ -515,8 +517,8 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         if exportTo == "mfs":
             fullExportText += """\
 CONSTANTS 2
-TRoomStore=1
 Tcw=1
+weather_TcwAvg=1
 """
             fullExportText += "ENDS"
 
@@ -605,12 +607,12 @@ Tcw=1
 
         ddckFolder = os.path.join(self.projectFolder, "ddck")
 
-        hydCtrlPath = os.path.join(ddckFolder, "user_control", "hydraulic_control_default.ddck")
+        hydCtrlPath = os.path.join(ddckFolder, "user_control", "user_control_default.ddck")
         if _pl.Path(hydCtrlPath).exists():
             qmb = _qtw.QMessageBox(self)
             qmb.setText(
                 "Warning: "
-                + "The file hydraulic_control_defalut.ddck already exists in the user_control folder. Do you want to overwrite it or cancel?"
+                + "The file user_control_defalut.ddck already exists in the user_control folder. Do you want to overwrite it or cancel?"
             )
             qmb.setStandardButtons(_qtw.QMessageBox.Save | _qtw.QMessageBox.Cancel)
             qmb.setDefaultButton(_qtw.QMessageBox.Cancel)
@@ -624,7 +626,7 @@ Tcw=1
                 return
 
         fullExportText += "*************************************\n"
-        fullExportText += "**BEGIN hydraulic_control_default.ddck\n"
+        fullExportText += "**BEGIN user_control_default.ddck\n"
         fullExportText += "*************************************\n"
 
         simulationUnit = 450
