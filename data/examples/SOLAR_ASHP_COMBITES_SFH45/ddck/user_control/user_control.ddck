@@ -1,0 +1,108 @@
+*************************************
+**BEGIN user_control.ddck
+*************************************
+
+********************************************************************************************
+** inputs from other ddck
+********************************************************************************************
+
+EQUATIONS # !dependencies from type888 control
+BoHS             = $type888_BoHS !heating season
+HpForDHWIsNeeded = $type888_HpForDhwIsNeeded
+HpForSHIsNeeded  = $type888_HpForSHIsNeeded
+
+!EQUATIONS # !dependencied from building -> mfb and type56
+!TroomSet  = $bui_TroomSet
+!Troom     = $buiModel_Troom
+
+EQUATIONS #
+T_set_MixDhw = $dhw_Tdhwset
+T_set_MixSh  = $type888_TRdSet ! to reach 21 ºC in the room we need a higher flow temperature
+
+***************************************************************
+** outputs to hydraulic solver
+** inputs necessary for the mass flow solver from hydraulic.ddck
+***************************************************************
+
+EQUATIONS #
+*** Massflowrates
+$MfrPuCond = $MfrHpPD*hpOnRc
+$MfrWtSp   = $dhw_MfrDHWset
+$MfrWtTp   = -$MfrWtSp
+$MfrPuSh   = $bui_MfrBuiNom*$PID_SHD_Mfr*BoHS
+$MfrPuSolar = $solarController_mfr*$solarController_puColOn
+***diverter valves***
+$xFracMixHp = NOT(HpForDHWIsNeededRc)
+
+***************************************************************
+** outputs to type888
+***************************************************************
+EQUATIONS #
+$userControl_TTesDhwUpAuxOn   = $CombiTes_T9 ! temperature of store (upper) below which auxiliary is on for WW-Mode zSen9=0.85
+$userControl_TTesDhwBotAuxOff = $CombiTes_T8 ! temperature of store (lower) above which auxiliary is off for WW-Mode zSen8=0.75
+$userControl_TTesSHUpAuxOn    = $CombiTes_T6 ! upper temperature measured for room heating (on). zSen6=0.55
+$userControl_TTesSHBotAuxOff  = $CombiTes_T4 ! lower temperature measured for room heating (off) zSen4=0.35
+!$userControl_TTesSHBotAuxOff  = $AshpTCondIn ! lower temperature measured for room heating (off)
+
+
+EQUATIONS #
+$userControl_hpIsOn  = hpOnRc !Recall value
+
+*******************************************************
+** ON/OFF Heat pump *
+*******************************************************
+
+EQUATIONS #
+hpOn = OR(HpForDHWIsNeeded,HpForSHIsNeeded)
+
+*******************************************************
+** ON/OFF Collector and mass flow rate *
+*******************************************************
+EQUATIONS #
+$userControl_tTesSolarTop = $CombiTes_T3
+$userControl_tTesSolarBot = $CombiTes_T1
+
+****************************************************************************
+** Mixing valves
+** Here we MUST use $ for the names that are exported from the GUI hydraulic
+****************************************************************************
+
+UNIT 441 TYPE 811 ! Passive Divider for heating 
+PARAMETERS 1
+5 !Nb.of iterations before fixing the value 
+INPUTS 4 
+$TTes2_MixDhw
+$TTee3_MixDhw
+$MMixDhw_WtTp
+T_set_MixDhw
+*** INITIAL INPUT VALUES
+35.0 21.0 800.0 T_set_MixDhw
+EQUATIONS 1
+$xFracMixDhw =  1.-[441,5]
+
+UNIT 442 TYPE 811 ! Passive Divider for heating
+PARAMETERS 1
+5 !Nb.of iterations before fixing the value
+INPUTS 4
+$TTes2_MixSh
+$TTee5_Val3
+$MVal3_Rad
+T_set_MixSh
+*** INITIAL INPUT VALUES
+35.0 21.0 800.0 T_set_MixSh
+EQUATIONS 1
+$xFracMixSh =  1.-[442,5]
+
+***************************************************************
+** recall values for control
+***************************************************************
+
+UNIT 18 TYPE 993
+PARAMETERS 1
+2  ! 1: number of variables to be remembered
+INPUTS 2
+hpOn  HpForDHWIsNeeded
+0.0 0.0
+EQUATIONS #   ! outputs of Input Value Recall
+hpOnRc = [18,1]
+HpForDHWIsNeededRc= [18,2]
