@@ -130,7 +130,7 @@ class Type1924_TesPlugFlow:
 
         lines = "*********Constant values of HX=%d***********\n" % idHx
 
-        line = "CONSTANTS 15\n"
+        line = "CONSTANTS #\n"
         lines = lines + line
 
         line = "dInHx%d=0.05 ! m only if modHx%d=0\n" % (idHx,  idHx)
@@ -745,7 +745,7 @@ class Type1924_TesPlugFlow:
         lines = lines + line
         line = "100     ! 6 Right axis maximum \n"
         lines = lines + line
-        line = "nPlotsPerSim     ! 7 Number of plots per simulation \n"
+        line = "$nPlotsPerSim     ! 7 Number of plots per simulation \n"
         lines = lines + line
         line = "12     ! 8 X-axis gridpoints\n"
         lines = lines + line
@@ -759,15 +759,14 @@ class Type1924_TesPlugFlow:
         lines = lines + line
         line = "INPUTS 10     \n"
         lines = lines + line
-        line = "T1 T2 T3 T4 T5 T6 T7 T8 T9 T10 \n"
-        lines = lines + line
-        line = "T1 T2 T3 T4 T5 T6 T7 T8 T9 T10 \n"
-        lines = lines + line
+        lineNames = "$%s_T1 $%s_T2 $%s_T3 $%s_T4 $%s_T5 $%s_T6 $%s_T7 $%s_T8 $%s_T9 $%s_T10 \n" %(self.nameTes,self.nameTes,self.nameTes,self.nameTes,self.nameTes,self.nameTes,self.nameTes,self.nameTes,self.nameTes,self.nameTes)
+        lines = lines + lineNames
+        lines = lines + lineNames
         line = "LABELS  3         \n"
         lines = lines + line
         line = "Temperatures  \n"
         lines = lines + line
-        line = "MassFlows  \n"
+        line = "Temperatures  \n"
         lines = lines + line
         line = "%s\n" % (self.nameTes)
         lines = lines + line
@@ -806,7 +805,7 @@ class Type1924_TesPlugFlow:
         lines = lines + self.getInputs(inputs)
         lines = lines + self.getOutputs(inputs)
         lines = lines + self.getMonthyPrinter(nTes, nUnit, inputs)
-        # lines = lines + self.getOnlinePlotter(nTes)
+        lines = lines + self.getOnlinePlotter(nTes)
         return lines
 
     def getHead(self):
