@@ -94,22 +94,23 @@ Dp1Strat=0 ! 0: no forced stratification ; 1: force to stratify
 CONSTANTS 1
 nHxUsed=1 
 *********Constant values of HX=1***********
-CONSTANTS 15
-dInHx1=0.05 ! m only if modHx1=1
-dOutHx1=0.06 ! m only if modHx1=1
-LHx1=20 ! m only if modHx1=1
-LamHx1=50 ! W/mK only if modHx1=1
-brineConcHx1=30 ! [0-100] only if modHx1=1
+CONSTANTS #
+dInHx1=0.05 ! m only if modHx1=0
+dOutHx1=0.06 ! m only if modHx1=0
+scaleHX1=13 ! m only if modHx1=0
+LHx1 = scaleHX1 * Vol / (2 * $PI * 0.0333) ! m only if modHx1=0
+LamHx1=50 ! W/mK only if modHx1=0
+brineConcHx1=0 ! [0-100] only if modHx1=0 TO BE MODIFIED IF GLYCOL USED
 VHx1=0. 
 nCvHx1=20 
-modHx1=1 ! modHX1, 0 = physical model, 1 = Drueck-model (Multiport)
-nNuHx1=0.5 !  only if modHx1=1
-cNuHx1=0.25 !  only if modHx1=1
-dUaMfrHx1=0.375 ! only if modHx1=0
-dUadTHx1=0.0 ! only if modHx1=0
-dUaTHx1=0.458 ! only if modHx1=0
-UaHx1=1105*ratio ! kJ/hK only if modHx1=0
-startUpHx1=0. ! only if modHx1=0
+modHx1=0 ! modHX1, 0 = physical model, 1 = Drueck-model (Multiport)
+nNuHx1=0.5 !  only if modHx1=0
+cNuHx1=0.25 !  only if modHx1=0
+dUaMfrHx1=0.375 ! only if modHx1=1
+dUadTHx1=0.0 ! only if modHx1=1
+dUaTHx1=0.458 ! only if modHx1=1
+UaHx1=1105*ratio ! kJ/hK only if modHx1=1
+startUpHx1=0. ! only if modHx1=1
 *************************************
 ** USER DEFINED TEMPERATURE SENSOR HEIGHTS. To be changed by user 
 *************************************
@@ -294,30 +295,3 @@ unitPrinter ! 1: Logical unit number, -
 INPUTS 8
 Qv QLoss QAcum QPorts QImb Qdp1 Qhx1Out qHeatSource 
 Qv QLoss QAcum QPorts QImb Qdp1 Qhx1Out qHeatSource 
-*************************************
-********** Online Plotter ***********
-*************************************
-
-!UNIT 501 TYPE 65     ! Online Plotter HX
-!PARAMETERS 12
-!10     ! 1 Nb. of left-axis variables
-!0     ! 2 Nb. of right-axis variables
-!0     ! 3 Left axis minimum
-!100     ! 4 Left axis maximum -
-!0     ! 5 Right axis minimum
-!100     ! 6 Right axis maximum
-!$nPlotsPerSim     ! 7 Number of plots per simulation
-!12     ! 8 X-axis gridpoints
-!1     ! 9 Shut off Online w/o removing
-!-1     ! 10 Logical unit for output file
-!0     ! 11 Output file units
-!0     ! 12 Output file delimiter
-!INPUTS 10
-!T1 T2 T3 T4 T5 T6 T7 T8 T9 T10
-!T1 T2 T3 T4 T5 T6 T7 T8 T9 T10
-!LABELS  3
-!Temperatures
-!MassFlows
-!TesDhw
-
-

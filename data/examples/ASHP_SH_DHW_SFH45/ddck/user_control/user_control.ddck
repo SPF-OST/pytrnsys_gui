@@ -41,9 +41,11 @@ $userControl_TTesDhwHpOff = $TesDhw_T6
 $userControl_TTesDhwHpOn  = $TesDhw_T9
 $userControl_TTesDhwBot   = $TesDhw_T1
 $userControl_TTesDhwTop   = $TesDhw_T9
-$userControl_TTesShBot    = $TesSh_T1
-$userControl_TTesShTop    = $TesSh_T9
 $userControl_TsensorTesSh = $TesSh_T8
+
+!Necessary for what?
+!$userControl_TTesShBot    = $TesSh_T1
+!$userControl_TTesShTop    = $TesSh_T9
 
 EQUATIONS #
 $userControl_hpIsOn    = hpOnRc !Recall value
