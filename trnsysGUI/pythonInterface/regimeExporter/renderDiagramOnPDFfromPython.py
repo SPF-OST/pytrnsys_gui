@@ -196,7 +196,9 @@ def _exportHydraulic(editor: _de.Editor, *, formatting) -> str:  # type: ignore[
 def _getTrnExePath() -> _pl.PureWindowsPath:
     isRunDuringCi = _os.environ.get("CI") == "true"
     if isRunDuringCi:
-        return _pl.PureWindowsPath(r"C:\CI-Progams\TRNSYS18_pytrnsys\Exe\TrnEXE.exe")
+        return _pl.PureWindowsPath(
+            r"C:\CI-Progams\TRNSYS18_pytrnsys\Exe\TrnEXE.exe"
+        )
 
     return _pl.PureWindowsPath(
         r"C:\TRNSYS18\Exe\TrnEXE.exe"
