@@ -46,8 +46,7 @@ def _getInstallRequirements():
     requirementsFile = (
         _pl.Path(__file__).parent / "requirements" / "release-3rd-party.in"
     )
-    lines = requirementsFile.read_text().split("\n")
-    requirements = [l for l in lines if l.strip() and not l.startswith("#")]
+    requirements = requirementsFile.read_text().split("\n")
     return requirements
 
 

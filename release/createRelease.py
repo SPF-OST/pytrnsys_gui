@@ -36,7 +36,6 @@ RELEASE_FILE_NAMES_TO_COPY_TO_DIST_DIR = [
     "pytrnsys.bat",
     "pytrnsys-gui.bat",
     "install-pytrnsys-gui-RUN-AS-ADMIN.bat",
-    "spyder.bat",
     "README.txt",
 ]
 
@@ -55,7 +54,7 @@ def createRelease() -> None:
 
     _copyDataDirPathsToDistFolder()
 
-    _copyReleaseFilesToDistFolder()
+    _copyBatchScriptsAndReadmeFileToDistFolder()
 
     _createReleaseZipFile()
 
@@ -126,7 +125,7 @@ def _installPackages(embeddablePythonDistDirPath: _pl.Path) -> None:
     _sh.copy(pthFilePath, embeddablePythonDistDirPath)
 
 
-def _copyReleaseFilesToDistFolder() -> None:
+def _copyBatchScriptsAndReadmeFileToDistFolder() -> None:
     for fileName in RELEASE_FILE_NAMES_TO_COPY_TO_DIST_DIR:
         sourceFilePath = RELEASE_DIR_PATH / fileName
         _sh.copy(sourceFilePath, DIST_DIR_PATH)
