@@ -162,7 +162,7 @@ class TestStorageTank:
             )
 
     @classmethod
-    def _addLoop(
+    def _addLoop(  # pylint: disable=too-many-positional-arguments, too-many-arguments
         cls,
         externalFromPortConnection,
         externalToPortConnection,

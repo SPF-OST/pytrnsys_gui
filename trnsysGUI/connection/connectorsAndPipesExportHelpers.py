@@ -53,7 +53,7 @@ EQUATIONS <<2 if canonicalMassFlowRate else 1>>
 )
 
 
-def getIfThenElseUnit(  # pylint: disable=too-many-arguments
+def getIfThenElseUnit(  # pylint: disable=too-many-arguments, too-many-positional-arguments
     unitNumber: int,
     outputTemp: str,
     initialTemp: str,

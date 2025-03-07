@@ -106,7 +106,7 @@ class TestGetBlockItem:
     @_pt.mark.parametrize(
         "componentTypeName, componentType, displayName", _BLOCK_ITEM_CASES
     )
-    def testGetNewBlockItem(
+    def testGetNewBlockItem(  # pylint: disable=too-many-positional-arguments
         self,
         componentTypeName,
         componentType,

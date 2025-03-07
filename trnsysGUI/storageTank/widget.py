@@ -112,7 +112,7 @@ class StorageTank(
         for heatExchanger in self.heatExchangers:
             heatExchanger.storageTank = self
 
-    def addDirectPortPair(  # pylint: disable=too-many-arguments
+    def addDirectPortPair(  # pylint: disable=too-many-positional-arguments
         self,
         trnsysId: int,
         side: _sd.Side,
@@ -172,7 +172,7 @@ class StorageTank(
         portItem.innerCircle.setBrush(color)
         portItem.visibleColor = color
 
-    def addHeatExchanger(
+    def addHeatExchanger(  # pylint: disable=too-many-positional-arguments
         self, name, trnsysId, side, relativeInputHeight, relativeOutputHeight
     ):
         heatExchanger = HeatExchanger(

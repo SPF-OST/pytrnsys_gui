@@ -74,7 +74,7 @@ def _renderTeePieceUnit(
     return unitText
 
 
-def getTeePieceUnit(
+def getTeePieceUnit(  # pylint: disable=too-many-positional-arguments
     unitNumber: int,
     teePiece: _tpb.TeePieceBase,
     massFlowNetworkNode: _mfn.TeePiece,
@@ -143,7 +143,7 @@ def _createPorts(
     return inputPort, orthogonalOutputPort, straightOutputPort
 
 
-def _createPort(
+def _createPort(  # pylint: disable=too-many-positional-arguments
     connection: _cb.ConnectionBase,
     modelPortItem: _mfn.PortItem,
     teePiece: _tpb.TeePieceBase,

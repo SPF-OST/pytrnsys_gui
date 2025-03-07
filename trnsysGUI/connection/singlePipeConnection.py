@@ -225,7 +225,7 @@ class SinglePipeConnection(
 
         return unitText, nextUnitNumber
 
-    def _getSimulatedPipeUnitText(  # pylint: disable=too-many-locals
+    def _getSimulatedPipeUnitText(  # pylint: disable=too-many-locals, too-many-positional-arguments
         self,
         unitNumber,
         inputMfrName,

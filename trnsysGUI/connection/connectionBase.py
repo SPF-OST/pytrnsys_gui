@@ -31,7 +31,7 @@ def calcDist(p1, p2):  # pylint: disable = invalid-name
 
 
 class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
-    # pylint: disable = too-many-public-methods, too-many-instance-attributes
+    # pylint: disable = too-many-public-methods, too-many-instance-attributes, too-many-positional-arguments
     def __init__(
         self,
         displayName: str,
