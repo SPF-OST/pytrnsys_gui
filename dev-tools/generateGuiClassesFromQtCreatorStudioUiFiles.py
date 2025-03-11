@@ -43,9 +43,9 @@ def _generatePythonCodeFromUiFiles():
 def _generatePythonCodeFromQrcFiles():
     print(f"Using pyrcc5 executable from {_PYRCC5_FILE_PATH}.")
 
-    currentDirPath = _pl.Path()
+    trnsysGuiDirPath = _pl.Path("trnsysGUI")
 
-    qrcFilePaths = currentDirPath.rglob("*.qrc")
+    qrcFilePaths = trnsysGuiDirPath.rglob("*.qrc")
     for qrcFilePath in qrcFilePaths:
         generatedFilePath = _getGeneratedFilePath(qrcFilePath, "QRC")
 
