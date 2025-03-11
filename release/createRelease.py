@@ -124,7 +124,7 @@ def _installPackages(embeddablePythonDistDirPath: _pl.Path) -> None:
 
     pthFilePath = RELEASE_DIR_PATH / "python312._pth"
     _sh.copy(pthFilePath, embeddablePythonDistDirPath)
-    
+
     # We need this for spyder autocompletion/pylsp/jedi
     # For more info see here: https://github.com/davidhalter/jedi/issues/2053
     emptyDirToAddToSysPath = embeddablePythonDistDirPath / "empty"
