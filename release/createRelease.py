@@ -32,10 +32,11 @@ PACKAGE_DATA_DIR_NAMES_TO_COPY_TO_DIST_DIR = [
     "pytrnsys_gui_data",
 ]
 
-RELEASE_FILE_NAMES_TO_COPY_TO_DIST_DIR = [
+RELEASE_FILE_OR_DIR_NAMES_TO_COPY_TO_DIST_DIR = [
     "pytrnsys.bat",
     "pytrnsys-gui.bat",
     "install-pytrnsys-gui-RUN-AS-ADMIN.bat",
+    "spyder",
     "spyder.bat",
     "README.txt",
 ]
@@ -55,7 +56,7 @@ def createRelease() -> None:
 
     _copyDataDirPathsToDistFolder()
 
-    _copyReleaseFilesToDistFolder()
+    _copyReleaseFileOrDirNamesToDistFolder()
 
     _createReleaseZipFile()
 
@@ -73,9 +74,10 @@ def _downloadAndExtractEmbeddablePythonDist() -> _pl.Path:
     embeddableZipFilePath = BUILD_DIR_PATH / embeddableZipFileName
 
     response: _htc.HTTPResponse
-    with _urlreq.urlopen(url) as response, embeddableZipFilePath.open(
-        "bw"
-    ) as embeddableZipFile:
+    with (
+        _urlreq.urlopen(url) as response,
+        embeddableZipFilePath.open("bw") as embeddableZipFile,
+    ):
         embeddableZipFile.write(response.read())
 
     DIST_DIR_PATH.mkdir()
@@ -131,10 +133,15 @@ def _installPackages(embeddablePythonDistDirPath: _pl.Path) -> None:
     emptyDirToAddToSysPath.mkdir()
 
 
-def _copyReleaseFilesToDistFolder() -> None:
-    for fileName in RELEASE_FILE_NAMES_TO_COPY_TO_DIST_DIR:
-        sourceFilePath = RELEASE_DIR_PATH / fileName
-        _sh.copy(sourceFilePath, DIST_DIR_PATH)
+def _copyReleaseFileOrDirNamesToDistFolder() -> None:
+    for fileOrDirName in RELEASE_FILE_OR_DIR_NAMES_TO_COPY_TO_DIST_DIR:
+        sourceFilePath = RELEASE_DIR_PATH / fileOrDirName
+        if sourceFilePath.is_file():
+            _sh.copy(sourceFilePath, DIST_DIR_PATH)
+        else:
+            dirName = fileOrDirName
+            targetDirPath = DIST_DIR_PATH / dirName
+            _sh.copytree(sourceFilePath, targetDirPath)
 
 
 def _createReleaseZipFile() -> None:
