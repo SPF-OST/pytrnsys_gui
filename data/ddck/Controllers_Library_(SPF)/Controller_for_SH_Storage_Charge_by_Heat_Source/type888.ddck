@@ -39,10 +39,14 @@ EQUATIONS 1
 
 EQUATIONS #
 !Those values are case dependent and need to be adapted for each case
-TTesDhwUpAuxOn  = $userControl_TTesDhwUpAuxOn
-TTesDhwBotAuxOff = $userControl_TTesDhwBotAuxOff
-TTesSHUpAuxOn   = $userControl_TTesSHUpAuxOn
-TTesSHBotAuxOff = $userControl_TTesSHBotAuxOff
+TTesDhwUpAuxOn   = $userControl_TTesDhwUpAuxOn    ! upper Store temperature measurement for Warm water
+TTesDhwBotAuxOff = $userControl_TTesDhwBotAuxOff  ! lower store temperature measurement for Warm water
+TTesSHUpAuxOn    = $userControl_TTesSHUpAuxOn     ! upper temperature measured for room heating (on)
+TTesSHBotAuxOff  = $userControl_TTesSHBotAuxOff   ! lower temperature measured for room heating (off)
+
+!TwwStAuxOFF = tDhwSet+offsetDhw  ! Stop heating DHW if  TTesDhwBotAuxOff > TWWStAuxOFF
+!TwwStAuxON  = tDhwSet+onsetDhw   ! Start heating DHW if TTesDhwUpAuxOn   < TwwStAuxON
+
 
 tRoomSet      = $bui_tRoomSet
 TBuiFlNom     = $bui_TBuiFlNom
@@ -80,7 +84,7 @@ CONSTANTS 12
 tavgTamb = 24  ! time for averaging of outdoor temperature for the evaluation of heating season or no heating season, h
 offsetDhw = 6  ! Usually we had it at 7.5 . This means the heat pump would need to reach TdhwSet+7.5 !!
 onsetDhw  = 2 !
-TwwStAuxOFF = tDhwSet+offsetDhw  ! Stop heating DHW if TStoreUp > TWWStAuxOFF
+TwwStAuxOFF = tDhwSet+offsetDhw  ! Stop heating DHW if TStoreDhwUp   > TWWStAuxOFF
 TwwStAuxON  = tDhwSet+onsetDhw   ! Start heating DHW if TStoreDhwBot < TwwStAuxON
 dt_rh_on = 0     ! start heating the store if the sh-store temp is below the flow temperature of the heating season + this value, K
 dt_rh_off = 3     ! end heating the store if the sh-store temp is below the setpoint of the heating curve + this value, K

@@ -45,6 +45,9 @@ m_Rd       = $bui_m_Rd
 EQUATIONS #
 $type985_PBuiGrd_kJh = PBuiGrd_kJh
 $type985_PBuiGrd_kW  = PBuiGrd_kW
+$type985_Tgrd1 = Tgrd1 ! at 1 m
+$type985_Tgrd2 = Tgrd2 ! at 2 m  
+$type985_Tgrd3 = Tgrd3 ! at 3 m
 
 ******************************************************************************************
 ** outputs to energy balance in kWh
@@ -72,7 +75,7 @@ Gt = 0.025      ! Geothermal gradient (K/m)
 EQUATIONS 8     ! Inputs for Undisturbed Ground temperature calculation and ground coupling losses
 zGrd1 = 1     ! depth 1 for evaluation of undisturbed ground temperature (m)
 zGrd2 = 2     ! depth 2 for evaluation of undisturbed ground temperature (m)
-zGrd5 = 5     ! depth 3 for evaluation of undisturbed ground temperature (m)
+zGrd3 = 3     ! depth 3 for evaluation of undisturbed ground temperature (m) !DC changed from 5 to 3 as Toni's file
 lFl = 10     ! lenght of building floor in contact with ground (m)
 bFl = 7     ! width of building floor in contact with ground (m)
 w = 0.4     ! width of sidewalls of floor (m)
@@ -95,7 +98,7 @@ CpGrd     ! 6: specific heat of the ground (kJ/kgK)
 Gt     ! 7: Geothermal gradient (K/m)
 zGrd1     ! 8: depth 1 for evaluation of undisturbed ground temperature (m)
 zGrd2     ! 9: depth 2 for evaluation of undisturbed ground temperature (m)
-zGrd5     ! 10: depth 3 for evaluation of undisturbed ground temperature (m)
+zGrd3     ! 10: depth 3 for evaluation of undisturbed ground temperature (m)
 TiAvg     ! 11: average inside temperature over the year (�C)
 dTi     ! 12: amplitude of sine-curve that fits inside temp. over the year (K)
 lFl     ! 13: lenght of building floor in contact with ground (m)
@@ -109,7 +112,7 @@ Psi     ! 17: Linear thermal transmittance associated with wall/floor junction (
 EQUATIONS #
 Tgrd1 = [55,1]
 Tgrd2 = [55,2]
-Tgrd5 = [55,3]
+Tgrd3 = [55,3]
 PBuiGrd_kJh = [55,4]     ! positive values are gains from the ground, negative ones are losses [kJ/h]
 !delGrd = [55,5]
 !dt = [55,6]

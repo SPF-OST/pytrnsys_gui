@@ -32,7 +32,8 @@ cp = @cp(In)		! MfrColl_B		! because its the other way around
 
 EQUATIONS #
 @temp(Out) = [74,1]		! Temperature of collector loop - collector to pipe
-tCollOut = [74,1]
+tCollOut   = [74,1]
+
 ***********************************
 ** outputs to other ddck
 ***********************************

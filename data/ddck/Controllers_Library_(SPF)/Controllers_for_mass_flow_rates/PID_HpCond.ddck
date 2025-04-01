@@ -33,12 +33,16 @@
 *******************************************
 ** inputs from other ddck
 *******************************************
-
+EQUATIONS #
+HpIsOn = $HpIsOn_forPID
+MfrHpCondNom = $MfrHpCondNom_forPID
+TCondIn = $TCondIn_forPID
+TCondOut = $TCondOut_forPID
 *******************************************
 ** outputs to other ddck
 *******************************************
 EQUATIONS #
-$MfrHpPD = MfrHpPD !controlled mass flow rate for fixed delta T
+$PID_HPCond_Mfr = MfrHpPD !controlled mass flow rate for fixed delta T
 
 **********************************************************
 ** Begin PD CONTROLLER for mass flow rate in the condenser

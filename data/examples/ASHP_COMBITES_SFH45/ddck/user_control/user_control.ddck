@@ -24,27 +24,34 @@ T_set_MixSh  = $type888_TRdSet
 ** inputs necessary for the mass flow solver from hydraulic.ddck
 ***************************************************************
 
-EQUATIONS 5
+EQUATIONS #
 *** Massflowrates
-$MfrPuCond = $MfrHpPD*hpOnRc
+$MfrPuCond = $PID_HPCond_Mfr*hpOnRc
 $MfrWtSp   = $dhw_MfrDHWset
 $MfrWtTp   = -$MfrWtSp
 $MfrPuSh   = $bui_MfrBuiNom*PIDRadBui*BoHS
 ***diverter valves***
 $xFracMixHp = HpForDHWIsNeededRc
 
+*******************************************************
+** PID controller for heat pump condenser *
+*******************************************************
+
+EQUATIONS #
+$HpIsOn_forPID = $userControl_hpIsOn
+$MfrHpCondNom_forPID = $AshpMfrHpCondNom
+$TCondIn_forPID = $AshpTCondIn
+$TCondOut_forPID = $AshpTCondOut
+
 ***************************************************************
 ** outputs to type888
 ***************************************************************
 EQUATIONS #
-$userControl_TTesDhwHpOff = $CombiTes_T6
-$userControl_TTesDhwHpOn  = $CombiTes_T9
-$userControl_TTesDhwBot   = $CombiTes_T8
-$userControl_TTesDhwTop   = $CombiTes_T10
-$userControl_TsensorTesSh = $CombiTes_T5
+$userControl_TTesDhwUpAuxOn    = $CombiTes_T9 ! upper Store temperature measurement for Warm water
+$userControl_TTesDhwBotAuxOff  = $CombiTes_T6 ! lower store temperature measurement for Warm water
+$userControl_TTesSHUpAuxOn     = $CombiTes_T3 ! upper temperature measured for room heating (on)
+$userControl_TTesSHBotAuxOff   = $CombiTes_T1 ! lower temperature measured for room heating (off)
 
-!$userControl_TTesShBot    = $CombiTes_T1
-!$userControl_TTesShTop    = $CombiTes_T9
 
 EQUATIONS #
 $userControl_hpIsOn    = hpOnRc !Recall value
