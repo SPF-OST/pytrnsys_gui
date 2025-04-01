@@ -47,7 +47,9 @@ class Loader:
 
     @staticmethod
     def createPackageResourceLoader():
-        loader = Loader(_paths.COMPONENTS_BASE_RESOURCE_PATH, PACKAGE_RESOURCE_LOADER)
+        loader = Loader(
+            _paths.COMPONENTS_BASE_RESOURCE_PATH, PACKAGE_RESOURCE_LOADER
+        )
         return loader
 
     def load(self, typeName: str) -> _res.Result[_model.Specification]:
@@ -60,7 +62,9 @@ class Loader:
 
         return specification
 
-    def _loadSpecification(self, pluginResourcePath: str) -> _res.Result[_model.Specification]:
+    def _loadSpecification(
+        self, pluginResourcePath: str
+    ) -> _res.Result[_model.Specification]:
         specResourcePath = f"{pluginResourcePath}/spec.yaml"
         bytesResult = self._loadData(specResourcePath)
         if _res.isError(bytesResult):
@@ -69,12 +73,16 @@ class Loader:
 
         dataResult = self._loadYaml(_bytes)
         if _res.isError(dataResult):
-            return _res.error(dataResult).withContext(f"Syntax error in `{specResourcePath}`")
+            return _res.error(dataResult).withContext(
+                f"Syntax error in `{specResourcePath}`"
+            )
         data = _res.value(dataResult)
 
         specificationResult = self._createSpecification(data)
         if _res.isError(specificationResult):
-            return _res.error(specificationResult).withContext(f"Error in specification `{specResourcePath}`")
+            return _res.error(specificationResult).withContext(
+                f"Error in specification `{specResourcePath}`"
+            )
         specification = _res.value(specificationResult)
 
         return specification
@@ -85,7 +93,9 @@ class Loader:
         except FileNotFoundError:
             return _res.Error(f"`{resourcePath}` could not be found.")
         except PermissionError:
-            return _res.Error(f"`{resourcePath}` could not be read. Maybe it's a directory instead of a file?")
+            return _res.Error(
+                f"`{resourcePath}` could not be read. Maybe it's a directory instead of a file?"
+            )
 
     @staticmethod
     def _loadYaml(_bytes: bytes) -> _res.Result[_cabc.Mapping]:
@@ -95,7 +105,9 @@ class Loader:
             return _res.Error(str(parseError))
 
     @staticmethod
-    def _createSpecification(data: _cabc.Mapping) -> _res.Result[_model.Specification]:
+    def _createSpecification(
+        data: _cabc.Mapping,
+    ) -> _res.Result[_model.Specification]:
         try:
             return _model.Specification(**data)
         except _pc.ValidationError as validationError:

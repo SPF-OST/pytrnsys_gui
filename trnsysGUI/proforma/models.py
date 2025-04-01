@@ -44,9 +44,13 @@ class VariableNameBuilder:
     variableNamePrefix: str | None
     usePortInVariableName: bool
 
-    def getVariableName(self, connectionName: str | None, portName: str) -> str:
+    def getVariableName(
+        self, connectionName: str | None, portName: str
+    ) -> str:
         if self.usePortInVariableName:
-            qualifiedPortName = _phn.getQualifiedPortName(connectionName, portName)
+            qualifiedPortName = _phn.getQualifiedPortName(
+                connectionName, portName
+            )
             return f"{self.variableNamePrefix}{qualifiedPortName}"
 
         connectionNameOrEmpty = connectionName or ""
@@ -58,7 +62,9 @@ class VariableNameBuilder:
         return f"@{self.propertyName}({qualifiedPortName})"
 
     @staticmethod
-    def _getConnectionNamePart(connectionName: str | None, shallCapitalize: bool) -> str:
+    def _getConnectionNamePart(
+        connectionName: str | None, shallCapitalize: bool
+    ) -> str:
         connectionNamePart = connectionName or ""
 
         if shallCapitalize:
@@ -67,16 +73,24 @@ class VariableNameBuilder:
         return connectionNamePart
 
     def _getPortNamePart(self, portName: str) -> str:
-        capitalizedPortNameOrEmpty = portName.capitalize() if self.usePortInVariableName else ""
+        capitalizedPortNameOrEmpty = (
+            portName.capitalize() if self.usePortInVariableName else ""
+        )
         return capitalizedPortNameOrEmpty
 
 
 class AllVariableStringConstants:
     TEMPERATURE = VariableNameBuilder("temp", "T", usePortInVariableName=True)
-    MASS_FLOW_RATE = VariableNameBuilder("mfr", "M", usePortInVariableName=False)
-    REVERSE_TEMPERATURE = VariableNameBuilder("revtemp", None, usePortInVariableName=True)
+    MASS_FLOW_RATE = VariableNameBuilder(
+        "mfr", "M", usePortInVariableName=False
+    )
+    REVERSE_TEMPERATURE = VariableNameBuilder(
+        "revtemp", None, usePortInVariableName=True
+    )
     DENSITY = VariableNameBuilder("rho", "Rho", usePortInVariableName=False)
-    HEAT_CAPACITY = VariableNameBuilder("cp", "Cp", usePortInVariableName=False)
+    HEAT_CAPACITY = VariableNameBuilder(
+        "cp", "Cp", usePortInVariableName=False
+    )
 
 
 def _getSummaryLine(
@@ -88,7 +102,9 @@ def _getSummaryLine(
     if not isinstance(variable, Variable):
         return ""
 
-    computedVariable = f"@{variableStringConstants.propertyName}({qualifiedPortName})"
+    computedVariable = (
+        f"@{variableStringConstants.propertyName}({qualifiedPortName})"
+    )
     summaryLine = (
         f'"{variable.tmfName}" = {computedVariable}'
         if direction == "input"
@@ -118,8 +134,18 @@ class Fluid:
 
     def getSummary(self, qualifiedPortName: str) -> str:
         summary = _joinNonEmptyStringsWithNewLines(
-            _getSummaryLine(qualifiedPortName, AllVariableStringConstants.DENSITY, self.density, "input"),
-            _getSummaryLine(qualifiedPortName, AllVariableStringConstants.HEAT_CAPACITY, self.heatCapacity, "input"),
+            _getSummaryLine(
+                qualifiedPortName,
+                AllVariableStringConstants.DENSITY,
+                self.density,
+                "input",
+            ),
+            _getSummaryLine(
+                qualifiedPortName,
+                AllVariableStringConstants.HEAT_CAPACITY,
+                self.heatCapacity,
+                "input",
+            ),
         )
 
         return summary
@@ -134,7 +160,11 @@ class Connection:
 
     @property
     def allVariables(self) -> _cabc.Sequence[Variable]:
-        return [*self.inputPort.allVariables, *self.outputPort.allVariables, *self.fluid.allVariables]
+        return [
+            *self.inputPort.allVariables,
+            *self.outputPort.allVariables,
+            *self.fluid.allVariables,
+        ]
 
     @property
     def areAnyRequiredVariablesUnset(self) -> bool:
@@ -145,12 +175,16 @@ class Connection:
         )
 
     def getSummary(self) -> str:
-        qualifiedInputPortName = _getQualifiedPortName(self.name, self.inputPort.name)
+        qualifiedInputPortName = _getQualifiedPortName(
+            self.name, self.inputPort.name
+        )
         fluidSummary = self.fluid.getSummary(qualifiedInputPortName)
         inputPortSummary = self.inputPort.getSummary(self.name)
         outputPortSummary = self.outputPort.getSummary(self.name)
 
-        subSummaries = _joinNonEmptyStringsWithNewLines(fluidSummary, inputPortSummary, outputPortSummary)
+        subSummaries = _joinNonEmptyStringsWithNewLines(
+            fluidSummary, inputPortSummary, outputPortSummary
+        )
 
         if not subSummaries:
             return ""
@@ -166,7 +200,11 @@ class Connection:
 def _getQualifiedPortName(connectionName: str | None, portName: str) -> str:
     capitalizedPortName = portName.capitalize()
 
-    qualifiedPortName = f"{connectionName.capitalize()}{capitalizedPortName}" if connectionName else capitalizedPortName
+    qualifiedPortName = (
+        f"{connectionName.capitalize()}{capitalizedPortName}"
+        if connectionName
+        else capitalizedPortName
+    )
 
     return qualifiedPortName
 
@@ -203,8 +241,18 @@ class InputPort:
     def getSummary(self, connectionName: str | None) -> str:
         qualifiedPortName = _getQualifiedPortName(connectionName, self.name)
         summary = _joinNonEmptyStringsWithNewLines(
-            _getSummaryLine(qualifiedPortName, AllVariableStringConstants.MASS_FLOW_RATE, self.massFlowRate, "input"),
-            _getSummaryLine(qualifiedPortName, AllVariableStringConstants.TEMPERATURE, self.temperature, "input"),
+            _getSummaryLine(
+                qualifiedPortName,
+                AllVariableStringConstants.MASS_FLOW_RATE,
+                self.massFlowRate,
+                "input",
+            ),
+            _getSummaryLine(
+                qualifiedPortName,
+                AllVariableStringConstants.TEMPERATURE,
+                self.temperature,
+                "input",
+            ),
         )
 
         return summary
@@ -231,16 +279,26 @@ class OutputPort:
     def getSummary(self, connectionName: str | None) -> str:
         qualifiedPortName = _getQualifiedPortName(connectionName, self.name)
         summary = _joinNonEmptyStringsWithNewLines(
-            _getSummaryLine(qualifiedPortName, AllVariableStringConstants.TEMPERATURE, self.temperature, "output"),
             _getSummaryLine(
-                qualifiedPortName, AllVariableStringConstants.REVERSE_TEMPERATURE, self.reverseTemperature, "input"
+                qualifiedPortName,
+                AllVariableStringConstants.TEMPERATURE,
+                self.temperature,
+                "output",
+            ),
+            _getSummaryLine(
+                qualifiedPortName,
+                AllVariableStringConstants.REVERSE_TEMPERATURE,
+                self.reverseTemperature,
+                "input",
             ),
         )
 
         return summary
 
 
-def _removeUnsetAndNone(*variables: Variable | Unset | None) -> _cabc.Sequence[Variable]:
+def _removeUnsetAndNone(
+    *variables: Variable | Unset | None,
+) -> _cabc.Sequence[Variable]:
     return [v for v in variables if isinstance(v, Variable)]
 
 

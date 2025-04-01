@@ -18,18 +18,27 @@ class ModifyRelativeHeightsDialog(_qwt.QDialog):
     A dialog box lets the user choose the path and the name of folder for a new project
     """
 
-    def __init__(self, relativeInputHeight: float, relativeOutputHeight: float, parent=None):
+    def __init__(
+        self,
+        relativeInputHeight: float,
+        relativeOutputHeight: float,
+        parent=None,
+    ):
         super().__init__(parent)
 
         self.newRelativeHeights: _tp.Optional[NewRelativeHeights] = None
 
-        inputLabel = _qwt.QLabel(f"New input height (was {relativeInputHeight * 100:.0f}%): ")
+        inputLabel = _qwt.QLabel(
+            f"New input height (was {relativeInputHeight * 100:.0f}%): "
+        )
         self._inputLineEdit = _qwt.QLineEdit()
         inputLayout = _qwt.QHBoxLayout()
         inputLayout.addWidget(inputLabel)
         inputLayout.addWidget(self._inputLineEdit)
 
-        outputLabel = _qwt.QLabel(f"New output height (was {relativeOutputHeight * 100:.0f}%): ")
+        outputLabel = _qwt.QLabel(
+            f"New output height (was {relativeOutputHeight * 100:.0f}%): "
+        )
         self._outputLineEdit = _qwt.QLineEdit()
         outputLayout = _qwt.QHBoxLayout()
         outputLayout.addWidget(outputLabel)
@@ -58,16 +67,22 @@ class ModifyRelativeHeightsDialog(_qwt.QDialog):
             return
 
         outputText = self._outputLineEdit.text()
-        newRelativeOutputHeight = self._getNewRelativeHeight(outputText, "output")
+        newRelativeOutputHeight = self._getNewRelativeHeight(
+            outputText, "output"
+        )
         if not newRelativeOutputHeight:
             return
 
-        self.newRelativeHeights = NewRelativeHeights(newRelativeInputHeight, newRelativeOutputHeight)
+        self.newRelativeHeights = NewRelativeHeights(
+            newRelativeInputHeight, newRelativeOutputHeight
+        )
 
         self.close()
 
     @classmethod
-    def _getNewRelativeHeight(cls, relativeHeightInPercentAsText: str, portName: str) -> _tp.Optional[NewHeight]:
+    def _getNewRelativeHeight(
+        cls, relativeHeightInPercentAsText: str, portName: str
+    ) -> _tp.Optional[NewHeight]:
         if not relativeHeightInPercentAsText:
             return "empty"
 
@@ -86,5 +101,7 @@ class ModifyRelativeHeightsDialog(_qwt.QDialog):
     @staticmethod
     def _showFormattingError(portName: str) -> None:
         messageBox = _qwt.QMessageBox()
-        messageBox.setText(f"Value for '{portName}' must be an integer between 1 and 99 inclusive.")
+        messageBox.setText(
+            f"Value for '{portName}' must be an integer between 1 and 99 inclusive."
+        )
         messageBox.exec()

@@ -22,11 +22,13 @@ class SplitLoopDialog(_qtw.QDialog, _uigen.Ui_splitHydraulicLoopDialog):
         setLoop1Selected: _tp.Callable[[bool], None],
         setLoop2Selected: _tp.Callable[[bool], None],
     ) -> _common.Cancellable[_common.SplitLoopsSummary]:
-        dialog = SplitLoopDialog(loop, occupiedNames, fluids, setLoop1Selected, setLoop2Selected)
+        dialog = SplitLoopDialog(
+            loop, occupiedNames, fluids, setLoop1Selected, setLoop2Selected
+        )
         dialog.exec()
         return dialog.splitSummary
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         loop: _model.HydraulicLoop,
         occupiedNames: _tp.Set[str],
@@ -43,7 +45,9 @@ class SplitLoopDialog(_qtw.QDialog, _uigen.Ui_splitHydraulicLoopDialog):
         self._setLoop1Selected = setLoop1Selected
         self._setLoop2Selected = setLoop2Selected
 
-        self.splitSummary: _common.Cancellable[_common.SplitLoopsSummary] = "cancelled"
+        self.splitSummary: _common.Cancellable[_common.SplitLoopsSummary] = (
+            "cancelled"
+        )
 
         self._configureGroupBoxes()
 
@@ -57,7 +61,9 @@ class SplitLoopDialog(_qtw.QDialog, _uigen.Ui_splitHydraulicLoopDialog):
 
         self._configureButtons()
 
-        self._onAnyChange(self.name1ComboBox.currentText(), self.name2ComboBox.currentText())
+        self._onAnyChange(
+            self.name1ComboBox.currentText(), self.name2ComboBox.currentText()
+        )
 
     def _configureGroupBoxes(self) -> None:
         def onEnter1() -> None:
@@ -93,7 +99,9 @@ class SplitLoopDialog(_qtw.QDialog, _uigen.Ui_splitHydraulicLoopDialog):
         self.abortButton.clicked.connect(onAbort)
 
         def onApply() -> None:
-            name1Value = self._createNameForValue(self.name1ComboBox.currentText())
+            name1Value = self._createNameForValue(
+                self.name1ComboBox.currentText()
+            )
             name1 = name1Value
             name2Value = self.name2ComboBox.currentText()
             name2 = self._createNameForValue(name2Value)
@@ -102,7 +110,8 @@ class SplitLoopDialog(_qtw.QDialog, _uigen.Ui_splitHydraulicLoopDialog):
             fluid2 = self.fluid2ComboBox.currentData()
 
             self.splitSummary = _common.SplitLoopsSummary(
-                _common.LoopSummary(name1, fluid1), _common.LoopSummary(name2, fluid2)
+                _common.LoopSummary(name1, fluid1),
+                _common.LoopSummary(name2, fluid2),
             )
 
             self.close()
@@ -178,7 +187,9 @@ class SplitLoopDialog(_qtw.QDialog, _uigen.Ui_splitHydraulicLoopDialog):
 
         return True
 
-    def _onNameChanged(self, newName: str, warningWidget: _qtw.QWidget) -> bool:
+    def _onNameChanged(
+        self, newName: str, warningWidget: _qtw.QWidget
+    ) -> bool:
         isEmpty = not newName
         isInUse = newName in self._occupiedNames
         tooltip = ""

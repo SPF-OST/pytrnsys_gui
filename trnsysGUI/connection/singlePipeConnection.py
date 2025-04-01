@@ -28,7 +28,9 @@ if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
 
 
-class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-instance-attributes
+class SinglePipeConnection(
+    _cb.ConnectionBase
+):  # pylint: disable=too-many-instance-attributes
     def __init__(
         self,
         displayName: str,
@@ -46,7 +48,9 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         )
 
         self.diameterInCm: _values.Value = _defaults.DEFAULT_DIAMETER_IN_CM
-        self.uValueInWPerM2K: _values.Value = _defaults.DEFAULT_U_VALUE_IN_W_PER_M2_K
+        self.uValueInWPerM2K: _values.Value = (
+            _defaults.DEFAULT_U_VALUE_IN_W_PER_M2_K
+        )
 
         self._setModels()
 
@@ -83,8 +87,12 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
     def editHydraulicLoop(self) -> None:
         self._editor.editHydraulicLoop(self)
 
-    def createDeleteUndoCommand(self, parentCommand: _tp.Optional[_qtw.QUndoCommand] = None) -> _qtw.QUndoCommand:
-        undoNamingHelper = _nu.UndoNamingHelper.create(self._editor.namesManager)
+    def createDeleteUndoCommand(
+        self, parentCommand: _tp.Optional[_qtw.QUndoCommand] = None
+    ) -> _qtw.QUndoCommand:
+        undoNamingHelper = _nu.UndoNamingHelper.create(
+            self._editor.namesManager
+        )
 
         hydraulicLoopsData = _dspc.HydraulicLoopsData(
             self._editor.hydraulicLoops,
@@ -105,10 +113,16 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
     def encode(self):
         if len(self.segments) > 0:
             labelPos = self._label.pos().x(), self._label.pos().y()
-            labelMassPos = self.massFlowLabel.pos().x(), self.massFlowLabel.pos().y()
+            labelMassPos = (
+                self.massFlowLabel.pos().x(),
+                self.massFlowLabel.pos().y(),
+            )
         else:
             self.logger.debug("This connection has no segment")
-            defaultPos = self.fromPort.pos().x(), self.fromPort.pos().y()  # pylint: disable = duplicate-code # 2
+            defaultPos = (
+                self.fromPort.pos().x(),
+                self.fromPort.pos().y(),
+            )  # pylint: disable = duplicate-code # 2
             labelPos = defaultPos
             labelMassPos = defaultPos
 
@@ -158,24 +172,37 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 
     def getInternalPiping(self) -> _pi.InternalPiping:
         return _pi.InternalPiping(
-            [self.modelPipe], {self.modelPipe.fromPort: self.fromPort, self.modelPipe.toPort: self.toPort}
+            [self.modelPipe],
+            {
+                self.modelPipe.fromPort: self.fromPort,
+                self.modelPipe.toPort: self.toPort,
+            },
         )
 
-    def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
+    def exportPipeAndTeeTypesForTemp(
+        self, startingUnit: int
+    ) -> _tp.Tuple[str, int]:
         unitNumber = startingUnit
 
-        exportHydraulicConnection = _cehspc.createExportHydraulicSinglePipeConnection(
-            self, self.fromPort, self.toPort, self.modelPipe
+        exportHydraulicConnection = (
+            _cehspc.createExportHydraulicSinglePipeConnection(
+                self, self.fromPort, self.toPort, self.modelPipe
+            )
         )
 
         if not self.shallBeSimulated:
-            return _he.exportDummyConnection(exportHydraulicConnection, unitNumber)
+            return _he.exportDummyConnection(
+                exportHydraulicConnection, unitNumber
+            )
 
         return self._exportSimulatedPipe(exportHydraulicConnection, unitNumber)
 
-    def _exportSimulatedPipe(self, exportHydraulicConnection, unitNumber) -> _tp.Tuple[str, int]:
+    def _exportSimulatedPipe(
+        self, exportHydraulicConnection, unitNumber
+    ) -> _tp.Tuple[str, int]:
         canonicalMfrName = _mnames.getCanonicalMassFlowVariableName(
-            componentDisplayName=exportHydraulicConnection.displayName, pipeName=None
+            componentDisplayName=exportHydraulicConnection.displayName,
+            pipeName=None,
         )
 
         outputTemperatureName = _temps.getTemperatureVariableName(
@@ -198,7 +225,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 
         return unitText, nextUnitNumber
 
-    def _getSimulatedPipeUnitText(  # pylint: disable=too-many-locals
+    def _getSimulatedPipeUnitText(  # pylint: disable=too-many-locals, too-many-positional-arguments
         self,
         unitNumber,
         inputMfrName,
@@ -211,10 +238,16 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         densityVar = _names.getDensityName(loop.name.value)
         specHeatVar = _names.getHeatCapacityName(loop.name.value)
         lengthInM = _values.getConvertedValueOrName(self.lengthInM)
-        diameterInM = _values.getConvertedValueOrName(self.diameterInCm, 1 / 100)
-        uValueInkJPerHourM2K = _values.getConvertedValueOrName(self.uValueInWPerM2K, 60 * 60 / 1000)
+        diameterInM = _values.getConvertedValueOrName(
+            self.diameterInCm, 1 / 100
+        )
+        uValueInkJPerHourM2K = _values.getConvertedValueOrName(
+            self.uValueInWPerM2K, 60 * 60 / 1000
+        )
         uValueInSIUnitsComment = (
-            f" (= {self.uValueInWPerM2K} W/(m^2*K))" if isinstance(self.uValueInWPerM2K, float) else ""
+            f" (= {self.uValueInWPerM2K} W/(m^2*K))"
+            if isinstance(self.uValueInWPerM2K, float)
+            else ""
         )
         convectedHeatFluxName = self.getConvectedHeatFluxVariableName()
         dissipatedHeatFluxName = self.getDissipatedHeatFluxVariableName()
@@ -260,16 +293,26 @@ EQUATIONS 5
     def _getFromAndToPortsAndParentBlockItems(
         self,
     ) -> _tp.Tuple[
-        _tp.Tuple[_pib.PortItemBase, _pi.HasInternalPiping], _tp.Tuple[_pib.PortItemBase, _pi.HasInternalPiping]
+        _tp.Tuple[_pib.PortItemBase, _pi.HasInternalPiping],
+        _tp.Tuple[_pib.PortItemBase, _pi.HasInternalPiping],
     ]:
         isToPortValveOutput = (
-            isinstance(self.toPort.parent, _tventil.TVentil) and self.fromPort in self.toPort.parent.outputs
+            isinstance(self.toPort.parent, _tventil.TVentil)
+            and self.fromPort in self.toPort.parent.outputs
         )
         if isToPortValveOutput:
-            return (self.toPort, self.toPort.parent), (self.fromPort, self.fromPort.parent)
+            return (self.toPort, self.toPort.parent), (
+                self.fromPort,
+                self.fromPort.parent,
+            )
 
-        return (self.fromPort, self.fromPort.parent), (self.toPort, self.toPort.parent)
+        return (self.fromPort, self.fromPort.parent), (
+            self.toPort,
+            self.toPort.parent,
+        )
 
-    def setMassFlowAndTemperature(self, massFlow: float, temperature: float) -> None:
+    def setMassFlowAndTemperature(
+        self, massFlow: float, temperature: float
+    ) -> None:
         label = _mfl.getFormattedMassFlowAndTemperature(massFlow, temperature)
         self.massFlowLabel.setPlainText(label)

@@ -7,7 +7,9 @@ import trnsysGUI.common as _com
 
 
 def configureLoggingCallback(
-    logger: _log.Logger, callback: "_Callback", formatString: _tp.Optional[str] = None
+    logger: _log.Logger,
+    callback: "_Callback",
+    formatString: _tp.Optional[str] = None,
 ) -> None:
     if _hasCallback(logger, callback):
         raise ValueError("Cannot add same callback to logger twice.")
@@ -26,8 +28,14 @@ def _hasCallback(logger: _log.Logger, callback: "_Callback") -> bool:
     return any(handlers)
 
 
-def _getHandlersForCallback(logger: _log.Logger, callback: "_Callback") -> _tp.Sequence[_log.Handler]:
-    return [h for h in logger.handlers if isinstance(h, _CallbackLogHandler) and h.callback == callback]
+def _getHandlersForCallback(
+    logger: _log.Logger, callback: "_Callback"
+) -> _tp.Sequence[_log.Handler]:
+    return [
+        h
+        for h in logger.handlers
+        if isinstance(h, _CallbackLogHandler) and h.callback == callback
+    ]
 
 
 def removeLoggingCallback(logger: _log.Logger, callback: "_Callback") -> None:

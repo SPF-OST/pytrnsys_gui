@@ -12,5 +12,7 @@ class SaltTankCold(SaltTankBase):
 
     @classmethod
     @_tp.override
-    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+    def _getImageAccessor(
+        cls,
+    ) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.SALT_TANK_COLD_SVG

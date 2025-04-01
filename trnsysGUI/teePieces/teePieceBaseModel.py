@@ -17,12 +17,16 @@ class TeePieceBaseModel(_ser.UpgradableJsonSchemaMixinVersion0):
         return _uuid.UUID("260c8083-5343-4345-8cb3-0cdd374bc076")
 
 
-class TeePieceLegacyModelProtocol(_bim.BlockItemLegacyModelProtocol, _tp.Protocol):
+class TeePieceLegacyModelProtocol(
+    _bim.BlockItemLegacyModelProtocol, _tp.Protocol
+):
     portsIdsIn: list[int]
     portsIdsOut: list[int]
 
 
-def createTeePieceBaseModelFromLegacyModel(superseded: TeePieceLegacyModelProtocol) -> TeePieceBaseModel:
+def createTeePieceBaseModelFromLegacyModel(
+    superseded: TeePieceLegacyModelProtocol,
+) -> TeePieceBaseModel:
     blockItemModel = _bim.createBlockItemBaseModelFromLegacyModel(superseded)
 
     assert len(superseded.portsIdsIn) == 1

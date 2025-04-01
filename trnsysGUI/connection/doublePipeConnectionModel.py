@@ -32,7 +32,9 @@ class DoublePipeConnectionModelVersion0(  # pylint: disable=too-many-instance-at
 
 
 @_dc.dataclass
-class DoublePipeConnectionModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
+class DoublePipeConnectionModelVersion1(
+    _ser.UpgradableJsonSchemaMixin
+):  # pylint: disable=too-many-instance-attributes
     connectionId: int
     name: str
     id: int  # pylint: disable=invalid-name
@@ -46,11 +48,15 @@ class DoublePipeConnectionModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pyli
     lengthInM: float
 
     @classmethod
-    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+    def getSupersededClass(
+        cls,
+    ) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
         return DoublePipeConnectionModelVersion0
 
     @classmethod
-    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "DoublePipeConnectionModelVersion1":
+    def upgrade(
+        cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0
+    ) -> "DoublePipeConnectionModelVersion1":
         assert isinstance(superseded, DoublePipeConnectionModelVersion0)
 
         return DoublePipeConnectionModelVersion1(
@@ -90,11 +96,15 @@ class DoublePipeConnectionModel(
     shallBeSimulated: bool
 
     @classmethod
-    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+    def getSupersededClass(
+        cls,
+    ) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
         return DoublePipeConnectionModelVersion1
 
     @classmethod
-    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "DoublePipeConnectionModel":
+    def upgrade(
+        cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0
+    ) -> "DoublePipeConnectionModel":
         assert isinstance(superseded, DoublePipeConnectionModelVersion1)
 
         return DoublePipeConnectionModel(
@@ -120,7 +130,9 @@ class DoublePipeConnectionModel(
         validate_enums: bool = True,  # /NOSONAR
         schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> "DoublePipeConnectionModel":
-        doublePipeConnectionModel = super().from_dict(data, validate, validate_enums, schema_type)
+        doublePipeConnectionModel = super().from_dict(
+            data, validate, validate_enums, schema_type
+        )
         return _tp.cast(DoublePipeConnectionModel, doublePipeConnectionModel)
 
     def to_dict(
@@ -130,7 +142,9 @@ class DoublePipeConnectionModel(
         validate_enums: bool = True,  # pylint: disable=duplicate-code # 1 # /NOSONAR
         schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums, schema_type)
+        data = super().to_dict(
+            omit_none, validate, validate_enums, schema_type
+        )
         return data
 
     @classmethod

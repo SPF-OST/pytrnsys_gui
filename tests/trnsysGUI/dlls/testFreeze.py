@@ -16,7 +16,9 @@ from . import _inputs
 class TestCase:
     id: str
     logFileContent: str
-    expectedResult: _res.Result[_warn.ValueWithWarnings[_cabc.Sequence[_pl.Path]]]
+    expectedResult: _res.Result[
+        _warn.ValueWithWarnings[_cabc.Sequence[_pl.Path]]
+    ]
 
 
 def getTestCases() -> _cabc.Iterable[TestCase]:
@@ -93,7 +95,9 @@ No DLLs implementing the following types were found:
 
 
 class TestFreeze:
-    @_pt.mark.parametrize("testCase", [_pt.param(t, id=t.id) for t in getTestCases()])
+    @_pt.mark.parametrize(
+        "testCase", [_pt.param(t, id=t.id) for t in getTestCases()]
+    )
     def testGetUsedDllRelativePaths(self, testCase: TestCase) -> None:
         actualResult = _freeze.getUsedDllRelativePaths(testCase.logFileContent)
         assert actualResult == testCase.expectedResult

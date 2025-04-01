@@ -10,7 +10,9 @@ import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
-class SaltTankBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin):
+class SaltTankBase(
+    _bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin
+):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
@@ -27,7 +29,9 @@ class SaltTankBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicIte
 
     @classmethod
     @_tp.override
-    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+    def _getImageAccessor(
+        cls,
+    ) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         raise NotImplementedError()
 
     def getInternalPiping(self) -> _ip.InternalPiping:
@@ -37,7 +41,10 @@ class SaltTankBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicIte
         inputSink = _mfn.TerminalWithFreeFlow(inputPort, "In")
         outputSink = _mfn.TerminalWithFreeFlow(outputPort, "Out")
 
-        return _ip.InternalPiping([inputSink, outputSink], {inputPort: self.inputs[0], outputPort: self.outputs[0]})
+        return _ip.InternalPiping(
+            [inputSink, outputSink],
+            {inputPort: self.inputs[0], outputPort: self.outputs[0]},
+        )
 
     def changeSize(self):
         w = self.w
@@ -58,8 +65,12 @@ class SaltTankBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicIte
         self.origInputsPos = [[w - delta, 0]]
         self.origOutputsPos = [[delta, 0]]
 
-        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
-        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
+        self.outputs[0].setPos(
+            self.origOutputsPos[0][0], self.origOutputsPos[0][1]
+        )
+        self.inputs[0].setPos(
+            self.origInputsPos[0][0], self.origInputsPos[0][1]
+        )
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)

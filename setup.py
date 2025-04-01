@@ -19,24 +19,35 @@ class _DestDirSourceFilePath:
 def _getDataFilePairs():
     dataDirPath = _pl.Path(__file__).parent / "data"
 
-    dataFilePaths = [p.relative_to(dataDirPath) for p in dataDirPath.rglob("*") if p.is_file()]
+    dataFilePaths = [
+        p.relative_to(dataDirPath)
+        for p in dataDirPath.rglob("*")
+        if p.is_file()
+    ]
 
     destDirSourcePathPairs = [
-        _DestDirSourceFilePath(str("pytrnsys_gui_data" / p.parent), str("data" / p)) for p in dataFilePaths
+        _DestDirSourceFilePath(
+            str("pytrnsys_gui_data" / p.parent), str("data" / p)
+        )
+        for p in dataFilePaths
     ]
 
     sortedPairs = sorted(destDirSourcePathPairs, key=lambda dp: dp.destDir)
 
     dataFilePairs = [
-        (d, [dp.sourceFilePath for dp in dps]) for d, dps in _it.groupby(sortedPairs, key=lambda dp: dp.destDir)
+        (d, [dp.sourceFilePath for dp in dps])
+        for d, dps in _it.groupby(sortedPairs, key=lambda dp: dp.destDir)
     ]
 
     return dataFilePairs
 
 
 def _getInstallRequirements():
-    requirementsFile = _pl.Path(__file__).parent / "requirements" / "release-3rd-party.in"
-    requirements = requirementsFile.read_text().split("\n")
+    requirementsFile = (
+        _pl.Path(__file__).parent / "requirements" / "release-3rd-party.in"
+    )
+    lines = requirementsFile.read_text().split("\n")
+    requirements = [l for l in lines if l.strip() and not l.startswith("#")]
     return requirements
 
 
@@ -59,7 +70,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: GPL3 License",
         "Operating System :: OS Independent",
     ],
     package_data={

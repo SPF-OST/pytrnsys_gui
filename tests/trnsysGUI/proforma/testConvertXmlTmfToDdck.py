@@ -54,10 +54,18 @@ class TestCase:
 
     @staticmethod
     def createForStem(fileNameStem: str) -> "TestCase":
-        inputFilePath = (_INPUT_DIR_PATH / "cases" / fileNameStem).with_suffix(".xmltmf")
-        actualOutputFilePath = (_DATA_DIR_PATH / "actual" / "cases" / fileNameStem).with_suffix(".ddck")
-        expectedOutputFilePath = (_DATA_DIR_PATH / "expected" / "cases" / fileNameStem).with_suffix(".ddck")
-        testCase = TestCase(inputFilePath, actualOutputFilePath, expectedOutputFilePath)
+        inputFilePath = (_INPUT_DIR_PATH / "cases" / fileNameStem).with_suffix(
+            ".xmltmf"
+        )
+        actualOutputFilePath = (
+            _DATA_DIR_PATH / "actual" / "cases" / fileNameStem
+        ).with_suffix(".ddck")
+        expectedOutputFilePath = (
+            _DATA_DIR_PATH / "expected" / "cases" / fileNameStem
+        ).with_suffix(".ddck")
+        testCase = TestCase(
+            inputFilePath, actualOutputFilePath, expectedOutputFilePath
+        )
         return testCase
 
 
@@ -69,12 +77,16 @@ def _getTestCases() -> _tp.Iterable[TestCase]:
         yield TestCase.createForStem(inputFilePath.stem)
 
 
-@_pt.mark.parametrize("testCase", [_pt.param(tc, id=tc.fileStem) for tc in _getTestCases()])
+@_pt.mark.parametrize(
+    "testCase", [_pt.param(tc, id=tc.fileStem) for tc in _getTestCases()]
+)
 def testConvertXmlTmfStringToDdck(testCase: TestCase, monkeypatch) -> None:
     xmlFileContent = testCase.inputFilePath.read_text(encoding="utf8")
 
     def returnConnectionsUnmodifiedWithGlobalDefaultVisibility(connections, _):
-        dialogResult = _ehcd.DialogResult(connections, _dv.DefaultVisibility.GLOBAL)
+        dialogResult = _ehcd.DialogResult(
+            connections, _dv.DefaultVisibility.GLOBAL
+        )
         return dialogResult
 
     monkeypatch.setattr(
@@ -84,14 +96,18 @@ def testConvertXmlTmfStringToDdck(testCase: TestCase, monkeypatch) -> None:
     )
 
     fileName = testCase.inputFilePath.with_suffix(".ddck").name
-    result = _pc.convertXmlTmfStringToDdck(xmlFileContent, suggestedHydraulicConnections=None, fileName=fileName)
+    result = _pc.convertXmlTmfStringToDdck(
+        xmlFileContent, suggestedHydraulicConnections=None, fileName=fileName
+    )
 
     if testCase.expectedOutputFilePath.is_file():
         assert isinstance(result, str)
         actualDdckContent = _res.value(result)
 
         testCase.actualOutputFilePath.write_text(result)
-        expectedDdckContent = testCase.expectedOutputFilePath.read_text(encoding="utf8")
+        expectedDdckContent = testCase.expectedOutputFilePath.read_text(
+            encoding="utf8"
+        )
         assert actualDdckContent == expectedDdckContent
     else:
         assert isinstance(result, _res.Error)
@@ -105,7 +121,9 @@ def testConvertXmlTmfStringToDdckTwoConnections(monkeypatch) -> None:
     xmlFileContent = xmlFilePath.read_text(encoding="utf8")
 
     def returnConnectionsUnmodifiedWithLocalDefaultVisibility(connections, _):
-        dialogResult = _ehcd.DialogResult(connections, _dv.DefaultVisibility.LOCAL)
+        dialogResult = _ehcd.DialogResult(
+            connections, _dv.DefaultVisibility.LOCAL
+        )
         return dialogResult
 
     monkeypatch.setattr(

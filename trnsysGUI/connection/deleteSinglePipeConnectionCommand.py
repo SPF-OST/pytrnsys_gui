@@ -21,8 +21,10 @@ class HydraulicLoopsData:
     defaultFluid: _hlmodel.Fluid
 
 
-class DeleteSinglePipeConnectionCommand(_qtw.QUndoCommand):  # pylint: disable=too-many-instance-attributes
-    def __init__(
+class DeleteSinglePipeConnectionCommand(
+    _qtw.QUndoCommand
+):  # pylint: disable=too-many-instance-attributes
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         connection: _spc.SinglePipeConnection,
         undoNamingHelper: _un.UndoNamingHelper,
@@ -41,7 +43,9 @@ class DeleteSinglePipeConnectionCommand(_qtw.QUndoCommand):  # pylint: disable=t
     def redo(self) -> None:
         assert self._connection
 
-        splitLoopsSummary = self._splitSummary.after if self._splitSummary else None  # pylint: disable=no-member
+        splitLoopsSummary = (
+            self._splitSummary.after if self._splitSummary else None
+        )  # pylint: disable=no-member
 
         cancellable = _hlsplit.split(
             self._connection,
@@ -56,10 +60,14 @@ class DeleteSinglePipeConnectionCommand(_qtw.QUndoCommand):  # pylint: disable=t
 
         self._graphicsScene.removeItem(self._connection)
         self._connection.deleteConnection()
-        self._undoNamingHelper.removeNameForDelete(self._connection.displayName)
+        self._undoNamingHelper.removeNameForDelete(
+            self._connection.displayName
+        )
 
     def undo(self) -> None:
-        mergedLoopSummary = self._splitSummary.before if self._splitSummary else None  # pylint: disable=no-member
+        mergedLoopSummary = (
+            self._splitSummary.before if self._splitSummary else None
+        )  # pylint: disable=no-member
 
         cancellable = _hlmerge.merge(
             self._connection,

@@ -7,7 +7,9 @@ from trnsysGUI.sourceSinkBase import SourceSinkBase
 class Source(SourceSinkBase):
     @classmethod
     @_tp.override
-    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+    def _getImageAccessor(
+        cls,
+    ) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.SOURCE_SVG
 
     @classmethod

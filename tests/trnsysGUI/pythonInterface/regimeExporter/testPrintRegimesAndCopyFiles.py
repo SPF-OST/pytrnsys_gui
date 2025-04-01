@@ -12,7 +12,7 @@ import trnsysGUI.project as _prj
 import trnsysGUI.pythonInterface.regimeExporter.renderDiagramOnPDFfromPython as _rdopfp
 
 _PROJECT_NAME = "diagramForRegimes"
-_BASE_FOLDER_FILE_PATH = "..\\tests\\trnsysGUI\\data\\"
+_BASE_FOLDER_FILE_PATH = "tests/trnsysGUI/data/"
 _EXPECTED_FILES_PATH = "expectedPDFs"
 _RESULTS_DIR_NAME = "results"
 _RESULTS_DIR_NAME_2 = "resultsReducedUsage"
@@ -32,7 +32,11 @@ class PathFinder:  # pylint: disable=too-many-instance-attributes
 
     @property
     def projectDir(self):
-        return _pl.Path(_GUI.__file__).parent / self.baseFolderRelativePath / self.projectName
+        return (
+            _pl.Path(_GUI.__file__).parents[1]
+            / self.baseFolderRelativePath
+            / self.projectName
+        )
 
     @property
     def expectedFilesDir(self):
@@ -83,7 +87,11 @@ class PathFinder:  # pylint: disable=too-many-instance-attributes
 
 
 pathFinder = PathFinder(
-    _PROJECT_NAME, _BASE_FOLDER_FILE_PATH, _EXPECTED_FILES_PATH, _RESULTS_DIR_NAME, _RESULTS_DIR_NAME_2
+    _PROJECT_NAME,
+    _BASE_FOLDER_FILE_PATH,
+    _EXPECTED_FILES_PATH,
+    _RESULTS_DIR_NAME,
+    _RESULTS_DIR_NAME_2,
 )
 
 _DATA_DIR = pathFinder.projectDir
@@ -119,7 +127,11 @@ _NEW_NAME2_PATH_2 = pathFinder.alternatePdfPath
 
 _PROJECT_NAME3 = "diagramWithSourceSinksForRegimes"
 pathFinder3 = PathFinder(
-    _PROJECT_NAME3, _BASE_FOLDER_FILE_PATH, _EXPECTED_FILES_PATH, _RESULTS_DIR_NAME, _RESULTS_DIR_NAME_2
+    _PROJECT_NAME3,
+    _BASE_FOLDER_FILE_PATH,
+    _EXPECTED_FILES_PATH,
+    _RESULTS_DIR_NAME,
+    _RESULTS_DIR_NAME_2,
 )
 _dataDir = pathFinder3.projectDir
 _resultsDir = pathFinder3.resultsDir
@@ -170,23 +182,26 @@ class TestPrintRegimesAndCopyFiles:
 
     def testUsingQtBot(self, qtbot):
         mainWindow = _createMainWindow(_DATA_DIR, _PROJECT_NAME, qtbot)
-        regimeExporter = _rdopfp.RegimeExporter(_PROJECT_NAME, _DATA_DIR, _RESULTS_DIR, _REGIMES_FILENAME, mainWindow)
+        regimeExporter = _rdopfp.RegimeExporter(
+            _PROJECT_NAME,
+            _DATA_DIR,
+            _RESULTS_DIR,
+            _REGIMES_FILENAME,
+            mainWindow,
+        )
         regimeExporter.export()
 
-        filesToCompare = {
-            "new_file": [_NEW_DIAGRAM_PATH, _NEW_NAME1_PATH, _NEW_NAME1_SVG_PATH, _NEW_NAME2_PATH],
-            "expected_file": [
-                _EXPECTED_DIAGRAM_PATH,
-                _EXPECTED_NAME1_PATH,
-                _EXPECTED_NAME1_SVG_PATH,
-                _EXPECTED_NAME2_PATH,
-            ],
-        }
+        filesToCompare = [
+            (_NEW_DIAGRAM_PATH, _EXPECTED_DIAGRAM_PATH),
+            (_NEW_NAME1_PATH, _EXPECTED_NAME1_PATH),
+            (_NEW_NAME1_SVG_PATH, _EXPECTED_NAME1_SVG_PATH),
+            (_NEW_NAME2_PATH, _EXPECTED_NAME2_PATH),
+        ]
 
         errors = []
-        for i, newFile in enumerate(filesToCompare["new_file"]):
+        for actualFile, expectedFile in filesToCompare:
             try:
-                self._fileExistsAndIsCorrect(newFile, filesToCompare["expected_file"][i])
+                self._fileExistsAndIsCorrect(actualFile, expectedFile)
             except AssertionError as currentError:
                 errors.append(currentError)
 
@@ -194,19 +209,31 @@ class TestPrintRegimesAndCopyFiles:
             raise ExceptionGroup("multiple errors", errors)
 
     @staticmethod
-    def _fileExistsAndIsCorrect(producedFile, expectedFile):
-        assert producedFile.is_file()
-        result = _mpltc.compare_images(str(producedFile), str(expectedFile), 0.001, in_decorator=False)
+    def _fileExistsAndIsCorrect(
+        actualFile: _pl.Path, expectedFile: _pl.Path
+    ) -> None:
+        assert actualFile.is_file()
+        result = _mpltc.compare_images(
+            str(expectedFile), str(actualFile), 0.001, in_decorator=False
+        )
         assert result is None
 
     def testUsingQtBotForGivenRegimes(self, qtbot):
         onlyTheseRegimes = ["name1"]
         mainWindow = _createMainWindow(_DATA_DIR, _PROJECT_NAME, qtbot)
-        regimeExporter = _rdopfp.RegimeExporter(_PROJECT_NAME, _DATA_DIR, _RESULTS_DIR_2, _REGIMES_FILENAME, mainWindow)
+        regimeExporter = _rdopfp.RegimeExporter(
+            _PROJECT_NAME,
+            _DATA_DIR,
+            _RESULTS_DIR_2,
+            _REGIMES_FILENAME,
+            mainWindow,
+        )
         regimeExporter.export(onlyTheseRegimes=onlyTheseRegimes)
         errors = []
         try:
-            self._fileExistsAndIsCorrect(_NEW_NAME1_PATH_2, _EXPECTED_NAME1_PATH)
+            self._fileExistsAndIsCorrect(
+                _NEW_NAME1_PATH_2, _EXPECTED_NAME1_PATH
+            )
         except AssertionError as currentError:
             errors.append(currentError)
 
@@ -220,6 +247,12 @@ class TestPrintRegimesAndCopyFiles:
         except AssertionError as currentError:
             errors.append(currentError)
 
+        # check no tempering valves show up
+        try:
+            assert 0 == len(regimeExporter.temperingValves)
+        except AssertionError as currentError:
+            errors.append(currentError)
+
         if errors:
             raise ExceptionGroup("multiple errors", errors)
 
@@ -229,7 +262,11 @@ class TestPrintRegimesAndCopyFiles:
         regimeEnding = "_dummy_regime"
 
         pathFinder2 = PathFinder(
-            projectName, _BASE_FOLDER_FILE_PATH, _EXPECTED_FILES_PATH, _RESULTS_DIR_NAME, _RESULTS_DIR_NAME_2
+            projectName,
+            _BASE_FOLDER_FILE_PATH,
+            _EXPECTED_FILES_PATH,
+            _RESULTS_DIR_NAME,
+            _RESULTS_DIR_NAME_2,
         )
         dataDir = pathFinder2.projectDir
         resultsDir = pathFinder2.resultsDir
@@ -239,12 +276,16 @@ class TestPrintRegimesAndCopyFiles:
         pathFinder2.setFileEnding(regimeEnding)
 
         mainWindow = _createMainWindow(dataDir, projectName, qtbot)
-        regimeExporter = _rdopfp.RegimeExporter(projectName, dataDir, resultsDir, _REGIMES_FILENAME, mainWindow)
+        regimeExporter = _rdopfp.RegimeExporter(
+            projectName, dataDir, resultsDir, _REGIMES_FILENAME, mainWindow
+        )
         regimeExporter.export(onlyTheseRegimes=onlyTheseRegimes)
 
         errors = []
         try:
-            self._fileExistsAndIsCorrect(pathFinder2.newPdfPath, pathFinder2.expectedPdfPath)
+            self._fileExistsAndIsCorrect(
+                pathFinder2.newPdfPath, pathFinder2.expectedPdfPath
+            )
         except AssertionError as currentError:
             errors.append(currentError)
 
@@ -260,11 +301,23 @@ class TestPrintRegimesAndCopyFiles:
     def testUsingQtBotForRegimeWithSourceSinks(self, qtbot):
 
         mainWindow = _createMainWindow(_dataDir, _PROJECT_NAME3, qtbot)
-        regimeExporter = _rdopfp.RegimeExporter(_PROJECT_NAME3, _dataDir, _resultsDir, _REGIMES_FILENAME, mainWindow)
+        regimeExporter = _rdopfp.RegimeExporter(
+            _PROJECT_NAME3,
+            _dataDir,
+            _resultsDir,
+            _REGIMES_FILENAME,
+            mainWindow,
+        )
         regimeExporter.export()
 
         filesToCompare = {
-            "new_file": [newDiagramPath, newName1Path, newName2Path, newName3Path, newName4Path],
+            "new_file": [
+                newDiagramPath,
+                newName1Path,
+                newName2Path,
+                newName3Path,
+                newName4Path,
+            ],
             "expected_file": [
                 expectedDiagramPath,
                 expectedName1Path,
@@ -277,9 +330,81 @@ class TestPrintRegimesAndCopyFiles:
         errors = []
         for i, newFile in enumerate(filesToCompare["new_file"]):
             try:
-                self._fileExistsAndIsCorrect(newFile, filesToCompare["expected_file"][i])
+                self._fileExistsAndIsCorrect(
+                    newFile, filesToCompare["expected_file"][i]
+                )
             except AssertionError as currentError:
                 errors.append(currentError)
+
+        if errors:
+            raise ExceptionGroup("multiple errors", errors)
+
+    # pylint: disable=too-many-locals
+    def testUsingQtBotForDiagramWithTemperingValve(self, qtbot):
+        projectName = "diagramWithTemperingValve"
+
+        pathFinder2 = PathFinder(
+            projectName,
+            _BASE_FOLDER_FILE_PATH,
+            _EXPECTED_FILES_PATH,
+            _RESULTS_DIR_NAME,
+            _RESULTS_DIR_NAME_2,
+        )
+        dataDir = pathFinder2.projectDir
+        resultsDir = pathFinder2.resultsDir
+
+        _ensureDirExists(resultsDir)
+
+        regimeExporter = _rdopfp.RegimeExporter(
+            projectName,
+            dataDir,
+            resultsDir,
+            _REGIMES_FILENAME,
+            _createMainWindow(dataDir, projectName, qtbot),
+        )
+        regimeExporter.export()
+
+        pathFinder2.setFileEnding("_diagram")
+        expectedDiagramPath2 = pathFinder2.expectedPdfPath
+        newDiagramPath2 = pathFinder2.newPdfPath
+
+        pathFinder2.setFileEnding("_name1")
+        expectedName1Path2 = pathFinder2.expectedPdfPath
+        newName1Path2 = pathFinder2.newPdfPath
+
+        pathFinder2.setFileEnding("_name2")
+        expectedName2Path2 = pathFinder2.expectedPdfPath
+        newName2Path2 = pathFinder2.newPdfPath
+
+        filesToCompare = {
+            "new_file": [
+                newDiagramPath2,
+                newName1Path2,
+                newName2Path2,
+            ],
+            "expected_file": [
+                expectedDiagramPath2,
+                expectedName1Path2,
+                expectedName2Path2,
+            ],
+        }
+
+        errors = []
+        for i, newFile in enumerate(filesToCompare["new_file"]):
+            try:
+                self._fileExistsAndIsCorrect(
+                    newFile, filesToCompare["expected_file"][i]
+                )
+            except AssertionError as currentError:
+                errors.append(currentError)
+
+        # check whether valves are tempering valves again
+        try:
+            assert 1 == len(regimeExporter.temperingValves)
+            valve = regimeExporter.temperingValves[0]
+            assert valve.isTempering
+        except AssertionError as currentError:
+            errors.append(currentError)
 
         if errors:
             raise ExceptionGroup("multiple errors", errors)

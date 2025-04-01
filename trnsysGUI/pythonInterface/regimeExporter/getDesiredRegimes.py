@@ -12,7 +12,9 @@ def getRegimesFromFile(fileName: _pl.Path) -> _pd.DataFrame:
     raise ValueError(f"Column name '{colName}' not found.")
 
 
-def getRegimes(filePath: _pl.Path, onlyTheseRegimes: _cabc.Sequence[str] | None) -> _pd.DataFrame:
+def getRegimes(
+    filePath: _pl.Path, onlyTheseRegimes: _cabc.Sequence[str] | None
+) -> _pd.DataFrame:
     regimeValues = getRegimesFromFile(filePath)
     regimeValues = regimeValues.set_index("regimeName")
     if onlyTheseRegimes:

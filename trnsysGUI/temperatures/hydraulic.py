@@ -10,7 +10,8 @@ def export(hasInternalPiping: _ip.HasInternalPiping) -> _tp.Sequence[str]:
     equations = []
     for node in internalPiping.nodes:
         internalName = _temps.getInternalTemperatureVariableName(
-            componentDisplayName=hasInternalPiping.getDisplayName(), nodeName=node.name
+            componentDisplayName=hasInternalPiping.getDisplayName(),
+            nodeName=node.name,
         )
         name = _temps.getTemperatureVariableName(
             hasInternalPiping.shallRenameOutputTemperaturesInHydraulicFile(),

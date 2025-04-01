@@ -14,7 +14,9 @@ from . import serialization as _ser
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.hydraulicLoops.names as _names
 
-class Pump(_patb.PumpsAndTabsBase):  # pylint: disable=too-many-instance-attributes
+class Pump(
+    _patb.PumpsAndTabsBase
+):  # pylint: disable=too-many-instance-attributes
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
@@ -38,7 +40,9 @@ class Pump(_patb.PumpsAndTabsBase):  # pylint: disable=too-many-instance-attribu
             self._modelPump.fromPort: self._fromPort,
             self._modelPump.toPort: self._toPort,
         }
-        return _ip.InternalPiping([self._modelPump], modelPortItemsToGraphicalPortItem)
+        return _ip.InternalPiping(
+            [self._modelPump], modelPortItemsToGraphicalPortItem
+        )
 
     @classmethod
     @_tp.override
@@ -47,14 +51,18 @@ class Pump(_patb.PumpsAndTabsBase):  # pylint: disable=too-many-instance-attribu
 
     @classmethod
     @_tp.override
-    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+    def _getImageAccessor(
+        cls,
+    ) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.PUMP_SVG
 
     def _getCanonicalMassFlowRate(self) -> float:
         return self.massFlowRateInKgPerH
 
     def encode(self) -> _tp.Tuple[str, _dcj.JsonDict]:
-        blockItemWithPrescribedMassFlowModel = self._createBlockItemWithPrescribedMassFlowForEncode()
+        blockItemWithPrescribedMassFlowModel = (
+            self._createBlockItemWithPrescribedMassFlowForEncode()
+        )
 
         inputPortId = self._getSinglePortId(self.inputs)
         outputPortId = self._getSinglePortId(self.outputs)
@@ -84,11 +92,15 @@ class Pump(_patb.PumpsAndTabsBase):  # pylint: disable=too-many-instance-attribu
         self.inputs[0].id = model.inputPortId
         self.outputs[0].id = model.outputPortId
 
-        self._applyBlockItemModelWithPrescribedMassFlowForDecode(model.blockItemWithPrescribedMassFlow)
+        self._applyBlockItemModelWithPrescribedMassFlowForDecode(
+            model.blockItemWithPrescribedMassFlow
+        )
 
         resBlockList.append(self)
 
-    def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
+    def exportPipeAndTeeTypesForTemp(
+        self, startingUnit: int
+    ) -> _tp.Tuple[str, int]:
         return _cehspc.exportDummySinglePipeConnection(
             self, startingUnit, self._fromPort, self._toPort, self._modelPump
         )
@@ -108,8 +120,12 @@ class Pump(_patb.PumpsAndTabsBase):  # pylint: disable=too-many-instance-attribu
         delta = 20
         self.origInputsPos = [[0, delta]]
         self.origOutputsPos = [[width, delta]]
-        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
-        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
+        self.inputs[0].setPos(
+            self.origInputsPos[0][0], self.origInputsPos[0][1]
+        )
+        self.outputs[0].setPos(
+            self.origOutputsPos[0][0], self.origOutputsPos[0][1]
+        )
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)

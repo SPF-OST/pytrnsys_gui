@@ -34,5 +34,4 @@ docs/trnsysGUI.uml
 
 pytrnsys-gui.log
 
-/release/pyinstaller-venv/
 /trnsysGUI/pytrnsys-gui.pyproject.user

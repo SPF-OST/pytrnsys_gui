@@ -17,7 +17,9 @@ class IceStorageTwoHx(BlockItemFourPorts):
 
     @classmethod
     @_tp.override
-    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+    def _getImageAccessor(
+        cls,
+    ) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.ICE_STORAGE_TWO_HX_SVG
 
     def changeSize(self):
@@ -35,10 +37,18 @@ class IceStorageTwoHx(BlockItemFourPorts):
 
         self.origInputsPos = [[0, delta], [w, delta]]
         self.origOutputsPos = [[0, h - delta], [w, h - delta]]
-        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
-        self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1])
-        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
-        self.outputs[1].setPos(self.origOutputsPos[1][0], self.origOutputsPos[1][1])
+        self.inputs[0].setPos(
+            self.origInputsPos[0][0], self.origInputsPos[0][1]
+        )
+        self.inputs[1].setPos(
+            self.origInputsPos[1][0], self.origInputsPos[1][1]
+        )
+        self.outputs[0].setPos(
+            self.origOutputsPos[0][0], self.origOutputsPos[0][1]
+        )
+        self.outputs[1].setPos(
+            self.origOutputsPos[1][0], self.origOutputsPos[1][1]
+        )
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
@@ -61,4 +71,6 @@ class IceStorageTwoHx(BlockItemFourPorts):
             side2Output: self.outputs[1],
         }
 
-        return _ip.InternalPiping([side1Pipe, side2Pipe], modelPortItemsToGraphicalPortItem)
+        return _ip.InternalPiping(
+            [side1Pipe, side2Pipe], modelPortItemsToGraphicalPortItem
+        )

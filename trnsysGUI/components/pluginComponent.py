@@ -14,7 +14,9 @@ class PluginComponentCreationError(Exception):
     pass
 
 
-class PluginComponent(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin):
+class PluginComponent(
+    _bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin
+):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
@@ -26,7 +28,9 @@ class PluginComponent(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphic
             raise PluginComponentCreationError(errorMessage)
         plugin = _res.value(pluginResult)
 
-        createdInternalPiping = plugin.internalPipingFactory.createInternalPiping(self)
+        createdInternalPiping = (
+            plugin.internalPipingFactory.createInternalPiping(self)
+        )
 
         self.inputs.extend(createdInternalPiping.inputPorts)
         self.outputs.extend(createdInternalPiping.outputPorts)

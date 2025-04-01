@@ -94,7 +94,11 @@ class Type1924_TesPlugFlow:
 
     def getSensorPositionValues(self, nTes):
 
-        lines = self.sLine + "** USER DEFINED TEMPERATURE SENSOR HEIGHTS. To be changed by user \n" + self.sLine
+        lines = (
+            self.sLine
+            + "** USER DEFINED TEMPERATURE SENSOR HEIGHTS. To be changed by user \n"
+            + self.sLine
+        )
 
         line = "CONSTANTS 10\n"
         lines = lines + line
@@ -350,7 +354,10 @@ class Type1924_TesPlugFlow:
                 )
                 lines = lines + line
             else:
-                line = "-1 -1 zero zero ! %d - %d: zIn, zOut, cp, strat\n" % (parId, parId + 4)
+                line = "-1 -1 zero zero ! %d - %d: zIn, zOut, cp, strat\n" % (
+                    parId,
+                    parId + 4,
+                )
                 lines = lines + line
 
             parId = parId + 5
@@ -810,7 +817,10 @@ class Type1924_TesPlugFlow:
 
     def getHead(self):
 
-        header = open(r"C:\Daten\OngoingProject\SolTherm2050\Simulations\ddck\Generic\Head.ddck", "r")
+        header = open(
+            r"C:\Daten\OngoingProject\SolTherm2050\Simulations\ddck\Generic\Head.ddck",
+            "r",
+        )
         lines = header.read()
         header.close()
 

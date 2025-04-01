@@ -17,10 +17,14 @@ def getReachableConnections(
     assert len(port.connectionList) <= 1
 
     portItems = {port}
-    newPortItems, newConnections = _expandPortItemSetByOneLayer(portItems, ignoreConnections)
+    newPortItems, newConnections = _expandPortItemSetByOneLayer(
+        portItems, ignoreConnections
+    )
     while newPortItems != portItems:
         portItems = newPortItems
-        newPortItems, newConnections = _expandPortItemSetByOneLayer(portItems, ignoreConnections)
+        newPortItems, newConnections = _expandPortItemSetByOneLayer(
+            portItems, ignoreConnections
+        )
 
     return newConnections
 
@@ -33,14 +37,23 @@ def _expandPortItemSetByOneLayer(
         ignoreConnections = set()
 
     connectedPortItems = [pi for pi in portItems if pi.connectionList]
-    connections = [_com.getSingle(pi.connectionList) for pi in connectedPortItems]
+    connections = [
+        _com.getSingle(pi.connectionList) for pi in connectedPortItems
+    ]
     relevantConnections = {
-        c for c in connections if isinstance(c, _spc.SinglePipeConnection) and c not in ignoreConnections
+        c
+        for c in connections
+        if isinstance(c, _spc.SinglePipeConnection)
+        and c not in ignoreConnections
     }
 
-    connectionPortItems = {p for c in relevantConnections for p in [c.fromPort, c.toPort]}
+    connectionPortItems = {
+        p for c in relevantConnections for p in [c.fromPort, c.toPort]
+    }
 
-    internalPortItems = {mpi for p in portItems for mpi in getInternallyConnectedPortItems(p)}
+    internalPortItems = {
+        mpi for p in portItems for mpi in getInternallyConnectedPortItems(p)
+    }
 
     portItems = connectionPortItems | internalPortItems
 
@@ -58,12 +71,18 @@ def getInternallyConnectedPortItems(
 
     allModelPortItems = [n.getPortItems() for n in nodes]
 
-    modelPortItem = internalPiping.getModelPortItem(port, _mfn.PortItemType.STANDARD)
+    modelPortItem = internalPiping.getModelPortItem(
+        port, _mfn.PortItemType.STANDARD
+    )
     for modelPortItems in allModelPortItems:
         if modelPortItem in modelPortItems:
-            internallyConnectedGraphicalPortItems = [graphicalPortItems[mpi] for mpi in modelPortItems]
+            internallyConnectedGraphicalPortItems = [
+                graphicalPortItems[mpi] for mpi in modelPortItems
+            ]
             internallyConnectedSinglePortItems = [
-                gpi for gpi in internallyConnectedGraphicalPortItems if isinstance(gpi, _spi.SinglePipePortItem)
+                gpi
+                for gpi in internallyConnectedGraphicalPortItems
+                if isinstance(gpi, _spi.SinglePipePortItem)
             ]
 
             return internallyConnectedSinglePortItems

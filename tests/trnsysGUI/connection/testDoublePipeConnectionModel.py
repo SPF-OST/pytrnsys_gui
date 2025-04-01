@@ -136,15 +136,21 @@ _SERIALIZATION_CASES = [
 
 _DESERIALIZATION_TEST_CASES = [
     _DeserializationTestCase(_JSON_VERSION_0, _DESERIALIZED_MODEL_VERSION_0),
-    _DeserializationTestCase(_JSON_VERSION_0, _UPGRADED_MODEL_VERSION_1, needsUpgrading=True),
+    _DeserializationTestCase(
+        _JSON_VERSION_0, _UPGRADED_MODEL_VERSION_1, needsUpgrading=True
+    ),
     _DeserializationTestCase(_JSON_VERSION_1, _DESERIALIZED_MODEL_VERSION_1),
-    _DeserializationTestCase(_JSON_VERSION_1_FOR_UPGRADING, _UPGRADED_MODEL, needsUpgrading=True),
+    _DeserializationTestCase(
+        _JSON_VERSION_1_FOR_UPGRADING, _UPGRADED_MODEL, needsUpgrading=True
+    ),
     _DeserializationTestCase(_JSON_VERSION_2, _DESERIALIZED_MODEL),
 ]
 
 
 _SUPERSEEDS_TEST_CASES = [
-    _SuperseedsTestCase(_DESERIALIZED_MODEL_VERSION_0, _UPGRADED_MODEL_VERSION_1),
+    _SuperseedsTestCase(
+        _DESERIALIZED_MODEL_VERSION_0, _UPGRADED_MODEL_VERSION_1
+    ),
     _SuperseedsTestCase(_DESERIALIZED_MODEL_VERSION_1, _UPGRADED_MODEL),
 ]
 
@@ -155,21 +161,37 @@ class TestDoublePipeConnectionModel:
         data = model.to_dict()
         assert data == json
 
-    @_pt.mark.parametrize("deserializationTestCase", _DESERIALIZATION_TEST_CASES, ids=_DeserializationTestCase.name)
-    def testDeserialize(self, deserializationTestCase: _DeserializationTestCase):
+    @_pt.mark.parametrize(
+        "deserializationTestCase",
+        _DESERIALIZATION_TEST_CASES,
+        ids=_DeserializationTestCase.name,
+    )
+    def testDeserialize(
+        self, deserializationTestCase: _DeserializationTestCase
+    ):
         clazz = type(deserializationTestCase.model)
         deserializedModel = clazz.from_dict(deserializationTestCase.json)
         assert deserializedModel == deserializationTestCase.model
 
-    @_pt.mark.parametrize("superseedsTestCase", _SUPERSEEDS_TEST_CASES, ids=_SuperseedsTestCase.name)
+    @_pt.mark.parametrize(
+        "superseedsTestCase",
+        _SUPERSEEDS_TEST_CASES,
+        ids=_SuperseedsTestCase.name,
+    )
     def testGetSupersededClass(self, superseedsTestCase: _SuperseedsTestCase):
         superseedingClass = type(superseedsTestCase.currentVersionModel)
         superseededClass = type(superseedsTestCase.previousVersionModel)
         assert superseedingClass.getSupersededClass() == superseededClass
 
-    @_pt.mark.parametrize("superseedsTestCase", _SUPERSEEDS_TEST_CASES, ids=_SuperseedsTestCase.name)
+    @_pt.mark.parametrize(
+        "superseedsTestCase",
+        _SUPERSEEDS_TEST_CASES,
+        ids=_SuperseedsTestCase.name,
+    )
     def testUpgrade(self, superseedsTestCase: _SuperseedsTestCase):
         superseedingClass = type(superseedsTestCase.currentVersionModel)
 
-        upgradedModel = superseedingClass.upgrade(superseedsTestCase.previousVersionModel)
+        upgradedModel = superseedingClass.upgrade(
+            superseedsTestCase.previousVersionModel
+        )
         assert upgradedModel == superseedsTestCase.currentVersionModel

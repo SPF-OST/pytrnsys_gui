@@ -9,7 +9,9 @@ import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
-class SourceSinkBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin):
+class SourceSinkBase(
+    _bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin
+):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
@@ -33,12 +35,18 @@ class SourceSinkBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicI
         self._updateDdckFilePath()
 
     def _updateDdckFilePath(self):
-        ddckFilePath = _pl.Path(self.editor.projectFolder) / "ddck" / f"{self.displayName}.ddck"
+        ddckFilePath = (
+            _pl.Path(self.editor.projectFolder)
+            / "ddck"
+            / f"{self.displayName}.ddck"
+        )
         self.path = str(ddckFilePath)
 
     @classmethod
     @_tp.override
-    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+    def _getImageAccessor(  # pylint: disable=arguments-differ
+        cls,
+    ) -> _img.SvgImageAccessor:
         raise NotImplementedError()
 
     @classmethod
@@ -61,7 +69,10 @@ class SourceSinkBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicI
         outputPort = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
         pump = _mfn.Pump(inputPort, outputPort)
 
-        modelPortItemsToGraphicalPortItem = {inputPort: self.inputs[0], outputPort: self.outputs[0]}
+        modelPortItemsToGraphicalPortItem = {
+            inputPort: self.inputs[0],
+            outputPort: self.outputs[0],
+        }
         return _ip.InternalPiping([pump], modelPortItemsToGraphicalPortItem)
 
     def exportMassFlows(self):

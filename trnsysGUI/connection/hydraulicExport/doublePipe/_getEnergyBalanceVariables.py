@@ -1,7 +1,6 @@
 import typing as _tp
 
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-
 from . import energyBalanceVariables as _ebv
 
 
@@ -50,13 +49,22 @@ class EnergyBalanceVariablesFactory:
                 "Dissipated heat to casing (aka gravel) [kW]",
             ),
             self._createVariable(
-                _ebv.EnergyBalanceVariables.COLD_TO_HOT, None, 13, "Dissipated heat from cold pipe to hot pipe [kW]"
+                _ebv.EnergyBalanceVariables.COLD_TO_HOT,
+                None,
+                13,
+                "Dissipated heat from cold pipe to hot pipe [kW]",
             ),
             self._createVariable(
-                _ebv.EnergyBalanceVariables.GRAVEL_TO_SOIL, None, 14, "Dissipated heat from gravel to soil [kW]"
+                _ebv.EnergyBalanceVariables.GRAVEL_TO_SOIL,
+                None,
+                14,
+                "Dissipated heat from gravel to soil [kW]",
             ),
             self._createVariable(
-                _ebv.EnergyBalanceVariables.SOIL_TO_FAR_FIELD, None, 15, 'Dissipated heat from soil to "far field" [kW]'
+                _ebv.EnergyBalanceVariables.SOIL_TO_FAR_FIELD,
+                None,
+                15,
+                'Dissipated heat from soil to "far field" [kW]',
             ),
             self._createVariable(
                 _ebv.EnergyBalanceVariables.SOIL_INTERNAL_CHANGE,
@@ -66,7 +74,7 @@ class EnergyBalanceVariablesFactory:
             ),
         ]
 
-    def _createVariable(
+    def _createVariable(  # pylint: disable=too-many-positional-arguments
         self,
         variable: _ebv.EnergyBalanceVariables,
         portItemType: _tp.Optional[_mfn.PortItemType],
@@ -75,14 +83,18 @@ class EnergyBalanceVariablesFactory:
         conversionFactor: str = "1/3600",
     ) -> _ebv.EnergyBalanceVariable:
         variableName = self._nameGenerator.getName(variable, portItemType)
-        return _ebv.EnergyBalanceVariable(variableName, outputNumber, conversionFactor, comment)
+        return _ebv.EnergyBalanceVariable(
+            variableName, outputNumber, conversionFactor, comment
+        )
 
 
 def getEnergyBalanceVariables(
     doublePipeDisplayName: str, *, coldPipeName: str, hotPipeName: str
 ) -> _tp.Sequence[_ebv.EnergyBalanceVariable]:
     nameGenerator = _ebv.VariableNameGenerator(
-        doublePipeDisplayName, coldPipeName=coldPipeName, hotPipeName=hotPipeName
+        doublePipeDisplayName,
+        coldPipeName=coldPipeName,
+        hotPipeName=hotPipeName,
     )
 
     variablesFactory = EnergyBalanceVariablesFactory(nameGenerator)

@@ -1,6 +1,9 @@
-#!/usr/bin/python3.9
+#!/usr/bin/python3.12
 
 # Run from top-level directory
+
+# To make black do the reformatting, use the following:
+#   devTools.py --black=""
 
 import argparse as ap
 import pathlib as pl
@@ -25,7 +28,9 @@ def main():
     arguments = _parseArguments()
 
     testResultsDirPath = pl.Path("test-results")
-    _prepareTestResultsDirectory(testResultsDirPath, arguments.shallKeepResults)
+    _prepareTestResultsDirectory(
+        testResultsDirPath, arguments.shallKeepResults
+    )
 
     _maybeRunMypy(arguments)
 
@@ -58,7 +63,14 @@ def _parseArguments() -> ap.Namespace:
         dest="shallPerformStaticChecks",
     )
     parser.add_argument(
-        "-l", "--lint", help="Perform linting", type=str, default=None, const="", nargs="?", dest="lintArguments"
+        "-l",
+        "--lint",
+        help="Perform linting",
+        type=str,
+        default=None,
+        const="",
+        nargs="?",
+        dest="lintArguments",
     )
     parser.add_argument(
         "-b",
@@ -118,9 +130,14 @@ def _parseArguments() -> ap.Namespace:
     return arguments
 
 
-def _prepareTestResultsDirectory(testResultsDirPath: pl.Path, shallKeepResults: bool) -> None:
+def _prepareTestResultsDirectory(
+    testResultsDirPath: pl.Path, shallKeepResults: bool
+) -> None:
     if testResultsDirPath.exists() and not testResultsDirPath.is_dir():
-        print("ERROR: `test-results` exists but is not a directory", file=sys.stderr)
+        print(
+            "ERROR: `test-results` exists but is not a directory",
+            file=sys.stderr,
+        )
         sys.exit(2)
 
     if not shallKeepResults and testResultsDirPath.is_dir():
@@ -135,10 +152,16 @@ def _prepareTestResultsDirectory(testResultsDirPath: pl.Path, shallKeepResults: 
 
 
 def _maybeRunMypy(arguments):
-    if not (arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.mypyArguments is not None):
+    if not (
+        arguments.shallRunAll
+        or arguments.shallPerformStaticChecks
+        or arguments.mypyArguments is not None
+    ):
         return
 
-    excludeArguments = [a for p in _EXCLUDED_PATH_PATTERNS for a in ["--exclude", p]]
+    excludeArguments = [
+        a for p in _EXCLUDED_PATH_PATTERNS for a in ["--exclude", p]
+    ]
 
     cmd = [
         _SCRIPTS_DIR / "mypy",
@@ -156,24 +179,42 @@ def _maybeRunMypy(arguments):
 
 
 def _maybeRunPylint(arguments):
-    if not (arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.lintArguments is not None):
+    if not (
+        arguments.shallRunAll
+        or arguments.shallPerformStaticChecks
+        or arguments.lintArguments is not None
+    ):
         return
 
     cmd = f"{_SCRIPTS_DIR / 'pylint'}  --recursive=yes"
     ignorePaths = ",".join(_EXCLUDED_PATH_PATTERNS)
     additionalArgs = arguments.lintArguments or ""
 
-    allArgs = [*cmd.split(), "--ignore-paths", ignorePaths, *additionalArgs.split(), *_SOURCE_DIRS]
+    allArgs = [
+        *cmd.split(),
+        "--ignore-paths",
+        ignorePaths,
+        *additionalArgs.split(),
+        *_SOURCE_DIRS,
+    ]
 
     _printAndRun(allArgs)
 
 
 def _maybeRunBlack(arguments):
-    if not (arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.blackArguments is not None):
+    if not (
+        arguments.shallRunAll
+        or arguments.shallPerformStaticChecks
+        or arguments.blackArguments is not None
+    ):
         return
 
-    cmd = f"{_SCRIPTS_DIR / 'black'} -l 120"
-    additionalArgs = "--check" if arguments.blackArguments is None else arguments.blackArguments
+    cmd = f"{_SCRIPTS_DIR / 'black'} -l 79"
+    additionalArgs = (
+        "--check"
+        if arguments.blackArguments is None
+        else arguments.blackArguments
+    )
 
     _printAndRun([*cmd.split(), *additionalArgs.split(), *_SOURCE_DIRS])
 
@@ -182,7 +223,9 @@ def _maybeCreateDiagrams(arguments):
     if not (arguments.shallRunAll or arguments.diagramsFormat):
         return
 
-    diagramsFormat = arguments.diagramsFormat if arguments.diagramsFormat else "pdf"
+    diagramsFormat = (
+        arguments.diagramsFormat if arguments.diagramsFormat else "pdf"
+    )
     cmd = f"{_SCRIPTS_DIR / 'pyreverse'} -k -o {diagramsFormat} -p pytrnsys_gui -d test-results trnsysGUI"
     _printAndRun(cmd.split())
 
@@ -207,8 +250,14 @@ def _maybeRunPytest(arguments, testResultsDirPath):
         and arguments.diagramsFormat is None
         and not arguments.shallCreateRelease
     )
-    if arguments.shallRunAll or arguments.pytestMarkersExpression is not None or wasCalledWithoutArguments:
-        markerExpressions = _getMarkerExpressions(arguments.pytestMarkersExpression)
+    if (
+        arguments.shallRunAll
+        or arguments.pytestMarkersExpression is not None
+        or wasCalledWithoutArguments
+    ):
+        markerExpressions = _getMarkerExpressions(
+            arguments.pytestMarkersExpression
+        )
         additionalArgs = ["-m", markerExpressions]
 
         cmd = [

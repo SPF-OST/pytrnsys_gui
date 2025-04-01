@@ -4,7 +4,9 @@ import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
-def getMassFlowVariableName(displayName: str, node: _mfn.Node, portItem: _mfn.PortItem) -> str:
+def getMassFlowVariableName(
+    displayName: str, node: _mfn.Node, portItem: _mfn.PortItem
+) -> str:
     if portItem not in node.getPortItems():
         raise ValueError("`portItem` not one of `node`'s port items.")
 
@@ -15,7 +17,9 @@ def getMassFlowVariableName(displayName: str, node: _mfn.Node, portItem: _mfn.Po
     return f"M{displayName}{nodeNameOrEmpty}_{postfix}"
 
 
-def getCanonicalMassFlowVariableName(*, componentDisplayName: str, pipeName: _tp.Optional[str]) -> str:
+def getCanonicalMassFlowVariableName(
+    *, componentDisplayName: str, pipeName: _tp.Optional[str]
+) -> str:
     pipeNameOrEmpty = pipeName or ""
     return f"M{componentDisplayName}{pipeNameOrEmpty}"
 
@@ -31,7 +35,9 @@ def _getPostfix(node: _mfn.Node, portItem: _mfn.PortItem) -> str:
     raise ValueError("`portItem` not one of `node`'s port items.")
 
 
-def getInputVariableName(hasInternalPiping: _ip.HasInternalPiping, node: _mfn.Node) -> str:
+def getInputVariableName(
+    hasInternalPiping: _ip.HasInternalPiping, node: _mfn.Node
+) -> str:
     prefix = node.getInputVariablePrefix()
     nodeNameOrEmtpy = node.name or ""
     displayName = hasInternalPiping.getDisplayName()

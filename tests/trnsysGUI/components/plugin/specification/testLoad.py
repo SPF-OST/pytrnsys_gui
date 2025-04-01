@@ -63,7 +63,9 @@ connections.0.output.position
     yield TestCase(
         "Missing",
         "thermDrivenHPMissingSpec",
-        _res.Error(f"`{_BASE_RESOURCE_PATH}/thermDrivenHPMissingSpec/spec.yaml` could not be found."),
+        _res.Error(
+            f"`{_BASE_RESOURCE_PATH}/thermDrivenHPMissingSpec/spec.yaml` could not be found."
+        ),
     )
     yield TestCase(
         "SyntaxError",
@@ -84,7 +86,9 @@ expected ',' or ']', but got ':'
 
 
 class TestLoad:
-    @_pt.mark.parametrize("testCase", [_pt.param(tc, id=tc.id) for tc in getTestCases()])
+    @_pt.mark.parametrize(
+        "testCase", [_pt.param(tc, id=tc.id) for tc in getTestCases()]
+    )
     def test(self, testCase: TestCase) -> None:
         loader = self._createLoader()
         actualResult = loader.load(testCase.typeName)

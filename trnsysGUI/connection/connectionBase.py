@@ -31,7 +31,7 @@ def calcDist(p1, p2):  # pylint: disable = invalid-name
 
 
 class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
-    # pylint: disable = too-many-public-methods, too-many-instance-attributes
+    # pylint: disable = too-many-public-methods, too-many-instance-attributes, too-many-positional-arguments
     def __init__(
         self,
         displayName: str,
@@ -43,7 +43,9 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
     ) -> None:
         super().__init__(parent=None)
 
-        assert isinstance(fromPort.parent, _ip.HasInternalPiping) and isinstance(toPort.parent, _ip.HasInternalPiping)
+        assert isinstance(
+            fromPort.parent, _ip.HasInternalPiping
+        ) and isinstance(toPort.parent, _ip.HasInternalPiping)
 
         self.logger = parent.logger
 
@@ -88,7 +90,10 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         return self.childrenBoundingRect()
 
     def paint(
-        self, painter: _qtg.QPainter, option: _qtw.QStyleOptionGraphicsItem, widget: _tp.Optional[_qtw.QWidget] = None
+        self,
+        painter: _qtg.QPainter,
+        option: _qtw.QStyleOptionGraphicsItem,
+        widget: _tp.Optional[_qtw.QWidget] = None,
     ) -> None:
         for child in self.childItems():
             child.paint(painter, option, widget)
@@ -183,9 +188,14 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         previousSegment: _sib.SegmentItemBase
         nextSegment: _sib.SegmentItemBase
 
-        previousAndNextSegments = zip(self.segments[:-1], self.segments[1:], strict=True)
+        previousAndNextSegments = zip(
+            self.segments[:-1], self.segments[1:], strict=True
+        )
         for previousSegment, nextSegment in previousAndNextSegments:
-            if previousSegment.endNode == intermediateNode and nextSegment.startNode == intermediateNode:
+            if (
+                previousSegment.endNode == intermediateNode
+                and nextSegment.startNode == intermediateNode
+            ):
                 return previousSegment, nextSegment
 
         raise ValueError("Node is not an intermediate node of connection.")
@@ -221,7 +231,9 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         rad = self.getRadius()
 
         for segmentsCorner in segmentsCorners:
-            cor = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, tempNode, tempNode.nextN(), self)
+            cor = _ci.CornerItem(
+                -rad, -rad, 2 * rad, 2 * rad, tempNode, tempNode.nextN(), self
+            )
 
             cor.setPos(float(segmentsCorner[0]), float(segmentsCorner[1]))
             cor.setFlag(cor.ItemSendsScenePositionChanges, True)
@@ -241,18 +253,33 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
             pos1 = None
             pos2 = None
 
-            if isinstance(segment.startNode.parent, ConnectionBase) and segment.startNode.prevNode is None:
+            if (
+                isinstance(segment.startNode.parent, ConnectionBase)
+                and segment.startNode.prevNode is None
+            ):
                 pos1 = (
                     segment.startNode.parent.fromPort.scenePos().x(),
                     segment.startNode.parent.fromPort.scenePos().y(),
                 )
-            if isinstance(segment.endNode.parent, ConnectionBase) and segment.endNode.nextNode is None:
-                pos2 = segment.endNode.parent.toPort.scenePos().x(), segment.endNode.parent.toPort.scenePos().y()
+            if (
+                isinstance(segment.endNode.parent, ConnectionBase)
+                and segment.endNode.nextNode is None
+            ):
+                pos2 = (
+                    segment.endNode.parent.toPort.scenePos().x(),
+                    segment.endNode.parent.toPort.scenePos().y(),
+                )
 
             if isinstance(segment.startNode.parent, _ci.CornerItem):
-                pos1 = segment.startNode.parent.scenePos().x(), segment.startNode.parent.scenePos().y()
+                pos1 = (
+                    segment.startNode.parent.scenePos().x(),
+                    segment.startNode.parent.scenePos().y(),
+                )
             if isinstance(segment.endNode.parent, _ci.CornerItem):
-                pos2 = segment.endNode.parent.scenePos().x(), segment.endNode.parent.scenePos().y()
+                pos2 = (
+                    segment.endNode.parent.scenePos().x(),
+                    segment.endNode.parent.scenePos().y(),
+                )
 
             assert pos1 and pos2
 
@@ -286,7 +313,9 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         raise NotImplementedError()
 
     # Makes 90deg angles of connection
-    def _createSegments(self):  # pylint: disable = too-many-locals, too-many-statements
+    def _createSegments(
+        self,
+    ):  # pylint: disable = too-many-locals, too-many-statements
         rad = self.getRadius()
 
         if (self.fromPort.side == 2) and (self.toPort.side == 2):
@@ -294,10 +323,18 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
             self.toPort.createdAtSide = 2
             portOffset = 30
 
-            corner1 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
-            corner2 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, None, self)
-            corner3 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner2.node, None, self)
-            corner4 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner3.node, self.endNode, self)
+            corner1 = _ci.CornerItem(
+                -rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self
+            )
+            corner2 = _ci.CornerItem(
+                -rad, -rad, 2 * rad, 2 * rad, corner1.node, None, self
+            )
+            corner3 = _ci.CornerItem(
+                -rad, -rad, 2 * rad, 2 * rad, corner2.node, None, self
+            )
+            corner4 = _ci.CornerItem(
+                -rad, -rad, 2 * rad, 2 * rad, corner3.node, self.endNode, self
+            )
 
             corner1.node.setNext(corner2.node)
             corner2.node.setNext(corner3.node)
@@ -317,10 +354,18 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
             baseLineHeight = max(pos1.y(), pos2.y()) + 100.6
 
-            p1 = _qtc.QPointF(pos1.x() + portOffset, pos1.y())  # pylint: disable = invalid-name
-            p2 = _qtc.QPointF(p1.x(), baseLineHeight)  # pylint: disable = invalid-name
-            p3 = _qtc.QPointF(pos2.x() + portOffset, baseLineHeight)  # pylint: disable = invalid-name
-            p4 = _qtc.QPointF(p3.x(), pos2.y())  # pylint: disable = invalid-name
+            p1 = _qtc.QPointF(
+                pos1.x() + portOffset, pos1.y()
+            )  # pylint: disable = invalid-name
+            p2 = _qtc.QPointF(
+                p1.x(), baseLineHeight
+            )  # pylint: disable = invalid-name
+            p3 = _qtc.QPointF(
+                pos2.x() + portOffset, baseLineHeight
+            )  # pylint: disable = invalid-name
+            p4 = _qtc.QPointF(
+                p3.x(), pos2.y()
+            )  # pylint: disable = invalid-name
 
             seg1.setLine(pos1, p1)
             seg2.setLine(p1, p2)
@@ -348,10 +393,18 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
             self.toPort.createdAtSide = 0
             portOffset = 30
 
-            corner1 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
-            corner2 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, None, self)
-            corner3 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner2.node, None, self)
-            corner4 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner3.node, self.endNode, self)
+            corner1 = _ci.CornerItem(
+                -rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self
+            )
+            corner2 = _ci.CornerItem(
+                -rad, -rad, 2 * rad, 2 * rad, corner1.node, None, self
+            )
+            corner3 = _ci.CornerItem(
+                -rad, -rad, 2 * rad, 2 * rad, corner2.node, None, self
+            )
+            corner4 = _ci.CornerItem(
+                -rad, -rad, 2 * rad, 2 * rad, corner3.node, self.endNode, self
+            )
 
             corner1.node.setNext(corner2.node)
             corner2.node.setNext(corner3.node)
@@ -371,10 +424,18 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
             baseLineHeight = max(pos1.y(), pos2.y()) + 100.6
 
-            p1 = _qtc.QPointF(pos1.x() - portOffset, pos1.y())  # pylint: disable = invalid-name
-            p2 = _qtc.QPointF(p1.x(), baseLineHeight)  # pylint: disable = invalid-name
-            p3 = _qtc.QPointF(pos2.x() - portOffset, baseLineHeight)  # pylint: disable = invalid-name
-            p4 = _qtc.QPointF(p3.x(), pos2.y())  # pylint: disable = invalid-name
+            p1 = _qtc.QPointF(
+                pos1.x() - portOffset, pos1.y()
+            )  # pylint: disable = invalid-name
+            p2 = _qtc.QPointF(
+                p1.x(), baseLineHeight
+            )  # pylint: disable = invalid-name
+            p3 = _qtc.QPointF(
+                pos2.x() - portOffset, baseLineHeight
+            )  # pylint: disable = invalid-name
+            p4 = _qtc.QPointF(
+                p3.x(), pos2.y()
+            )  # pylint: disable = invalid-name
 
             seg1.setLine(pos1, p1)
             seg2.setLine(p1, p2)
@@ -406,7 +467,15 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
             pos2 = self.toPort.scenePos()
 
             if pos2.y() <= pos1.y():
-                corner1 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, self.endNode, self)
+                corner1 = _ci.CornerItem(
+                    -rad,
+                    -rad,
+                    2 * rad,
+                    2 * rad,
+                    self.startNode,
+                    self.endNode,
+                    self,
+                )
 
                 seg1 = self._createSegmentItem(self.startNode, corner1.node)
                 seg2 = self._createSegmentItem(corner1.node, self.endNode)
@@ -415,7 +484,9 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
                 self.endNode.setPrev(corner1.node)
 
                 # position of the connecting node
-                p1 = _qtc.QPointF(pos1.x(), pos2.y() - 0.333)  # pylint: disable = invalid-name
+                p1 = _qtc.QPointF(
+                    pos1.x(), pos2.y() - 0.333
+                )  # pylint: disable = invalid-name
 
                 seg1.setLine(pos1, p1)
                 seg2.setLine(p1, pos2)
@@ -427,8 +498,18 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
                 corner1.setPos(p1)
             else:
-                corner1 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
-                corner2 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, self.endNode, self)
+                corner1 = _ci.CornerItem(
+                    -rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self
+                )
+                corner2 = _ci.CornerItem(
+                    -rad,
+                    -rad,
+                    2 * rad,
+                    2 * rad,
+                    corner1.node,
+                    self.endNode,
+                    self,
+                )
 
                 corner1.node.setNext(corner2.node)
 
@@ -441,8 +522,12 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
                 offsetPoint = pos1.y() - 15.666
 
-                helperPoint1 = _qtc.QPointF(pos1.x(), offsetPoint)  # pylint: disable = invalid-name
-                helperPoint2 = _qtc.QPointF(pos2.x(), offsetPoint)  # pylint: disable = invalid-name
+                helperPoint1 = _qtc.QPointF(
+                    pos1.x(), offsetPoint
+                )  # pylint: disable = invalid-name
+                helperPoint2 = _qtc.QPointF(
+                    pos2.x(), offsetPoint
+                )  # pylint: disable = invalid-name
 
                 seg1.setLine(pos1, helperPoint1)
                 seg2.setLine(helperPoint1, helperPoint2)
@@ -466,7 +551,15 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
             pos2 = self.toPort.scenePos()
 
             if pos2.y() >= pos1.y():
-                corner1 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, self.endNode, self)
+                corner1 = _ci.CornerItem(
+                    -rad,
+                    -rad,
+                    2 * rad,
+                    2 * rad,
+                    self.startNode,
+                    self.endNode,
+                    self,
+                )
 
                 seg1 = self._createSegmentItem(self.startNode, corner1.node)
                 seg2 = self._createSegmentItem(corner1.node, self.endNode)
@@ -475,7 +568,9 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
                 self.endNode.setPrev(corner1.node)
 
                 # position of the connecting node
-                p1 = _qtc.QPointF(pos1.x(), pos2.y() - 0.333)  # pylint: disable = invalid-name
+                p1 = _qtc.QPointF(
+                    pos1.x(), pos2.y() - 0.333
+                )  # pylint: disable = invalid-name
 
                 seg1.setLine(pos1, p1)
                 seg2.setLine(p1, pos2)
@@ -487,8 +582,18 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
                 corner1.setPos(p1)
             else:
-                corner1 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
-                corner2 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, self.endNode, self)
+                corner1 = _ci.CornerItem(
+                    -rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self
+                )
+                corner2 = _ci.CornerItem(
+                    -rad,
+                    -rad,
+                    2 * rad,
+                    2 * rad,
+                    corner1.node,
+                    self.endNode,
+                    self,
+                )
 
                 corner1.node.setNext(corner2.node)
 
@@ -501,8 +606,12 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
                 offsetPoint = pos1.y() + 15.666
 
-                helperPoint1 = _qtc.QPointF(pos1.x(), offsetPoint)  # pylint: disable = invalid-name
-                helperPoint2 = _qtc.QPointF(pos2.x(), offsetPoint)  # pylint: disable = invalid-name
+                helperPoint1 = _qtc.QPointF(
+                    pos1.x(), offsetPoint
+                )  # pylint: disable = invalid-name
+                helperPoint2 = _qtc.QPointF(
+                    pos2.x(), offsetPoint
+                )  # pylint: disable = invalid-name
 
                 seg1.setLine(pos1, helperPoint1)
                 seg2.setLine(helperPoint1, helperPoint2)
@@ -526,8 +635,12 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
             self.fromPort.createdAtSide = self.fromPort.side
             self.toPort.createdAtSide = self.toPort.side
 
-            corner1 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
-            corner2 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, self.endNode, self)
+            corner1 = _ci.CornerItem(
+                -rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self
+            )
+            corner2 = _ci.CornerItem(
+                -rad, -rad, 2 * rad, 2 * rad, corner1.node, self.endNode, self
+            )
 
             corner1.node.setNext(corner2.node)
 
@@ -552,8 +665,12 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
             self.toPort.setZValue(100)
             self.fromPort.setZValue(100)
 
-            helperPoint1 = _qtc.QPointF(midx, pos1.y())  # pylint: disable = invalid-name
-            helperPoint2 = _qtc.QPointF(midx, pos2.y())  # pylint: disable = invalid-name
+            helperPoint1 = _qtc.QPointF(
+                midx, pos1.y()
+            )  # pylint: disable = invalid-name
+            helperPoint2 = _qtc.QPointF(
+                midx, pos2.y()
+            )  # pylint: disable = invalid-name
 
             corner1.setPos(helperPoint1)
             corner2.setPos(helperPoint2)
@@ -578,7 +695,9 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         deleteConnectionCommand = self.createDeleteUndoCommand()
         self.parent.parent().undoStack.push(deleteConnectionCommand)
 
-    def createDeleteUndoCommand(self, parentCommand: _tp.Optional[_qtw.QUndoCommand] = None) -> _qtw.QUndoCommand:
+    def createDeleteUndoCommand(
+        self, parentCommand: _tp.Optional[_qtw.QUndoCommand] = None
+    ) -> _qtw.QUndoCommand:
         raise NotImplementedError()
 
     # Gradient related
@@ -633,7 +752,12 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
             s.firstChild = s.secondChild
             s.secondChild = temp3
 
-            s.setLine(s.line().p2().x(), s.line().p2().y(), s.line().p1().x(), s.line().p1().y())
+            s.setLine(
+                s.line().p2().x(),
+                s.line().p2().y(),
+                s.line().p1().x(),
+                s.line().p1().y(),
+            )
 
             s.resetLinePens()
 
@@ -702,10 +826,16 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         raise NotImplementedError()
 
-    def assignIDsToUninitializedValuesAfterJsonFormatMigration(self, generator: _id.IdGenerator) -> None:
+    def assignIDsToUninitializedValuesAfterJsonFormatMigration(
+        self, generator: _id.IdGenerator
+    ) -> None:
         pass
 
-    def onMousePressed(self, segment: _sib.SegmentItemBase, event: _qtw.QGraphicsSceneMouseEvent) -> None:
+    def onMousePressed(
+        self,
+        segment: _sib.SegmentItemBase,
+        event: _qtw.QGraphicsSceneMouseEvent,
+    ) -> None:
         if event.button() != _qtc.Qt.LeftButton:
             return
 
@@ -723,8 +853,18 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
         rad = self.getRadius()
 
-        secondCorner = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, segment.startNode, None, self)
-        thirdCorner = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, secondCorner.node, segment.endNode, self)
+        secondCorner = _ci.CornerItem(
+            -rad, -rad, 2 * rad, 2 * rad, segment.startNode, None, self
+        )
+        thirdCorner = _ci.CornerItem(
+            -rad,
+            -rad,
+            2 * rad,
+            2 * rad,
+            secondCorner.node,
+            segment.endNode,
+            self,
+        )
 
         secondCorner.setFlag(_qtw.QGraphicsItem.ItemSendsScenePositionChanges)
         thirdCorner.setFlag(_qtw.QGraphicsItem.ItemSendsScenePositionChanges)
@@ -737,13 +877,21 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         if segment.isFirstSegment():
             segment.endNode = secondCorner.node
 
-            firstAdditionalSegment = self._createSegmentItem(secondCorner.node, thirdCorner.node)
-            secondAdditionalSegment = self._createSegmentItem(thirdCorner.node, thirdCorner.node.nextN())
+            firstAdditionalSegment = self._createSegmentItem(
+                secondCorner.node, thirdCorner.node
+            )
+            secondAdditionalSegment = self._createSegmentItem(
+                thirdCorner.node, thirdCorner.node.nextN()
+            )
         else:
             segment.startNode = thirdCorner.node
 
-            firstAdditionalSegment = self._createSegmentItem(secondCorner.node.prevN(), secondCorner.node)
-            secondAdditionalSegment = self._createSegmentItem(secondCorner.node, thirdCorner.node)
+            firstAdditionalSegment = self._createSegmentItem(
+                secondCorner.node.prevN(), secondCorner.node
+            )
+            secondAdditionalSegment = self._createSegmentItem(
+                secondCorner.node, thirdCorner.node
+            )
 
         secondCorner.setZValue(100)
         thirdCorner.setZValue(100)
@@ -833,7 +981,9 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
             self._recenterVerticalConnection()
 
     def _recenterVerticalConnection(self) -> None:
-        assert len(self.segments) == 3, "Can only recenter connections with three segments."
+        assert (
+            len(self.segments) == 3
+        ), "Can only recenter connections with three segments."
 
         intermediateSegment = self.segments[1]
 
@@ -850,7 +1000,9 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
     def _assertSegmentsAreConsistent(self):
         if self._isHorizontal():
-            assert len(self.segments) >= 3, "Horizontal segments must always have 3 or more segments."
+            assert (
+                len(self.segments) >= 3
+            ), "Horizontal segments must always have 3 or more segments."
 
         firstSegment = self.segments[0]
         assert firstSegment.isFirstSegment()

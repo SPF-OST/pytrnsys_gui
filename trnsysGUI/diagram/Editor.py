@@ -40,8 +40,12 @@ from trnsysGUI.LibraryModel import LibraryModel
 from trnsysGUI.PortItemBase import PortItemBase
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TVentilDlg import TVentilDlg
-from trnsysGUI.connection.addDoublePipeConnectionCommand import AddDoublePipeConnectionCommand
-from trnsysGUI.connection.addSinglePipeConnectionCommand import AddSinglePipeConnectionCommand
+from trnsysGUI.connection.addDoublePipeConnectionCommand import (
+    AddDoublePipeConnectionCommand,
+)
+from trnsysGUI.connection.addSinglePipeConnectionCommand import (
+    AddSinglePipeConnectionCommand,
+)
 from trnsysGUI.connection.connectionBase import ConnectionBase
 from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
 from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
@@ -59,6 +63,7 @@ from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.storageTank.widget import StorageTank
 from . import _sizes
 from . import fileSystemTreeView as _fst
+from ..recentProjectsHandler import RecentProjectsHandler
 
 
 class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
@@ -122,9 +127,13 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
         self.trnsysObj = []
 
         ddckDirPath = _pl.Path(self.projectFolder) / "ddck"
-        ddckDirFileOrDirNamesProvider = _nm.DdckDirFileOrDirNamesProvider(ddckDirPath)
+        ddckDirFileOrDirNamesProvider = _nm.DdckDirFileOrDirNamesProvider(
+            ddckDirPath
+        )
         existingNames = []
-        self.namesManager = _nm.NamesManager(existingNames, ddckDirFileOrDirNamesProvider)
+        self.namesManager = _nm.NamesManager(
+            existingNames, ddckDirFileOrDirNamesProvider
+        )
 
         self.graphicalObj = []
         self.fluids = _hlm.Fluids.createDefault()
@@ -169,7 +178,10 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
         self.diagramScene.addItem(self.alignXLineItem)
 
         if loadValue == "load" or loadValue == "copy":
-            self._decodeDiagram(os.path.join(self.projectFolder, self.diagramName), loadValue=loadValue)
+            self._decodeDiagram(
+                os.path.join(self.projectFolder, self.diagramName),
+                loadValue=loadValue,
+            )
         elif loadValue == "json":
             self._decodeDiagram(jsonPath, loadValue=loadValue)
 
@@ -177,11 +189,15 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
         libraryBrowserView = self._createLibraryBrowserView()
         self.contextInfoList = _qtw.QListWidget()
 
-        libraryBrowserAndContextInfoSplitter = _qtw.QSplitter(_qtc.Qt.Orientation.Vertical)
+        libraryBrowserAndContextInfoSplitter = _qtw.QSplitter(
+            _qtc.Qt.Orientation.Vertical
+        )
         libraryBrowserAndContextInfoSplitter.addWidget(libraryBrowserView)
         libraryBrowserAndContextInfoSplitter.addWidget(self.contextInfoList)
         _sizes.setRelativeSizes(
-            libraryBrowserAndContextInfoSplitter, [libraryBrowserView, self.contextInfoList], [3, 1]
+            libraryBrowserAndContextInfoSplitter,
+            [libraryBrowserView, self.contextInfoList],
+            [3, 1],
         )
 
         self._consoleWidget = _con.QtConsoleWidget()
@@ -193,7 +209,11 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
         diagramAndTabsSplitter = _qtw.QSplitter(_qtc.Qt.Orientation.Vertical)
         diagramAndTabsSplitter.addWidget(self.diagramView)
         diagramAndTabsSplitter.addWidget(logAndConsoleTabs)
-        _sizes.setRelativeSizes(diagramAndTabsSplitter, [self.diagramView, logAndConsoleTabs], [3, 1])
+        _sizes.setRelativeSizes(
+            diagramAndTabsSplitter,
+            [self.diagramView, logAndConsoleTabs],
+            [3, 1],
+        )
 
         fileBrowserWidget = _qtw.QWidget()
         fileBrowserWidget.setLayout(self.fileBrowserLayout)
@@ -203,7 +223,13 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
         mainSplitter.addWidget(diagramAndTabsSplitter)
         mainSplitter.addWidget(fileBrowserWidget)
         _sizes.setRelativeSizes(
-            mainSplitter, [libraryBrowserAndContextInfoSplitter, diagramAndTabsSplitter, fileBrowserWidget], [1, 5, 1]
+            mainSplitter,
+            [
+                libraryBrowserAndContextInfoSplitter,
+                diagramAndTabsSplitter,
+                fileBrowserWidget,
+            ],
+            [1, 5, 1],
         )
 
         topLevelLayout = _qtw.QGridLayout(self)
@@ -255,47 +281,71 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
                 and startPort.parent != endPort.parent
             ):
                 msgSTank = _qtw.QMessageBox(self)
-                msgSTank.setText("Storage Tank to Storage Tank connection is not working atm!")
+                msgSTank.setText(
+                    "Storage Tank to Storage Tank connection is not working atm!"
+                )
                 msgSTank.exec_()
 
-            isValidSinglePipeConnection = isinstance(startPort, SinglePipePortItem) and isinstance(
-                endPort, SinglePipePortItem
-            )
-            isValidDoublePipeConnection = isinstance(startPort, DoublePipePortItem) and isinstance(
-                endPort, DoublePipePortItem
-            )
+            isValidSinglePipeConnection = isinstance(
+                startPort, SinglePipePortItem
+            ) and isinstance(endPort, SinglePipePortItem)
+            isValidDoublePipeConnection = isinstance(
+                startPort, DoublePipePortItem
+            ) and isinstance(endPort, DoublePipePortItem)
 
             if isValidSinglePipeConnection:
-                command = self._createCreateSinglePipeConnectionCommand(startPort, endPort)
+                command = self._createCreateSinglePipeConnectionCommand(
+                    startPort, endPort
+                )
             elif isValidDoublePipeConnection:
-                command = self._createCreateDoublePipeConnectionCommand(startPort, endPort)
+                command = self._createCreateDoublePipeConnectionCommand(
+                    startPort, endPort
+                )
             else:
-                raise AssertionError("Can only connect port items. Also, they have to be of the same type.")
+                raise AssertionError(
+                    "Can only connect port items. Also, they have to be of the same type."
+                )
 
             self.parent().undoStack.push(command)
 
     def _createCreateSinglePipeConnectionCommand(
         self, startPort: SinglePipePortItem, endPort: SinglePipePortItem
     ) -> AddSinglePipeConnectionCommand:
-        displayName, undoNamingHelper = self._createDisplayAndUndoNamingHelper(startPort, endPort)
-        connection = SinglePipeConnection(displayName, startPort, endPort, self)
-        command = AddSinglePipeConnectionCommand(connection, undoNamingHelper, self)
+        displayName, undoNamingHelper = self._createDisplayAndUndoNamingHelper(
+            startPort, endPort
+        )
+        connection = SinglePipeConnection(
+            displayName, startPort, endPort, self
+        )
+        command = AddSinglePipeConnectionCommand(
+            connection, undoNamingHelper, self
+        )
         return command
 
     def _createCreateDoublePipeConnectionCommand(
         self, startPort: DoublePipePortItem, endPort: DoublePipePortItem
     ) -> AddDoublePipeConnectionCommand:
-        displayName, undoNamingHelper = self._createDisplayAndUndoNamingHelper(startPort, endPort)
-        connection = DoublePipeConnection(displayName, startPort, endPort, self)
-        command = AddDoublePipeConnectionCommand(connection, undoNamingHelper, self)
+        displayName, undoNamingHelper = self._createDisplayAndUndoNamingHelper(
+            startPort, endPort
+        )
+        connection = DoublePipeConnection(
+            displayName, startPort, endPort, self
+        )
+        command = AddDoublePipeConnectionCommand(
+            connection, undoNamingHelper, self
+        )
         return command
 
     def _createDisplayAndUndoNamingHelper(
         self, startPort: PortItemBase, endPort: PortItemBase
     ) -> _tp.Tuple[str, _nu.UndoNamingHelper]:
         createNamingHelper = _nc.CreateNamingHelper(self.namesManager)
-        undoNamingHelper = _nu.UndoNamingHelper(self.namesManager, createNamingHelper)
-        displayName = _cnames.generateDefaultConnectionName(startPort, endPort, createNamingHelper)
+        undoNamingHelper = _nu.UndoNamingHelper(
+            self.namesManager, createNamingHelper
+        )
+        displayName = _cnames.generateDefaultConnectionName(
+            startPort, endPort, createNamingHelper
+        )
         return displayName, undoNamingHelper
 
     def sceneMouseMoveEvent(self, event):
@@ -328,7 +378,10 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
         portItemX = hitPortItem.scenePos().x()
         portItemY = hitPortItem.scenePos().y()
 
-        distance = _math.sqrt((mousePosition.x() - portItemX) ** 2 + (mousePosition.y() - portItemY) ** 2)
+        distance = _math.sqrt(
+            (mousePosition.x() - portItemX) ** 2
+            + (mousePosition.y() - portItemY) ** 2
+        )
         if distance <= 3.5:
             hitPortItem.enlargePortSize()
             hitPortItem.innerCircle.setBrush(hitPortItem.ashColorR)
@@ -366,7 +419,9 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
             return None
 
         mousePosition = event.scenePos()
-        relevantPortItems = self._getRelevantHitPortItems(mousePosition, fromPort)
+        relevantPortItems = self._getRelevantHitPortItems(
+            mousePosition, fromPort
+        )
         if not relevantPortItems:
             return None
 
@@ -392,22 +447,32 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
     ) -> _tp.Sequence[PortItemBase]:
         hitItems = self.diagramScene.items(mousePosition)
         relevantPortItems = [
-            i for i in hitItems if isinstance(i, PortItemBase) and type(i) == type(fromPort) and not i.connectionList
+            i
+            for i in hitItems
+            if isinstance(i, PortItemBase)
+            and type(i) == type(fromPort)
+            and not i.connectionList
         ]
         return relevantPortItems
 
-    def exportHydraulics(self, exportTo=_tp.Literal["ddck", "mfs"]):
+    def exportHydraulics(
+        self, exportTo=_tp.Literal["ddck", "mfs"], disableFileExistMsgb=False
+    ):
         assert exportTo in ["ddck", "mfs"]
 
         if not self.isHydraulicConnected():
             messageBox = _qtw.QMessageBox()
             messageBox.setWindowTitle("Hydraulic not connected")
-            messageBox.setText("You need to connect all port items before you can export the hydraulics.")
+            messageBox.setText(
+                "You need to connect all port items before you can export the hydraulics."
+            )
             messageBox.setStandardButtons(_qtw.QMessageBox.Ok)
             messageBox.exec()
             return
 
-        self.logger.info("------------------------> START OF EXPORT <------------------------")
+        self.logger.info(
+            "------------------------> START OF EXPORT <------------------------"
+        )
 
         self.sortTrnsysObj()
 
@@ -419,15 +484,23 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
             mfsFileName = self.diagramName.rsplit(".", 1)[0] + "_mfs.dck"
             exportPath = os.path.join(self.projectFolder, mfsFileName)
         elif exportTo == "ddck":
-            exportPath = os.path.join(ddckFolder, "hydraulic", "hydraulic.ddck")
+            exportPath = os.path.join(
+                ddckFolder, "hydraulic", "hydraulic.ddck"
+            )
 
-        if self._doesFileExistAndDontOverwrite(exportPath):
-            return None
+        if not disableFileExistMsgb and self._doesFileExistAndDontOverwrite(
+            exportPath,
+        ):
+            return
 
         self.logger.info("Printing the TRNSYS file...")
 
         if exportTo == "mfs":
-            header = open(os.path.join(ddckFolder, "generic", "head.ddck"), "r", encoding="windows-1252")
+            header = open(
+                os.path.join(ddckFolder, "generic", "head.ddck"),
+                "r",
+                encoding="windows-1252",
+            )
             headerLines = header.readlines()
             for line in headerLines:
                 if line[:4] == "STOP":
@@ -440,7 +513,9 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
             DoublePipeTotals = _cnames.EnergyBalanceTotals.DoublePipe
 
             simulatedSinglePipes = [
-                o for o in self.trnsysObj if isinstance(o, SinglePipeConnection) and o.shallBeSimulated
+                o
+                for o in self.trnsysObj
+                if isinstance(o, SinglePipeConnection) and o.shallBeSimulated
             ]
             singlePipeEnergyBalanceEquations = ""
             if simulatedSinglePipes:
@@ -452,7 +527,9 @@ qSysOut_{SinglePipeTotals.PIPE_INTERNAL_CHANGE} = {SinglePipeTotals.PIPE_INTERNA
 
 """
             simulatedDoublePipes = [
-                o for o in self.trnsysObj if isinstance(o, DoublePipeConnection) and o.shallBeSimulated
+                o
+                for o in self.trnsysObj
+                if isinstance(o, DoublePipeConnection) and o.shallBeSimulated
             ]
             doublePipesEnergyBalanceEquations = ""
             if simulatedDoublePipes:
@@ -487,7 +564,9 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
 
         exporter = self._createExporter()
 
-        blackBoxProblem, blackBoxText = exporter.exportBlackBox(exportTo=exportTo)
+        blackBoxProblem, blackBoxText = exporter.exportBlackBox(
+            exportTo=exportTo
+        )
         if blackBoxProblem:
             return None
 
@@ -499,20 +578,30 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             fullExportText += exporter.exportDivSetting(simulationUnit - 10)
 
         fullExportText += exporter.exportSinglePipeParameters()
-        fullExportText += exporter.exportDoublePipeParameters(exportTo=exportTo)
+        fullExportText += exporter.exportDoublePipeParameters(
+            exportTo=exportTo
+        )
 
-        fullExportText += exporter.exportParametersFlowSolver(simulationUnit, simulationType, descConnLength)
+        fullExportText += exporter.exportParametersFlowSolver(
+            simulationUnit, simulationType, descConnLength
+        )
 
         fullExportText += exporter.exportInputsFlowSolver()
         fullExportText += exporter.exportOutputsFlowSolver(simulationUnit)
         fullExportText += exporter.exportFluids() + "\n"
         fullExportText += exporter.exportHydraulicLoops() + "\n"
-        fullExportText += exporter.exportPipeAndTeeTypesForTemp(simulationUnit + 1)  # DC-ERROR
+        fullExportText += exporter.exportPipeAndTeeTypesForTemp(
+            simulationUnit + 1
+        )  # DC-ERROR
         fullExportText += exporter.exportSinglePipeEnergyBalanceVariables()
         fullExportText += exporter.exportDoublePipeEnergyBalanceVariables()
 
-        fullExportText += exporter.exportMassFlowPrinter(self.printerUnitnr, 15)
-        fullExportText += exporter.exportTempPrinter(self.printerUnitnr + 1, 15)
+        fullExportText += exporter.exportMassFlowPrinter(
+            self.printerUnitnr, 15
+        )
+        fullExportText += exporter.exportTempPrinter(
+            self.printerUnitnr + 1, 15
+        )
 
         if exportTo == "mfs":
             fullExportText += """\
@@ -522,7 +611,9 @@ weather_TcwAvg=1
 """
             fullExportText += "ENDS"
 
-        self.logger.info("------------------------> END OF EXPORT <------------------------")
+        self.logger.info(
+            "------------------------> END OF EXPORT <------------------------"
+        )
 
         if exportTo == "mfs":
             f = open(exportPath, "w")
@@ -541,7 +632,9 @@ weather_TcwAvg=1
             f.close()
 
         try:
-            lines = _du.loadDeck(exportPath, eraseBeginComment=True, eliminateComments=True)
+            lines = _du.loadDeck(
+                exportPath, eraseBeginComment=True, eliminateComments=True
+            )
             _du.checkEquationsAndConstants(lines, exportPath)
         except Exception as error:
             errorMessage = f"An error occurred while exporting the system hydraulics: {error}"
@@ -563,7 +656,9 @@ weather_TcwAvg=1
         return exporter
 
     def _getMassFlowContributors(self) -> _tp.Sequence[_ip.HasInternalPiping]:
-        massFlowContributors = [o for o in self.trnsysObj if isinstance(o, _ip.HasInternalPiping)]
+        massFlowContributors = [
+            o for o in self.trnsysObj if isinstance(o, _ip.HasInternalPiping)
+        ]
         return massFlowContributors
 
     def isHydraulicConnected(self) -> bool:
@@ -573,7 +668,9 @@ weather_TcwAvg=1
 
             internalPiping = obj.getInternalPiping()
 
-            for portItem in internalPiping.modelPortItemsToGraphicalPortItem.values():
+            for (
+                portItem
+            ) in internalPiping.modelPortItemsToGraphicalPortItem.values():
                 if not portItem.connectionList:
                     return False
 
@@ -584,7 +681,9 @@ weather_TcwAvg=1
             return False
 
         qmb = _qtw.QMessageBox(self)
-        qmb.setText(f"Warning: {folderPath} already exists. Do you want to overwrite it or cancel?")
+        qmb.setText(
+            f"Warning: {folderPath} already exists. Do you want to overwrite it or cancel?"
+        )
         qmb.setStandardButtons(_qtw.QMessageBox.Save | _qtw.QMessageBox.Cancel)
         qmb.setDefaultButton(_qtw.QMessageBox.Cancel)
         ret = qmb.exec()
@@ -599,7 +698,9 @@ weather_TcwAvg=1
         return False
 
     def exportHydraulicControl(self):
-        self.logger.info("------------------------> START OF EXPORT <------------------------")
+        self.logger.info(
+            "------------------------> START OF EXPORT <------------------------"
+        )
 
         self.sortTrnsysObj()
 
@@ -720,7 +821,12 @@ weather_TcwAvg=1
     def sortTrnsysObj(self):
         self.trnsysObj.sort(key=self.sortId)
         for s in self.trnsysObj:
-            self.logger.debug("s has tr id " + str(s.trnsysId) + " has dname " + s.displayName)
+            self.logger.debug(
+                "s has tr id "
+                + str(s.trnsysId)
+                + " has dname "
+                + s.displayName
+            )
 
     def sortId(self, l1):
         """
@@ -755,7 +861,9 @@ weather_TcwAvg=1
             elif isinstance(trnsysObject, ConnectionBase):
                 trnsysObject.deleteConnection()
             else:
-                raise AssertionError(f"Don't know how to delete {trnsysObject}.")
+                raise AssertionError(
+                    f"Don't know how to delete {trnsysObject}."
+                )
 
         while self.graphicalObj:
             self.graphicalObj[0].deleteBlock()
@@ -776,7 +884,9 @@ weather_TcwAvg=1
         self.logger.info("filename is at encoder " + str(filename))
 
         with open(filename, "w") as jsonfile:
-            json.dump(self, jsonfile, indent=4, sort_keys=True, cls=_enc.Encoder)
+            json.dump(
+                self, jsonfile, indent=4, sort_keys=True, cls=_enc.Encoder
+            )
 
     def _decodeDiagram(self, filename, loadValue="load"):
         self.logger.info("Decoding " + filename)
@@ -803,7 +913,9 @@ weather_TcwAvg=1
                 if isinstance(k, dict):
                     if "__idDct__" in k:
                         # here we don't set the ids because the copyGroup would need access to idGen
-                        self.logger.debug("Found the id dict while loading, not setting the ids")
+                        self.logger.debug(
+                            "Found the id dict while loading, not setting the ids"
+                        )
 
                         self.idGen.setID(k["GlobalId"])
                         self.idGen.setTrnsysID(k["trnsysID"])
@@ -839,7 +951,9 @@ weather_TcwAvg=1
             _qtw.QMessageBox.warning(None, "Orphaned ddck folders", message)
 
         for t in self.trnsysObj:
-            t.assignIDsToUninitializedValuesAfterJsonFormatMigration(self.idGen)
+            t.assignIDsToUninitializedValuesAfterJsonFormatMigration(
+                self.idGen
+            )
 
             if hasattr(t, "isTempering"):
                 self.logger.debug("tv has " + str(t.isTempering))
@@ -849,9 +963,15 @@ weather_TcwAvg=1
         self._setHydraulicLoopsOnStorageTanks()
 
     def _decodeHydraulicLoops(self, blocklist) -> None:
-        singlePipeConnections = [c for c in self.connectionList if isinstance(c, SinglePipeConnection)]
+        singlePipeConnections = [
+            c
+            for c in self.connectionList
+            if isinstance(c, SinglePipeConnection)
+        ]
         if "hydraulicLoops" not in blocklist:
-            hydraulicLoops = _hlmig.createLoops(singlePipeConnections, self.fluids.WATER)
+            hydraulicLoops = _hlmig.createLoops(
+                singlePipeConnections, self.fluids.WATER
+            )
         else:
             serializedHydraulicLoops = blocklist["hydraulicLoops"]
             hydraulicLoops = _hlm.HydraulicLoops.createFromJson(
@@ -870,7 +990,7 @@ weather_TcwAvg=1
             storageTank.setHydraulicLoops(self.hydraulicLoops)
 
     # Saving related
-    def save(self, showWarning=True):
+    def saveProject(self, showWarning=True):
         """
         If saveas has not been used, diagram will be saved in "/diagrams"
         If saveas has been used, diagram will be saved in self.saveAsPath
@@ -879,11 +999,17 @@ weather_TcwAvg=1
 
         """
         self.diagramName = os.path.split(self.projectFolder)[-1] + ".json"
+        diagramPath = os.path.join(self.projectFolder, self.diagramName)
 
-        if os.path.isfile(self.diagramPath) and showWarning:
+        if os.path.isfile(diagramPath) and showWarning:
             qmb = _qtw.QMessageBox(self)
-            qmb.setText("Warning: " + "This diagram name exists already. Do you want to overwrite or cancel?")
-            qmb.setStandardButtons(_qtw.QMessageBox.Save | _qtw.QMessageBox.Cancel)
+            qmb.setText(
+                "Warning: "
+                + "This diagram name exists already. Do you want to overwrite or cancel?"
+            )
+            qmb.setStandardButtons(
+                _qtw.QMessageBox.Save | _qtw.QMessageBox.Cancel
+            )
             qmb.setDefaultButton(_qtw.QMessageBox.Cancel)
             ret = qmb.exec()
 
@@ -892,13 +1018,14 @@ weather_TcwAvg=1
                 return
 
             self.logger.info("Overwriting")
-            self.encodeDiagram(self.diagramPath)
+            self.encodeDiagram(diagramPath)
 
-        self.encodeDiagram(self.diagramPath)
+        self.encodeDiagram(diagramPath)
+        RecentProjectsHandler.addProject(_pl.Path(diagramPath))
         if showWarning:
             msgb = _qtw.QMessageBox()
             msgb.setWindowTitle("Saved successfully")
-            msgb.setText("Saved diagram at " + self.diagramPath)
+            msgb.setText("Saved diagram at " + diagramPath)
             msgb.setStandardButtons(_qtw.QMessageBox.Ok)
             msgb.setDefaultButton(_qtw.QMessageBox.Ok)
             msgb.exec()
@@ -919,11 +1046,17 @@ weather_TcwAvg=1
             # print("Path name is " + self.saveAsPath.name)
             if newName + ".json" in self.saveAsPath.glob("*"):
                 _qtw.QMessageBox(
-                    self, "Warning", "This diagram name exists already in the directory." " Please rename this diagram"
+                    self,
+                    "Warning",
+                    "This diagram name exists already in the directory."
+                    " Please rename this diagram",
                 )
             else:
                 self.saveAsPath = _pl.Path(
-                    self.saveAsPath.stem[0 : self.saveAsPath.name.index(self.diagramName)] + newName
+                    self.saveAsPath.stem[
+                        0 : self.saveAsPath.name.index(self.diagramName)
+                    ]
+                    + newName
                 )
 
         self.diagramName = newName
@@ -949,9 +1082,13 @@ weather_TcwAvg=1
         dialog = BlockDlg(blockItem, renameHelper, self.projectFolder)
         dialog.exec()
 
-    def showDoublePipeBlockDlg(self, connector: _dctor.DoublePipeConnectorBase) -> None:
+    def showDoublePipeBlockDlg(
+        self, connector: _dctor.DoublePipeConnectorBase
+    ) -> None:
         renameHelper = self._createRenameHelper()
-        dialog = DoublePipeBlockDlg(connector, renameHelper, self.projectFolder)
+        dialog = DoublePipeBlockDlg(
+            connector, renameHelper, self.projectFolder
+        )
         dialog.exec()
 
     def showDiagramDlg(self):
@@ -975,7 +1112,9 @@ weather_TcwAvg=1
 
     def showConfigStorageDlg(self, storageTank: _stwidget.StorageTank) -> None:
         renameHelper = self._createRenameHelper()
-        storageDialog = ConfigureStorageDialog(storageTank, self, renameHelper, self.projectFolder)
+        storageDialog = ConfigureStorageDialog(
+            storageTank, self, renameHelper, self.projectFolder
+        )
         storageDialog.exec()
 
     def _createRenameHelper(self) -> _rename.RenameHelper:
@@ -1031,19 +1170,25 @@ weather_TcwAvg=1
     def editHydraulicLoop(self, singlePipeConnection: SinglePipeConnection):
         assert isinstance(singlePipeConnection.fromPort, SinglePipePortItem)
 
-        hydraulicLoop = self.hydraulicLoops.getLoopForExistingConnection(singlePipeConnection)
+        hydraulicLoop = self.hydraulicLoops.getLoopForExistingConnection(
+            singlePipeConnection
+        )
         _hledit.edit(hydraulicLoop, self.hydraulicLoops, self.fluids)
 
         self._updateGradientsInHydraulicLoop(hydraulicLoop)
 
     @staticmethod
-    def _updateGradientsInHydraulicLoop(hydraulicLoop: _hlm.HydraulicLoop) -> None:
+    def _updateGradientsInHydraulicLoop(
+        hydraulicLoop: _hlm.HydraulicLoop,
+    ) -> None:
         for connection in hydraulicLoop.connections:
             connection.updateSegmentGradients()
 
     @_tp.override
     def getInternalPipings(self) -> _cabc.Sequence[_ip.HasInternalPiping]:
-        return [o for o in self.trnsysObj if isinstance(o, _ip.HasInternalPiping)]
+        return [
+            o for o in self.trnsysObj if isinstance(o, _ip.HasInternalPiping)
+        ]
 
     def toggleSnap(self) -> None:
         self.snapGrid = not self.snapGrid

@@ -33,7 +33,9 @@ class SinglePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
 
         editHydraulicLoopAction = menu.addAction("Edit hydraulic loop")
 
-        editHydraulicLoopAction.triggered.connect(self._singlePipeConnection.editHydraulicLoop)
+        editHydraulicLoopAction.triggered.connect(
+            self._singlePipeConnection.editHydraulicLoop
+        )
 
         return menu
 
@@ -50,18 +52,28 @@ class SinglePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
         partLen1 = self.connection.partialLength(self.startNode)
         partLen2 = self.connection.partialLength(self.endNode)
         if isinstance(self.startNode.parent, _ci.CornerItem):  # type: ignore[attr-defined]
-            startGradP = _qtc.QPointF(self.startNode.parent.scenePos().x(), self.startNode.parent.scenePos().y())
+            startGradP = _qtc.QPointF(
+                self.startNode.parent.scenePos().x(),
+                self.startNode.parent.scenePos().y(),
+            )
         elif self.startNode.prevN() is None:
             startGradP = _qtc.QPointF(
-                self.startNode.parent.fromPort.scenePos().x(), self.startNode.parent.fromPort.scenePos().y()
+                self.startNode.parent.fromPort.scenePos().x(),
+                self.startNode.parent.fromPort.scenePos().y(),
             )
         else:
-            startGradP = _qtc.QPointF(self.line().p1().x(), self.line().p1().y())
+            startGradP = _qtc.QPointF(
+                self.line().p1().x(), self.line().p1().y()
+            )
         if isinstance(self.endNode.parent, _ci.CornerItem):  # type: ignore[attr-defined]
-            endGradP = _qtc.QPointF(self.endNode.parent.scenePos().x(), self.endNode.parent.scenePos().y())
+            endGradP = _qtc.QPointF(
+                self.endNode.parent.scenePos().x(),
+                self.endNode.parent.scenePos().y(),
+            )
         elif self.endNode.nextN() is None:
             endGradP = _qtc.QPointF(
-                self.endNode.parent.toPort.scenePos().x(), self.endNode.parent.toPort.scenePos().y()
+                self.endNode.parent.toPort.scenePos().x(),
+                self.endNode.parent.toPort.scenePos().y(),
             )
         else:
             endGradP = _qtc.QPointF(self.line().p2().x(), self.line().p2().y())
@@ -75,7 +87,11 @@ class SinglePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
         segmentLength: int,
         connectionLength: int,
     ) -> _qtg.QColor:
-        alpha = 255 if self._singlePipeConnection.shallBeSimulated else _common.NOT_SIMULATED_COLOR_ALPHA
+        alpha = (
+            255
+            if self._singlePipeConnection.shallBeSimulated
+            else _common.NOT_SIMULATED_COLOR_ALPHA
+        )
 
         red1 = 160
         blue1 = 160

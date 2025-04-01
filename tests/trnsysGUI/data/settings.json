@@ -1,0 +1,9 @@
+{
+    "trnsysBinaryPath": "C:/TRNSYS18/Exe/TrnEXE.exe",
+    "recentProjects": [
+        "C:/pytrnsys-projects/s/s.json",
+        "C:/Development/parent/pytrnsys_gui/data/examples/icegrid/icegrid.json",
+        "C:/Development/parent/pytrnsys_gui/data/examples/solar_dhw_GUI/solar_dhw_GUI.json"
+    ],
+    "__version__": "c49c052a-f41a-481f-9849-2f6e7185e3cd"
+}

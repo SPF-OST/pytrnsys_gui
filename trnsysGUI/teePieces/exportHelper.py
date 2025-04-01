@@ -74,7 +74,7 @@ def _renderTeePieceUnit(
     return unitText
 
 
-def getTeePieceUnit(
+def getTeePieceUnit(  # pylint: disable=too-many-positional-arguments
     unitNumber: int,
     teePiece: _tpb.TeePieceBase,
     massFlowNetworkNode: _mfn.TeePiece,
@@ -89,7 +89,8 @@ def getTeePieceUnit(
     )
 
     outputTemperature = _temps.getInternalTemperatureVariableName(
-        componentDisplayName=teePiece.displayName, nodeName=massFlowNetworkNode.name
+        componentDisplayName=teePiece.displayName,
+        nodeName=massFlowNetworkNode.name,
     )
 
     unitText = _renderTeePieceUnit(
@@ -142,7 +143,7 @@ def _createPorts(
     return inputPort, orthogonalOutputPort, straightOutputPort
 
 
-def _createPort(
+def _createPort(  # pylint: disable=too-many-positional-arguments
     connection: _cb.ConnectionBase,
     modelPortItem: _mfn.PortItem,
     teePiece: _tpb.TeePieceBase,
@@ -151,7 +152,14 @@ def _createPort(
     initialTemperature: str | float,
 ) -> _Port:
 
-    massFlowName = _mnames.getMassFlowVariableName(teePiece.displayName, massFlowNetworkNode, modelPortItem)
-    temperatureName = _cnames.getTemperatureVariableName(connection, portItemType)
-    port = _Port(_Variable(massFlowName, 0), _Variable(temperatureName, initialTemperature))
+    massFlowName = _mnames.getMassFlowVariableName(
+        teePiece.displayName, massFlowNetworkNode, modelPortItem
+    )
+    temperatureName = _cnames.getTemperatureVariableName(
+        connection, portItemType
+    )
+    port = _Port(
+        _Variable(massFlowName, 0),
+        _Variable(temperatureName, initialTemperature),
+    )
     return port

@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+import collections.abc as _cabc
 import dataclasses as _dc
 import os as _os
 import pathlib as _pl
@@ -13,11 +16,13 @@ import pandas as _pd
 import trnsysGUI.MassFlowVisualizer as _mfv
 import trnsysGUI.TVentil as _tv
 import trnsysGUI.diagram.Editor as _de
-import trnsysGUI.mainWindow as _mw
 import trnsysGUI.pumpsAndTaps._tapBase as _tb
 import trnsysGUI.pumpsAndTaps.pump as _pump
 import trnsysGUI.pythonInterface.regimeExporter.getDesiredRegimes as _gdr
 import trnsysGUI.sourceSinkBase as _ssb
+
+if _tp.TYPE_CHECKING:
+    import trnsysGUI.mainWindow as _mw
 
 
 _BlockItems = (_pump.Pump, _tv.TVentil, _tb.TapBase, _ssb.SourceSinkBase)
@@ -31,6 +36,10 @@ class RegimeExporter:
     resultsDir: _pl.Path
     regimesFileName: str
     mainWindow: _mw.MainWindow  # type: ignore[name-defined]
+    temperingValveWasTrue: bool = False
+
+    def __post_init__(self) -> None:
+        self._temperingValves: list[_tv.TVentil] = []
 
     @property
     def massFlowRatesPrintFilePath(self) -> _pl.Path:
@@ -42,16 +51,26 @@ class RegimeExporter:
         temperaturesPintFileName = f"{self.projectName}_T.prt"
         return self.projectDir / temperaturesPintFileName
 
-    def export(self, onlyTheseRegimes: _tp.Optional[_tp.Sequence[str]] = None) -> None:
+    @property
+    def temperingValves(self) -> _cabc.Sequence[_tv.TVentil]:
+        return self._temperingValves
+
+    def export(
+        self, onlyTheseRegimes: _tp.Optional[_tp.Sequence[str]] = None
+    ) -> _tp.List[str]:
 
         if not onlyTheseRegimes:
             self._makeDiagramFiles()
 
-        regimeValues = _gdr.getRegimes(self.projectDir / self.regimesFileName, onlyTheseRegimes)
+        regimeValues = _gdr.getRegimes(
+            self.projectDir / self.regimesFileName, onlyTheseRegimes
+        )
         relevantNames = list(regimeValues.columns)
         relevantBlockItems = self.getRelevantBlockItems(relevantNames)
 
-        self._simulateAndVisualizeMassFlows(relevantBlockItems, regimeValues)
+        return self._simulateAndVisualizeMassFlows(
+            relevantBlockItems, regimeValues
+        )
 
     def _makeDiagramFiles(self, regimeName: str = "diagram") -> None:
         pdfName = self.resultsDir / f"{self.projectName}_{regimeName}.pdf"
@@ -59,19 +78,25 @@ class RegimeExporter:
         self._printDiagramToPDF(pdfName)
         self._printDiagramToSVG(svgName)
 
-    def getRelevantBlockItems(self, relevantNames: _tp.Sequence[str]) -> _tp.Sequence[_BlockItem]:
+    def getRelevantBlockItems(
+        self, relevantNames: _tp.Sequence[str]
+    ) -> _tp.Sequence[_BlockItem]:
         blockItemsAndConnections = self.mainWindow.editor.trnsysObj
 
         pumpsAndValvesAndTaps = [
-            b for b in blockItemsAndConnections if isinstance(b, _BlockItems) and b.displayName in relevantNames
+            b
+            for b in blockItemsAndConnections
+            if isinstance(b, _BlockItems) and b.displayName in relevantNames
         ]
 
         return pumpsAndValvesAndTaps
 
     def _simulateAndVisualizeMassFlows(
-        self, relevantBlockItems: _tp.Sequence[_BlockItem], regimeValues: _pd.DataFrame
-    ) -> None:
-
+        self,
+        relevantBlockItems: _tp.Sequence[_BlockItem],
+        regimeValues: _pd.DataFrame,
+    ) -> _tp.List[str]:
+        failures = []
         for regimeName in regimeValues.index:
             regimeRow = regimeValues.loc[regimeName]
 
@@ -81,6 +106,7 @@ class RegimeExporter:
                 _exportMassFlowSolverDeckAndRunTrnsys(self.mainWindow.editor)
                 timeStep = 2
             except (FileNotFoundError, _sp.CalledProcessError):
+                failures.append(regimeName)
                 regimeName = regimeName + "_FAILED"
                 timeStep = 1
 
@@ -95,18 +121,31 @@ class RegimeExporter:
 
             massFlowSolverVisualizer.close()
 
-    @staticmethod
-    def _adjustPumpsAndValves(relevantBlockItems: _tp.Sequence[_BlockItem], regimeRow: _pd.Series) -> None:
+        self._resetTemperingValves()
+        return failures
 
+    def _adjustPumpsAndValves(
+        self,
+        relevantBlockItems: _tp.Sequence[_BlockItem],
+        regimeRow: _pd.Series,
+    ) -> None:
         for blockItem in relevantBlockItems:
             blockItemName = blockItem.displayName
             desiredValue = regimeRow[blockItemName]
 
             match blockItem:
-                case _pump.Pump() | _tb.TapBase() | _ssb.SourceSinkBase() as hasMassFlowRate:
+                case (
+                    _pump.Pump()
+                    | _tb.TapBase()
+                    | _ssb.SourceSinkBase() as hasMassFlowRate
+                ):
                     hasMassFlowRate.massFlowRateInKgPerH = desiredValue
                 case _tv.TVentil() as valve:
                     valve.positionForMassFlowSolver = desiredValue
+                    if valve.isTempering:
+                        self.temperingValveWasTrue = True
+                        valve.isTempering = False
+                        self._temperingValves.append(valve)
                 case _:
                     _tp.assert_never(blockItem)
 
@@ -129,6 +168,15 @@ class RegimeExporter:
         self.mainWindow.editor.diagramScene.render(painter)
         painter.end()
 
+    def _resetTemperingValves(self) -> None:
+        if not self.temperingValves:
+            return
+
+        for valve in self.temperingValves:
+            valve.isTempering = True
+
+        self.temperingValveWasTrue = False
+
 
 def _exportMassFlowSolverDeckAndRunTrnsys(editor: _de.Editor) -> None:  # type: ignore[name-defined]
     exportedFilePath = str(_exportHydraulic(editor, formatting="mfs"))
@@ -139,20 +187,28 @@ def _exportMassFlowSolverDeckAndRunTrnsys(editor: _de.Editor) -> None:  # type: 
 
 
 def _exportHydraulic(editor: _de.Editor, *, formatting) -> str:  # type: ignore[name-defined]
-    exportedFilePath = editor.exportHydraulics(exportTo=formatting)
+    exportedFilePath = editor.exportHydraulics(
+        exportTo=formatting, disableFileExistMsgb=True
+    )
     return exportedFilePath
 
 
 def _getTrnExePath() -> _pl.PureWindowsPath:
     isRunDuringCi = _os.environ.get("CI") == "true"
     if isRunDuringCi:
-        return _pl.PureWindowsPath(r"C:\CI-Progams\TRNSYS18\Exe\TrnEXE.exe")
+        return _pl.PureWindowsPath(
+            r"C:\CI-Progams\TRNSYS18_pytrnsys\Exe\TrnEXE.exe"
+        )
 
-    return _pl.PureWindowsPath(r"C:\TRNSYS18\Exe\TrnEXE.exe")
+    return _pl.PureWindowsPath(
+        r"C:\TRNSYS18\Exe\TrnEXE.exe"
+    )  # pragma: no cover
 
 
 def runDck(cmd: str, dckName: str) -> None:
     if not _os.path.isfile(dckName):
-        raise FileNotFoundError("File not found: " + dckName)
+        raise FileNotFoundError(
+            "File not found: " + dckName
+        )  # pragma: no cover
 
     _sp.run([cmd, dckName, "/H"], shell=True, check=True)

@@ -49,7 +49,9 @@ class GraphicalItem(QGraphicsPixmapItem):
         menu.exec_(event.screenPos())
 
     def loadAction(self):
-        fileName = QFileDialog.getOpenFileName(self._editor, "Load image", filter="*.png *.svg")[0]
+        fileName = QFileDialog.getOpenFileName(
+            self._editor, "Load image", filter="*.png *.svg"
+        )[0]
         if fileName[-3:] == "png" or fileName[-3:] == "svg":
             self.setImageSource(fileName)
             self.updateImage()

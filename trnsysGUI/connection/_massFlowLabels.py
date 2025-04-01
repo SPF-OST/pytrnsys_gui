@@ -1,6 +1,10 @@
-def getFormattedMassFlowAndTemperature(massFlow: float, temperature: float) -> str:
+def getFormattedMassFlowAndTemperature(
+    massFlow: float, temperature: float
+) -> str:
     formattedMassFlow = _getFormattedMassFlow(massFlow)
-    formattedMassFlowAndTemperature = f"M = {formattedMassFlow} kg/h, T: {temperature:.1f}°C"
+    formattedMassFlowAndTemperature = (
+        f"M = {formattedMassFlow} kg/h, T: {temperature:.1f}°C"
+    )
     return formattedMassFlowAndTemperature
 
 

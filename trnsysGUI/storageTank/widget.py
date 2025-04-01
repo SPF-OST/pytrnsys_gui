@@ -426,7 +426,9 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
         tool.setInputs(inputs, directPairsPorts, heatExchangerPorts, auxiliaryPorts,self.displayName)
 
         projectDirPath = _pl.Path(self.editor.projectFolder)
-        ddckDirPath = _dfh.getComponentDdckDirPath(self.displayName, projectDirPath)
+        ddckDirPath = _dfh.getComponentDdckDirPath(
+            self.displayName, projectDirPath
+        )
 
         if not ddckDirPath.is_dir():
             _qtw.QMessageBox.information(
@@ -438,15 +440,19 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
             return
 
         tool.createDDck(str(ddckDirPath), self.displayName, typeFile="ddck")
-        a=1
+
     def _getDirectPairPortsForExport(self):
         directPairsPorts = []
         for directPortPair in self.directPortPairs:
             incomingConnection = directPortPair.fromPort.getConnection()
-            inputTemperatureName = _cnames.getTemperatureVariableName(incomingConnection, _mfn.PortItemType.STANDARD)
+            inputTemperatureName = _cnames.getTemperatureVariableName(
+                incomingConnection, _mfn.PortItemType.STANDARD
+            )
 
             modelPipe = directPortPair.modelPipe
-            massFlowRateName = _mnames.getMassFlowVariableName(self.displayName, modelPipe, modelPipe.fromPort)
+            massFlowRateName = _mnames.getMassFlowVariableName(
+                self.displayName, modelPipe, modelPipe.fromPort
+            )
 
             outgoingConnection = directPortPair.toPort.getConnection()
             reverseInputTemperatureName = _cnames.getTemperatureVariableName(
@@ -475,21 +481,31 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
     def _getHeatExchangerPortsForExport(self):
         heatExchangerPorts = []
         for heatExchanger in self.heatExchangers:
-            heatExchangerPort = self._getHeatExchangerPortForExport(heatExchanger)
+            heatExchangerPort = self._getHeatExchangerPortForExport(
+                heatExchanger
+            )
 
             heatExchangerPorts.append(heatExchangerPort)
         return heatExchangerPorts
 
-    def _getHeatExchangerPortForExport(self, heatExchanger):  # pylint: disable=too-many-locals
+    def _getHeatExchangerPortForExport(
+        self, heatExchanger
+    ):  # pylint: disable=too-many-locals
         heatExchangerName = heatExchanger.displayName
 
         incomingConnection = heatExchanger.port1.getConnection()
-        inputTemperatureName = _cnames.getTemperatureVariableName(incomingConnection, _mfn.PortItemType.STANDARD)
+        inputTemperatureName = _cnames.getTemperatureVariableName(
+            incomingConnection, _mfn.PortItemType.STANDARD
+        )
         modelPipe = heatExchanger.modelPipe
-        massFlowRateName = _mnames.getMassFlowVariableName(self.displayName, modelPipe, modelPipe.fromPort)
+        massFlowRateName = _mnames.getMassFlowVariableName(
+            self.displayName, modelPipe, modelPipe.fromPort
+        )
 
         outgoingConnection = heatExchanger.port2.getConnection()
-        reverseInputTemperatureName = _cnames.getTemperatureVariableName(outgoingConnection, _mfn.PortItemType.STANDARD)
+        reverseInputTemperatureName = _cnames.getTemperatureVariableName(
+            outgoingConnection, _mfn.PortItemType.STANDARD
+        )
 
         inputPos = heatExchanger.relativeInputHeight
         outputPos = heatExchanger.relativeOutputHeight
@@ -498,7 +514,9 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
             componentDisplayName=self.displayName, nodeName=modelPipe.name
         )
 
-        loop = self._hydraulicLoops.getLoopForExistingConnection(incomingConnection)
+        loop = self._hydraulicLoops.getLoopForExistingConnection(
+            incomingConnection
+        )
         loopName = loop.name.value
 
         heatExchangerPort = {
@@ -540,7 +558,9 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
                 errorConnList = errorConnList + connName2 + "\n"
         if errorConnList != "":
             msgBox = _qtw.QMessageBox()
-            msgBox.setText(f"{errorConnList} is connected wrongly, right click StorageTank to invert connection.")
+            msgBox.setText(
+                f"{errorConnList} is connected wrongly, right click StorageTank to invert connection."
+            )
             msgBox.exec()
             noError = False
         else:
