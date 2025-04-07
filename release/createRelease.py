@@ -117,7 +117,7 @@ def _installPackages(embeddablePythonDistDirPath: _pl.Path) -> None:
 
     commands = [
         rf"{_sys.executable} dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py",
-        rf"{_sys.executable} -m uv pip install -r requirements\release.txt -t {SITE_PACKAGES_DIR_PATH}",
+        rf"{_sys.executable} -m pip install -r requirements\release.txt -t {SITE_PACKAGES_DIR_PATH}",
     ]
 
     pytrnsysGuiRootDirPath = RELEASE_DIR_PATH.parent
