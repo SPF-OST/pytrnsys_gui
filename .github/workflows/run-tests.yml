@@ -54,7 +54,7 @@ jobs:
         run: venv\Scripts\python -c "import trnsysGUI"
 
       - name: Run pip-compile-multi
-        run: venv\Scripts\pip-compile-multi -d requirements --no-upgrade
+        run: venv\Scripts\pip-compile-multi --uv -d requirements --no-upgrade
 
   test:
     runs-on: [self-hosted, etna]
@@ -80,8 +80,8 @@ jobs:
       - name: Install dependencies
         run: |
           venv\Scripts\python -m pip install --upgrade pip
-          venv\Scripts\python -m pip install wheel
-          venv\Scripts\python -m pip install -r requirements/test.txt
+          venv\Scripts\python -m pip install wheel uv
+          venv\Scripts\python -m uv pip install -r requirements\test.txt
 
       - name: Generate UI code from Qt Creator Studio .ui files
         run: venv\Scripts\python dev-tools/generateGuiClassesFromQtCreatorStudioUiFiles.py
