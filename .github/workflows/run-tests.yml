@@ -40,8 +40,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          venv\Scripts\python -m pip install wheel
-          venv\Scripts\python -m pip install -r requirements/dev.txt
+          venv\Scripts\python -m pip install --upgrade pip
+          venv\Scripts\python -m pip install wheel uv
+          venv\Scripts\python -m uv pip install -r requirements\dev.txt
 
       - name: Generate UI code from Qt Creator Studio .ui files
         run: venv\Scripts\python dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py

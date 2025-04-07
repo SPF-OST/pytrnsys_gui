@@ -1,4 +1,4 @@
 -r dev-3rd-party.in
 
--e file:../pytrnsys --config-settings editable_mode=compat
+-e file:../pytrnsys
 -e file:.

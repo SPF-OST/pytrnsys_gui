@@ -93,8 +93,9 @@ All the following commands should be run from the `pytrnsys_gui` directory. The 
     ```
 3. Install the requirements:
     ```commandline
-    python -m pip install wheel
-    python -m pip install -r requirements\dev.txt
+    python -m pip install --upgrade pip
+    python -m pip install wheel uv
+    python -m uv pip install -r requirements\dev.txt
     ```
 4. Generate Python files from the include Qt creator files:
    ```commandline

@@ -6,7 +6,7 @@
 #    pip-compile-multi
 #
 -r dev-3rd-party.txt
--e file:../pytrnsys --config-settings editable_mode=compat
+-e file:../pytrnsys
     # via -r requirements\dev.in
 -e file:.
     # via -r requirements\dev.in
