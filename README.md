@@ -125,3 +125,7 @@ Beware that the GUI can only be started from within the virtual environment you 
 I.e., whenever you open a new console window from which you want to start the GUI you first need 
 to activate the environment (step 2. above).
 
+### Updating the environment as a developer
+```commandline
+    pip-compile-multi --use-cache --backtracking --uv --no-upgrade -d .\requirements\
+```
