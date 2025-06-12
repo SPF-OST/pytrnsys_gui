@@ -6,569 +6,187 @@
 #    pip-compile-multi
 #
 aiohappyeyeballs==2.5.0
-    # via aiohttp
 aiohttp==3.11.13
-    # via spyder
 aiosignal==1.3.2
-    # via aiohttp
 alabaster==0.7.13
-    # via sphinx
 annotated-types==0.7.0
-    # via pydantic
 appdirs==1.4.4
-    # via -r requirements\release-3rd-party.in
 arrow==1.3.0
-    # via cookiecutter
 astroid==3.3.8
-    # via pylint
 asttokens==2.4.1
-    # via stack-data
 asyncssh==2.20.0
-    # via spyder
 atomicwrites==1.4.1
-    # via spyder
 attrs==23.1.0
-    # via
-    #   aiohttp
-    #   jsonschema
-    #   referencing
 autopep8==2.0.4
-    # via python-lsp-server
 babel==2.13.1
-    # via sphinx
 beautifulsoup4==4.13.3
-    # via nbconvert
 binaryornot==0.4.4
-    # via cookiecutter
 black==24.2.0
-    # via python-lsp-black
-bleach[css]==6.2.0
-    # via nbconvert
+bleach==6.2.0
 bokeh==3.3.2
-    # via -r requirements\release-3rd-party.in
 certifi==2023.11.17
-    # via requests
 cffi==1.17.1
-    # via
-    #   cryptography
-    #   pynacl
 chardet==5.2.0
-    # via
-    #   binaryornot
-    #   spyder
 charset-normalizer==3.3.2
-    # via requests
 click==8.1.7
-    # via
-    #   black
-    #   cookiecutter
-    #   typer
 cloudpickle==3.1.1
-    # via
-    #   spyder
-    #   spyder-kernels
 colorama==0.4.6
-    # via
-    #   click
-    #   ipython
-    #   pylint
-    #   sphinx
 comm==0.2.0
-    # via ipykernel
 contourpy==1.2.0
-    # via
-    #   bokeh
-    #   matplotlib
 cookiecutter==2.6.0
-    # via spyder
 cryptography==44.0.2
-    # via
-    #   asyncssh
-    #   pyjwt
 cycler==0.12.1
-    # via matplotlib
 dataclasses-jsonschema==2.16.0
-    # via -r requirements\release-3rd-party.in
 debugpy==1.8.0
-    # via ipykernel
 decorator==5.1.1
-    # via ipython
 defusedxml==0.7.1
-    # via nbconvert
 deprecated==1.2.18
-    # via pygithub
 diff-match-patch==20241021
-    # via
-    #   spyder
-    #   three-merge
 dill==0.3.7
-    # via pylint
 docstring-to-markdown==0.15
-    # via python-lsp-server
 docutils==0.20.1
-    # via sphinx
 elementpath==4.4.0
-    # via xmlschema
 executing==2.0.1
-    # via stack-data
 fastjsonschema==2.21.1
-    # via nbformat
 flake8==7.1.2
-    # via python-lsp-server
 fonttools==4.46.0
-    # via matplotlib
 frozenlist==1.5.0
-    # via
-    #   aiohttp
-    #   aiosignal
 idna==3.6
-    # via
-    #   requests
-    #   yarl
 imagesize==1.4.1
-    # via sphinx
 importlib-metadata==8.6.1
-    # via spyder
 inflection==0.5.1
-    # via qstylizer
 intervaltree==3.1.0
-    # via spyder
 ipykernel==6.29.5
-    # via
-    #   qtconsole
-    #   spyder-kernels
 ipython==8.18.1
-    # via
-    #   ipykernel
-    #   spyder
-    #   spyder-kernels
 isort==5.12.0
-    # via pylint
 jaraco-classes==3.4.0
-    # via keyring
 jaraco-context==6.0.1
-    # via keyring
 jaraco-functools==4.1.0
-    # via keyring
 jedi==0.19.1
-    # via
-    #   ipython
-    #   python-lsp-server
-    #   spyder
 jellyfish==1.1.3
-    # via spyder
 jinja2==3.1.2
-    # via
-    #   -r requirements\release-3rd-party.in
-    #   bokeh
-    #   cookiecutter
-    #   nbconvert
-    #   sphinx
 jsonschema==4.20.0
-    # via
-    #   dataclasses-jsonschema
-    #   nbformat
-    #   spyder
 jsonschema-specifications==2023.11.2
-    # via jsonschema
 jupyter-client==8.6.0
-    # via
-    #   ipykernel
-    #   nbclient
-    #   qtconsole
-    #   spyder-kernels
 jupyter-core==5.5.0
-    # via
-    #   ipykernel
-    #   jupyter-client
-    #   nbclient
-    #   nbconvert
-    #   nbformat
-    #   qtconsole
 jupyterlab-pygments==0.3.0
-    # via nbconvert
 keyring==25.6.0
-    # via spyder
 kiwisolver==1.4.5
-    # via matplotlib
 lark==1.1.8
-    # via
-    #   -r requirements\release-3rd-party.in
-    #   pytrnsys-process
 markdown-it-py==3.0.0
-    # via rich
 markupsafe==2.1.3
-    # via
-    #   jinja2
-    #   nbconvert
 matplotlib==3.8.2
-    # via
-    #   -r requirements\release-3rd-party.in
-    #   pytrnsys-process
-    #   seaborn
 matplotlib-inline==0.1.6
-    # via
-    #   ipykernel
-    #   ipython
 mccabe==0.7.0
-    # via
-    #   flake8
-    #   pylint
-    #   python-lsp-server
 mdurl==0.1.2
-    # via markdown-it-py
 mistune==3.1.2
-    # via nbconvert
 more-itertools==10.6.0
-    # via
-    #   jaraco-classes
-    #   jaraco-functools
 multidict==6.1.0
-    # via
-    #   aiohttp
-    #   yarl
 mypy-extensions==1.0.0
-    # via black
 nbclient==0.10.2
-    # via nbconvert
 nbconvert==7.16.6
-    # via spyder
 nbformat==5.10.4
-    # via
-    #   nbclient
-    #   nbconvert
 nest-asyncio==1.5.8
-    # via ipykernel
 numpy==1.26.2
-    # via
-    #   -r requirements\release-3rd-party.in
-    #   bokeh
-    #   contourpy
-    #   matplotlib
-    #   pandas
-    #   scipy
-    #   seaborn
 numpydoc==1.8.0
-    # via spyder
 packaging==23.2
-    # via
-    #   -r requirements\release-3rd-party.in
-    #   black
-    #   bokeh
-    #   ipykernel
-    #   matplotlib
-    #   nbconvert
-    #   pytoolconfig
-    #   qtconsole
-    #   qtpy
-    #   sphinx
 pandas==2.1.4
-    # via
-    #   -r requirements\release-3rd-party.in
-    #   bokeh
-    #   pytrnsys-process
-    #   seaborn
 pandocfilters==1.5.1
-    # via nbconvert
 parso==0.8.3
-    # via
-    #   jedi
-    #   spyder
 pathspec==0.12.1
-    # via black
 pexpect==4.9.0
-    # via spyder
 pickleshare==0.7.5
-    # via
-    #   -r requirements\release-3rd-party.in
-    #   spyder
 pillow==10.1.0
-    # via
-    #   bokeh
-    #   matplotlib
 platformdirs==4.1.0
-    # via
-    #   black
-    #   jupyter-core
-    #   pylint
-    #   pytoolconfig
-    #   yapf
 pluggy==1.3.0
-    # via python-lsp-server
 prompt-toolkit==3.0.41
-    # via ipython
 propcache==0.3.0
-    # via
-    #   aiohttp
-    #   yarl
 psutil==5.9.6
-    # via
-    #   ipykernel
-    #   spyder
 ptyprocess==0.7.0
-    # via pexpect
 pure-eval==0.2.2
-    # via stack-data
 pyarrow==19.0.1
-    # via pytrnsys-process
 pycodestyle==2.12.1
-    # via
-    #   autopep8
-    #   flake8
-    #   python-lsp-server
 pycparser==2.22
-    # via cffi
 pydantic==2.7.4
-    # via -r requirements\release-3rd-party.in
 pydantic-core==2.18.4
-    # via pydantic
 pydocstyle==6.3.0
-    # via python-lsp-server
 pyflakes==3.2.0
-    # via
-    #   flake8
-    #   python-lsp-server
 pygithub==2.6.1
-    # via spyder
 pygments==2.17.2
-    # via
-    #   ipython
-    #   nbconvert
-    #   qtconsole
-    #   rich
-    #   sphinx
-    #   spyder
-    #   superqt
-pyjwt[crypto]==2.10.1
-    # via pygithub
+pyjwt==2.10.1
 pylint==3.3.4
-    # via
-    #   python-lsp-server
-    #   spyder
 pylint-venv==3.0.4
-    # via spyder
 pyls-spyder==0.4.0
-    # via spyder
 pynacl==1.5.0
-    # via pygithub
 pyparsing==3.1.1
-    # via matplotlib
 pyqt5==5.15.10
-    # via
-    #   -r requirements\release-3rd-party.in
-    #   pyqtwebengine
-    #   spyder
 pyqt5-qt5==5.15.2
-    # via pyqt5
 pyqt5-sip==12.13.0
-    # via
-    #   pyqt5
-    #   pyqtwebengine
 pyqtwebengine==5.15.7
-    # via spyder
 pyqtwebengine-qt5==5.15.2
-    # via pyqtwebengine
 python-dateutil==2.8.2
-    # via
-    #   arrow
-    #   dataclasses-jsonschema
-    #   jupyter-client
-    #   matplotlib
-    #   pandas
 python-lsp-black==2.0.0
-    # via spyder
 python-lsp-jsonrpc==1.1.2
-    # via python-lsp-server
-python-lsp-server[all]==1.12.2
-    # via
-    #   pyls-spyder
-    #   python-lsp-black
-    #   spyder
+python-lsp-server==1.12.2
 python-slugify==8.0.4
-    # via cookiecutter
-pytoolconfig[global]==1.3.1
-    # via rope
+pytoolconfig==1.3.1
 pytrnsys-process==0.0.24
-    # via -r requirements\release-3rd-party.in
 pytz==2023.3.post1
-    # via pandas
 pyuca==1.2
-    # via spyder
 pywin32==306
-    # via jupyter-core
 pywin32-ctypes==0.2.3
-    # via keyring
 pyyaml==6.0.1
-    # via
-    #   -r requirements\release-3rd-party.in
-    #   bokeh
-    #   cookiecutter
 pyzmq==25.1.2
-    # via
-    #   ipykernel
-    #   jupyter-client
-    #   spyder
-    #   spyder-kernels
 qdarkstyle==3.2.3
-    # via spyder
 qstylizer==0.2.4
-    # via spyder
 qtawesome==1.3.1
-    # via spyder
 qtconsole==5.6.1
-    # via
-    #   -r requirements\release-3rd-party.in
-    #   spyder
 qtpy==2.4.1
-    # via
-    #   qdarkstyle
-    #   qtawesome
-    #   qtconsole
-    #   spyder
-    #   superqt
 referencing==0.32.0
-    # via
-    #   jsonschema
-    #   jsonschema-specifications
 requests==2.31.0
-    # via
-    #   cookiecutter
-    #   pygithub
-    #   sphinx
 rich==13.9.4
-    # via cookiecutter
 rope==1.13.0
-    # via python-lsp-server
 rpds-py==0.13.2
-    # via
-    #   jsonschema
-    #   referencing
 rtree==1.4.0
-    # via spyder
 scipy==1.11.4
-    # via -r requirements\release-3rd-party.in
 seaborn==0.13.0
-    # via -r requirements\release-3rd-party.in
+setuptools==80.9.0
 six==1.16.0
-    # via
-    #   asttokens
-    #   python-dateutil
 snowballstemmer==2.2.0
-    # via
-    #   pydocstyle
-    #   sphinx
 sortedcontainers==2.4.0
-    # via intervaltree
 soupsieve==2.6
-    # via beautifulsoup4
 sphinx==7.2.6
-    # via
-    #   numpydoc
-    #   sphinxcontrib-applehelp
-    #   sphinxcontrib-devhelp
-    #   sphinxcontrib-htmlhelp
-    #   sphinxcontrib-qthelp
-    #   sphinxcontrib-serializinghtml
-    #   spyder
 sphinxcontrib-applehelp==1.0.7
-    # via sphinx
 sphinxcontrib-devhelp==1.0.5
-    # via sphinx
 sphinxcontrib-htmlhelp==2.0.4
-    # via sphinx
 sphinxcontrib-jsmath==1.0.1
-    # via sphinx
 sphinxcontrib-qthelp==1.0.6
-    # via sphinx
 sphinxcontrib-serializinghtml==1.1.9
-    # via sphinx
 spyder==6.0.4
-    # via -r requirements\release-3rd-party.in
 spyder-kernels==3.0.3
-    # via spyder
 stack-data==0.6.3
-    # via ipython
 superqt==0.7.1
-    # via spyder
 tabulate==0.9.0
-    # via numpydoc
 text-unidecode==1.3
-    # via python-slugify
 textdistance==4.6.3
-    # via spyder
 three-merge==0.1.1
-    # via spyder
 tinycss2==1.4.0
-    # via
-    #   bleach
-    #   qstylizer
 tomlkit==0.12.3
-    # via pylint
 tornado==6.4
-    # via
-    #   bokeh
-    #   ipykernel
-    #   jupyter-client
 traitlets==5.14.0
-    # via
-    #   comm
-    #   ipykernel
-    #   ipython
-    #   jupyter-client
-    #   jupyter-core
-    #   matplotlib-inline
-    #   nbclient
-    #   nbconvert
-    #   nbformat
-    #   qtconsole
 typer==0.9.0
-    # via -r requirements\release-3rd-party.in
 types-python-dateutil==2.9.0.20241206
-    # via arrow
 typing-extensions==4.9.0
-    # via
-    #   -r requirements\release-3rd-party.in
-    #   asyncssh
-    #   beautifulsoup4
-    #   pydantic
-    #   pydantic-core
-    #   pygithub
-    #   superqt
-    #   typer
 tzdata==2023.3
-    # via pandas
 ujson==5.10.0
-    # via
-    #   python-lsp-jsonrpc
-    #   python-lsp-server
 urllib3==2.1.0
-    # via
-    #   pygithub
-    #   requests
 watchdog==6.0.0
-    # via spyder
 wcwidth==0.2.12
-    # via prompt-toolkit
 webencodings==0.5.1
-    # via
-    #   bleach
-    #   tinycss2
 whatthepatch==1.0.7
-    # via python-lsp-server
 wrapt==1.17.2
-    # via deprecated
 xmlschema==3.3.1
-    # via -r requirements\release-3rd-party.in
 xyzservices==2023.10.1
-    # via bokeh
 yapf==0.43.0
-    # via python-lsp-server
 yarl==1.18.3
-    # via
-    #   aiohttp
-    #   spyder
 zipp==3.21.0
-    # via importlib-metadata
-
-# The following packages are considered to be unsafe in a requirements file:
-# setuptools
