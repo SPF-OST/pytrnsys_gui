@@ -24,6 +24,6 @@ pyyaml
 
 xmlschema
 
-pytrnsys-process
+pytrnsys-process==0.0.25
 
 spyder
