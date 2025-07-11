@@ -6,6 +6,6 @@
 #    requirements upgrade
 #
 -r release-3rd-party.txt
-pytrnsys @ git+https://github.com/SPF-OST/pytrnsys.git@36064ce45c5a97e8221356037f6db57b93e6b582#egg=pytrnsys
+pytrnsys @ git+https://github.com/SPF-OST/pytrnsys.git
 pytrnsys-gui @ file:.
 shortpath83==0.12
