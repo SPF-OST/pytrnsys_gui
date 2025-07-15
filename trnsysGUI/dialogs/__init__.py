@@ -7,6 +7,7 @@ import importlib as _il
 
 # This module needs to be imported at least once as it registers resources (icons, etc) with QT
 # upon being imported. So even though it looks like an unused import DON'T REMOVE IT
+import trnsysGUI.resources.QRC_resources_generated as _qresources
 
 DEFAULT_MODULE_NAME = "_UI_dialog_generated"
 
