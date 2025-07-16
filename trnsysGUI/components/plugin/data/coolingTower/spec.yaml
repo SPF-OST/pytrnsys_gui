@@ -1,0 +1,10 @@
+defaultName: coolingTower
+description: Cooling tower
+connections:
+  - name:
+    input:
+      position: [100, 120]
+    output:
+      position: [20, 120]
+size: [120, 120]
+
