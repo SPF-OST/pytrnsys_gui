@@ -51,7 +51,7 @@ def _getInstallRequirements():
     return requirements
 
 
-_MASTER_VERSION_TEMPLATE = "0.0.0+master.{sha}"
+_MASTER_VERSION_TEMPLATE = "0.0.1+master.{sha}"
 
 setuptools.setup(
     name="pytrnsys-gui",
