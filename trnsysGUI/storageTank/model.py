@@ -243,7 +243,7 @@ class StorageTank(
         data: _dcj.JsonDict,  # pylint: disable=duplicate-code  # 2
         validate=True,
         validate_enums: bool = True,
-        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # NOSONAR,
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # NOSONAR
     ) -> "StorageTank":
         data.pop(".__BlockDict__")
         storageTank = super().from_dict(
@@ -256,7 +256,7 @@ class StorageTank(
         omit_none: bool = True,
         validate: bool = False,
         validate_enums: bool = True,
-        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # NOSONAR,
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # NOSONAR
     ) -> _dcj.JsonDict:
         data = super().to_dict(
             omit_none, validate, validate_enums, schema_type
