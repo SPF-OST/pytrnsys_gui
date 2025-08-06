@@ -52,9 +52,7 @@ TDPCnrHot = [2,1]
 
 
 class TestDoubleDoublePipeConnector:
-    def test(
-        self, tmp_path, qtbot
-    ):  # pylint: disable=invalid-name  # NOSONAR
+    def test(self, tmp_path, qtbot):  # pylint: disable=invalid-name  # NOSONAR
         connector = self._createConnector(tmp_path, qtbot)
 
         unitNumber = 1
