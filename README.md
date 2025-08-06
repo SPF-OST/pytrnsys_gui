@@ -127,7 +127,7 @@ to activate the environment (step 2. above).
 
 ### Managing requirements
 
-#### Adding/Removing and Updating package versions pinned in .in files
+#### Adding new/removing packages and updating package versions pinned in .in files
 ```commandline
     pip-compile-multi --use-cache --backtracking --uv --no-upgrade -d .\requirements\
 ```
@@ -144,7 +144,7 @@ to activate the environment (step 2. above).
 
 ### Keeping your virtual environment up to date
 
-#### Syncing virtual environment with package versions
+#### Syncing virtual environment with package versions (of `dev.txt, e.g.)
 ```commandline
     python -m uv pip sync .\requirements\dev.txt
 ```
