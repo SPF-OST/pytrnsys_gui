@@ -77,11 +77,14 @@ jobs:
       - name: Create virtual environment
         run: py -3.12 -m venv venv
 
-      - name: Install dependencies
+      - name: Install packages to do with dependencies
         run: |
           venv\Scripts\python -m pip install --upgrade pip
           venv\Scripts\python -m pip install wheel uv
-          venv\Scripts\python -m uv pip install -r requirements\test.txt
+          venv\Scripts\uv cache prune --ci
+      
+      - name: Install dependencies
+          venv\Scripts\python -m pip install -r requirements\test.txt
 
       - name: Generate UI code from Qt Creator Studio .ui files
         run: venv\Scripts\python dev-tools/generateGuiClassesFromQtCreatorStudioUiFiles.py
