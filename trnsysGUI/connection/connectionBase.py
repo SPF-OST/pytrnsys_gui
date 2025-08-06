@@ -283,7 +283,7 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
             assert pos1 and pos2
 
-            segment.setLine(pos1[0], pos1[1], pos2[0], pos2[1])  # /NOSONAR
+            segment.setLine(pos1[0], pos1[1], pos2[0], pos2[1])  # NOSONAR
 
         self.updateSegmentGradients()
         self.rotateLabel()
