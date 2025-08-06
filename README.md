@@ -125,7 +125,26 @@ Beware that the GUI can only be started from within the virtual environment you 
 I.e., whenever you open a new console window from which you want to start the GUI you first need 
 to activate the environment (step 2. above).
 
-### Updating the environment as a developer
+### Managing requirements
+
+#### Adding/Removing and Updating package versions pinned in .in files
 ```commandline
     pip-compile-multi --use-cache --backtracking --uv --no-upgrade -d .\requirements\
+```
+
+#### Upgrading specific package version to latest (e.g. `pytrnsys-process`)
+```commandline
+    pip-compile-multi --use-cache --backtracking --uv -P pytrnsys-process -d .\requirements\
+```
+
+#### Upgrading all package versions to latest
+```commandline
+    pip-compile-multi --use-cache --backtracking --uv -d .\requirements\
+```
+
+### Keeping your virtual environment up to date
+
+#### Syncing virtual environment with package versions
+```commandline
+    python -m uv pip sync .\requirements\dev.txt
 ```
