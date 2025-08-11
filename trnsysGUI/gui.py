@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import logging as _log
 import pathlib as _pl
 import sys as _sys
+import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
 
@@ -10,8 +13,11 @@ import trnsysGUI.arguments as _args
 import trnsysGUI.setup as _setup
 import trnsysGUI.warningsAndErrors as _werrors
 
+if _tp.TYPE_CHECKING:
+    import trnsysGUI.project as _prj  # pylint: disable=import-outside-toplevel
 
-def main():
+
+def main() -> None:
     arguments = _args.getArgsOrExit()
 
     logFilePath = _getLogFilePath()
@@ -40,13 +46,26 @@ def main():
     _sdlg.ensureSettingsExist()
 
     maybeCancelled = _prj.getProject()
+    _tp.reveal_type(maybeCancelled)
     if _ccl.isCancelled(maybeCancelled):
         return
-    project = _ccl.value(maybeCancelled)
+    project: _prj.Project = _tp.reveal_type(_ccl.value(maybeCancelled))
+    
+    _tp.reveal_type(project)
 
+    _createAndShowMainWindow(app, project, logger, arguments.shallTrace)
+
+
+def _createAndShowMainWindow(
+    app: _qtw.QApplication,
+    project: _prj.Project,
+    logger: _log.Logger,
+    shallTrace: bool,
+) -> None:
     import trnsysGUI.mainWindow as _mw  # pylint: disable=import-outside-toplevel
+    import trnsysGUI.tracing as trc  # pylint: disable=import-outside-toplevel
 
-    mainWindow = _mw.MainWindow(logger, project)
+    mainWindow = _mw.MainWindow(logger, project)  # type: ignore[attr-defined]
     mainWindow.start()
 
     def _shutdownMainWindowIfRunning() -> None:
@@ -54,14 +73,11 @@ def main():
             mainWindow.shutdown()
 
     app.aboutToQuit.connect(_shutdownMainWindowIfRunning)
-
     try:
         mainWindow.showMaximized()
         mainWindow.loadTrnsysPath()
 
-        import trnsysGUI.tracing as trc  # pylint: disable=import-outside-toplevel
-
-        tracer = trc.createTracer(arguments.shallTrace)
+        tracer = trc.createTracer(shallTrace)
         tracer.run(app.exec)
     finally:
         _shutdownMainWindowIfRunning()

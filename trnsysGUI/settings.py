@@ -1,6 +1,3 @@
-# pylint: skip-file
-# type: ignore
-
 import dataclasses as _dc
 import pathlib as _pl
 import typing as _tp
@@ -33,11 +30,15 @@ class SettingsVersion1(_ser.UpgradableJsonSchemaMixin):
         return SettingsVersion0
 
     @classmethod
-    def upgrade(cls, superseded: SettingsVersion0) -> "Settings":
+    def upgrade(
+        cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0
+    ) -> "SettingsVersion1":
+        assert isinstance(superseded, SettingsVersion0)
+
         trnsysBinaryPath = (
             _pl.Path(superseded.trnsysBinaryDirPath) / "TRNExe.exe"
         )
-        return Settings.create(trnsysBinaryPath)
+        return SettingsVersion1(str(trnsysBinaryPath))
 
 
 @_dc.dataclass
@@ -97,7 +98,11 @@ class Settings(_ser.UpgradableJsonSchemaMixin):
         return SettingsVersion1
 
     @classmethod
-    def upgrade(cls, superseded: SettingsVersion1) -> "Settings":
+    def upgrade(
+        cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0
+    ) -> "Settings":
+        assert isinstance(superseded, SettingsVersion1)
+
         return Settings.create(_pl.Path(superseded.trnsysBinaryPath), [])
 
     @classmethod

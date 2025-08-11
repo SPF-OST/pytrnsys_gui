@@ -28,4 +28,4 @@ def value(maybeCancelled: MaybeCancelled[_T]) -> _T:
     if isCancelled(maybeCancelled):
         raise ValueError("Value was cancelled.")
 
-    return _tp.cast(_T, maybeCancelled)
+    return _tp.reveal_type(_tp.cast(_T, maybeCancelled))
