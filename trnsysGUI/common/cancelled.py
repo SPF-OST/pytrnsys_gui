@@ -11,7 +11,7 @@ type MaybeCancelled[T] = T | Cancelled
 
 
 def isCancelled[
-    T
+    T  # pylint: disable=redefined-outer-name
 ](maybeCancelled: MaybeCancelled[T],) -> _tp.TypeGuard[Cancelled]:
     if maybeCancelled == CANCELLED:
         return True
@@ -24,7 +24,9 @@ def isCancelled[
     return False
 
 
-def value[T](maybeCancelled: MaybeCancelled[T]) -> T:
+def value[
+    T  # pylint: disable=redefined-outer-name
+](maybeCancelled: MaybeCancelled[T]) -> T:
     if isCancelled(maybeCancelled):
         raise ValueError("Value was cancelled.")
 

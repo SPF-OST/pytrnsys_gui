@@ -55,7 +55,7 @@ class SettingsDlg(_widgets.QDialog):
     ) -> _cancel.MaybeCancelled[_settings.Settings]:
         dialog = SettingsDlg(parent)
         dialog.exec()
-        return dialog._settings  # pylint: disable=protected-class
+        return dialog._settings  # pylint: disable=protected-access
 
     @staticmethod
     def _getSettings() -> _tp.Optional[_settings.Settings]:
