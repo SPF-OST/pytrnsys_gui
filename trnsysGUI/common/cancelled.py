@@ -6,13 +6,13 @@ class Cancelled:
 
 
 CANCELLED = Cancelled()
-_T = _tp.TypeVar("_T")
-MaybeCancelled: _tp.TypeAlias = _T | Cancelled
+
+type MaybeCancelled[T] = T | Cancelled
 
 
-def isCancelled(
-    maybeCancelled: MaybeCancelled[_T],
-) -> _tp.TypeGuard[Cancelled]:
+def isCancelled[
+    T
+](maybeCancelled: MaybeCancelled[T],) -> _tp.TypeGuard[Cancelled]:
     if maybeCancelled == CANCELLED:
         return True
 
@@ -24,8 +24,8 @@ def isCancelled(
     return False
 
 
-def value(maybeCancelled: MaybeCancelled[_T]) -> _T:
+def value[T](maybeCancelled: MaybeCancelled[T]) -> T:
     if isCancelled(maybeCancelled):
         raise ValueError("Value was cancelled.")
 
-    return _tp.reveal_type(_tp.cast(_T, maybeCancelled))
+    return _tp.cast(T, maybeCancelled)

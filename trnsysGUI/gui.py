@@ -41,17 +41,16 @@ def main() -> None:
 
     import trnsysGUI.common.cancelled as _ccl  # pylint: disable=import-outside-toplevel
     import trnsysGUI.project as _prj  # pylint: disable=import-outside-toplevel
-    import trnsysGUI.settingsDlg as _sdlg
+    import trnsysGUI.settingsDlg as _sdlg  # pylint: disable=import-outside-toplevel
 
     _sdlg.ensureSettingsExist()
 
     maybeCancelled = _prj.getProject()
-    _tp.reveal_type(maybeCancelled)
     if _ccl.isCancelled(maybeCancelled):
         return
-    project: _prj.Project = _tp.reveal_type(_ccl.value(maybeCancelled))
-    
-    _tp.reveal_type(project)
+
+    # mypy issue: https://github.com/python/mypy/issues/19640#issuecomment-3174819987
+    project: _prj.Project = _ccl.value(maybeCancelled)  # type: ignore[assignment]
 
     _createAndShowMainWindow(app, project, logger, arguments.shallTrace)
 

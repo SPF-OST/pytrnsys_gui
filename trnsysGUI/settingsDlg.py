@@ -55,7 +55,7 @@ class SettingsDlg(_widgets.QDialog):
     ) -> _cancel.MaybeCancelled[_settings.Settings]:
         dialog = SettingsDlg(parent)
         dialog.exec()
-        return dialog._settings
+        return dialog._settings  # pylint: disable=protected-class
 
     @staticmethod
     def _getSettings() -> _tp.Optional[_settings.Settings]:
@@ -70,7 +70,7 @@ class SettingsDlg(_widgets.QDialog):
 
         self._lineEdit.setText(newBinaryPath)
 
-        canOk = True if self._getSettings() or newBinaryPath else False
+        canOk = bool(self._getSettings() or newBinaryPath)
         self._okButton.setEnabled(canOk)
 
     def _onOkButtonClicked(self) -> None:
