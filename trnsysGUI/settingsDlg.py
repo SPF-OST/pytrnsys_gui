@@ -92,7 +92,7 @@ class SettingsDlg(_widgets.QDialog):
         if settings:
             settings.trnsysBinaryPath = newBinaryPath
         else:
-            settings = _settings.Settings.create(_pl.Path(newBinaryPath))
+            settings = _settings.Settings.create(_pl.Path(newBinaryPath), [])
 
         self._settings = settings
 
@@ -101,3 +101,21 @@ class SettingsDlg(_widgets.QDialog):
     def cancel(self) -> None:
         self._settings = CANCELLED
         self.close()
+
+
+def _createSettings(
+    parent=None,
+) -> _settings.Settings:
+    while not (settings := SettingsDlg.showDialogAndGetSettings(parent)):
+        pass
+
+    return settings
+
+
+def ensureSettingsExist() -> None:
+    existingSettings = _settings.Settings.tryLoadOrNone()
+    if existingSettings:
+        return
+
+    settings = _createSettings()
+    settings.save()

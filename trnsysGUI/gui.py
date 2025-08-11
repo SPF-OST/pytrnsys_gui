@@ -35,6 +35,9 @@ def main():
 
     import trnsysGUI.common.cancelled as _ccl  # pylint: disable=import-outside-toplevel
     import trnsysGUI.project as _prj  # pylint: disable=import-outside-toplevel
+    import trnsysGUI.settingsDlg as _sdlg
+
+    _sdlg.ensureSettingsExist()
 
     maybeCancelled = _prj.getProject()
     if _ccl.isCancelled(maybeCancelled):
@@ -54,7 +57,6 @@ def main():
 
     try:
         mainWindow.showMaximized()
-        mainWindow.ensureSettingsExist()
         mainWindow.loadTrnsysPath()
 
         import trnsysGUI.tracing as trc  # pylint: disable=import-outside-toplevel
