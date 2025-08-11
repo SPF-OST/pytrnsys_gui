@@ -20,31 +20,37 @@ class StartupDialog(_qtw.QDialog, _gen.Ui_startupDialog):
     def __init__(self) -> None:
         super().__init__()
         self.setupUi(self)
+
+        self.signal = _ccl.CANCELLED
+
         self.buttonGroup.buttonClicked.connect(self.clickButtonHandler)
+        self.listWidget.itemDoubleClicked.connect(self.clickButtonHandler)
+
         # ===============================================================================
         # Must be monospaced font to ensure paths align nicely.
         self.listWidget.setFont(_qtg.QFont(_consts.DEFAULT_MONOSPACED_FONT))
         # ===============================================================================
-        self.listWidget.itemDoubleClicked.connect(self.clickButtonHandler)
+
         _rph.RecentProjectsHandler.initWithExistingRecentProjects()
+
         maxLength = _rph.RecentProjectsHandler.getLengthOfLongestFileName()
         for recentProject in _rph.RecentProjectsHandler.recentProjects:
             # Padding name to the longest name to nicely align paths.
             formattedFileName = recentProject.stem.ljust(maxLength)
-            _qtw.QListWidgetItem(
+            item = _qtw.QListWidgetItem(
                 f"{formattedFileName} {recentProject}", self.listWidget
-            ).setData(_qtc.Qt.UserRole, recentProject)
+            )
+            item.setData(_qtc.Qt.UserRole, recentProject)
         self.adjustSizeToContent()
 
     def clickButtonHandler(self, clickedItem):
-        if clickedItem is self.cancelButton:
-            self.signal = _ccl.CANCELLED
         if clickedItem is self.createButton:
             self.signal = _consts.CreateNewOrOpenExisting.CREATE_NEW
-        if clickedItem is self.openButton:
+        elif clickedItem is self.openButton:
             self.signal = _consts.CreateNewOrOpenExisting.OPEN_EXISTING
-        if isinstance(clickedItem, _qtw.QListWidgetItem):
+        elif isinstance(clickedItem, _qtw.QListWidgetItem):
             self.signal = clickedItem.data(_qtc.Qt.UserRole)
+
         self.close()
 
     def adjustSizeToContent(self):
