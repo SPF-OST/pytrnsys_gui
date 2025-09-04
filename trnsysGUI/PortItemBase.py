@@ -35,9 +35,9 @@ class PortItemBase(
         self.ashColorR = _qtg.QColor(239, 57, 75)
         self.ashColorB = _qtg.QColor(20, 83, 245)
 
-        super().__init__(-4, -4, 7.0, 7.0, parent)
+        super().__init__(-3.5, -3.5, 7.0, 7.0, parent)
 
-        self.innerCircle = _qtw.QGraphicsEllipseItem(-4, -4, 6, 6, self)
+        self.innerCircle = _qtw.QGraphicsEllipseItem(-3, -3, 6, 6, self)
         self.innerCircle.setPen(_qtg.QPen(_qtg.QColor(0, 0, 0, 0), 0))
 
         self.visibleColor = _qtg.QColor(0, 0, 0)
@@ -61,7 +61,6 @@ class PortItemBase(
 
         # QUndo framework related
         self.savePos = None
-        self.savedPos = False
 
     def setParent(self, p):  # pylint: disable = invalid-name
         self.parent = p
@@ -238,11 +237,8 @@ class PortItemBase(
         self.debugprint()
 
     def enlargePortSize(self):
-        if not self.savedPos:
-            self.setPos(self.pos().x() - 3, self.pos().y() - 3)
-            self.savedPos = True
-        self.setRect(-4, -4, 10, 10)
-        self.innerCircle.setRect(-4, -4, 10, 10)
+        self.setRect(-5, -5, 10, 10)
+        self.innerCircle.setRect(-5, -5, 10, 10)
 
     def hoverLeaveEvent(self, event):  # pylint: disable = unused-argument
         self.resetPortSize()
@@ -254,11 +250,8 @@ class PortItemBase(
         self._debugClear()
 
     def resetPortSize(self):
-        if self.savedPos:
-            self.setPos(self.pos().x() + 3, self.pos().y() + 3)
-            self.savedPos = False
-        self.setRect(-4, -4, 7, 7)
-        self.innerCircle.setRect(-4, -4, 6.5, 6.5)
+        self.setRect(-3.5, -3.5, 7, 7)
+        self.innerCircle.setRect(-3, -3, 6, 6)
 
     def debugprint(self):
 
@@ -308,21 +301,6 @@ class PortItemBase(
         cor2 = connection.getCorners()[-1]
         cor.setVisible(True)
         cor2.setVisible(True)
-
-    def _getConnectedMassFlowContributor(
-        self, massFlowContributor: _ip.HasInternalPiping
-    ) -> _tp.Optional[_ip.HasInternalPiping]:
-        if massFlowContributor == self.parent:
-            return self.getConnectionOrNone()
-
-        connection = self.getConnectionOrNone()
-
-        if not connection or connection != massFlowContributor:
-            raise ValueError(
-                "`massFlowContributor' is not adjacent to this port item."
-            )
-
-        return self.parent
 
     def isConnected(self) -> bool:
         return bool(self.connectionList)

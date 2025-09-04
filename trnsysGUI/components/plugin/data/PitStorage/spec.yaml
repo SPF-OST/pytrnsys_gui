@@ -1,10 +1,14 @@
 defaultName: pitStore
 description: Pit Storage
-tee-pieces:
-  - input:
-      position: [80, 0]
-    output0:
-      position: [120, 0]
-    output1:
-      position: [160, 0]
-size: [240, 160]
+connections:
+  - name: Medium
+    input:
+      position: [ 120, 0 ]
+    output:
+      position: [ 75, 0 ]
+  - name: Hot
+    input:
+      position: [ 160, 0 ]
+    output:
+      position: [ 85, 0 ]
+size: [ 240, 160 ]
