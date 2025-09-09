@@ -105,7 +105,7 @@ jobs:
         run: venv\Scripts\python dev-tools/devTools.py --unit --keep-results
 
       - name: Post coverage report to Coveralls
-        uses: coverallsapp/github-action@v2
+        uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: test-results/coverage.lcov
@@ -120,7 +120,7 @@ jobs:
 
       - if: github.event_name == 'push' || env.PYTRNSYS_DEPENDENCY_CHANGED == 'true'
         name: Trigger build of executable for push
-        uses: peter-evans/repository-dispatch@v3
+        uses: peter-evans/repository-dispatch@ff45666b9427631e3450c54a1bcbee4d9ff4d7c0
         with:
           repository: SPF-OST/pytrnsys_gui
           token: ${{ secrets.GITHUB_TOKEN }}
