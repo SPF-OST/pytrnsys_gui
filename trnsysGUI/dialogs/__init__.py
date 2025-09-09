@@ -15,8 +15,8 @@ _ERROR_MESSAGE = (
 # upon being imported. So even though it looks like an unused import DON'T REMOVE IT
 try:
     import trnsysGUI.resources.QRC_resources_generated as _qresources
-except ImportError:
-    raise AssertionError(_ERROR_MESSAGE)
+except ImportError as importError:
+    raise AssertionError(_ERROR_MESSAGE) from importError
 
 DEFAULT_MODULE_NAME = "_UI_dialog_generated"
 
