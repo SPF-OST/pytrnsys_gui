@@ -5,9 +5,18 @@ __all__ = [
 
 import importlib as _il
 
+_ERROR_MESSAGE = (
+    "Could not find the generated Python code for a .ui or .qrc file. Please run the "
+    "`dev-tools\\generateGuiClassesFromQtCreatorStudioUiFiles.py' script from your "
+    "`pytrnsys_gui` directory."
+)
+
 # This module needs to be imported at least once as it registers resources (icons, etc) with QT
 # upon being imported. So even though it looks like an unused import DON'T REMOVE IT
-import trnsysGUI.resources.QRC_resources_generated as _qresources
+try:
+    import trnsysGUI.resources.QRC_resources_generated as _qresources
+except ImportError:
+    raise AssertionError(_ERROR_MESSAGE)
 
 DEFAULT_MODULE_NAME = "_UI_dialog_generated"
 
@@ -18,11 +27,8 @@ def assertThatGeneratedUIModuleAndResourcesExist(
     try:
         _il.import_module(f".{moduleName}", packageName)
     except ImportError as importError:
-        raise AssertionError(
-            "Could not find the generated Python code for a .ui or .qrc file. Please run the "
-            "`dev-tools\\generateGuiClassesFromQtCreatorStudioUiFiles.py' script from your "
-            "`pytrnsys_gui` directory."
-        ) from importError
+
+        raise AssertionError(_ERROR_MESSAGE) from importError
 
 
 def assertThatLocalGeneratedUIModuleAndResourcesExist(
