@@ -1,6 +1,6 @@
 # Graphical user interface for pytrnsys
 
-[![Coverage Status](https://coveralls.io/repos/github/SPF-OST/pytrnsys_gui/badge.svg?branch=master)](https://coveralls.io/github/SPF-OST/pytrnsys_gui?branch=master) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=SPF-OST_pytrnsys_gui&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=SPF-OST_pytrnsys_gui) ![Zenodo DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17276891.svg)
+[![Coverage Status](https://coveralls.io/repos/github/SPF-OST/pytrnsys_gui/badge.svg?branch=master)](https://coveralls.io/github/SPF-OST/pytrnsys_gui?branch=master) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=SPF-OST_pytrnsys_gui&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=SPF-OST_pytrnsys_gui) [![Zenodo DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17276891.svg)](https://doi.org/10.5281/zenodo.8475)
 
 ## Overview
 
