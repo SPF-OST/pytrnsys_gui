@@ -525,7 +525,6 @@ class StorageTank(
             return
 
         tool.createDDck(str(ddckDirPath), self.displayName, typeFile="ddck")
-        a = 1
 
     def _getDirectPairPortsForExport(self):
         directPairsPorts = []

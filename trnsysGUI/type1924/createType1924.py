@@ -54,8 +54,6 @@ class Type1924_TesPlugFlow:
 
     @staticmethod
     def _getOnePortInputs(nTes, idPort, connectorPort):
-
-        # This should be replaced by nomrla connectors using @temp(Side1In)
         lines = ""
 
         line = "EQUATIONS 3\n"
