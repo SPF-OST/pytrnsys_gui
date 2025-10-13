@@ -14,6 +14,7 @@ from . import serialization as _ser
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.hydraulicLoops.names as _names
 
+
 class Pump(
     _patb.PumpsAndTabsBase
 ):  # pylint: disable=too-many-instance-attributes
@@ -140,14 +141,14 @@ class Pump(
 
         return f"Pel{inputVariableName}"
 
-    def exportPumpPowerConsumption(self,loop):
+    def exportPumpPowerConsumption(self, loop):
 
         internalPiping = self.getInternalPiping()
         node = _com.getSingle(internalPiping.nodes)
         inputVariableName = _mnames.getInputVariableName(self, node)
         canonicalMassFlowRate = self._getCanonicalMassFlowRate()
 
-        result  = f"***********************************************\n"
+        result = f"***********************************************\n"
         result += f"*** Pump Consumption of {inputVariableName} ***\n"
         result += f"***********************************************\n"
 

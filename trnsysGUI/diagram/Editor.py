@@ -705,7 +705,9 @@ Tcw=1
 
         ddckFolder = os.path.join(self.projectFolder, "ddck")
 
-        hydCtrlPath = os.path.join(ddckFolder, "user_control", "hydraulic_control_default.ddck")
+        hydCtrlPath = os.path.join(
+            ddckFolder, "user_control", "hydraulic_control_default.ddck"
+        )
         if _pl.Path(hydCtrlPath).exists():
             qmb = _qtw.QMessageBox(self)
             qmb.setText(
@@ -753,7 +755,9 @@ Tcw=1
         return hydCtrlPath
 
     def exportPumpConsumptionFile(self):
-        self.logger.info("------------------------> START OF EXPORT <------------------------")
+        self.logger.info(
+            "------------------------> START OF EXPORT <------------------------"
+        )
 
         self.sortTrnsysObj()
 
@@ -761,14 +765,18 @@ Tcw=1
 
         ddckFolder = os.path.join(self.projectFolder, "ddck")
 
-        hydCtrlPath = os.path.join(ddckFolder, "user_control", "pump_consumption_default.ddck")
+        hydCtrlPath = os.path.join(
+            ddckFolder, "user_control", "pump_consumption_default.ddck"
+        )
         if _pl.Path(hydCtrlPath).exists():
             qmb = _qtw.QMessageBox(self)
             qmb.setText(
                 "Warning: "
                 + "The file pump_consumption_default.ddck already exists in the user_control folder. Do you want to overwrite it or cancel?"
             )
-            qmb.setStandardButtons(_qtw.QMessageBox.Save | _qtw.QMessageBox.Cancel)
+            qmb.setStandardButtons(
+                _qtw.QMessageBox.Save | _qtw.QMessageBox.Cancel
+            )
             qmb.setDefaultButton(_qtw.QMessageBox.Cancel)
             ret = qmb.exec()
             if ret == _qtw.QMessageBox.Save:
@@ -778,7 +786,6 @@ Tcw=1
                 self.canceled = True
                 self.logger.info("Canceling")
                 return
-
 
         fullExportText = """
 **************************************
@@ -805,7 +812,9 @@ Tcw=1
 **************************************
 """
 
-        self.logger.info("------------------------> END OF EXPORT <------------------------")
+        self.logger.info(
+            "------------------------> END OF EXPORT <------------------------"
+        )
 
         if fullExportText[:1] == "\n":
             fullExportText = fullExportText[1:]

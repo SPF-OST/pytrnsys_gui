@@ -502,7 +502,13 @@ class StorageTank(
 
         auxiliaryPorts = self._getAuxiliaryPortForExport(inputs)
 
-        tool.setInputs(inputs, directPairsPorts, heatExchangerPorts, auxiliaryPorts, self.displayName)
+        tool.setInputs(
+            inputs,
+            directPairsPorts,
+            heatExchangerPorts,
+            auxiliaryPorts,
+            self.displayName,
+        )
 
         projectDirPath = _pl.Path(self.editor.projectFolder)
         ddckDirPath = _dfh.getComponentDdckDirPath(
@@ -519,7 +525,8 @@ class StorageTank(
             return
 
         tool.createDDck(str(ddckDirPath), self.displayName, typeFile="ddck")
-        a=1
+        a = 1
+
     def _getDirectPairPortsForExport(self):
         directPairsPorts = []
         for directPortPair in self.directPortPairs:

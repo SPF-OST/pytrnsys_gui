@@ -216,9 +216,14 @@ class MainWindow(_qtw.QMainWindow):
         )
         exportHydraulicsActionMenu.triggered.connect(self.exportHydraulicsDdck)
 
-        exportHydCtrlActionMenu = _qtw.QAction("Export hydraulic_control_default.ddck and pump_consumption_file.ddck", self)
+        exportHydCtrlActionMenu = _qtw.QAction(
+            "Export hydraulic_control_default.ddck and pump_consumption_file.ddck",
+            self,
+        )
         exportHydCtrlActionMenu.triggered.connect(self.exportHydraulicControl)
-        exportHydCtrlActionMenu.triggered.connect(self.exportPumpConsumptionFile)
+        exportHydCtrlActionMenu.triggered.connect(
+            self.exportPumpConsumptionFile
+        )
 
         exportDdckPlaceHolderValuesJsonFileActionMenu = _qtw.QAction(
             "Export ddck placeholder values JSON file", self

@@ -191,20 +191,22 @@ ddTcwOffset = 36 ! Days of minimum surface temperature
 
     def exportPumpConsumption(self):  # What the controller should give
 
-        pumps = [ip for ip in self._hasInternalPipings if isinstance(ip, _pump.Pump)]
+        pumps = [
+            ip for ip in self._hasInternalPipings if isinstance(ip, _pump.Pump)
+        ]
 
-        f ="""
+        f = """
 *******************************************
 *** Energy Balance
 *******************************************
 """
-        f2=""
-        i=0
+        f2 = ""
+        i = 0
         for pump in pumps:
-            if(i>0):
-                f2 +=" + "
+            if i > 0:
+                f2 += " + "
             f2 += pump.exportPumpConsumptionName()
-            i +=1
+            i += 1
 
         f += "EQUATIONS 1\n"
         f += f"@energy(out, el, PuElTotal) = " + f2 + "\n"
@@ -218,7 +220,6 @@ dpmin_bar = 0.1 ! minimal pressure-drop of loop at nominal mass flow, bar
 dpmax_bar = 15  ! maximum pressure-drop of loop at nominal mass flow, bar
 """
 
-
         for pump in pumps:
 
             inputPort = _com.getSingle(pump.inputs)
@@ -226,7 +227,9 @@ dpmax_bar = 15  ! maximum pressure-drop of loop at nominal mass flow, bar
             if not connection:
                 # error: can only export pump powers if diagram fully connected
                 pass
-            loop = _com.getSingle(l for l in self._hydraulicLoops if connection in l.connections)
+            loop = _com.getSingle(
+                l for l in self._hydraulicLoops if connection in l.connections
+            )
 
             f += pump.exportPumpPowerConsumption(loop)
 

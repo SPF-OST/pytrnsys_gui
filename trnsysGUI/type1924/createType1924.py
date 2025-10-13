@@ -24,7 +24,9 @@ class Type1924_TesPlugFlow:
 
         self.setDefault()
 
-    def setInputs(self, inputs, connectorsPort, connectorsHx, connectorsAux, nameTes):
+    def setInputs(
+        self, inputs, connectorsPort, connectorsHx, connectorsAux, nameTes
+    ):
 
         self.inputs = inputs
         self.connectorsPort = connectorsPort
@@ -53,7 +55,7 @@ class Type1924_TesPlugFlow:
     @staticmethod
     def _getOnePortInputs(nTes, idPort, connectorPort):
 
-        #This should be replaced by nomrla connectors using @temp(Side1In)
+        # This should be replaced by nomrla connectors using @temp(Side1In)
         lines = ""
 
         line = "EQUATIONS 3\n"
@@ -62,14 +64,19 @@ class Type1924_TesPlugFlow:
         lines = lines + line
         line = "Mfrdp%d = $%s\n" % (idPort, connectorPort[idPort - 1]["Mfr"])
         lines = lines + line
-        line = "Tdp%dInRev = $%s\n" % (idPort, connectorPort[idPort - 1]["Trev"])
+        line = "Tdp%dInRev = $%s\n" % (
+            idPort,
+            connectorPort[idPort - 1]["Trev"],
+        )
         lines = lines + line
 
         return lines
 
     def getOnePortParConn(self, idPort, nTes, connectorPort):
 
-        lines = "*********Connecting values of DIRECT PORT=%d***********\n" % (idPort + 1)
+        lines = "*********Connecting values of DIRECT PORT=%d***********\n" % (
+            idPort + 1
+        )
 
         line = "CONSTANTS 2\n"
         lines = lines + line
@@ -83,18 +90,27 @@ class Type1924_TesPlugFlow:
 
     def getOnePortPar(self, idPort, nTes):
 
-        lines = "*********Constant of DIRECT PORT=%d***********\n" % (idPort + 1)
+        lines = "*********Constant of DIRECT PORT=%d***********\n" % (
+            idPort + 1
+        )
 
         line = "CONSTANTS 1\n"
         lines = lines + line
-        line = "Dp%dStrat=0 ! 0: no forced stratification ; 1: force to stratify\n" % (idPort + 1)
+        line = (
+            "Dp%dStrat=0 ! 0: no forced stratification ; 1: force to stratify\n"
+            % (idPort + 1)
+        )
         lines = lines + line
 
         return lines
 
     def getSensorPositionValues(self, nTes):
 
-        lines = self.sLine + "** USER DEFINED TEMPERATURE SENSOR HEIGHTS. To be changed by user \n" + self.sLine
+        lines = (
+            self.sLine
+            + "** USER DEFINED TEMPERATURE SENSOR HEIGHTS. To be changed by user \n"
+            + self.sLine
+        )
 
         line = "CONSTANTS 10\n"
         lines = lines + line
@@ -118,9 +134,9 @@ class Type1924_TesPlugFlow:
         lines = lines + line
         line = "zOuthx%d=%.2f\n" % (idHx, connectHx[idHx - 1]["zOut"])
         lines = lines + line
-        line = "Cphx%d=$%s\n" % (idHx,  connectHx[idHx - 1]["cp"])
+        line = "Cphx%d=$%s\n" % (idHx, connectHx[idHx - 1]["cp"])
         lines = lines + line
-        line = "Rhohx%d=$%s\n" % (idHx,  connectHx[idHx - 1]["rho"])
+        line = "Rhohx%d=$%s\n" % (idHx, connectHx[idHx - 1]["rho"])
         lines = lines + line
 
         return lines
@@ -133,17 +149,23 @@ class Type1924_TesPlugFlow:
         line = "CONSTANTS 15\n"
         lines = lines + line
 
-        line = "dInHx%d=0.05 ! m only if modHx%d=0\n" % (idHx,  idHx)
+        line = "dInHx%d=0.05 ! m only if modHx%d=0\n" % (idHx, idHx)
         lines = lines + line
         line = "dOutHx%d=0.06 ! m only if modHx%d=0\n" % (idHx, idHx)
         lines = lines + line
         line = "scaleHX%d=13 ! m only if modHx%d=0\n" % (idHx, idHx)
         lines = lines + line
-        line = "LHx%d = scaleHX%d * Vol / (2 * $PI * 0.0333) ! m only if modHx%d=0\n" % (idHx, idHx, idHx)
+        line = (
+            "LHx%d = scaleHX%d * Vol / (2 * $PI * 0.0333) ! m only if modHx%d=0\n"
+            % (idHx, idHx, idHx)
+        )
         lines = lines + line
         line = "LamHx%d=50 ! W/mK only if modHx%d=0\n" % (idHx, idHx)
         lines = lines + line
-        line = "brineConcHx%d=0 ! [0-100] only if modHx%d=0 TO BE MODIFIED IF GLYCOL USED\n" % (idHx, idHx)
+        line = (
+            "brineConcHx%d=0 ! [0-100] only if modHx%d=0 TO BE MODIFIED IF GLYCOL USED\n"
+            % (idHx, idHx)
+        )
         lines = lines + line
 
         line = "VHx%d=0. \n" % (idHx)
@@ -151,7 +173,10 @@ class Type1924_TesPlugFlow:
         line = "nCvHx%d=20 \n" % (idHx)
         lines = lines + line
 
-        line = "modHx%d=0 ! modHX1, 0 = physical model, 1 = Drueck-model (Multiport)\n" % (idHx)
+        line = (
+            "modHx%d=0 ! modHX1, 0 = physical model, 1 = Drueck-model (Multiport)\n"
+            % (idHx)
+        )
         lines = lines + line
         line = "nNuHx%d=0.5 !  only if modHx%d=0\n" % (idHx, idHx)
         lines = lines + line
@@ -293,7 +318,9 @@ class Type1924_TesPlugFlow:
         lines = lines + line
         line = "nCvMin  ! 8: -, maximum relative plug height\n"
         lines = lines + line
-        line = "maxTDiff  ! 9: K, maximum temperature difference between plugs\n"
+        line = (
+            "maxTDiff  ! 9: K, maximum temperature difference between plugs\n"
+        )
         lines = lines + line
         line = "readMode  ! 10: 1: from table, 0: Tini and CapTot\n"
         lines = lines + line
@@ -341,16 +368,22 @@ class Type1924_TesPlugFlow:
         parId = 21
         for i in range(self.nMaxPorts):
             if i <= nPorts - 1:
-                line = "zInDp%d zOutDp%d zero Dp%dStrat ! %d - %d: zIn, zOut, cp, strat\n" % (
-                    i + 1,
-                    i + 1,
-                    i + 1,
-                    parId,
-                    parId + 4,
+                line = (
+                    "zInDp%d zOutDp%d zero Dp%dStrat ! %d - %d: zIn, zOut, cp, strat\n"
+                    % (
+                        i + 1,
+                        i + 1,
+                        i + 1,
+                        parId,
+                        parId + 4,
+                    )
                 )
                 lines = lines + line
             else:
-                line = "-1 -1 zero zero ! %d - %d: zIn, zOut, cp, strat\n" % (parId, parId + 4)
+                line = "-1 -1 zero zero ! %d - %d: zIn, zOut, cp, strat\n" % (
+                    parId,
+                    parId + 4,
+                )
                 lines = lines + line
 
             parId = parId + 5
@@ -365,7 +398,10 @@ class Type1924_TesPlugFlow:
             line = "zSen%d " % (i + 1)
             lines = lines + line
 
-        line = "! %d-%d : relative storage temperature sensor heights \n" % (parId, parId + 10)
+        line = "! %d-%d : relative storage temperature sensor heights \n" % (
+            parId,
+            parId + 10,
+        )
         lines = lines + line
 
         return lines
@@ -381,7 +417,7 @@ class Type1924_TesPlugFlow:
             for i in range(nHeatSources):
                 line = "zAux%d=%.2f\n" % (i + 1, connectorAux[i]["zAux"])
                 lines = lines + line
-                line = "qAux%d=%.2f\n" % (i + 1,  connectorAux[i]["qAux"])
+                line = "qAux%d=%.2f\n" % (i + 1, connectorAux[i]["qAux"])
                 lines = lines + line
 
             line = "\n"
@@ -410,7 +446,9 @@ class Type1924_TesPlugFlow:
     def getHeighAvgSensorParValues(self, nTes):
 
         lines = (
-            self.sLine + "** USER DEFINED AVERAGED TEMPERATURE SENSOR HEIGHTS. To be changed by user \n" + self.sLine
+            self.sLine
+            + "** USER DEFINED AVERAGED TEMPERATURE SENSOR HEIGHTS. To be changed by user \n"
+            + self.sLine
         )
 
         line = "CONSTANTS 10\n"
@@ -432,7 +470,7 @@ class Type1924_TesPlugFlow:
         for i in range(self.nMaxAvgSensor):
             line = (
                 "zSenAvgBot%d zSenAvgTop%d ! %d-%d : relative position of lower and upper edge temeprature sensors\n"
-                % (i + 1, i + 1,  parId, parId + 1)
+                % (i + 1, i + 1, parId, parId + 1)
             )
             lines = lines + line
             parId = parId + 2
@@ -445,21 +483,13 @@ class Type1924_TesPlugFlow:
 
         lines = lines + "CONSTANTS 4\n"
 
-        line = (
-            "MoInsPlate=0 ! 0-2, Insulation Plate Mode: 0 = no insulation plate inside TES, 1 = insulation plate at fixed relative height, 2 = insulation plate at fixed temperature / density controlled \n"
-        )
+        line = "MoInsPlate=0 ! 0-2, Insulation Plate Mode: 0 = no insulation plate inside TES, 1 = insulation plate at fixed relative height, 2 = insulation plate at fixed temperature / density controlled \n"
         lines = lines + line
-        line = (
-            "zInsPlate=0  ! 0-1, relative position of fixed height insulation plate inside TES (only for Insulation Plate Mode = 1\n"
-        )
+        line = "zInsPlate=0  ! 0-1, relative position of fixed height insulation plate inside TES (only for Insulation Plate Mode = 1\n"
         lines = lines + line
-        line = (
-            "TinsPlate=0  ! oC, temperature at which moveable insulation plate floats in TES (only for Insulation Plate Mode = 2)\n"
-        )
+        line = "TinsPlate=0  ! oC, temperature at which moveable insulation plate floats in TES (only for Insulation Plate Mode = 2)\n"
         lines = lines + line
-        line = (
-            "UAinsPlate=0 ! W/K, overall heat transfer coefficient across moveable insulation plate (including heat transfer in gap between plate and wall and in wall at the respective height)\n"
-        )
+        line = "UAinsPlate=0 ! W/K, overall heat transfer coefficient across moveable insulation plate (including heat transfer in gap between plate and wall and in wall at the respective height)\n"
         lines = lines + line
 
         return lines
@@ -467,21 +497,13 @@ class Type1924_TesPlugFlow:
     def getInsulationPlatePar(self, nTes):
 
         lines = ""
-        line = (
-            "MoInsPlate ! 81: 0-2, Insulation Plate Mode: 0 = no insulation plate inside TES, 1 = insulation plate at fixed relative height, 2 = insulation plate at fixed temperature / density controlled \n"
-        )
+        line = "MoInsPlate ! 81: 0-2, Insulation Plate Mode: 0 = no insulation plate inside TES, 1 = insulation plate at fixed relative height, 2 = insulation plate at fixed temperature / density controlled \n"
         lines = lines + line
-        line = (
-            "zInsPlate  ! 82: 0-1, relative position of fixed height insulation plate inside TES (only for Insulation Plate Mode = 1\n"
-        )
+        line = "zInsPlate  ! 82: 0-1, relative position of fixed height insulation plate inside TES (only for Insulation Plate Mode = 1\n"
         lines = lines + line
-        line = (
-            "TinsPlate  ! 83: oC, temperature at which moveable insulation plate floats in TES (only for Insulation Plate Mode = 2)\n"
-        )
+        line = "TinsPlate  ! 83: oC, temperature at which moveable insulation plate floats in TES (only for Insulation Plate Mode = 2)\n"
         lines = lines + line
-        line = (
-            "UAinsPlate ! 84: W/K, overall heat transfer coefficient across moveable insulation plate (including heat transfer in gap between plate and wall and in wall at the respective height)\n"
-        )
+        line = "UAinsPlate ! 84: W/K, overall heat transfer coefficient across moveable insulation plate (including heat transfer in gap between plate and wall and in wall at the respective height)\n"
         lines = lines + line
 
         return lines
@@ -524,7 +546,10 @@ class Type1924_TesPlugFlow:
             else:
                 line = "zero zero zero\n"
             lines = lines + line
-        lines = lines + "***************** 20 HEAT SOURCE INPUTS ******************\n"
+        lines = (
+            lines
+            + "***************** 20 HEAT SOURCE INPUTS ******************\n"
+        )
 
         for i in range(20):  # This adds 20 inputs
             if i <= nHeatSources - 1:
@@ -534,12 +559,22 @@ class Type1924_TesPlugFlow:
             lines = lines + line
         lines = lines + "\n"
 
-        lines = lines + "****************** INTIAL INPUTS***********************\n"
+        lines = (
+            lines + "****************** INTIAL INPUTS***********************\n"
+        )
 
         for i in range(69):
             line = "zero "
             lines = lines + line
-            if i == 9 or i == 19 or i == 29 or i == 39 or i == 49 or i == 59 or i == 69:
+            if (
+                i == 9
+                or i == 19
+                or i == 29
+                or i == 39
+                or i == 49
+                or i == 59
+                or i == 69
+            ):
                 line = "\n"
                 lines = lines + line
 
@@ -548,12 +583,12 @@ class Type1924_TesPlugFlow:
 
         return lines
 
+    def getInputsFromOtherDdck(self, inputs):
 
-    def getInputsFromOtherDdck(self,inputs):
+        lines = self.sLine + "**inputs from other ddck\n" + self.sLine
 
-        lines = self.sLine + "**inputs from other ddck\n" +self.sLine
-
-        line = "CONSTANTS #\n"; lines = lines + line
+        line = "CONSTANTS #\n"
+        lines = lines + line
         line = "RhoWat = $RhoWat  ! kg/m3, density of storage media\n"
         lines = lines + line
         line = "CpWat = $CpWat  ! kJ/kgK, specific heat of storage media\n"
@@ -570,7 +605,7 @@ class Type1924_TesPlugFlow:
         nHx = inputs["nHx"]
         nPorts = inputs["nPorts"]
 
-        lines = self.sLine + "**outputs to other ddck\n" +self.sLine
+        lines = self.sLine + "**outputs to other ddck\n" + self.sLine
 
         line = "***Temperatures at 10 equally distributed height \n"
         lines = lines + line
@@ -579,12 +614,18 @@ class Type1924_TesPlugFlow:
 
         counter = 21
         for i in range(10):
-           height = 0.05 + 0.1 * i
-           line = "$%s_T%d =[%d,%d] !temperature at %.2f \n" % (self.nameTes,i + 1, nUnit, counter, height)
-           lines = lines + line
-           counter = counter + 1
+            height = 0.05 + 0.1 * i
+            line = "$%s_T%d =[%d,%d] !temperature at %.2f \n" % (
+                self.nameTes,
+                i + 1,
+                nUnit,
+                counter,
+                height,
+            )
+            lines = lines + line
+            counter = counter + 1
 
-        line = "$%s_qHeatSource = qHeatSource \n"%self.nameTes
+        line = "$%s_qHeatSource = qHeatSource \n" % self.nameTes
         lines = lines + line
 
         return lines
@@ -610,12 +651,12 @@ class Type1924_TesPlugFlow:
         line = "EQUATIONS #\n"
         lines = lines + line
 
-        line = "TAvg = [%d,180] ! Average storage temperature \n" % ( nUnit)
+        line = "TAvg = [%d,180] ! Average storage temperature \n" % (nUnit)
         lines = lines + line
-        #line = "***Temperatures at 10 equally distributed height \n"
-        #lines = lines + line
-        #counter = 21
-        #for i in range(10):
+        # line = "***Temperatures at 10 equally distributed height \n"
+        # lines = lines + line
+        # counter = 21
+        # for i in range(10):
         #    height = 0.05 + 0.1 * i
         #    line = "T%d =[%d,%d] !temperature at %.2f \n" % (i + 1, nUnit, counter, height)
         #    lines = lines + line
@@ -625,11 +666,14 @@ class Type1924_TesPlugFlow:
         lines = lines + line
         counter = 71
         for i in range(10):
-            line = "Tsen%d =[%d,%d] ! temperature at user defined sensor height Tsen%d \n" % (
-                i + 1,
-                nUnit,
-                counter,
-                i + 1,
+            line = (
+                "Tsen%d =[%d,%d] ! temperature at user defined sensor height Tsen%d \n"
+                % (
+                    i + 1,
+                    nUnit,
+                    counter,
+                    i + 1,
+                )
             )
             lines = lines + line
             counter = counter + 1
@@ -648,24 +692,31 @@ class Type1924_TesPlugFlow:
         line = "EQUATIONS 1\n"
         lines = lines + line
 
-        line = "qHeatSource = [%d,181] ! Heat input of all auxiliary heat sources [kW]\n" % (nUnit)
+        line = (
+            "qHeatSource = [%d,181] ! Heat input of all auxiliary heat sources [kW]\n"
+            % (nUnit)
+        )
         lines = lines + line
 
         line = "EQUATIONS 5\n"
         lines = lines + line
 
-        line = "Qv     = [%d,176] ! Heat input of all heat exchangers and auxiliary heat sources [kW]\n" % (
-            nUnit,
+        line = (
+            "Qv     = [%d,176] ! Heat input of all heat exchangers and auxiliary heat sources [kW]\n"
+            % (nUnit,)
         )
         lines = lines + line
         line = "QLoss  = [%d,177] ! Heat Losses of the Tes [kW]\n" % (nUnit)
         lines = lines + line
         line = "QAcum  = [%d,178] ! Sensible accumulated heat [kW]\n" % (nUnit)
         lines = lines + line
-        line = "QPorts = [%d,179] ! Heat Input by direct ports [kW]\n" % (nUnit)
+        line = "QPorts = [%d,179] ! Heat Input by direct ports [kW]\n" % (
+            nUnit
+        )
         lines = lines + line
-        line = "QImb   = [%d,64]  ! Heat Imbalance in Tes  IMB = sumQv - sumQLoss -sumQAcum + sumQPort\n" % (
-            nUnit,
+        line = (
+            "QImb   = [%d,64]  ! Heat Imbalance in Tes  IMB = sumQv - sumQLoss -sumQAcum + sumQPort\n"
+            % (nUnit,)
         )
         lines = lines + line
 
@@ -696,7 +747,9 @@ class Type1924_TesPlugFlow:
         line = "0  ! 5: Number of inputs to avoid integration\n"
         lines = lines + line
         # line = "0  ! 6: Number of inputs to avoid integration\n"; lines = lines + line
-        nInputs = 5 + inputs["nPorts"] + inputs["nHx"] + 1  # +inputs["nHeatSources"]
+        nInputs = (
+            5 + inputs["nPorts"] + inputs["nHx"] + 1
+        )  # +inputs["nHeatSources"]
 
         line = "INPUTS %d\n" % nInputs
         lines = lines + line
@@ -787,9 +840,14 @@ class Type1924_TesPlugFlow:
         nHx = inputs["nHx"]
         nHeatSources = inputs["nHeatSources"]
 
-        lines = self.sLine + "********** TYPE DEFINITION **********\n" + self.sLine
+        lines = (
+            self.sLine + "********** TYPE DEFINITION **********\n" + self.sLine
+        )
 
-        lines = lines + "UNIT %d TYPE %d     ! plug flow tank\n" % (nUnit, nType)
+        lines = lines + "UNIT %d TYPE %d     ! plug flow tank\n" % (
+            nUnit,
+            nType,
+        )
         lines = lines + "PARAMETERS 219 \n"
         lines = lines + self.getFirst12Par(nTes)
         lines = lines + self.getUaPar(nTes)
@@ -811,7 +869,10 @@ class Type1924_TesPlugFlow:
 
     def getHead(self):
 
-        header = open(r"C:\Daten\OngoingProject\SolTherm2050\Simulations\ddck\Generic\Head.ddck", "r")
+        header = open(
+            r"C:\Daten\OngoingProject\SolTherm2050\Simulations\ddck\Generic\Head.ddck",
+            "r",
+        )
         lines = header.read()
         header.close()
 
@@ -830,7 +891,10 @@ class Type1924_TesPlugFlow:
             lines = lines + self.sLine
             lines = lines + "** To be checked: \n"
             lines = lines + "** check cp and rho values for the circuits \n"
-            lines = lines + "** default is cpwat and rhowat, for solarcirc usually cpbri and rhobri have to be used \n"
+            lines = (
+                lines
+                + "** default is cpwat and rhowat, for solarcirc usually cpbri and rhobri have to be used \n"
+            )
             lines = lines + self.sLine + "\n"
             lines = lines + self.sLine
             lines = lines + "** outputs to energy balance in kWh\n"
@@ -839,12 +903,16 @@ class Type1924_TesPlugFlow:
             lines = lines + "EQUATIONS 3\n"
 
             lines = lines + ("@energy(out, heat, %sLoss) = QLoss\n" % tankName)
-            lines = lines + ("@energy(out, heat, %sAcum) = QAcum\n" % (tankName))
-            lines = lines + ("@energy(in, el, %sAux)     = qHeatSource\n" % (tankName))
+            lines = lines + (
+                "@energy(out, heat, %sAcum) = QAcum\n" % (tankName)
+            )
+            lines = lines + (
+                "@energy(in, el, %sAux)     = qHeatSource\n" % (tankName)
+            )
 
-           # lines = lines + ("qSysOut_%sLoss = QLoss_Tes%d\n" % (tankName, self.inputs["nTes"]))
-           # lines = lines + ("qSysOut_%sAcum = QAcum_Tes%d\n" % (tankName, self.inputs["nTes"]))
-           # lines = lines + ("elSysIn_Q_%sAux = qHeatSource_Tes%d\n" % (tankName, self.inputs["nTes"]))
+        # lines = lines + ("qSysOut_%sLoss = QLoss_Tes%d\n" % (tankName, self.inputs["nTes"]))
+        # lines = lines + ("qSysOut_%sAcum = QAcum_Tes%d\n" % (tankName, self.inputs["nTes"]))
+        # lines = lines + ("elSysIn_Q_%sAux = qHeatSource_Tes%d\n" % (tankName, self.inputs["nTes"]))
 
         elif typeFile == "dck":
             self.extension = "dck"
@@ -852,7 +920,13 @@ class Type1924_TesPlugFlow:
         else:
             raise ValueError("typeFile %s unknown (Must be dck or ddck)")
 
-        lines = lines + "\n" + self.sLine + "*** Inputs from hydraulic solver ****\n" + self.sLine
+        lines = (
+            lines
+            + "\n"
+            + self.sLine
+            + "*** Inputs from hydraulic solver ****\n"
+            + self.sLine
+        )
 
         nTes = self.inputs["nTes"]
         nHxs = self.inputs["nHx"]
@@ -861,7 +935,9 @@ class Type1924_TesPlugFlow:
         nUnit = self.inputs["nUnit"]
 
         for idPort in range(nPorts):
-            line = self._getOnePortInputs(nTes, idPort + 1, self.connectorsPort)
+            line = self._getOnePortInputs(
+                nTes, idPort + 1, self.connectorsPort
+            )
             lines = lines + line
 
         for idHx in range(nHxs):
@@ -871,7 +947,12 @@ class Type1924_TesPlugFlow:
         line = self.getHeatSourcesValues(nTes, nAux, self.connectorsAux)
         lines = lines + line
 
-        lines = lines + self.sLine + "**** Outputs to hydraulic solver ****\n" + self.sLine
+        lines = (
+            lines
+            + self.sLine
+            + "**** Outputs to hydraulic solver ****\n"
+            + self.sLine
+        )
 
         nEq = nPorts
         if nEq > 0:
@@ -907,8 +988,9 @@ class Type1924_TesPlugFlow:
         lines = lines + "\n"
         lines = lines + self.getOutputsToOtherDdck(self.inputs)
 
-
-        line = self.sLine + "****** Parameters of Type1924 *******\n" + self.sLine
+        line = (
+            self.sLine + "****** Parameters of Type1924 *******\n" + self.sLine
+        )
         lines = lines + line
 
         lines = lines + "CONSTANTS #\n"
@@ -927,7 +1009,9 @@ class Type1924_TesPlugFlow:
             lines = lines + line
 
         for idHx in range(nHxs):
-            line = self.getOneHxParConnValues(nTes, idHx + 1, self.connectorsHx)
+            line = self.getOneHxParConnValues(
+                nTes, idHx + 1, self.connectorsHx
+            )
             lines = lines + line
 
         for idPort in range(nPorts):
