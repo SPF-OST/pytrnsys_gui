@@ -9,7 +9,9 @@ import trnsysGUI.diagram.Editor as _de
 
 class Encoder(json.JSONEncoder):
     def default(self, obj):
-        assert isinstance(obj, _de.Editor), f"Object to encode must be an `{_de.Editor.__name__}`."
+        assert isinstance(
+            obj, _de.Editor
+        ), f"Object to encode must be an `{_de.Editor.__name__}`."
 
         res = {}
         blockDct = {".__BlockDct__": True}
@@ -30,7 +32,11 @@ class Encoder(json.JSONEncoder):
         }
         blockDct["IDs"] = idDict
 
-        nameDict = {"__nameDct__": True, "DiagramName": obj.diagramName, "ProjectFolder": obj.projectFolder}
+        nameDict = {
+            "__nameDct__": True,
+            "DiagramName": obj.diagramName,
+            "ProjectFolder": obj.projectFolder,
+        }
         blockDct["Strings"] = nameDict
 
         for gi in obj.graphicalObj:

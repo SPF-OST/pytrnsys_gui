@@ -32,4 +32,6 @@ class AddDoublePipeConnectionCommand(_qtw.QUndoCommand):
     def undo(self):
         self._editor.diagramScene.removeItem(self._connection)
         self._connection.deleteConnection()
-        self._undoNamingHelper.removeNameForDelete(self._connection.displayName)
+        self._undoNamingHelper.removeNameForDelete(
+            self._connection.displayName
+        )

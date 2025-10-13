@@ -1,6 +1,3 @@
-# pylint: skip-file
-# type: ignore
-
 import trace as _trc
 import typing as _tp
 import abc as _abc
@@ -28,7 +25,9 @@ class _DummyTracer(TracerBase):
 class _Tracer(TracerBase):
     def __init__(self):
         ignoredirs = [_sys.prefix]
-        self._trace = _trc.Trace(count=False, trace=True, timing=True, ignoredirs=ignoredirs)
+        self._trace = _trc.Trace(
+            count=False, trace=True, timing=True, ignoredirs=ignoredirs
+        )
 
     def run(self, func: _tp.Callable[[], _TCo]) -> _TCo:
         return self._trace.runfunc(func)

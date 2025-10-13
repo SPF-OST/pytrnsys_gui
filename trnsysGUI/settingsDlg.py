@@ -1,8 +1,3 @@
-# pylint: skip-file
-# type: ignore
-
-__all__ = ["SettingsDlg", "MaybeCancelled", "CANCELLED"]
-
 import pathlib as _pl
 import typing as _tp
 
@@ -11,20 +6,11 @@ import PyQt5.QtWidgets as _widgets
 
 import trnsysGUI.settings as _settings
 
-
-class _Cancelled:
-    pass
-
-
-CANCELLED = _Cancelled()
-
-_TCo = _tp.TypeVar("_TCo", covariant=True)
-
-MaybeCancelled = _TCo | _Cancelled
+import trnsysGUI.common.cancelled as _cancel
 
 
 class SettingsDlg(_widgets.QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None) -> None:
         super().__init__(parent)
 
         settings = self._getSettings()
@@ -59,13 +45,17 @@ class SettingsDlg(_widgets.QDialog):
 
         self.setWindowTitle("Set Paths")
 
-        self._settings: MaybeCancelled[_settings.Settings] = CANCELLED
+        self._settings: _cancel.MaybeCancelled[_settings.Settings] = (
+            _cancel.CANCELLED
+        )
 
     @staticmethod
-    def showDialogAndGetSettings(parent=None) -> MaybeCancelled[_settings.Settings]:
+    def showDialogAndGetSettings(
+        parent=None,
+    ) -> _cancel.MaybeCancelled[_settings.Settings]:
         dialog = SettingsDlg(parent)
         dialog.exec()
-        return dialog._settings
+        return dialog._settings  # pylint: disable=protected-access
 
     @staticmethod
     def _getSettings() -> _tp.Optional[_settings.Settings]:
@@ -80,7 +70,7 @@ class SettingsDlg(_widgets.QDialog):
 
         self._lineEdit.setText(newBinaryPath)
 
-        canOk = True if self._getSettings() or newBinaryPath else False
+        canOk = bool(self._getSettings() or newBinaryPath)
         self._okButton.setEnabled(canOk)
 
     def _onOkButtonClicked(self) -> None:
@@ -90,12 +80,31 @@ class SettingsDlg(_widgets.QDialog):
         if settings:
             settings.trnsysBinaryPath = newBinaryPath
         else:
-            settings = _settings.Settings.create(_pl.Path(newBinaryPath))
+            settings = _settings.Settings.create(_pl.Path(newBinaryPath), [])
 
         self._settings = settings
 
         self.close()
 
     def cancel(self) -> None:
-        self._settings = CANCELLED
+        self._settings = _cancel.CANCELLED
         self.close()
+
+
+def _createSettings(
+    parent=None,
+) -> _settings.Settings:
+    while True:
+        maybeCancelled = SettingsDlg.showDialogAndGetSettings(parent)
+        if not _cancel.isCancelled(maybeCancelled):
+            settings = _cancel.value(maybeCancelled)
+            return settings
+
+
+def ensureSettingsExist() -> None:
+    existingSettings = _settings.Settings.tryLoadOrNone()
+    if existingSettings:
+        return
+
+    settings = _createSettings()
+    settings.save()

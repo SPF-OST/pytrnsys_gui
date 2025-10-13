@@ -10,7 +10,12 @@ import trnsysGUI.warningsAndErrors as _werrors
 
 
 class ChangeNameDialogBase(_qtw.QDialog):
-    def __init__(self, blockItem: _bi.BlockItem, renameHelper: _rename.RenameHelper, projectDirPath: _pl.Path) -> None:
+    def __init__(
+        self,
+        blockItem: _bi.BlockItem,
+        renameHelper: _rename.RenameHelper,
+        projectDirPath: _pl.Path,
+    ) -> None:
         super().__init__()
 
         self._blockItem = blockItem
@@ -34,7 +39,9 @@ class ChangeNameDialogBase(_qtw.QDialog):
             self._displayNameLineEdit.setText(oldName)
             return
 
-        _dfh.moveComponentDdckFolderIfNecessary(self._blockItem, newName, oldName, self._projectDirPath)
+        _dfh.moveComponentDdckFolderIfNecessary(
+            self._blockItem, newName, oldName, self._projectDirPath
+        )
 
         self._blockItem.setDisplayName(newName)
         self._renameHelper.rename(oldName, newName)

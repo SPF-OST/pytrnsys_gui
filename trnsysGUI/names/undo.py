@@ -12,7 +12,11 @@ class DeleteCommandTargetType(_enum.Enum):
 
 
 class UndoNamingHelper:
-    def __init__(self, namesManager: _nm.NamesManager, createNamingHelper: _nc.CreateNamingHelper) -> None:
+    def __init__(
+        self,
+        namesManager: _nm.NamesManager,
+        createNamingHelper: _nc.CreateNamingHelper,
+    ) -> None:
         self._namesManager = namesManager
         self._createNamingHelper = createNamingHelper
 
@@ -21,7 +25,7 @@ class UndoNamingHelper:
         createNamingHelper = _nc.CreateNamingHelper(namesManager)
         return UndoNamingHelper(namesManager, createNamingHelper)
 
-    def addOrGenerateAndAddAnNonCollidingNameForAdd(
+    def addOrGenerateAndAddAnNonCollidingNameForAdd(  # pylint: disable=too-many-positional-arguments
         self,
         oldName: str,
         targetType: DeleteCommandTargetType,

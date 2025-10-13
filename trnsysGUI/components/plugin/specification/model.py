@@ -56,13 +56,17 @@ class Specification(_pc.BaseModel):
     defaultName: str
     description: str
     connections: _cabc.Sequence[Connection] | None = None
-    teePieces: _cabc.Sequence[TeePiece] | None = _pc.Field(alias="tee-pieces", default=None)
+    teePieces: _cabc.Sequence[TeePiece] | None = _pc.Field(
+        alias="tee-pieces", default=None
+    )
     size: tuple[int, int]
 
     @_pc.model_validator(mode="after")
     def _oneConnectionOrTeePieceMustBeGiven(self) -> _tp.Self:
         if not self.connections and not self.teePieces:
-            raise ValueError("At least one connection or T-piece must be specified.")
+            raise ValueError(
+                "At least one connection or T-piece must be specified."
+            )
 
         return self
 
@@ -72,7 +76,9 @@ class Specification(_pc.BaseModel):
         teePieces = self.teePieces or []
 
         connectionsAndTeePieces = [*connections, *teePieces]
-        hasWithoutName = any(tc for tc in connectionsAndTeePieces if not tc.name)
+        hasWithoutName = any(
+            tc for tc in connectionsAndTeePieces if not tc.name
+        )
         nTeePiecesAndConnections = len(connectionsAndTeePieces)
 
         if hasWithoutName and nTeePiecesAndConnections > 1:

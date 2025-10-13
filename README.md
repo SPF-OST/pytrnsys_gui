@@ -1,6 +1,7 @@
 # Graphical user interface for pytrnsys
 
-[![Coverage Status](https://coveralls.io/repos/github/SPF-OST/pytrnsys_gui/badge.svg?branch=master)](https://coveralls.io/github/SPF-OST/pytrnsys_gui?branch=master) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=SPF-OST_pytrnsys_gui&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=SPF-OST_pytrnsys_gui)
+[![Coverage Status](https://coveralls.io/repos/github/SPF-OST/pytrnsys_gui/badge.svg?branch=master)](https://coveralls.io/github/SPF-OST/pytrnsys_gui?branch=master) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=SPF-OST_pytrnsys_gui&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=SPF-OST_pytrnsys_gui) [![DOI](https://zenodo.org/badge/269046674.svg)](https://doi.org/10.5281/zenodo.17276890)
+
 
 ## Overview
 
@@ -93,8 +94,9 @@ All the following commands should be run from the `pytrnsys_gui` directory. The 
     ```
 3. Install the requirements:
     ```commandline
-    python -m pip install wheel
-    python -m pip install -r requirements\dev.txt
+    python -m pip install --upgrade pip
+    python -m pip install wheel uv
+    python -m uv pip install -r requirements\dev.txt
     ```
 4. Generate Python files from the include Qt creator files:
    ```commandline
@@ -124,3 +126,26 @@ Beware that the GUI can only be started from within the virtual environment you 
 I.e., whenever you open a new console window from which you want to start the GUI you first need 
 to activate the environment (step 2. above).
 
+### Managing requirements
+
+#### Adding new/removing packages and updating package versions pinned in .in files
+```commandline
+    pip-compile-multi --use-cache --backtracking --uv --no-upgrade -d .\requirements\
+```
+
+#### Upgrading specific package version to latest (e.g. `pytrnsys-process`)
+```commandline
+    pip-compile-multi --use-cache --backtracking --uv -P pytrnsys-process -d .\requirements\
+```
+
+#### Upgrading all package versions to latest
+```commandline
+    pip-compile-multi --use-cache --backtracking --uv -d .\requirements\
+```
+
+### Keeping your virtual environment up to date
+
+#### Syncing virtual environment with package versions (of `dev.txt, e.g.)
+```commandline
+    python -m uv pip sync .\requirements\dev.txt
+```

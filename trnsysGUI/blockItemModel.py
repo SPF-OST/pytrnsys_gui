@@ -41,7 +41,9 @@ class BlockItemModelVersion1(
     rotationN: int
 
     @classmethod
-    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+    def getSupersededClass(
+        cls,
+    ) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
         return BlockItemModelVersion0
 
     @classmethod
@@ -78,7 +80,9 @@ class BlockItemModel(
     rotationN: int
 
     @classmethod
-    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+    def getSupersededClass(
+        cls,
+    ) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
         return BlockItemModelVersion1
 
     @classmethod
@@ -127,11 +131,15 @@ class BlockItemBaseModel(_ser.UpgradableJsonSchemaMixin):
     rotationN: int
 
     @classmethod
-    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+    def getSupersededClass(
+        cls,
+    ) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
         return BlockItemBaseModelVersion0
 
     @classmethod
-    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "BlockItemBaseModel":
+    def upgrade(
+        cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0
+    ) -> "BlockItemBaseModel":
         assert isinstance(superseded, BlockItemBaseModelVersion0)
 
         blockItemModel = createBlockItemBaseModelFromLegacyModel(superseded)
@@ -152,7 +160,13 @@ class BlockItemLegacyModelProtocol(_tp.Protocol):
     rotationN: int
 
 
-def createBlockItemBaseModelFromLegacyModel(superseded: BlockItemLegacyModelProtocol) -> BlockItemBaseModel:
+def createBlockItemBaseModelFromLegacyModel(
+    superseded: BlockItemLegacyModelProtocol,
+) -> BlockItemBaseModel:
     return BlockItemBaseModel(
-        superseded.blockPosition, superseded.trnsysId, superseded.flippedH, superseded.flippedV, superseded.rotationN
+        superseded.blockPosition,
+        superseded.trnsysId,
+        superseded.flippedH,
+        superseded.flippedV,
+        superseded.rotationN,
     )

@@ -1,6 +1,3 @@
-# pylint: skip-file
-# type: ignore
-
 import dataclasses as _dc
 import pathlib as _pl
 import typing as _tp
@@ -21,14 +18,42 @@ class SettingsVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
 
 
 @_dc.dataclass
+class SettingsVersion1(_ser.UpgradableJsonSchemaMixin):
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID("e5ea1fbd-1be9-4415-b3e9-7f3a2a11d216")
+
+    trnsysBinaryPath: str
+
+    @classmethod
+    def getSupersededClass(cls) -> _tp.Type[SettingsVersion0]:
+        return SettingsVersion0
+
+    @classmethod
+    def upgrade(
+        cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0
+    ) -> "SettingsVersion1":
+        assert isinstance(superseded, SettingsVersion0)
+
+        trnsysBinaryPath = (
+            _pl.Path(superseded.trnsysBinaryDirPath) / "TRNExe.exe"
+        )
+        return SettingsVersion1(str(trnsysBinaryPath))
+
+
+@_dc.dataclass
 class Settings(_ser.UpgradableJsonSchemaMixin):
     @staticmethod
-    def create(trnsysBinaryDirPath: _pl.Path) -> "Settings":
-        return Settings(str(trnsysBinaryDirPath))
+    def create(
+        trnsysBinaryDirPath: _pl.Path, recentProjects: list[_pl.Path]
+    ) -> "Settings":
+        return Settings(str(trnsysBinaryDirPath), list(recentProjects))
 
     _SETTINGS_FILE_NAME = "settings.json"
 
     trnsysBinaryPath: str
+
+    recentProjects: list
 
     @classmethod
     def tryLoadOrNone(cls) -> _tp.Optional["Settings"]:
@@ -62,19 +87,24 @@ class Settings(_ser.UpgradableJsonSchemaMixin):
 
     @classmethod
     def _getSettingsFilePath(cls) -> _pl.Path:
-        userConfigDirPath = _pl.Path(_ad.user_config_dir("pytrnsys-gui", "SPF OST"))
+        userConfigDirPath = _pl.Path(
+            _ad.user_config_dir("pytrnsys-gui", "SPF OST")
+        )
         settingsFilePath = userConfigDirPath / cls._SETTINGS_FILE_NAME
         return settingsFilePath
 
     @classmethod
-    def getSupersededClass(cls) -> _tp.Type[SettingsVersion0]:
-        return SettingsVersion0
+    def getSupersededClass(cls) -> _tp.Type[SettingsVersion1]:
+        return SettingsVersion1
 
     @classmethod
-    def upgrade(cls, superseded: SettingsVersion0) -> "Settings":
-        trnsysBinaryPath = _pl.Path(superseded.trnsysBinaryDirPath) / "TRNExe.exe"
-        return Settings.create(trnsysBinaryPath)
+    def upgrade(
+        cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0
+    ) -> "Settings":
+        assert isinstance(superseded, SettingsVersion1)
+
+        return Settings.create(_pl.Path(superseded.trnsysBinaryPath), [])
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID("e5ea1fbd-1be9-4415-b3e9-7f3a2a11d216")
+        return _uuid.UUID("c49c052a-f41a-481f-9849-2f6e7185e3cd")

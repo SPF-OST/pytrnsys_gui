@@ -56,7 +56,11 @@ class Export:
         self.maxChar = 20
 
         o: _ip.HasInternalPiping
-        nodes = [n for c in self._hasInternalPipings for n in c.getInternalPiping().nodes]
+        nodes = [
+            n
+            for c in self._hasInternalPipings
+            for n in c.getInternalPiping().nodes
+        ]
         self.lineNumOfPar = len(nodes)
 
         self.numOfPar = 4 * self.lineNumOfPar + 1
@@ -93,7 +97,8 @@ class Export:
 
     def exportSinglePipeParameters(self) -> str:
         doesHydraulicContainSinglePipes = any(
-            isinstance(obj, _spc.SinglePipeConnection) for obj in self._hasInternalPipings
+            isinstance(obj, _spc.SinglePipeConnection)
+            for obj in self._hasInternalPipings
         )
 
         if not doesHydraulicContainSinglePipes:
@@ -108,7 +113,8 @@ CONSTANTS 1
 
     def exportDoublePipeParameters(self, exportTo="ddck"):
         doesHydraulicContainDoublePipes = any(
-            isinstance(obj, _dpc.DoublePipeConnection) for obj in self._hasInternalPipings
+            isinstance(obj, _dpc.DoublePipeConnection)
+            for obj in self._hasInternalPipings
         )
 
         if not doesHydraulicContainDoublePipes:
@@ -162,7 +168,9 @@ ddTcwOffset = 36 ! Days of minimum surface temperature
         if exportTo == "ddck":
             return constantsBlock + "\n"
         elif exportTo == "mfs":
-            return constantsBlock + "\n\n" + massFlowSolverConstantsBlock + "\n"
+            return (
+                constantsBlock + "\n\n" + massFlowSolverConstantsBlock + "\n"
+            )
         else:
             raise ValueError("Unknown value for `exportTo`", exportTo)
 
@@ -249,7 +257,9 @@ dpmax_bar = 15  ! maximum pressure-drop of loop at nominal mass flow, bar
 
         return f
 
-    def exportParametersFlowSolver(self, simulationUnit: int, simulationType: int, descConnLength: int) -> str:
+    def exportParametersFlowSolver(
+        self, simulationUnit: int, simulationType: int, descConnLength: int
+    ) -> str:
         hasInternalPipings = []
         for hasInternalPiping in self._hasInternalPipings:
             noHydraulicConnection = (
@@ -298,12 +308,19 @@ PARAMETERS {nToleranceParameters + 1 + len(serializedNodes) * 4}
         hasInternalPipings: _tp.Sequence[_ip.HasInternalPiping],
     ) -> _tp.Sequence[_SerializedNode]:
         globalNetwork = _gn.getGlobalNetwork(hasInternalPipings)
-        internalPortItemToExternalRealNode = globalNetwork.internalPortItemToExternalNode
+        internalPortItemToExternalRealNode = (
+            globalNetwork.internalPortItemToExternalNode
+        )
 
-        nodesToIndex = {nwp.node: i for i, nwp in enumerate(globalNetwork.nodesWithParent, start=1)}
+        nodesToIndex = {
+            nwp.node: i
+            for i, nwp in enumerate(globalNetwork.nodesWithParent, start=1)
+        }
 
         serializedNodes = []
-        for index, nodeWithParent in enumerate(globalNetwork.nodesWithParent, start=1):
+        for index, nodeWithParent in enumerate(
+            globalNetwork.nodesWithParent, start=1
+        ):
             node = nodeWithParent.node
             parent = nodeWithParent.parent
 
@@ -314,7 +331,9 @@ PARAMETERS {nToleranceParameters + 1 + len(serializedNodes) * 4}
             displayName = parent.getDisplayName()
             nodeNameOrEmpty = node.name or ""
             fullName = f"{displayName}{nodeNameOrEmpty}"
-            serializedNode = _SerializedNode(fullName, index, node.getNodeType(), neighborsAndUnusedIndexes)
+            serializedNode = _SerializedNode(
+                fullName, index, node.getNodeType(), neighborsAndUnusedIndexes
+            )
 
             serializedNodes.append(serializedNode)
 
@@ -324,7 +343,9 @@ PARAMETERS {nToleranceParameters + 1 + len(serializedNodes) * 4}
     def _getNeighborAndUnusedIndexes(
         realNode: _mfn.Node,
         realNodesToIndex: _tp.Mapping[_mfn.Node, int],
-        internalPortItemToExternalRealNode: _tp.Mapping[_mfn.PortItem, _mfn.Node],
+        internalPortItemToExternalRealNode: _tp.Mapping[
+            _mfn.PortItem, _mfn.Node
+        ],
     ) -> _tp.Tuple[int, int, int]:
         neighborIndexes = []
         for neighbor in realNode.getPortItems():
@@ -341,7 +362,11 @@ PARAMETERS {nToleranceParameters + 1 + len(serializedNodes) * 4}
         nNeighborIndexes = len(neighborIndexes)
 
         assert nNeighborIndexes > 0
-        neighborAndUnusedIndexes = [neighborIndexes[0], _UNUSED_INDEX, _UNUSED_INDEX]
+        neighborAndUnusedIndexes = [
+            neighborIndexes[0],
+            _UNUSED_INDEX,
+            _UNUSED_INDEX,
+        ]
 
         if nNeighborIndexes > 1:
             neighborAndUnusedIndexes[1] = neighborIndexes[1]
@@ -349,7 +374,11 @@ PARAMETERS {nToleranceParameters + 1 + len(serializedNodes) * 4}
         if nNeighborIndexes > 2:
             neighborAndUnusedIndexes[2] = neighborIndexes[2]
 
-        return neighborAndUnusedIndexes[0], neighborAndUnusedIndexes[1], neighborAndUnusedIndexes[2]
+        return (
+            neighborAndUnusedIndexes[0],
+            neighborAndUnusedIndexes[1],
+            neighborAndUnusedIndexes[2],
+        )
 
     def exportInputsFlowSolver(self):
         f = ""
@@ -397,12 +426,18 @@ PARAMETERS {nToleranceParameters + 1 + len(serializedNodes) * 4}
         tot = ""
 
         for t in self._hasInternalPipings:
-            noHydraulicConnection = not isinstance(t, _cb.ConnectionBase) and not t.outputs and not t.inputs
+            noHydraulicConnection = (
+                not isinstance(t, _cb.ConnectionBase)
+                and not t.outputs
+                and not t.inputs
+            )
 
             if noHydraulicConnection:
                 continue
             else:
-                res = _mfse.exportOutputsFlowSolver(t, equationNumber, simulationUnit)
+                res = _mfse.exportOutputsFlowSolver(
+                    t, equationNumber, simulationUnit
+                )
                 tot += res[0]
                 equationNumber = res[1]
                 nEqUsed += res[2]
@@ -437,19 +472,30 @@ PARAMETERS {nToleranceParameters + 1 + len(serializedNodes) * 4}
 
     def exportSinglePipeEnergyBalanceVariables(self):
         simulatedSinglePipes = [
-            ip for ip in self._hasInternalPipings if isinstance(ip, _spc.SinglePipeConnection) and ip.shallBeSimulated
+            ip
+            for ip in self._hasInternalPipings
+            if isinstance(ip, _spc.SinglePipeConnection)
+            and ip.shallBeSimulated
         ]
 
         if not simulatedSinglePipes:
             return ""
 
-        convectedFluxes = [sp.getConvectedHeatFluxVariableName() for sp in simulatedSinglePipes]
+        convectedFluxes = [
+            sp.getConvectedHeatFluxVariableName()
+            for sp in simulatedSinglePipes
+        ]
         summedConvectedFluxes = "+".join(convectedFluxes)
 
-        dissipatedFluxes = [sp.getDissipatedHeatFluxVariableName() for sp in simulatedSinglePipes]
+        dissipatedFluxes = [
+            sp.getDissipatedHeatFluxVariableName()
+            for sp in simulatedSinglePipes
+        ]
         summedDissipatedFluxes = "+".join(dissipatedFluxes)
 
-        internalEnergies = [sp.getInternalHeatVariableName() for sp in simulatedSinglePipes]
+        internalEnergies = [
+            sp.getInternalHeatVariableName() for sp in simulatedSinglePipes
+        ]
         summedInternalEnergies = "+".join(internalEnergies)
 
         Totals = _cnames.EnergyBalanceTotals.SinglePipe
@@ -477,7 +523,12 @@ EQUATIONS 4
     def exportDoublePipeEnergyBalanceVariables(self):
 
         doublePipes = [
-            _gdpebe.DoublePipe(ip.displayName, ip.coldModelPipe.name, ip.hotModelPipe.name, ip.shallBeSimulated)
+            _gdpebe.DoublePipe(
+                ip.displayName,
+                ip.coldModelPipe.name,
+                ip.hotModelPipe.name,
+                ip.shallBeSimulated,
+            )
             for ip in self._hasInternalPipings
             if isinstance(ip, _dpc.DoublePipeConnection)
         ]
@@ -495,7 +546,13 @@ EQUATIONS 4
         delimiter = 0
         printLabels = 1
 
-        f = "ASSIGN " + self._diagramName.rsplit(".", 1)[0] + "_Mfr.prt " + str(unitnr) + "\n\n"
+        f = (
+            "ASSIGN "
+            + self._diagramName.rsplit(".", 1)[0]
+            + "_Mfr.prt "
+            + str(unitnr)
+            + "\n\n"
+        )
 
         f += "UNIT " + str(unitnr) + " TYPE " + str(typenr)
         f += " " * (descLen - len(f)) + "! User defined Printer" + "\n"
@@ -511,7 +568,11 @@ EQUATIONS 4
         f += str(printingMode)
         f += " " * (descLen - len(f)) + "! 5 Units printing mode" + "\n"
         f += str(relAbsStart)
-        f += " " * (descLen - len(f)) + "! 6 Relative or absolute start time" + "\n"
+        f += (
+            " " * (descLen - len(f))
+            + "! 6 Relative or absolute start time"
+            + "\n"
+        )
         f += str(overwriteApp)
         f += " " * (descLen - len(f)) + "! 7 Overwrite or Append" + "\n"
         f += str(printHeader)
@@ -526,7 +587,8 @@ EQUATIONS 4
         for hasInternalPiping in self._hasInternalPipings:
             if isinstance(hasInternalPiping, _spc.SinglePipeConnection):
                 mfrVariableName = _mnames.getCanonicalMassFlowVariableName(
-                    componentDisplayName=hasInternalPiping.getDisplayName(), pipeName=hasInternalPiping.modelPipe.name
+                    componentDisplayName=hasInternalPiping.getDisplayName(),
+                    pipeName=hasInternalPiping.modelPipe.name,
                 )
                 allVariableNames.append(mfrVariableName)
             elif isinstance(hasInternalPiping, _dpc.DoublePipeConnection):
@@ -538,14 +600,23 @@ EQUATIONS 4
                     componentDisplayName=hasInternalPiping.getDisplayName(),
                     pipeName=hasInternalPiping.hotModelPipe.name,
                 )
-                allVariableNames.extend([coldMfrVariableName, hotMfrVariableName])
+                allVariableNames.extend(
+                    [coldMfrVariableName, hotMfrVariableName]
+                )
             elif isinstance(hasInternalPiping, _tventil.TVentil):
-                inputVariableName = _mnames.getInputVariableName(hasInternalPiping, hasInternalPiping.modelDiverter)
+                inputVariableName = _mnames.getInputVariableName(
+                    hasInternalPiping, hasInternalPiping.modelDiverter
+                )
                 allVariableNames.append(inputVariableName)
 
-        variableNameOctets = [allVariableNames[s : s + 8] for s in range(0, len(allVariableNames), 8)]
+        variableNameOctets = [
+            allVariableNames[s : s + 8]
+            for s in range(0, len(allVariableNames), 8)
+        ]
 
-        formattedInputVariables = "\n".join(" ".join(o) for o in variableNameOctets) + "\n"
+        formattedInputVariables = (
+            "\n".join(" ".join(o) for o in variableNameOctets) + "\n"
+        )
 
         f += f"""\
 INPUTS {len(allVariableNames)}
@@ -566,7 +637,13 @@ INPUTS {len(allVariableNames)}
         delimiter = 0
         printLabels = 1
 
-        f = "ASSIGN " + self._diagramName.rsplit(".", 1)[0] + "_T.prt " + str(unitnr) + "\n\n"
+        f = (
+            "ASSIGN "
+            + self._diagramName.rsplit(".", 1)[0]
+            + "_T.prt "
+            + str(unitnr)
+            + "\n\n"
+        )
 
         f += "UNIT " + str(unitnr) + " TYPE " + str(typenr)
         f += " " * (descLen - len(f)) + "! User defined Printer" + "\n"
@@ -582,7 +659,11 @@ INPUTS {len(allVariableNames)}
         f += str(printingMode)
         f += " " * (descLen - len(f)) + "! 5 Units printing mode" + "\n"
         f += str(relAbsStart)
-        f += " " * (descLen - len(f)) + "! 6 Relative or absolute start time" + "\n"
+        f += (
+            " " * (descLen - len(f))
+            + "! 6 Relative or absolute start time"
+            + "\n"
+        )
         f += str(overwriteApp)
         f += " " * (descLen - len(f)) + "! 7 Overwrite or Append" + "\n"
         f += str(printHeader)
@@ -595,19 +676,29 @@ INPUTS {len(allVariableNames)}
 
         allVariableNames = []
         for hasInternalPiping in self._hasInternalPipings:
-            if not isinstance(hasInternalPiping, (_spc.SinglePipeConnection, _dpc.DoublePipeConnection)):
+            if not isinstance(
+                hasInternalPiping,
+                (_spc.SinglePipeConnection, _dpc.DoublePipeConnection),
+            ):
                 continue
 
             internalPiping = hasInternalPiping.getInternalPiping()
             nodes = internalPiping.nodes
 
-            temperatureVariableNames = self._getOutputTemperatureVariableNames(hasInternalPiping, nodes)
+            temperatureVariableNames = self._getOutputTemperatureVariableNames(
+                hasInternalPiping, nodes
+            )
 
             allVariableNames.extend(temperatureVariableNames)
 
-        variableNameOctets = [allVariableNames[s : s + 8] for s in range(0, len(allVariableNames), 8)]
+        variableNameOctets = [
+            allVariableNames[s : s + 8]
+            for s in range(0, len(allVariableNames), 8)
+        ]
 
-        formattedInputVariables = "\n".join(" ".join(s) for s in variableNameOctets) + "\n"
+        formattedInputVariables = (
+            "\n".join(" ".join(s) for s in variableNameOctets) + "\n"
+        )
 
         f += f"""\
 INPUTS {len(allVariableNames)}
@@ -631,7 +722,9 @@ INPUTS {len(allVariableNames)}
         return temperatureVariableNames
 
     def exportFluids(self) -> str:
-        def getValueOrVariableName(valueOrVariable: float | _hlm.Variable, factor: float = 1) -> float | str:
+        def getValueOrVariableName(
+            valueOrVariable: float | _hlm.Variable, factor: float = 1
+        ) -> float | str:
             if isinstance(valueOrVariable, float):
                 return valueOrVariable * factor
 
@@ -641,7 +734,9 @@ INPUTS {len(allVariableNames)}
 
                 return f"{valueOrVariable.name}*{factor}"
 
-            raise ValueError(f"Can't deal with type {type(valueOrVariable).__name__}.")
+            raise ValueError(
+                f"Can't deal with type {type(valueOrVariable).__name__}."
+            )
 
         template = """\
 ** Fluids:
@@ -655,7 +750,11 @@ F{{fluid.name}}Cp = {{cp}} ! [kJ/(kg*K)]
 {% endfor -%}
 """
         fluids = self._fluids
-        return self._render(template, fluids=fluids, getValueOrVariableName=getValueOrVariableName)
+        return self._render(
+            template,
+            fluids=fluids,
+            getValueOrVariableName=getValueOrVariableName,
+        )
 
     def exportHydraulicLoops(self) -> str:
         template = """\
@@ -684,7 +783,10 @@ EQUATIONS {{nEquations}}
 """
         loops = self._hydraulicLoops
 
-        nEquations = sum(6 if l.connectionsDefinitionMode.useLoopWideDefaults() else 2 for l in loops)
+        nEquations = sum(
+            6 if l.connectionsDefinitionMode.useLoopWideDefaults() else 2
+            for l in loops
+        )
 
         return self._render(
             template,

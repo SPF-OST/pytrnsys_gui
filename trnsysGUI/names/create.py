@@ -21,8 +21,12 @@ class CreateNamingHelper:
             else:
                 newNameCandidate = f"{baseName}{i}"
 
-            result = self._namesManager.validateName(newNameCandidate, checkDdckFolder)
+            result = self._namesManager.validateName(
+                newNameCandidate, checkDdckFolder
+            )
             if not _res.isError(result):
                 return newNameCandidate
 
-        raise AssertionError(f'Could not generate a name with base "{baseName}" after {self._N_MAX_TRIES} tries.')
+        raise AssertionError(
+            f'Could not generate a name with base "{baseName}" after {self._N_MAX_TRIES} tries.'
+        )

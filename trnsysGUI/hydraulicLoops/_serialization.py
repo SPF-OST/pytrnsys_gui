@@ -20,8 +20,8 @@ class Variable(_ser.UpgradableJsonSchemaMixinVersion0):
 @_dc.dataclass(frozen=True, eq=False)
 class Fluid(_ser.UpgradableJsonSchemaMixinVersion0):
     name: str
-    specificHeatCapacityInJPerKgK: _tp.Union[Variable, float]  # /NOSONAR
-    densityInKgPerM3: _tp.Union[Variable, float]  # /NOSONAR
+    specificHeatCapacityInJPerKgK: _tp.Union[Variable, float]  # NOSONAR
+    densityInKgPerM3: _tp.Union[Variable, float]  # NOSONAR
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
@@ -49,7 +49,9 @@ class HydraulicLoopVersion1(_ser.UpgradableJsonSchemaMixin):
     connectionsTrnsysId: _tp.Sequence[int]
 
     @classmethod
-    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "HydraulicLoopVersion1":
+    def upgrade(
+        cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0
+    ) -> "HydraulicLoopVersion1":
         assert isinstance(superseded, HydraulicLoopVersion0)
 
         useLoopWideDefaults = False
@@ -63,7 +65,9 @@ class HydraulicLoopVersion1(_ser.UpgradableJsonSchemaMixin):
         )
 
     @classmethod
-    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+    def getSupersededClass(
+        cls,
+    ) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
         return HydraulicLoopVersion0
 
     @classmethod
@@ -98,7 +102,9 @@ class HydraulicLoopVersion2(_ser.UpgradableJsonSchemaMixin):
     connectionsTrnsysId: _tp.Sequence[int]
 
     @classmethod
-    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "HydraulicLoopVersion2":
+    def upgrade(
+        cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0
+    ) -> "HydraulicLoopVersion2":
         assert isinstance(superseded, HydraulicLoopVersion1)
 
         connectionsDefinitionMode = (
@@ -133,7 +139,9 @@ class HydraulicLoop(_ser.UpgradableJsonSchemaMixin):
     connectionsTrnsysId: _tp.Sequence[int]
 
     @classmethod
-    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "HydraulicLoop":
+    def upgrade(
+        cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0
+    ) -> "HydraulicLoop":
         assert isinstance(superseded, HydraulicLoopVersion2)
 
         return HydraulicLoop(

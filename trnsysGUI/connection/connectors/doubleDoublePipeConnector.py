@@ -27,11 +27,15 @@ class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         self.changeSize()
 
     def _setModels(self) -> None:
-        self._coldPipe, self._hotPipe = _cmnp.createMassFlowSolverNetworkPipes()
+        self._coldPipe, self._hotPipe = (
+            _cmnp.createMassFlowSolverNetworkPipes()
+        )
 
     @classmethod
     @_tp.override
-    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+    def _getImageAccessor(
+        cls,
+    ) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.DOUBLE_DOUBLE_PIPE_CONNECTOR_SVG
 
     def changeSize(self):
@@ -40,8 +44,12 @@ class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         self.origInputsPos = [[0, 10]]
         self.origOutputsPos = [[40, 10]]
 
-        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
-        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
+        self.inputs[0].setPos(
+            self.origInputsPos[0][0], self.origInputsPos[0][1]
+        )
+        self.outputs[0].setPos(
+            self.origOutputsPos[0][0], self.origOutputsPos[0][1]
+        )
 
         # pylint: disable=duplicate-code  # 3
         self.updateFlipStateH(self.flippedH)
@@ -58,13 +66,20 @@ class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
             self._hotPipe.toPort: self.outputs[0],
         }
 
-        modelPortItemsToGraphicalPortItem = coldModelPortItemsToGraphicalPortItem | hotModelPortItemsToGraphicalPortItem
+        modelPortItemsToGraphicalPortItem = (
+            coldModelPortItemsToGraphicalPortItem
+            | hotModelPortItemsToGraphicalPortItem
+        )
 
-        internalPiping = _ip.InternalPiping([self._coldPipe, self._hotPipe], modelPortItemsToGraphicalPortItem)
+        internalPiping = _ip.InternalPiping(
+            [self._coldPipe, self._hotPipe], modelPortItemsToGraphicalPortItem
+        )
 
         return internalPiping
 
-    def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
+    def exportPipeAndTeeTypesForTemp(
+        self, startingUnit: int
+    ) -> _tp.Tuple[str, int]:
         hydraulicConnection = _cehc.HydraulicDoublePipeConnection(
             self.displayName,
             _hecom.getAdjacentConnection(self.fromPort),
@@ -77,5 +92,7 @@ class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
 
         unitNumber = startingUnit
         return _he.exportDummyConnection(
-            hydraulicExportConnection, unitNumber, shallDefineCanonicalMassFlowVariables=False
+            hydraulicExportConnection,
+            unitNumber,
+            shallDefineCanonicalMassFlowVariables=False,
         )

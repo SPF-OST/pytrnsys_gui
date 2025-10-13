@@ -162,7 +162,9 @@ MDTeeD_SCnrDHot = MDTeeD_SCnrDHot_A
 
 class TestDoublePipeConnection:
     def testSimulatedExport(self):
-        actualUnitText, nextUnitNumber = _he.export(_SIMULATED_DOUBLE_PIPE_CONNECTION, 503)
+        actualUnitText, nextUnitNumber = _he.export(
+            _SIMULATED_DOUBLE_PIPE_CONNECTION, 503
+        )
         print(actualUnitText)
         assert actualUnitText == _EXPECTED_SIMULATED_UNIT_TEXT
         assert nextUnitNumber == 504

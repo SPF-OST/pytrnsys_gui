@@ -17,7 +17,9 @@ import trnsysGUI.moveCommand as _mc
 # pylint: disable = fixme
 # TODO : TeePiece and AirSourceHp size ratio need to be fixed, maybe just use original
 #  svg instead of modified ones, TVentil is flipped. heatExchangers are also wrongly oriented
-class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-methods, too-many-instance-attributes
+class BlockItem(
+    _qtw.QGraphicsItem
+):  # pylint: disable = too-many-public-methods, too-many-instance-attributes
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(None)
         self.logger = editor.logger
@@ -67,10 +69,14 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         if isinstance(self, BlockItem):
-            raise AssertionError("`BlockItem' cannot be instantiated directly.")
+            raise AssertionError(
+                "`BlockItem' cannot be instantiated directly."
+            )
 
         currentClassName = BlockItem.__name__
-        currentMethodName = f"{currentClassName}.{BlockItem._getImageAccessor.__name__}"
+        currentMethodName = (
+            f"{currentClassName}.{BlockItem._getImageAccessor.__name__}"
+        )
 
         message = (
             f"{currentMethodName} has been called. However, this method should not be called directly but must be\n"
@@ -103,10 +109,14 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
     def contextMenuEvent(self, event):
         menu = _qtw.QMenu()
 
-        rotateCwAction = menu.addAction(_img.ROTATE_TO_RIGHT_PNG.icon(), "Rotate Block clockwise")
+        rotateCwAction = menu.addAction(
+            _img.ROTATE_TO_RIGHT_PNG.icon(), "Rotate Block clockwise"
+        )
         rotateCwAction.triggered.connect(self.rotateBlockCW)
 
-        rotateCcwAction = menu.addAction(_img.ROTATE_LEFT_PNG.icon(), "Rotate Block counter-clockwise")
+        rotateCcwAction = menu.addAction(
+            _img.ROTATE_LEFT_PNG.icon(), "Rotate Block counter-clockwise"
+        )
         rotateCcwAction.triggered.connect(self.rotateBlockCCW)
 
         resetRotationAction = menu.addAction("Reset Rotation")
@@ -122,7 +132,10 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
     def _addChildContextMenuActions(self, contextMenu: _qtw.QMenu) -> None:
         pass
 
-    def mouseDoubleClickEvent(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:  # pylint: disable=unused-argument
+    def mouseDoubleClickEvent(
+        self,
+        event: _qtw.QGraphicsSceneMouseEvent,  # pylint: disable=unused-argument
+    ) -> None:
         self.editor.showBlockDlg(self)
 
     def mousePressEvent(self, event):
@@ -139,7 +152,12 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
         if oldPos is None or newPos == oldPos:
             return
 
-        command = _mc.MoveCommand(self, oldScenePos=oldPos, newScenePos=newPos, descr="Move BlockItem")
+        command = _mc.MoveCommand(
+            self,
+            oldScenePos=oldPos,
+            newScenePos=newPos,
+            descr="Move BlockItem",
+        )
         self.editor.parent().undoStack.push(command)
 
     # Transform related
@@ -226,7 +244,10 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
                 snapSize = self.editor.snapSize
                 self.logger.debug("itemchange")
                 self.logger.debug(type(value))
-                value = _qtc.QPointF(value.x() - value.x() % snapSize, value.y() - value.y() % snapSize)
+                value = _qtc.QPointF(
+                    value.x() - value.x() % snapSize,
+                    value.y() - value.y() % snapSize,
+                )
                 return value
             if self.editor.alignMode:
                 if self.hasElementsInYBand():
@@ -240,7 +261,10 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
                 if self.elementInYBand(t):
                     value = _qtc.QPointF(self.pos().x(), t.pos().y())
                     self.editor.alignYLineItem.setLine(
-                        self.pos().x() + self.w / 2, t.pos().y(), t.pos().x() + t.w / 2, t.pos().y()
+                        self.pos().x() + self.w / 2,
+                        t.pos().y(),
+                        t.pos().x() + t.w / 2,
+                        t.pos().y(),
                     )
 
                     self.editor.alignYLineItem.setVisible(True)
@@ -263,7 +287,10 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
                 if self.elementInXBand(t):
                     value = _qtc.QPointF(t.pos().x(), self.pos().y())
                     self.editor.alignXLineItem.setLine(
-                        t.pos().x(), t.pos().y() + self.w / 2, t.pos().x(), self.pos().y() + t.w / 2
+                        t.pos().x(),
+                        t.pos().y() + self.w / 2,
+                        t.pos().x(),
+                        self.pos().y() + t.w / 2,
                     )
 
                     self.editor.alignXLineItem.setVisible(True)
@@ -301,11 +328,19 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
 
     def elementInYBand(self, t):
         eps = 50
-        return self.scenePos().y() - eps <= t.scenePos().y() <= self.scenePos().y() + eps
+        return (
+            self.scenePos().y() - eps
+            <= t.scenePos().y()
+            <= self.scenePos().y() + eps
+        )
 
     def elementInXBand(self, t):
         eps = 50
-        return self.scenePos().x() - eps <= t.scenePos().x() <= self.scenePos().x() + eps
+        return (
+            self.scenePos().x() - eps
+            <= t.scenePos().x()
+            <= self.scenePos().x() + eps
+        )
 
     def _encodeBaseModel(self) -> _bim.BlockItemBaseModel:
         position = (self.pos().x(), self.pos().y())
@@ -320,7 +355,9 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
 
         return blockItemModel
 
-    def _decodeBaseModel(self, blockItemModel: _bim.BlockItemBaseModel) -> None:
+    def _decodeBaseModel(
+        self, blockItemModel: _bim.BlockItemBaseModel
+    ) -> None:
         x = float(blockItemModel.blockPosition[0])
         y = float(blockItemModel.blockPosition[1])
         self.setPos(x, y)
@@ -362,10 +399,14 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
         model = _bim.BlockItemModel.from_dict(i)
 
         self.setDisplayName(model.BlockDisplayName)
-        self.setPos(float(model.blockPosition[0]), float(model.blockPosition[1]))
+        self.setPos(
+            float(model.blockPosition[0]), float(model.blockPosition[1])
+        )
         self.trnsysId = model.trnsysId
 
-        if len(self.inputs) != len(model.portsIdsIn) or len(self.outputs) != len(model.portsIdsOut):
+        if len(self.inputs) != len(model.portsIdsIn) or len(
+            self.outputs
+        ) != len(model.portsIdsOut):
             temp = model.portsIdsIn
             model.portsIdsIn = model.portsIdsOut
             model.portsIdsOut = temp
@@ -391,10 +432,14 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
     def exportDivSetting2(self, nUnit):
         return "", nUnit
 
-    def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
+    def exportPipeAndTeeTypesForTemp(
+        self, startingUnit: int
+    ) -> _tp.Tuple[str, int]:
         return "", startingUnit
 
-    def assignIDsToUninitializedValuesAfterJsonFormatMigration(self, generator: _id.IdGenerator) -> None:
+    def assignIDsToUninitializedValuesAfterJsonFormatMigration(
+        self, generator: _id.IdGenerator
+    ) -> None:
         pass
 
     def getInternalPiping(self) -> _ip.InternalPiping:

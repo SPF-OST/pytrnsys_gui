@@ -6,22 +6,28 @@ class Cancelled:
 
 
 CANCELLED = Cancelled()
-_T = _tp.TypeVar("_T")
-MaybeCancelled: _tp.TypeAlias = _T | Cancelled
+
+type MaybeCancelled[T] = T | Cancelled
 
 
-def isCancelled(maybeCancelled: MaybeCancelled[_T]) -> _tp.TypeGuard[Cancelled]:
+def isCancelled[
+    T  # pylint: disable=redefined-outer-name
+](maybeCancelled: MaybeCancelled[T],) -> _tp.TypeGuard[Cancelled]:
     if maybeCancelled == CANCELLED:
         return True
 
     if isinstance(maybeCancelled, Cancelled):
-        raise AssertionError(f"Don't instantiate {Cancelled} but use the variable `CANCELLED' instead.")
+        raise AssertionError(
+            f"Don't instantiate {Cancelled} but use the variable `CANCELLED' instead."
+        )
 
     return False
 
 
-def value(maybeCancelled: MaybeCancelled[_T]) -> _T:
+def value[
+    T  # pylint: disable=redefined-outer-name
+](maybeCancelled: MaybeCancelled[T]) -> T:
     if isCancelled(maybeCancelled):
         raise ValueError("Value was cancelled.")
 
-    return _tp.cast(_T, maybeCancelled)
+    return _tp.cast(T, maybeCancelled)

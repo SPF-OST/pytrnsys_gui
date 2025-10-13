@@ -52,23 +52,29 @@ TDPCnrHot = [2,1]
 
 
 class TestDoubleDoublePipeConnector:
-    def test(self, tmp_path, qtbot):  # pylint: disable=invalid-name  # /NOSONAR
+    def test(self, tmp_path, qtbot):  # pylint: disable=invalid-name  # NOSONAR
         connector = self._createConnector(tmp_path, qtbot)
 
         unitNumber = 1
-        text, nextUnitNumber = connector.exportPipeAndTeeTypesForTemp(unitNumber)
+        text, nextUnitNumber = connector.exportPipeAndTeeTypesForTemp(
+            unitNumber
+        )
 
         assert nextUnitNumber == unitNumber + 2
         assert text == _EXPECTED_TEXT
 
     @classmethod
-    def _createConnector(cls, tmp_path, bot):  # pylint: disable=invalid-name  # /NOSONAR
+    def _createConnector(
+        cls, tmp_path, bot
+    ):  # pylint: disable=invalid-name  # NOSONAR
         logger = _log.getLogger("root")
 
         (
             editorMock,
             objectsNeededToBeKeptAliveWhileTanksAlive,  # pylint: disable=unused-variable
-        ) = cls._createEditorMockAndOtherObjectsToKeepAlive(logger, tmp_path, bot)
+        ) = cls._createEditorMockAndOtherObjectsToKeepAlive(
+            logger, tmp_path, bot
+        )
 
         connector = _ddpc.DoubleDoublePipeConnector(
             editor=editorMock,
@@ -76,10 +82,14 @@ class TestDoubleDoublePipeConnector:
             displayName="DPCnr",
         )
 
-        externalFromPortConnection = cls._createConnectionMock("inputConnection", toPort=connector.inputs[0])
+        externalFromPortConnection = cls._createConnectionMock(
+            "inputConnection", toPort=connector.inputs[0]
+        )
         connector.inputs[0].connectionList.append(externalFromPortConnection)
 
-        externalToPortConnection = cls._createConnectionMock("outputConnection", fromPort=connector.outputs[0])
+        externalToPortConnection = cls._createConnectionMock(
+            "outputConnection", fromPort=connector.outputs[0]
+        )
         connector.outputs[0].connectionList.append(externalToPortConnection)
 
         return connector
@@ -88,21 +98,39 @@ class TestDoubleDoublePipeConnector:
     def _createConnectionMock(
         displayName: str, fromPort=_StrictMock(), toPort=_StrictMock()
     ) -> _dpc.DoublePipeConnection:
-        coldInput = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.COLD)
-        coldOutput = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.COLD)
+        coldInput = _mfn.PortItem(
+            "In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.COLD
+        )
+        coldOutput = _mfn.PortItem(
+            "Out", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.COLD
+        )
         coldModelPipe = _mfn.Pipe(coldInput, coldOutput, "Cold")
 
-        hotInput = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.HOT)
-        hotOutput = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.HOT)
+        hotInput = _mfn.PortItem(
+            "In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.HOT
+        )
+        hotOutput = _mfn.PortItem(
+            "Out", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.HOT
+        )
         hotModelPipe = _mfn.Pipe(hotInput, hotOutput, "Hot")
 
         def getInternalPiping() -> _ip.InternalPiping:
-            coldModelPortItemsToGraphicalPortItem = {coldModelPipe.fromPort: toPort, coldModelPipe.toPort: fromPort}
-            hotModelPortItemsToGraphicalPortItem = {hotModelPipe.fromPort: fromPort, hotModelPipe.toPort: toPort}
+            coldModelPortItemsToGraphicalPortItem = {
+                coldModelPipe.fromPort: toPort,
+                coldModelPipe.toPort: fromPort,
+            }
+            hotModelPortItemsToGraphicalPortItem = {
+                hotModelPipe.fromPort: fromPort,
+                hotModelPipe.toPort: toPort,
+            }
             modelPortItemsToGraphicalPortItem = (
-                coldModelPortItemsToGraphicalPortItem | hotModelPortItemsToGraphicalPortItem
+                coldModelPortItemsToGraphicalPortItem
+                | hotModelPortItemsToGraphicalPortItem
             )
-            return _ip.InternalPiping([coldModelPipe, hotModelPipe], modelPortItemsToGraphicalPortItem)
+            return _ip.InternalPiping(
+                [coldModelPipe, hotModelPipe],
+                modelPortItemsToGraphicalPortItem,
+            )
 
         mock = _StrictMock(
             displayName=displayName,

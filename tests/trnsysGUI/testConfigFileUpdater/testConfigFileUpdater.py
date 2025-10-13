@@ -18,7 +18,10 @@ class TestConfigFile:
         configFile = _cfu.ConfigFileUpdater(actualConfigFilePath)
         configFile.updateConfig()
 
-        assert self._getContentsWithLocalPathsReplaced(actualConfigFilePath) == expectedConfigFilePath.read_text()
+        assert (
+            self._getContentsWithLocalPathsReplaced(actualConfigFilePath)
+            == expectedConfigFilePath.read_text()
+        )
 
     def testUpdateExistingConfig(self) -> None:
 
@@ -40,12 +43,17 @@ class TestConfigFile:
         configFile = _cfu.ConfigFileUpdater(actualConfigFilePath)
         configFile.updateConfig()
 
-        assert self._getContentsWithLocalPathsReplaced(actualConfigFilePath) == expectedConfigFilePath.read_text()
+        assert (
+            self._getContentsWithLocalPathsReplaced(actualConfigFilePath)
+            == expectedConfigFilePath.read_text()
+        )
 
     @staticmethod
     def _getContentsWithLocalPathsReplaced(filePath: _pl.Path) -> str:
         pathToReplace = _pl.Path(_tg.__file__).parents[2]
         replacementPath = r"C:\actions-runner\_work\pytrnsys_gui"
         content = filePath.read_text()
-        contentWithPathReplaced = content.replace(str(pathToReplace), replacementPath)
+        contentWithPathReplaced = content.replace(
+            str(pathToReplace), replacementPath
+        )
         return contentWithPathReplaced

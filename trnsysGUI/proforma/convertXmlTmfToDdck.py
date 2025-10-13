@@ -48,12 +48,16 @@ def convertXmltmfToDdck(
     containingDir.mkdir(parents=True, exist_ok=True)
 
     xmlTmfContent = xmlTmfFilePath.read_text(encoding="utf8")
-    maybeCancelled = convertXmlTmfStringToDdck(xmlTmfContent, suggestedHydraulicConnections, ddckFilePath.name)
+    maybeCancelled = convertXmlTmfStringToDdck(
+        xmlTmfContent, suggestedHydraulicConnections, ddckFilePath.name
+    )
     if _cancel.isCancelled(maybeCancelled):
         return _cancel.CANCELLED
     result = _cancel.value(maybeCancelled)
     if _res.isError(result):
-        return _res.error(result).withContext(f"Converting proforma `{xmlTmfFilePath}`")
+        return _res.error(result).withContext(
+            f"Converting proforma `{xmlTmfFilePath}`"
+        )
     ddckContent = _res.value(result)
 
     assert isinstance(ddckContent, str)
@@ -73,33 +77,61 @@ class _HydraulicConnectionsData:
 
     @property
     def variableName(self) -> str:
-        return self.variableNameBuilder.getVariableName(self.name, self.portName)
+        return self.variableNameBuilder.getVariableName(
+            self.name, self.portName
+        )
 
     @property
     def rhs(self) -> str:
         return self.variableNameBuilder.getRhs(self.name, self.portName)
 
     @staticmethod
-    def createForTemperature(connectionName: str | None, portName: str) -> "_HydraulicConnectionsData":
-        return _HydraulicConnectionsData(connectionName, portName, _models.AllVariableStringConstants.TEMPERATURE)
+    def createForTemperature(
+        connectionName: str | None, portName: str
+    ) -> "_HydraulicConnectionsData":
+        return _HydraulicConnectionsData(
+            connectionName,
+            portName,
+            _models.AllVariableStringConstants.TEMPERATURE,
+        )
 
     @staticmethod
     def createForReverseTemperature(connectionName: str | None, portName: str):
         return _HydraulicConnectionsData(
-            connectionName, portName, _models.AllVariableStringConstants.REVERSE_TEMPERATURE
+            connectionName,
+            portName,
+            _models.AllVariableStringConstants.REVERSE_TEMPERATURE,
         )
 
     @staticmethod
-    def createForMassFlowRate(connectionName: str | None, portName: str) -> "_HydraulicConnectionsData":
-        return _HydraulicConnectionsData(connectionName, portName, _models.AllVariableStringConstants.MASS_FLOW_RATE)
+    def createForMassFlowRate(
+        connectionName: str | None, portName: str
+    ) -> "_HydraulicConnectionsData":
+        return _HydraulicConnectionsData(
+            connectionName,
+            portName,
+            _models.AllVariableStringConstants.MASS_FLOW_RATE,
+        )
 
     @staticmethod
-    def createForFluidHeatCapacity(connectionName: str | None, portName: str) -> "_HydraulicConnectionsData":
-        return _HydraulicConnectionsData(connectionName, portName, _models.AllVariableStringConstants.HEAT_CAPACITY)
+    def createForFluidHeatCapacity(
+        connectionName: str | None, portName: str
+    ) -> "_HydraulicConnectionsData":
+        return _HydraulicConnectionsData(
+            connectionName,
+            portName,
+            _models.AllVariableStringConstants.HEAT_CAPACITY,
+        )
 
     @staticmethod
-    def createForFluidDensity(connectionName: str | None, portName: str) -> "_HydraulicConnectionsData":
-        return _HydraulicConnectionsData(connectionName, portName, _models.AllVariableStringConstants.DENSITY)
+    def createForFluidDensity(
+        connectionName: str | None, portName: str
+    ) -> "_HydraulicConnectionsData":
+        return _HydraulicConnectionsData(
+            connectionName,
+            portName,
+            _models.AllVariableStringConstants.DENSITY,
+        )
 
 
 @_dc.dataclass
@@ -108,7 +140,8 @@ class _VariableWithHydraulicConnectionsData(_models.Variable):
 
     @staticmethod
     def fromVariable(
-        variable: _models.Variable, connectionsDataByOrder: _tp.Mapping[int, _HydraulicConnectionsData]
+        variable: _models.Variable,
+        connectionsDataByOrder: _tp.Mapping[int, _HydraulicConnectionsData],
     ) -> "_VariableWithHydraulicConnectionsData":
         hydraulicConnectionsData = connectionsDataByOrder.get(variable.order)
         variableWithData = _VariableWithHydraulicConnectionsData(
@@ -123,7 +156,10 @@ def _createProcessedVariables(
 ) -> _cabc.Sequence[_VariableWithHydraulicConnectionsData]:
 
     processedVariables = [
-        _VariableWithHydraulicConnectionsData.fromVariable(v, connectionsDataByOrder) for v in variables
+        _VariableWithHydraulicConnectionsData.fromVariable(
+            v, connectionsDataByOrder
+        )
+        for v in variables
     ]
 
     return processedVariables
@@ -137,11 +173,19 @@ def _createVariablesByRole(
 
     sortedSerializedVariables = sorted(serializedVariables, key=getOrder)
 
-    parameterVariables = _createVariablesForRole("parameter", sortedSerializedVariables)
-    inputVariables = _createVariablesForRole("input", sortedSerializedVariables)
-    outputVariables = _createVariablesForRole("output", sortedSerializedVariables)
+    parameterVariables = _createVariablesForRole(
+        "parameter", sortedSerializedVariables
+    )
+    inputVariables = _createVariablesForRole(
+        "input", sortedSerializedVariables
+    )
+    outputVariables = _createVariablesForRole(
+        "output", sortedSerializedVariables
+    )
 
-    return _models.VariablesByRole(parameterVariables, inputVariables, outputVariables)
+    return _models.VariablesByRole(
+        parameterVariables, inputVariables, outputVariables
+    )
 
 
 _Role = _tp.Literal["parameter", "input", "output"]
@@ -150,10 +194,14 @@ _Role = _tp.Literal["parameter", "input", "output"]
 def _createVariablesForRole(
     role: _Role, sortedSerializedVariables: _cabc.Sequence[_StringMapping]
 ) -> _cabc.Sequence[_models.Variable]:
-    sortedSerializedVariablesForRole = _getSerializedVariablesWithRole(role, sortedSerializedVariables)
+    sortedSerializedVariablesForRole = _getSerializedVariablesWithRole(
+        role, sortedSerializedVariables
+    )
 
     variables = []
-    for roleOrder, serializedVariable in enumerate(sortedSerializedVariablesForRole, start=1):
+    for roleOrder, serializedVariable in enumerate(
+        sortedSerializedVariablesForRole, start=1
+    ):
         definition = _getDefinition(serializedVariable)
         bounds = _getBounds(serializedVariable)
 
@@ -174,14 +222,18 @@ def _createVariablesForRole(
 
 
 def convertXmlTmfStringToDdck(
-    xmlTmfContent: str, suggestedHydraulicConnections: _cabc.Sequence[_models.Connection] | None, fileName: str
+    xmlTmfContent: str,
+    suggestedHydraulicConnections: _cabc.Sequence[_models.Connection] | None,
+    fileName: str,
 ) -> _cancel.MaybeCancelled[_res.Result[str]]:
     schema = _xs.XMLSchema11(_SCHEMA_FILE_PATH)
 
     try:
         schema.validate(xmlTmfContent)
     except (_etree.ParseError, _xs.XMLSchemaException) as error:
-        return _res.Error(f"Error reading or validating the proforma file: {error}")
+        return _res.Error(
+            f"Error reading or validating the proforma file: {error}"
+        )
 
     proforma: _tp.Any = schema.to_dict(xmlTmfContent)
 
@@ -189,8 +241,12 @@ def convertXmlTmfStringToDdck(
     variablesByRole = _createVariablesByRole(serializedVariables)
 
     if "hydraulicConnections" in proforma:
-        serializedHydraulicConnections = proforma["hydraulicConnections"]["connection"]
-        result = _cmcs.createModelConnectionsFromProforma(serializedHydraulicConnections, variablesByRole.allVariables)
+        serializedHydraulicConnections = proforma["hydraulicConnections"][
+            "connection"
+        ]
+        result = _cmcs.createModelConnectionsFromProforma(
+            serializedHydraulicConnections, variablesByRole.allVariables
+        )
         if _res.isError(result):
             return _res.error(result)
         hydraulicConnections = _res.value(result)
@@ -202,8 +258,10 @@ def convertXmlTmfStringToDdck(
     defaultVisibility = _dv.DefaultVisibility.LOCAL
 
     if hydraulicConnections:
-        maybeCancelled = _ehcd.EditHydraulicConnectionsDialog.showDialogAndGetResults(
-            hydraulicConnections, variablesByRole
+        maybeCancelled = (
+            _ehcd.EditHydraulicConnectionsDialog.showDialogAndGetResults(
+                hydraulicConnections, variablesByRole
+            )
         )
         if _cancel.isCancelled(maybeCancelled):
             return _cancel.CANCELLED
@@ -220,7 +278,9 @@ def convertXmlTmfStringToDdck(
         "visibilityModifier": _getVisibilityModifier(defaultVisibility),
     }
 
-    return _convertXmlTmfStringToDdck(hydraulicConnections, variablesByRole, otherJinjaVariables)
+    return _convertXmlTmfStringToDdck(
+        hydraulicConnections, variablesByRole, otherJinjaVariables
+    )
 
 
 def _getVisibilityModifier(  # pylint: disable=inconsistent-return-statements
@@ -244,7 +304,9 @@ def _makeMultilineComment(text: str, width: int = 120) -> str:
 
 
 def _collapseWhitespace(text: str) -> str:
-    textWithCollapsedWhitespace = _re.sub(r"\s+", " ", text.strip(), count=0, flags=_re.MULTILINE)
+    textWithCollapsedWhitespace = _re.sub(
+        r"\s+", " ", text.strip(), count=0, flags=_re.MULTILINE
+    )
     return textWithCollapsedWhitespace
 
 
@@ -253,10 +315,18 @@ def _convertXmlTmfStringToDdck(
     variablesByRole: _models.VariablesByRole,
     otherJinjaVariables: _cabc.Mapping[str, _tp.Any],
 ) -> str:
-    connectionsDataByOrder = _createHydraulicConnectionDataByOrder(hydraulicConnections)
-    parameters = _createProcessedVariables(variablesByRole.parameters, connectionsDataByOrder)
-    inputs = _createProcessedVariables(variablesByRole.inputs, connectionsDataByOrder)
-    outputs = _createProcessedVariables(variablesByRole.outputs, connectionsDataByOrder)
+    connectionsDataByOrder = _createHydraulicConnectionDataByOrder(
+        hydraulicConnections
+    )
+    parameters = _createProcessedVariables(
+        variablesByRole.parameters, connectionsDataByOrder
+    )
+    inputs = _createProcessedVariables(
+        variablesByRole.inputs, connectionsDataByOrder
+    )
+    outputs = _createProcessedVariables(
+        variablesByRole.outputs, connectionsDataByOrder
+    )
     ddckContent = _JINJA_TEMPLATE.render(
         parameters=parameters,
         inputs=inputs,
@@ -274,30 +344,42 @@ def _createHydraulicConnectionDataByOrder(
     for hydraulicConnection in hydraulicConnections:
         connectionName = hydraulicConnection.name
         inputPort = hydraulicConnection.inputPort
-        dataByOrderForFluid = _getHydraulicConnectionDataByOrderForFluid(connectionName, hydraulicConnection, inputPort)
+        dataByOrderForFluid = _getHydraulicConnectionDataByOrderForFluid(
+            connectionName, hydraulicConnection, inputPort
+        )
 
-        dataByOrderForInput = _getHydraulicConnectionDataByOrderForInput(connectionName, inputPort)
+        dataByOrderForInput = _getHydraulicConnectionDataByOrderForInput(
+            connectionName, inputPort
+        )
         dataByOrderForOutput = _getHydraulicConnectionDataByOrderForOutput(
             connectionName, hydraulicConnection.outputPort
         )
-        hydraulicConnectionDataByOrder |= dataByOrderForFluid | dataByOrderForInput | dataByOrderForOutput
+        hydraulicConnectionDataByOrder |= (
+            dataByOrderForFluid | dataByOrderForInput | dataByOrderForOutput
+        )
 
     return hydraulicConnectionDataByOrder
 
 
 def _getHydraulicConnectionDataByOrderForFluid(
-    connectionName: str | None, hydraulicConnection: _models.Connection, inputPort: _models.InputPort
+    connectionName: str | None,
+    hydraulicConnection: _models.Connection,
+    inputPort: _models.InputPort,
 ) -> dict[int, _HydraulicConnectionsData]:
     dataByOrderForFluid = {}
     heatCapacityVariable = hydraulicConnection.fluid.heatCapacity
     if heatCapacityVariable:
-        dataByOrderForFluid[heatCapacityVariable.order] = _HydraulicConnectionsData.createForFluidHeatCapacity(
-            connectionName, inputPort.name
+        dataByOrderForFluid[heatCapacityVariable.order] = (
+            _HydraulicConnectionsData.createForFluidHeatCapacity(
+                connectionName, inputPort.name
+            )
         )
     densityVariable = hydraulicConnection.fluid.density
     if densityVariable:
-        dataByOrderForFluid[densityVariable.order] = _HydraulicConnectionsData.createForFluidDensity(
-            connectionName, inputPort.name
+        dataByOrderForFluid[densityVariable.order] = (
+            _HydraulicConnectionsData.createForFluidDensity(
+                connectionName, inputPort.name
+            )
         )
     return dataByOrderForFluid
 
@@ -311,8 +393,12 @@ def _getHydraulicConnectionDataByOrderForInput(
     tempOrder = inputPort.temperatureSet.order
 
     hydraulicConnectionData = {
-        mfrOrder: _HydraulicConnectionsData.createForMassFlowRate(connectionName, portName),
-        tempOrder: _HydraulicConnectionsData.createForTemperature(connectionName, portName),
+        mfrOrder: _HydraulicConnectionsData.createForMassFlowRate(
+            connectionName, portName
+        ),
+        tempOrder: _HydraulicConnectionsData.createForTemperature(
+            connectionName, portName
+        ),
     }
 
     return hydraulicConnectionData
@@ -324,15 +410,23 @@ def _getHydraulicConnectionDataByOrderForOutput(
 ) -> dict[int, _HydraulicConnectionsData]:
     portName = outputPort.name
     tempOrder = outputPort.temperatureSet.order
-    revTempOrder = outputPort.reverseTemperature.order if outputPort.reverseTemperature else None
+    revTempOrder = (
+        outputPort.reverseTemperature.order
+        if outputPort.reverseTemperature
+        else None
+    )
 
     hydraulicConnectionData = {
-        tempOrder: _HydraulicConnectionsData.createForTemperature(connectionName, portName),
+        tempOrder: _HydraulicConnectionsData.createForTemperature(
+            connectionName, portName
+        ),
     }
 
     if revTempOrder is not None:
-        hydraulicConnectionData[revTempOrder] = _HydraulicConnectionsData.createForReverseTemperature(
-            connectionName, portName
+        hydraulicConnectionData[revTempOrder] = (
+            _HydraulicConnectionsData.createForReverseTemperature(
+                connectionName, portName
+            )
         )
 
     return hydraulicConnectionData
@@ -357,7 +451,9 @@ def _getDefinition(variable: _StringMapping) -> str | None:
 
 
 def _getBounds(variable: _StringMapping) -> str:
-    leftBracket, rightBracket = [b.strip() for b in variable["boundaries"].split(";")]
+    leftBracket, rightBracket = [
+        b.strip() for b in variable["boundaries"].split(";")
+    ]
     minimum = variable["min"]
     maximum = variable["max"]
     bounds = f"{leftBracket}{minimum},{maximum}{rightBracket}"

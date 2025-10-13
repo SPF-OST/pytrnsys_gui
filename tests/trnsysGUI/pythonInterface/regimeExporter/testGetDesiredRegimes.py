@@ -6,7 +6,10 @@ import pytest as _pt
 import trnsysGUI.pythonInterface.regimeExporter.getDesiredRegimes as _gdr
 import trnsysGUI as _GUI
 
-_DATA_DIR_ = _pl.Path(_GUI.__file__).parent / "..\\tests\\trnsysGUI\\data\\diagramForRegimes"
+_DATA_DIR_ = (
+    _pl.Path(_GUI.__file__).parent
+    / "..\\tests\\trnsysGUI\\data\\diagramForRegimes"
+)
 
 _COL_NAME_ = "regimeName"
 
@@ -29,5 +32,7 @@ class TestGetDesiredRegimes:
 
     def testColumnNameIncorrectRaises(self):
         fileName = _DATA_DIR_ / "regimes_incorrect.csv"
-        with _pt.raises(ValueError, match=f"Column name '{_COL_NAME_}' not found."):
+        with _pt.raises(
+            ValueError, match=f"Column name '{_COL_NAME_}' not found."
+        ):
             _gdr.getRegimesFromFile(fileName)

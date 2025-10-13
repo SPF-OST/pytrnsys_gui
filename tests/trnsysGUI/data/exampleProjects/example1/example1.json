@@ -1,0 +1,33 @@
+{
+    "Blocks": {
+        ".__BlockDct__": true,
+        "Block-1": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "PV",
+            "BlockName": "PV",
+            "__version__": "e8cfde2f-8239-4338-a5f0-63a7abb93900",
+            "blockPosition": [
+                -10.0,
+                -55.0
+            ],
+            "flippedH": false,
+            "flippedV": false,
+            "portsIdsIn": [],
+            "portsIdsOut": [],
+            "rotationN": 0,
+            "trnsysId": 1
+        },
+        "IDs": {
+            "GlobalId": 1,
+            "__idDct__": true,
+            "globalConnID": 1,
+            "trnsysID": 2
+        },
+        "Strings": {
+            "DiagramName": "example1.json",
+            "ProjectFolder": "C:\\Development\\parent\\pytrnsys_gui\\tests\\trnsysGUI\\data\\exampleProjects\\example1",
+            "__nameDct__": true
+        }
+    },
+    "hydraulicLoops": []
+}

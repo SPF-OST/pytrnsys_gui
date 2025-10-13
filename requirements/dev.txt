@@ -6,11 +6,6 @@
 #    pip-compile-multi
 #
 -r dev-3rd-party.txt
--e file:../pytrnsys
-    # via -r requirements\dev.in
 -e file:.
-    # via -r requirements\dev.in
-
-# The following packages are considered to be unsafe in a requirements file:
-# pip
-# setuptools
+-e file:../pytrnsys
+shortpath83==0.12

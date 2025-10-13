@@ -11,17 +11,23 @@ import trnsysGUI.serialization as _gser
 
 
 @_dc.dataclass
-class ConnectionModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):  # pylint: disable=too-many-instance-attributes
+class ConnectionModelVersion0(
+    _ser.UpgradableJsonSchemaMixinVersion0
+):  # pylint: disable=too-many-instance-attributes
     ConnCID: int  # pylint: disable=invalid-name
     ConnDisplayName: str  # pylint: disable=invalid-name
     ConnID: int  # pylint: disable=invalid-name
-    CornerPositions: _tp.List[_tp.Tuple[float, float]]  # pylint: disable=invalid-name
-    FirstSegmentLabelPos: _tp.Tuple[float, float]  # pylint: disable=invalid-name
-    FirstSegmentMassFlowLabelPos: _tp.Optional[_tp.Tuple[float, float]]  # pylint: disable=invalid-name
+    # pylint: disable=invalid-name
+    CornerPositions: _tp.List[_tp.Tuple[float, float]]
+    # pylint: disable=invalid-name
+    FirstSegmentLabelPos: _tp.Tuple[float, float]
+    # pylint: disable=invalid-name
+    FirstSegmentMassFlowLabelPos: _tp.Optional[_tp.Tuple[float, float]]
     GroupName: str  # pylint: disable=invalid-name
     PortFromID: int  # pylint: disable=invalid-name
     PortToID: int  # pylint: disable=invalid-name
-    SegmentPositions: _tp.List[_tp.Tuple[float, float, float, float]]  # pylint: disable=invalid-name
+    # pylint: disable=invalid-name
+    SegmentPositions: _tp.List[_tp.Tuple[float, float, float, float]]
     isVirtualConn: _tp.Optional[bool]
     trnsysID: int
 
@@ -31,7 +37,9 @@ class ConnectionModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):  # pylint
 
 
 @_dc.dataclass
-class ConnectionModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
+class ConnectionModelVersion1(
+    _ser.UpgradableJsonSchemaMixin
+):  # pylint: disable=too-many-instance-attributes
     connectionId: int
     name: str
     groupName: _tp.Optional[str]
@@ -47,22 +55,30 @@ class ConnectionModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disabl
     lengthInM: _values.Value = _defaults.DEFAULT_LENGTH_IN_M
 
     @classmethod
-    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+    def getSupersededClass(
+        cls,
+    ) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
         return ConnectionModelVersion0
 
     @classmethod
-    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "ConnectionModelVersion1":
+    def upgrade(
+        cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0
+    ) -> "ConnectionModelVersion1":
         assert isinstance(superseded, ConnectionModelVersion0)
 
         firstSegmentLabelPos = (
-            superseded.SegmentPositions[0][0] + superseded.FirstSegmentLabelPos[0],
-            superseded.SegmentPositions[0][1] + superseded.FirstSegmentLabelPos[1],
+            superseded.SegmentPositions[0][0]
+            + superseded.FirstSegmentLabelPos[0],
+            superseded.SegmentPositions[0][1]
+            + superseded.FirstSegmentLabelPos[1],
         )
 
         if superseded.FirstSegmentMassFlowLabelPos:
             firstSegmentMassFlowLabelPos = (
-                superseded.SegmentPositions[0][0] + superseded.FirstSegmentMassFlowLabelPos[0],
-                superseded.SegmentPositions[0][1] + superseded.FirstSegmentMassFlowLabelPos[1],
+                superseded.SegmentPositions[0][0]
+                + superseded.FirstSegmentMassFlowLabelPos[0],
+                superseded.SegmentPositions[0][1]
+                + superseded.FirstSegmentMassFlowLabelPos[1],
             )
         else:
             firstSegmentMassFlowLabelPos = firstSegmentLabelPos
@@ -89,7 +105,9 @@ class ConnectionModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disabl
 
 
 @_dc.dataclass
-class ConnectionModelVersion2(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
+class ConnectionModelVersion2(
+    _ser.UpgradableJsonSchemaMixin
+):  # pylint: disable=too-many-instance-attributes
     connectionId: int
     name: str
     id: int  # pylint: disable=invalid-name
@@ -104,11 +122,15 @@ class ConnectionModelVersion2(_ser.UpgradableJsonSchemaMixin):  # pylint: disabl
     lengthInM: _values.Value
 
     @classmethod
-    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+    def getSupersededClass(
+        cls,
+    ) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
         return ConnectionModelVersion1
 
     @classmethod
-    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "ConnectionModelVersion2":
+    def upgrade(
+        cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0
+    ) -> "ConnectionModelVersion2":
         assert isinstance(superseded, ConnectionModelVersion1)
 
         return ConnectionModelVersion2(
@@ -132,7 +154,9 @@ class ConnectionModelVersion2(_ser.UpgradableJsonSchemaMixin):  # pylint: disabl
 
 
 @_dc.dataclass
-class ConnectionModelVersion3(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
+class ConnectionModelVersion3(
+    _ser.UpgradableJsonSchemaMixin
+):  # pylint: disable=too-many-instance-attributes
     connectionId: int
     name: str
     id: int  # pylint: disable=invalid-name
@@ -148,11 +172,15 @@ class ConnectionModelVersion3(_ser.UpgradableJsonSchemaMixin):  # pylint: disabl
     shallCreateTrnsysUnit: bool
 
     @classmethod
-    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+    def getSupersededClass(
+        cls,
+    ) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
         return ConnectionModelVersion2
 
     @classmethod
-    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "ConnectionModelVersion3":
+    def upgrade(
+        cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0
+    ) -> "ConnectionModelVersion3":
         assert isinstance(superseded, ConnectionModelVersion2)
 
         return ConnectionModelVersion3(
@@ -177,7 +205,9 @@ class ConnectionModelVersion3(_ser.UpgradableJsonSchemaMixin):  # pylint: disabl
 
 
 @_dc.dataclass
-class ConnectionModel(_gser.ConnectionItemUpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
+class ConnectionModel(
+    _gser.ConnectionItemUpgradableJsonSchemaMixin
+):  # pylint: disable=too-many-instance-attributes
     connectionId: int
     name: str
     id: int  # pylint: disable=invalid-name
@@ -193,11 +223,15 @@ class ConnectionModel(_gser.ConnectionItemUpgradableJsonSchemaMixin):  # pylint:
     shallBeSimulated: bool
 
     @classmethod
-    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+    def getSupersededClass(
+        cls,
+    ) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
         return ConnectionModelVersion3
 
     @classmethod
-    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "ConnectionModel":
+    def upgrade(
+        cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0
+    ) -> "ConnectionModel":
         assert isinstance(superseded, ConnectionModelVersion3)
 
         return ConnectionModel(

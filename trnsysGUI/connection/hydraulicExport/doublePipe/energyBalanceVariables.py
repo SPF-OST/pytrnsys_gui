@@ -31,7 +31,13 @@ class EnergyBalanceVariables(_enum.Enum):
 
 @_dc.dataclass
 class VariableNameGenerator:
-    def __init__(self, doublePipeDisplayName: str, *, coldPipeName: str, hotPipeName: str) -> None:
+    def __init__(
+        self,
+        doublePipeDisplayName: str,
+        *,
+        coldPipeName: str,
+        hotPipeName: str,
+    ) -> None:
         self.doublePipeDisplayName = doublePipeDisplayName
         self.coldPipeName = coldPipeName
         self.hotPipeName = hotPipeName
@@ -47,9 +53,15 @@ class VariableNameGenerator:
         return variableName
 
     def _getEnergyBalanceVariablePrefix(
-        self, variable: EnergyBalanceVariables, portItemType: _tp.Optional[_mfn.PortItemType]
+        self,
+        variable: EnergyBalanceVariables,
+        portItemType: _tp.Optional[_mfn.PortItemType],
     ) -> str:
-        if portItemType not in [_mfn.PortItemType.COLD, _mfn.PortItemType.HOT, None]:
+        if portItemType not in [
+            _mfn.PortItemType.COLD,
+            _mfn.PortItemType.HOT,
+            None,
+        ]:
             errorMessage = (
                 f"Energy balance variables are only defined for "
                 f"`{_mfn.PortItemType.COLD.name}` or `{_mfn.PortItemType.HOT.name}` "  # pylint: disable=no-member
@@ -59,13 +71,21 @@ class VariableNameGenerator:
 
         isPerSinglePipe = variable.value.isPerSinglePipe
         if not isPerSinglePipe and portItemType:
-            raise ValueError(f"Energy balance variable `{variable.name}` is not defined per single pipe.")
+            raise ValueError(
+                f"Energy balance variable `{variable.name}` is not defined per single pipe."
+            )
 
         if isPerSinglePipe and not portItemType:
-            raise ValueError(f"Energy balance variable `{variable.name}` is defined per single pipe.")
+            raise ValueError(
+                f"Energy balance variable `{variable.name}` is defined per single pipe."
+            )
 
         if not portItemType:
             return self.doublePipeDisplayName
 
-        pipeName = self.coldPipeName if portItemType == _mfn.PortItemType.COLD else self.hotPipeName
+        pipeName = (
+            self.coldPipeName
+            if portItemType == _mfn.PortItemType.COLD
+            else self.hotPipeName
+        )
         return f"{self.doublePipeDisplayName}{pipeName}"

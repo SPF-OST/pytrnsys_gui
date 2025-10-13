@@ -22,13 +22,17 @@ class ExportHydraulicDoublePipeConnection:
     @property
     def coldOutputTemperatureVariableName(self) -> str:
         return _temps.getTemperatureVariableName(
-            shallRenameOutputInHydraulicFile=False, componentDisplayName=self.displayName, nodeName=self.coldPipe.name
+            shallRenameOutputInHydraulicFile=False,
+            componentDisplayName=self.displayName,
+            nodeName=self.coldPipe.name,
         )
 
     @property
     def hotOutputTemperatureVariableName(self) -> str:
         return _temps.getTemperatureVariableName(
-            shallRenameOutputInHydraulicFile=False, componentDisplayName=self.displayName, nodeName=self.hotPipe.name
+            shallRenameOutputInHydraulicFile=False,
+            componentDisplayName=self.displayName,
+            nodeName=self.hotPipe.name,
         )
 
     @property
@@ -52,4 +56,6 @@ class ExportHydraulicDoublePipeConnection:
         )
 
 
-ExportDoublePipeConnection = _com.GenericConnection[ExportHydraulicDoublePipeConnection]
+ExportDoublePipeConnection = _com.GenericConnection[
+    ExportHydraulicDoublePipeConnection
+]

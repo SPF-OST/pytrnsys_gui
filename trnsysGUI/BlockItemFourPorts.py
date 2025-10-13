@@ -31,7 +31,9 @@ class BlockItemFourPorts(
 
     @classmethod
     @_tp.override
-    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+    def _getImageAccessor(  # pylint: disable=arguments-differ
+        cls,
+    ) -> _img.SvgImageAccessor:
         raise NotImplementedError()
 
     def getDisplayName(self) -> str:
@@ -59,7 +61,10 @@ class BlockItemFourPorts(
         dct["BlockDisplayName"] = self.displayName
         dct["PortsIDIn"] = portListInputs
         dct["PortsIDOut"] = portListOutputs
-        dct[self.name + "Position"] = (float(self.pos().x()), float(self.pos().y()))
+        dct[self.name + "Position"] = (
+            float(self.pos().x()),
+            float(self.pos().y()),
+        )
         dct["trnsysID"] = self.trnsysId
         dct["childIds"] = self.childIds
         dct["FlippedH"] = self.flippedH
@@ -84,7 +89,10 @@ class BlockItemFourPorts(
         for x, outputPort in enumerate(self.outputs):
             outputPort.id = i["PortsIDOut"][x]
 
-        self.setPos(float(i[self.name + "Position"][0]), float(i[self.name + "Position"][1]))
+        self.setPos(
+            float(i[self.name + "Position"][0]),
+            float(i[self.name + "Position"][1]),
+        )
         self.trnsysId = i["trnsysID"]
 
         resBlockList.append(self)

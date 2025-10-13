@@ -15,9 +15,13 @@ import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
-class GenericBlock(_biip.BlockItemHasInternalPiping, _bmx.RasterImageBlockItemMixin):
+class GenericBlock(
+    _biip.BlockItemHasInternalPiping, _bmx.RasterImageBlockItemMixin
+):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
-        _biip.BlockItemHasInternalPiping.__init__(self, trnsysType, editor, displayName)
+        _biip.BlockItemHasInternalPiping.__init__(
+            self, trnsysType, editor, displayName
+        )
         _bmx.RasterImageBlockItemMixin.__init__(self)
 
         self.inputs.append(_cspi.createSinglePipePortItem("i", self))
@@ -69,7 +73,9 @@ class GenericBlock(_biip.BlockItemHasInternalPiping, _bmx.RasterImageBlockItemMi
             if i.side == side:
                 res += 1
 
-        self.logger.debug("there are " + str(res) + " pairs on the side " + str(side))
+        self.logger.debug(
+            "there are " + str(res) + " pairs on the side " + str(side)
+        )
         return res
 
     def addPortDlg(self):
@@ -94,7 +100,11 @@ class GenericBlock(_biip.BlockItemHasInternalPiping, _bmx.RasterImageBlockItemMi
         self._imageAccessor = _ia.createForFile(_pl.Path(name))
 
     def pickImage(self):
-        return _pl.Path(_qtw.QFileDialog.getOpenFileName(self.editor, filter="*.png *.svg")[0])
+        return _pl.Path(
+            _qtw.QFileDialog.getOpenFileName(
+                self.editor, filter="*.png *.svg"
+            )[0]
+        )
 
     def _addChildContextMenuActions(self, contextMenu: _qtw.QMenu) -> None:
         super()._addChildContextMenuActions(contextMenu)
@@ -151,40 +161,66 @@ class GenericBlock(_biip.BlockItemHasInternalPiping, _bmx.RasterImageBlockItemMi
         portNb = [0, 0, 0, 0]
         for i in self.inputs:
             if i.side == 0:
-                distBetweenPorts = (self.h - 4 * delta) / (2 * self.getPairNb(0) - 1)
-                self.logger.debug("distance betw ports " + str(distBetweenPorts))
+                distBetweenPorts = (self.h - 4 * delta) / (
+                    2 * self.getPairNb(0) - 1
+                )
+                self.logger.debug(
+                    "distance betw ports " + str(distBetweenPorts)
+                )
                 i.setPos(-2 * delta, 2 * delta + distBetweenPorts * portNb[0])
                 portNb[0] += 1
 
-                self.outputs[self.inputs.index(i)].setPos(-2 * delta, 2 * delta + distBetweenPorts * portNb[0])
+                self.outputs[self.inputs.index(i)].setPos(
+                    -2 * delta, 2 * delta + distBetweenPorts * portNb[0]
+                )
                 portNb[0] += 1
             elif i.side == 1:
-                distBetweenPorts = (self.w - 4 * delta) / (2 * self.getPairNb(1) - 1)
+                distBetweenPorts = (self.w - 4 * delta) / (
+                    2 * self.getPairNb(1) - 1
+                )
                 i.setPos(2 * delta + distBetweenPorts * portNb[1], -2 * delta)
                 portNb[1] += 1
 
-                self.outputs[self.inputs.index(i)].setPos(2 * delta + distBetweenPorts * portNb[1], -2 * delta)
+                self.outputs[self.inputs.index(i)].setPos(
+                    2 * delta + distBetweenPorts * portNb[1], -2 * delta
+                )
                 portNb[1] += 1
 
             elif i.side == 2:
                 self.logger.debug("side == 2")
-                distBetweenPorts = (self.h - 4 * delta) / (2 * self.getPairNb(2) - 1)
-                self.logger.debug("side 2 dist betw ports is " + str(distBetweenPorts))
-                i.setPos(2 * delta + w, 2 * delta + distBetweenPorts * portNb[2])
+                distBetweenPorts = (self.h - 4 * delta) / (
+                    2 * self.getPairNb(2) - 1
+                )
+                self.logger.debug(
+                    "side 2 dist betw ports is " + str(distBetweenPorts)
+                )
+                i.setPos(
+                    2 * delta + w, 2 * delta + distBetweenPorts * portNb[2]
+                )
                 self.logger.debug(2 * delta + distBetweenPorts * portNb[2])
                 portNb[2] += 1
 
-                self.outputs[self.inputs.index(i)].setPos(2 * delta + w, 2 * delta + distBetweenPorts * portNb[2])
+                self.outputs[self.inputs.index(i)].setPos(
+                    2 * delta + w, 2 * delta + distBetweenPorts * portNb[2]
+                )
                 self.logger.debug(2 * delta + distBetweenPorts * portNb[2])
                 portNb[2] += 1
 
             else:
-                distBetweenPorts = (self.w - 4 * delta) / (2 * self.getPairNb(3) - 1)
-                self.logger.debug("distance betw ports " + str(distBetweenPorts))
-                i.setPos(2 * delta + distBetweenPorts * portNb[3], 2 * delta + h)
+                distBetweenPorts = (self.w - 4 * delta) / (
+                    2 * self.getPairNb(3) - 1
+                )
+                self.logger.debug(
+                    "distance betw ports " + str(distBetweenPorts)
+                )
+                i.setPos(
+                    2 * delta + distBetweenPorts * portNb[3], 2 * delta + h
+                )
                 portNb[3] += 1
 
-                self.outputs[self.inputs.index(i)].setPos(2 * delta + distBetweenPorts * portNb[3], 2 * delta + h)
+                self.outputs[self.inputs.index(i)].setPos(
+                    2 * delta + distBetweenPorts * portNb[3], 2 * delta + h
+                )
                 portNb[3] += 1
 
     def removePortPairOnSide(self, side):
@@ -202,7 +238,9 @@ class GenericBlock(_biip.BlockItemHasInternalPiping, _bmx.RasterImageBlockItemMi
 
         pipes = []
         portItems = {}
-        for i, (graphicalInputPort, graphicalOutputPort) in enumerate(zip(self.inputs, self.outputs)):
+        for i, (graphicalInputPort, graphicalOutputPort) in enumerate(
+            zip(self.inputs, self.outputs)
+        ):
             inputPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
             outputPort = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
             pipe = _mfn.Pipe(inputPort, outputPort, name=f"Side{i}")

@@ -22,7 +22,12 @@ def calcDist(p1, p2):
 
 
 class SegmentItemBase(_qtw.QGraphicsItemGroup):
-    def __init__(self, startNode: _node.Node, endNode: _node.Node, parent: _cib.ConnectionBase) -> None:
+    def __init__(
+        self,
+        startNode: _node.Node,
+        endNode: _node.Node,
+        parent: _cib.ConnectionBase,
+    ) -> None:
         """
         A connection is displayed as a chain of segmentItems (stored in Connection.segments)
         Parameters.
@@ -89,10 +94,14 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
             self.connection.segments.insert(0, self)
             return
 
-        self.connection.segments.insert(self.connection.segments.index(previousSegment) + 1, self)
+        self.connection.segments.insert(
+            self.connection.segments.index(previousSegment) + 1, self
+        )
 
     def isIntermediateSegment(self) -> bool:
-        return isinstance(self.startNode.parent, _ci.CornerItem) and isinstance(self.endNode.parent, _ci.CornerItem)
+        return isinstance(
+            self.startNode.parent, _ci.CornerItem
+        ) and isinstance(self.endNode.parent, _ci.CornerItem)
 
     def isFirstOrLastSegment(self) -> bool:
         isFirstSegment = self.isFirstSegment()
@@ -101,11 +110,17 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
         return isFirstOrLastSegment
 
     def isFirstSegment(self) -> bool:
-        isFirstSegment = hasattr(self.startNode.parent, "fromPort") and not self.startNode.prevN()
+        isFirstSegment = (
+            hasattr(self.startNode.parent, "fromPort")
+            and not self.startNode.prevN()
+        )
         return isFirstSegment
 
     def isLastSegment(self) -> bool:
-        isLastSegment = hasattr(self.endNode.parent, "fromPort") and not self.endNode.nextN()
+        isLastSegment = (
+            hasattr(self.endNode.parent, "fromPort")
+            and not self.endNode.nextN()
+        )
         return isLastSegment
 
     def isVertical(self) -> bool:
@@ -130,7 +145,9 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
         a1 = menu.addAction("Rename...")
         a1.triggered.connect(self.renameConn)
         a2 = menu.addAction("Delete this connection")
-        a2.triggered.connect(self.connection.createDeleteUndoCommandAndAddToStack)
+        a2.triggered.connect(
+            self.connection.createDeleteUndoCommandAndAddToStack
+        )
         a3 = menu.addAction("Invert this connection")
         a3.triggered.connect(self.connection.invertConnection)
         a4 = menu.addAction("Toggle name")

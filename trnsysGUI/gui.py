@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import logging as _log
 import pathlib as _pl
 import sys as _sys
+import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
 
@@ -10,12 +13,17 @@ import trnsysGUI.arguments as _args
 import trnsysGUI.setup as _setup
 import trnsysGUI.warningsAndErrors as _werrors
 
+if _tp.TYPE_CHECKING:
+    import trnsysGUI.project as _prj  # pylint: disable=import-outside-toplevel
 
-def main():
+
+def main() -> None:
     arguments = _args.getArgsOrExit()
 
     logFilePath = _getLogFilePath()
-    logger = _ulog.getOrCreateCustomLogger("root", arguments.logLevel, logFilePath)
+    logger = _ulog.getOrCreateCustomLogger(
+        "root", arguments.logLevel, logFilePath
+    )
 
     _registerExceptionHook(logger)
 
@@ -32,16 +40,31 @@ def main():
         return
 
     import trnsysGUI.common.cancelled as _ccl  # pylint: disable=import-outside-toplevel
-    import trnsysGUI.mainWindow as _mw  # pylint: disable=import-outside-toplevel
     import trnsysGUI.project as _prj  # pylint: disable=import-outside-toplevel
-    import trnsysGUI.tracing as trc  # pylint: disable=import-outside-toplevel
+    import trnsysGUI.settingsDlg as _sdlg  # pylint: disable=import-outside-toplevel
+
+    _sdlg.ensureSettingsExist()
 
     maybeCancelled = _prj.getProject()
     if _ccl.isCancelled(maybeCancelled):
         return
-    project = _ccl.value(maybeCancelled)
 
-    mainWindow = _mw.MainWindow(logger, project)
+    # mypy issue: https://github.com/python/mypy/issues/19640#issuecomment-3174819987
+    project: _prj.Project = _ccl.value(maybeCancelled)  # type: ignore[assignment]
+
+    _createAndShowMainWindow(app, project, logger, arguments.shallTrace)
+
+
+def _createAndShowMainWindow(
+    app: _qtw.QApplication,
+    project: _prj.Project,
+    logger: _log.Logger,
+    shallTrace: bool,
+) -> None:
+    import trnsysGUI.mainWindow as _mw  # pylint: disable=import-outside-toplevel
+    import trnsysGUI.tracing as trc  # pylint: disable=import-outside-toplevel
+
+    mainWindow = _mw.MainWindow(logger, project)  # type: ignore[attr-defined]
     mainWindow.start()
 
     def _shutdownMainWindowIfRunning() -> None:
@@ -49,13 +72,11 @@ def main():
             mainWindow.shutdown()
 
     app.aboutToQuit.connect(_shutdownMainWindowIfRunning)
-
     try:
         mainWindow.showMaximized()
-        mainWindow.ensureSettingsExist()
         mainWindow.loadTrnsysPath()
 
-        tracer = trc.createTracer(arguments.shallTrace)
+        tracer = trc.createTracer(shallTrace)
         tracer.run(app.exec)
     finally:
         _shutdownMainWindowIfRunning()
@@ -67,7 +88,9 @@ def _getLogFilePath():
 
 def _registerExceptionHook(logger: _log.Logger) -> None:
     def exceptionHook(exceptionType, value, traceback):
-        logger.critical("Uncaught exception", exc_info=(exceptionType, value, traceback))
+        logger.critical(
+            "Uncaught exception", exc_info=(exceptionType, value, traceback)
+        )
 
         for handler in logger.handlers:
             handler.flush()

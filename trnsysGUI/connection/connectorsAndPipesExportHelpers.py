@@ -11,7 +11,9 @@ import trnsysGUI.temperatures as _temps
 
 
 def getTemperatureVariableName(
-    parent: _ip.HasInternalPiping, portItem: _pib.PortItemBase, portItemType: _mfn.PortItemType
+    parent: _ip.HasInternalPiping,
+    portItem: _pib.PortItemBase,
+    portItemType: _mfn.PortItemType,
 ) -> str:
     parentInternalPiping = parent.getInternalPiping()
     node = parentInternalPiping.getNode(portItem, portItemType)
@@ -51,7 +53,7 @@ EQUATIONS <<2 if canonicalMassFlowRate else 1>>
 )
 
 
-def getIfThenElseUnit(  # pylint: disable=too-many-arguments
+def getIfThenElseUnit(  # pylint: disable=too-many-arguments, too-many-positional-arguments
     unitNumber: int,
     outputTemp: str,
     initialTemp: str,

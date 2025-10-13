@@ -9,9 +9,16 @@ class RenameHelper:
     def __init__(self, namesManager: _nm.NamesManager) -> None:
         self._namesManager = namesManager
 
-    def canRename(self, currentName: _tp.Optional[str], newName: str, checkDdckFolder: bool) -> _res.Result[None]:
+    def canRename(
+        self,
+        currentName: _tp.Optional[str],
+        newName: str,
+        checkDdckFolder: bool,
+    ) -> _res.Result[None]:
         if currentName:
-            isNameUnchangedExceptForCasing = self.isSameName(currentName, newName)
+            isNameUnchangedExceptForCasing = self.isSameName(
+                currentName, newName
+            )
             if isNameUnchangedExceptForCasing:
                 return None
 

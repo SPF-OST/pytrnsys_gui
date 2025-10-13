@@ -14,7 +14,9 @@ def exportDummyConnection(
 
     coldCanonicalMassFlowRateVariableName: _tp.Optional[str] = None
     if shallDefineCanonicalMassFlowVariables:
-        coldCanonicalMassFlowRateVariableName = doublePipeConnection.coldCanonicalMassFlowRateVariableName
+        coldCanonicalMassFlowRateVariableName = (
+            doublePipeConnection.coldCanonicalMassFlowRateVariableName
+        )
 
     coldUnitText = _helper.getIfThenElseUnit(
         coldIfThenElseUnitNumber,
@@ -32,7 +34,9 @@ def exportDummyConnection(
 
     hotCanonicalMassFlowRateVariableName: _tp.Optional[str] = None
     if shallDefineCanonicalMassFlowVariables:
-        hotCanonicalMassFlowRateVariableName = doublePipeConnection.hotCanonicalMassFlowRateVariableName
+        hotCanonicalMassFlowRateVariableName = (
+            doublePipeConnection.hotCanonicalMassFlowRateVariableName
+        )
 
     hotUnitText = _helper.getIfThenElseUnit(
         hotIfThenElseUnitNumber,

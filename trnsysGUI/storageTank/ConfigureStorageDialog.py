@@ -1,11 +1,11 @@
 # pylint: disable = invalid-name
-
 from __future__ import annotations
 
-import typing as _tp
 import pathlib as _pl
+import typing as _tp
 
 import PyQt5.QtCore as _qtc
+from PyQt5.QtGui import QDoubleValidator
 from PyQt5.QtWidgets import QGridLayout
 from PyQt5.QtWidgets import QHBoxLayout
 from PyQt5.QtWidgets import QLabel
@@ -32,9 +32,21 @@ if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
 
 
-class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable = too-many-instance-attributes
+class ConfigureStorageDialog(
+    _ndialog.ChangeNameDialogBase
+):  # pylint: disable = too-many-instance-attributes
     WIDTH_INCREMENT = 10
     HEIGHT_INCREMENT = 100
+    minimumPortDistance = 9
+
+    MISSING_NAME_ERROR_MESSAGE = (
+        "Please specify the name of the heat exchanger that you want to add."
+    )
+    PORT_HEIGHT_ERROR_MESSAGE = (
+        "Ports need to be on the tank,"
+        " please make sure the port heights are within (0 %, 100 %)."
+    )
+    NO_SIDE_SELECTED_ERROR_MESSAGE = "No side selected for heat exchanger."
 
     def __init__(
         self,
@@ -43,14 +55,14 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         renameHelper: _rename.RenameHelper,
         projectDirPath: str,
     ) -> None:
-        # pylint: disable = too-many-locals, too-many-statements
         super().__init__(storage, renameHelper, _pl.Path(projectDirPath))
         self._editor = editor
         self.storage = storage
-        self.n = 0  # pylint: disable = invalid-name
-        self.m = 0  # pylint: disable = invalid-name
-        self.minimumPortDistance = 9
+        self.__post_init__()
 
+    def __post_init__(
+        self,
+    ):  # pylint: disable = too-many-locals, too-many-statements
         spacerHeight = 15
 
         self.tabs = QTabWidget()
@@ -87,7 +99,9 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         offsetLeILabel = QLabel("Input:")
         offsetLeOLabel = QLabel("Output:")
         self.offsetLeI = QLineEdit("0")
+        self.offsetLeI.setValidator(QDoubleValidator())
         self.offsetLeO = QLineEdit("0")
+        self.offsetLeO.setValidator(QDoubleValidator())
         self.lButton = QRadioButton("Left side")
         self.rButton = QRadioButton("Right side")
 
@@ -104,9 +118,9 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         gridLayout.addWidget(self.lButton, 9, 0, 1, 1)
         gridLayout.addWidget(self.rButton, 9, 2, 1, 1)
 
-        addButton = QPushButton("Add...")
-        addButton.clicked.connect(self.addHx)
-        gridLayout.addWidget(addButton, 10, 0, 1, 1)
+        self.addButton = QPushButton("Add...")
+        self.addButton.clicked.connect(self.addHx)
+        gridLayout.addWidget(self.addButton, 10, 0, 1, 1)
         removeButton = QPushButton("Remove...")
         removeButton.clicked.connect(self.removeHxL)
         removeButton.clicked.connect(self.removeHxR)
@@ -120,11 +134,11 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         manPortLay = QVBoxLayout()
         qhbL2 = QHBoxLayout()
 
-        self._leftDirectPortPairsItemListWidget = QListWidget()
-        qhbL2.addWidget(self._leftDirectPortPairsItemListWidget)
+        self.leftDirectPortPairsItemListWidget = QListWidget()
+        qhbL2.addWidget(self.leftDirectPortPairsItemListWidget)
 
-        self._rightDirectPortPairsItemListWidget = QListWidget()
-        qhbL2.addWidget(self._rightDirectPortPairsItemListWidget)
+        self.rightDirectPortPairsItemListWidget = QListWidget()
+        qhbL2.addWidget(self.rightDirectPortPairsItemListWidget)
 
         manPortLay.addLayout(qhbL2)
 
@@ -132,8 +146,10 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         manPortLabel2 = QLabel("Enter height in percent: ")
         portlabelUpper = QLabel("Inlet")
         self.manPortLeI = QLineEdit("0")
+        self.manPortLeI.setValidator(QDoubleValidator())
         portlabelLower = QLabel("Outlet")
         self.manPortLeO = QLineEdit("0")
+        self.manPortLeO.setValidator(QDoubleValidator())
 
         qhbl3 = QHBoxLayout()
         self.manlButton = QRadioButton("Left side")
@@ -170,8 +186,8 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         self.okButton = QPushButton("OK")
         self.cancelButton = QPushButton("Cancel")
 
-        increaseSizeButton.clicked.connect(self.incrSize)
-        decreaseSizeButton.clicked.connect(self.decrSize)
+        increaseSizeButton.clicked.connect(self.increaseSize)
+        decreaseSizeButton.clicked.connect(self.decreaseSize)
         self.okButton.clicked.connect(self.acceptedEdit)
         self.cancelButton.clicked.connect(self.cancel)
 
@@ -201,15 +217,33 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         self._loadDirectPortPairs()
 
         # This is to ensure that only one list element is selected
-        self.rightHeatExchangersItemListWidget.setSelectionMode(QListWidget.SelectionMode(1))
-        self.leftHeatExchangersItemListWidget.setSelectionMode(QListWidget.SelectionMode(1))
-        self.rightHeatExchangersItemListWidget.clicked.connect(self.listWRClicked)
-        self.leftHeatExchangersItemListWidget.clicked.connect(self.listWLClicked)
+        self.rightHeatExchangersItemListWidget.setSelectionMode(
+            QListWidget.SelectionMode(1)
+        )
+        self.leftHeatExchangersItemListWidget.setSelectionMode(
+            QListWidget.SelectionMode(1)
+        )
+        self.rightHeatExchangersItemListWidget.clicked.connect(
+            self.listWRClicked
+        )
+        self.leftHeatExchangersItemListWidget.clicked.connect(
+            self.listWLClicked
+        )
 
-        self._rightDirectPortPairsItemListWidget.setSelectionMode(QListWidget.SelectionMode(1))
-        self._leftDirectPortPairsItemListWidget.setSelectionMode(QListWidget.SelectionMode(1))
-        self._rightDirectPortPairsItemListWidget.clicked.connect(self.listWR2Clicked)
-        self._leftDirectPortPairsItemListWidget.clicked.connect(self.listWL2Clicked)
+        self.rightDirectPortPairsItemListWidget.setSelectionMode(
+            QListWidget.SelectionMode(1)
+        )
+        self.leftDirectPortPairsItemListWidget.setSelectionMode(
+            QListWidget.SelectionMode(1)
+        )
+        self.rightDirectPortPairsItemListWidget.clicked.connect(
+            self.listWR2Clicked
+        )
+        self.leftDirectPortPairsItemListWidget.clicked.connect(
+            self.listWL2Clicked
+        )
+
+        self.msgb = QMessageBox()
 
         self.show()
 
@@ -229,13 +263,11 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
 
     @staticmethod
     def _getHeatExchangerListItemText(h):  # pylint: disable = invalid-name
-        return (
-            f"{h.displayName}, y_offset = {int(h.relativeInputHeight * 100)}% to {int(h.relativeOutputHeight * 100)}%"
-        )
+        return f"{h.displayName}, y_offset = {int(h.relativeInputHeight * 100)}% to {int(h.relativeOutputHeight * 100)}%"
 
     def _loadDirectPortPairs(self):
-        self._leftDirectPortPairsItemListWidget.clear()
-        self._rightDirectPortPairsItemListWidget.clear()
+        self.leftDirectPortPairsItemListWidget.clear()
+        self.rightDirectPortPairsItemListWidget.clear()
 
         directPortPair: _dpp.DirectPortPair
         for directPortPair in self.storage.directPortPairs:
@@ -244,9 +276,9 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
             item.setData(_qtc.Qt.UserRole, directPortPair)
 
             if directPortPair.side.isLeft:
-                self._leftDirectPortPairsItemListWidget.addItem(item)
+                self.leftDirectPortPairsItemListWidget.addItem(item)
             else:
-                self._rightDirectPortPairsItemListWidget.addItem(item)
+                self.rightDirectPortPairsItemListWidget.addItem(item)
 
     @staticmethod
     def _getDirectPortPairListItemText(directPortPair: _dpp.DirectPortPair):
@@ -262,10 +294,10 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         self.leftHeatExchangersItemListWidget.clearSelection()
 
     def listWL2Clicked(self):
-        self._rightDirectPortPairsItemListWidget.clearSelection()
+        self.rightDirectPortPairsItemListWidget.clearSelection()
 
     def listWR2Clicked(self):
-        self._leftDirectPortPairsItemListWidget.clearSelection()
+        self.leftDirectPortPairsItemListWidget.clearSelection()
 
     def addHx(self):
         """
@@ -295,18 +327,25 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
                 self._editor.logger.debug("Adding HX on lefthand side.")
                 self._addHxL()
             else:
-                self._editor.logger.warning("No side selected for heat exchanger.")
+                self._editor.logger.warning(
+                    "No side selected for heat exchanger."
+                )
                 return
         else:
-            msgb = QMessageBox()
-            msgb.setText(f"At least {self.minimumPortDistance}% of difference needed and valid range (0, 100)")
-            msgb.exec_()
+            self._openMessageBox(
+                f"At least {self.minimumPortDistance}% of difference needed and valid range (0, 100)"
+            )
 
     def minOffsetDistance(self):
-        return abs(float(self.offsetLeI.text()) - float(self.offsetLeO.text())) >= self.minimumPortDistance
+        return (
+            abs(float(self.offsetLeI.text()) - float(self.offsetLeO.text()))
+            >= self.minimumPortDistance
+        )
 
     def offsetsInRange(self):
-        return (0 <= float(self.offsetLeI.text()) <= 100) and (0 <= float(self.offsetLeO.text()) <= 100)
+        return (0 <= float(self.offsetLeI.text()) <= 100) and (
+            0 <= float(self.offsetLeO.text()) <= 100
+        )
 
     def _addHxL(self):
         self._addHeatExchanger(_sd.Side.LEFT)
@@ -317,16 +356,16 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
     def _addHeatExchanger(self, side: _sd.Side):
         name = self.hxNameLe.text()
         if not name:
-            messageBox = QMessageBox()
-            messageBox.setText("Please specify the name of the heat exchanger that you want to add.")
-            messageBox.exec_()
+            self._openMessageBox(self.MISSING_NAME_ERROR_MESSAGE)
             return
 
         relativeInputHeight = float(self.offsetLeI.text()) / 100
         relativeOutputHeight = float(self.offsetLeO.text()) / 100
 
         trnsysId = self._editor.idGen.getTrnsysID()
-        self.storage.addHeatExchanger(name, trnsysId, side, relativeInputHeight, relativeOutputHeight)
+        self.storage.addHeatExchanger(
+            name, trnsysId, side, relativeInputHeight, relativeOutputHeight
+        )
 
         self._loadHeatExchangers()
 
@@ -345,13 +384,10 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
 
         if (
             max(_inputPortPercentageHeight, _outputPortPercentageHeight) >= 100
-            or min(_inputPortPercentageHeight, _outputPortPercentageHeight) <= 0
+            or min(_inputPortPercentageHeight, _outputPortPercentageHeight)
+            <= 0
         ):
-            messageBox = QMessageBox()
-            messageBox.setText(
-                "Ports need to be on the tank, please make sure the port heights are within (0 %, 100 %)."
-            )
-            messageBox.exec_()
+            self._openMessageBox(self.PORT_HEIGHT_ERROR_MESSAGE)
             return
 
         trnsysId = self._editor.idGen.getTrnsysID()
@@ -362,6 +398,7 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
             _pairSide = _sd.Side.RIGHT
         else:
             self._editor.logger.warning("No side selected for port pair.")
+            self._openMessageBox(self.NO_SIDE_SELECTED_ERROR_MESSAGE)
             return
 
         self.storage.addDirectPortPair(
@@ -375,16 +412,20 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         self._loadDirectPortPairs()
 
     def removePortPairLeft(self):
-        self._removeSelectedPortPairs(self._leftDirectPortPairsItemListWidget)
+        self._removeSelectedPortPairs(self.leftDirectPortPairsItemListWidget)
 
     def removePortPairRight(self):
-        self._removeSelectedPortPairs(self._rightDirectPortPairsItemListWidget)
+        self._removeSelectedPortPairs(self.rightDirectPortPairsItemListWidget)
 
     def _removeSelectedPortPairs(self, directPortPairsListWidget):
         for selectedItem in directPortPairsListWidget.selectedItems():
-            selectedDirectPortPair: _dpp.DirectPortPair = selectedItem.data(_qtc.Qt.UserRole)
+            selectedDirectPortPair: _dpp.DirectPortPair = selectedItem.data(
+                _qtc.Qt.UserRole
+            )
 
-            self._removePorts(selectedDirectPortPair.fromPort, selectedDirectPortPair.toPort)
+            self._removePorts(
+                selectedDirectPortPair.fromPort, selectedDirectPortPair.toPort
+            )
 
             self.storage.directPortPairs.remove(selectedDirectPortPair)
 
@@ -392,14 +433,20 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
             directPortPairsListWidget.takeItem(row)
 
     def removeHxL(self):
-        self._removeSelectedHeatExchangers(self.leftHeatExchangersItemListWidget)
+        self._removeSelectedHeatExchangers(
+            self.leftHeatExchangersItemListWidget
+        )
 
     def removeHxR(self):
-        self._removeSelectedHeatExchangers(self.rightHeatExchangersItemListWidget)
+        self._removeSelectedHeatExchangers(
+            self.rightHeatExchangersItemListWidget
+        )
 
     def _removeSelectedHeatExchangers(self, heatExchangersItemListWidget):
         for selectedItem in heatExchangersItemListWidget.selectedItems():
-            heatExchanger: _st.HeatExchanger = selectedItem.data(_qtc.Qt.UserRole)
+            heatExchanger: _st.HeatExchanger = selectedItem.data(
+                _qtc.Qt.UserRole
+            )
 
             self._removePorts(heatExchanger.port1, heatExchanger.port2)
 
@@ -420,35 +467,47 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
     def _removeConnectionIfAny(self, port):
         if port.isConnected():
             connection = port.getConnection()
-            _hls.split(connection, self._editor.hydraulicLoops, self._editor.fluids)
+            _hls.split(
+                connection, self._editor.hydraulicLoops, self._editor.fluids
+            )
             connection.deleteConnection()
 
     def modifyHx(self):
-        """
-        Modify Hx.
-        """
         result = self._getFirstSelectedItemAndHeatExchanger()
         if not result:
             return
         selectedItem, heatExchanger = result
 
         modifyDialog = _mhd.ModifyRelativeHeightsDialog(
-            heatExchanger.relativeInputHeight, heatExchanger.relativeOutputHeight
+            heatExchanger.relativeInputHeight,
+            heatExchanger.relativeOutputHeight,
         )
         newHeights = modifyDialog.newRelativeHeights
         if not newHeights:
             return
 
-        newInputHeight = newHeights.input if newHeights.input != "empty" else heatExchanger.relativeInputHeight
-        newOutputHeight = newHeights.output if newHeights.output != "empty" else heatExchanger.relativeOutputHeight
+        newInputHeight = (
+            newHeights.input
+            if newHeights.input != "empty"
+            else heatExchanger.relativeInputHeight
+        )
+        newOutputHeight = (
+            newHeights.output
+            if newHeights.output != "empty"
+            else heatExchanger.relativeOutputHeight
+        )
         heatExchanger.setRelativeHeights(newInputHeight, newOutputHeight)
 
         listText = self._getHeatExchangerListItemText(heatExchanger)
         selectedItem.setText(listText)
 
     def _getFirstSelectedItemAndHeatExchanger(self):
-        leftSelectedItems = self.leftHeatExchangersItemListWidget.selectedItems()
-        rightSelectedItems = self.rightHeatExchangersItemListWidget.selectedItems()
+        leftSelectedItems = (
+            self.leftHeatExchangersItemListWidget.selectedItems()
+        )
+        rightSelectedItems = (
+            self.rightHeatExchangersItemListWidget.selectedItems()
+        )
 
         if leftSelectedItems:
             side = 0
@@ -461,34 +520,45 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
 
         name = selectedItem.text().split(",")[0]
         for heatExchanger in self.storage.heatExchangers:
-            if heatExchanger.displayName == name and heatExchanger.sSide == side:
+            if (
+                heatExchanger.displayName == name
+                and heatExchanger.sSide == side
+            ):
                 return selectedItem, heatExchanger
 
         raise AssertionError(f"No heat exchanger with name {name} found.")
 
     def modifyPort(self):
-        """
-        Modify existing ports.
-        """
         selectedItem = self._getFirstSelectedDirectPortPairListWidgetItem()
         if not selectedItem:
             return
 
-        directPortPair: _dpp.DirectPortPair = selectedItem.data(_qtc.Qt.UserRole)
+        directPortPair: _dpp.DirectPortPair = selectedItem.data(
+            _qtc.Qt.UserRole
+        )
 
         dialogResult = _mhd.ModifyRelativeHeightsDialog(
-            directPortPair.relativeInputHeight, directPortPair.relativeOutputHeight
+            directPortPair.relativeInputHeight,
+            directPortPair.relativeOutputHeight,
         )
         newHeights = dialogResult.newRelativeHeights
         if not newHeights:
             return
 
-        newRelativeInputHeight = newHeights.input if newHeights.input != "empty" else directPortPair.relativeInputHeight
+        newRelativeInputHeight = (
+            newHeights.input
+            if newHeights.input != "empty"
+            else directPortPair.relativeInputHeight
+        )
         newRelativeOutputHeight = (
-            newHeights.output if newHeights.output != "empty" else directPortPair.relativeOutputHeight
+            newHeights.output
+            if newHeights.output != "empty"
+            else directPortPair.relativeOutputHeight
         )
 
-        directPortPair.setRelativeHeights(newRelativeInputHeight, newRelativeOutputHeight, self.storage.h)
+        directPortPair.setRelativeHeights(
+            newRelativeInputHeight, newRelativeOutputHeight, self.storage.h
+        )
 
         newText = self._getDirectPortPairListItemText(directPortPair)
         selectedItem.setText(newText)
@@ -496,20 +566,24 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
     def _getFirstSelectedDirectPortPairListWidgetItem(
         self,
     ) -> _tp.Optional[QListWidgetItem]:
-        leftSelectedItems = self._leftDirectPortPairsItemListWidget.selectedItems()
+        leftSelectedItems = (
+            self.leftDirectPortPairsItemListWidget.selectedItems()
+        )
         if leftSelectedItems:
             return leftSelectedItems[0]
 
-        rightSelectedItems = self._rightDirectPortPairsItemListWidget.selectedItems()
+        rightSelectedItems = (
+            self.rightDirectPortPairsItemListWidget.selectedItems()
+        )
         if rightSelectedItems:
             return rightSelectedItems[0]
 
         return None
 
-    def incrSize(self):
+    def increaseSize(self):
         self._changeSize(self.HEIGHT_INCREMENT, self.WIDTH_INCREMENT)
 
-    def decrSize(self):
+    def decreaseSize(self):
         self._changeSize(-self.HEIGHT_INCREMENT, -self.WIDTH_INCREMENT)
 
     def _changeSize(self, deltaH: int, deltaW: int) -> None:
@@ -520,3 +594,7 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
 
     def cancel(self):
         self.close()
+
+    def _openMessageBox(self, text):
+        self.msgb.setText(text)
+        self.msgb.exec()

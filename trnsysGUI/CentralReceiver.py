@@ -14,7 +14,9 @@ import trnsysGUI.blockItemGraphicItemMixins as _gimx
 import trnsysGUI.blockItemHasInternalPiping as _bip
 
 
-class CentralReceiver(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin):
+class CentralReceiver(
+    _bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin
+):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
@@ -34,11 +36,15 @@ class CentralReceiver(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphic
         outputPort = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
         pipe = _mfn.Pipe(inputPort, outputPort)
 
-        return _ip.InternalPiping([pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]})
+        return _ip.InternalPiping(
+            [pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]}
+        )
 
     @classmethod
     @_tp.override
-    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+    def _getImageAccessor(
+        cls,
+    ) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.CENTRAL_RECEVIER_SVG
 
     def changeSize(self):
@@ -60,8 +66,12 @@ class CentralReceiver(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphic
         self.origInputsPos = [[3 * delta, h]]
         self.origOutputsPos = [[5 * delta, h]]
 
-        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
-        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
+        self.outputs[0].setPos(
+            self.origOutputsPos[0][0], self.origOutputsPos[0][1]
+        )
+        self.inputs[0].setPos(
+            self.origInputsPos[0][0], self.origInputsPos[0][1]
+        )
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)

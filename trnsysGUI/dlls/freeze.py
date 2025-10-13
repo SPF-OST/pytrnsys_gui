@@ -9,22 +9,30 @@ import trnsysGUI.common as _com
 from . import _regexes
 
 
-def getUsedDllRelativePaths(logFileContent: str) -> _res.Result[_warn.ValueWithWarnings[_cabc.Sequence[_pl.Path]]]:
+def getUsedDllRelativePaths(
+    logFileContent: str,
+) -> _res.Result[_warn.ValueWithWarnings[_cabc.Sequence[_pl.Path]]]:
     notFoundTypeNumbers = _getNotFoundTypeNumbers(logFileContent)
 
     if notFoundTypeNumbers:
         sortedNotFoundTypeNumbers = sorted(notFoundTypeNumbers)
-        formattedTypeNumbers = "\n".join(f"    {n}" for n in sortedNotFoundTypeNumbers)
+        formattedTypeNumbers = "\n".join(
+            f"    {n}" for n in sortedNotFoundTypeNumbers
+        )
         message = f"No DLLs implementing the following types were found:\n\n{formattedTypeNumbers}\n\n"
         return _res.Error(message)
 
     chosenPathsByTypeNumber = _getChosenFoundPathsByTypeNumber(logFileContent)
 
-    warning = _getDuplicatesWarningOrNone(logFileContent, chosenPathsByTypeNumber)
+    warning = _getDuplicatesWarningOrNone(
+        logFileContent, chosenPathsByTypeNumber
+    )
 
     uniqueChosenPaths = set(chosenPathsByTypeNumber.values())
     sortedUniqueChosenPaths = _sortPaths(uniqueChosenPaths)
-    valueWithWarning = _warn.ValueWithWarnings.create(sortedUniqueChosenPaths, warning)
+    valueWithWarning = _warn.ValueWithWarnings.create(
+        sortedUniqueChosenPaths, warning
+    )
 
     return valueWithWarning
 
@@ -39,7 +47,9 @@ def _getNotFoundTypeNumbers(logFileContent: str) -> _cabc.Sequence[int]:
     return notFoundTypeNumbers
 
 
-def _getChosenFoundPathsByTypeNumber(logFileContent: str) -> _cabc.Mapping[int, _pl.Path]:
+def _getChosenFoundPathsByTypeNumber(
+    logFileContent: str,
+) -> _cabc.Mapping[int, _pl.Path]:
     chosenFoundPathsByTypeNumber = {}
     for match in _regexes.TYPES_FOUND.finditer(logFileContent):
         typeNumbers = _regexes.getTypeNumbers(match)
@@ -56,15 +66,21 @@ def _getDuplicatesWarningOrNone(
 ) -> str | None:
     duplicatePathsByTypeNumber = _getDuplicatePathsByTypeNumber(logFileContent)
 
-    def getTypeNumber(typeNumberAndDuplicatePaths: tuple[int, _cabc.Sequence[_pl.Path]]) -> int:
+    def getTypeNumber(
+        typeNumberAndDuplicatePaths: tuple[int, _cabc.Sequence[_pl.Path]]
+    ) -> int:
         return typeNumberAndDuplicatePaths[0]
 
-    typeNumbersAndDuplicatePaths = sorted(duplicatePathsByTypeNumber.items(), key=getTypeNumber)
+    typeNumbersAndDuplicatePaths = sorted(
+        duplicatePathsByTypeNumber.items(), key=getTypeNumber
+    )
 
     messages = []
     for typeNumber, duplicatePaths in typeNumbersAndDuplicatePaths:
         chosenPath = chosenPathByTypeNumber[typeNumber]
-        message = _createDuplicateImplementationsMessage(typeNumber, chosenPath, duplicatePaths)
+        message = _createDuplicateImplementationsMessage(
+            typeNumber, chosenPath, duplicatePaths
+        )
         messages.append(message)
 
     warning = None
@@ -80,7 +96,9 @@ used implementations):
     return warning
 
 
-def _getDuplicatePathsByTypeNumber(logFileContent: str) -> _cabc.Mapping[int, _cabc.Sequence[_pl.Path]]:
+def _getDuplicatePathsByTypeNumber(
+    logFileContent: str,
+) -> _cabc.Mapping[int, _cabc.Sequence[_pl.Path]]:
     duplicatePathsByTypeNumber = dict[int, list[_pl.Path]]()
     for match in _regexes.DUPLICATE_FOUND.finditer(logFileContent):
         typeGroup = match.group("type")
@@ -89,18 +107,24 @@ def _getDuplicatePathsByTypeNumber(logFileContent: str) -> _cabc.Mapping[int, _c
         pathGroup = _regexes.getPath(match)
         relativePath = _pl.Path(pathGroup)
 
-        duplicatePathsForTypeNumber = _com.getOrAdd(typeNumber, list[_pl.Path](), duplicatePathsByTypeNumber)
+        duplicatePathsForTypeNumber = _com.getOrAdd(
+            typeNumber, list[_pl.Path](), duplicatePathsByTypeNumber
+        )
         duplicatePathsForTypeNumber.append(relativePath)
     return duplicatePathsByTypeNumber
 
 
 def _createDuplicateImplementationsMessage(
-    typeNumber: int, chosenPath: _pl.Path, duplicatePaths: _cabc.Sequence[_pl.Path]
+    typeNumber: int,
+    chosenPath: _pl.Path,
+    duplicatePaths: _cabc.Sequence[_pl.Path],
 ) -> str:
     allPaths = [chosenPath, *duplicatePaths]
 
     sortedPaths = _sortPaths(allPaths)
-    formattedPaths = [f"    {p}" if p != chosenPath else f" => {p}" for p in sortedPaths]
+    formattedPaths = [
+        f"    {p}" if p != chosenPath else f" => {p}" for p in sortedPaths
+    ]
     message = f"Type {typeNumber}:\n{'\n'.join(formattedPaths)}"
 
     return message

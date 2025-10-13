@@ -20,14 +20,22 @@ class ExportHydraulicSinglePipeConnection:
     @property
     def outputTemperatureVariableName(self):
         return _temps.getTemperatureVariableName(
-            shallRenameOutputInHydraulicFile=False, componentDisplayName=self.displayName, nodeName=None
+            shallRenameOutputInHydraulicFile=False,
+            componentDisplayName=self.displayName,
+            nodeName=None,
         )
 
     @property
     def canonicalMassFlowRateVariableName(self):
-        return _mnames.getCanonicalMassFlowVariableName(componentDisplayName=self.displayName, pipeName=None)
+        return _mnames.getCanonicalMassFlowVariableName(
+            componentDisplayName=self.displayName, pipeName=None
+        )
 
-    initialOutputTemperatureVariableName = _gnames.SinglePipes.INITIAL_TEMPERATURE
+    initialOutputTemperatureVariableName = (
+        _gnames.SinglePipes.INITIAL_TEMPERATURE
+    )
 
 
-ExportSinglePipeConnection = _com.GenericConnection[ExportHydraulicSinglePipeConnection]
+ExportSinglePipeConnection = _com.GenericConnection[
+    ExportHydraulicSinglePipeConnection
+]

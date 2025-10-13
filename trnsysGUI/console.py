@@ -8,13 +8,17 @@ import qtconsole.manager as _qtcm
 import qtconsole.rich_jupyter_widget as _qtcjw
 
 
-class QtConsoleWidget(_qtcjw.RichJupyterWidget):  # pylint: disable=abstract-method,too-many-ancestors
+class QtConsoleWidget(
+    _qtcjw.RichJupyterWidget
+):  # pylint: disable=abstract-method,too-many-ancestors
     _KERNEL = "python3"
 
     def __init__(self) -> None:
         super().__init__()
-        self.kernel_manager: _tp.Optional[_qtcm.KernelManager] = None  # pylint: disable=invalid-name # /NOSONAR
-        self.kernel_client: _tp.Optional[_qtcc.QtKernelClient] = None  # pylint: disable=invalid-name # /NOSONAR
+        # pylint: disable=invalid-name # NOSONAR
+        self.kernel_manager: _tp.Optional[_qtcm.KernelManager] = None
+        # pylint: disable=invalid-name # NOSONAR
+        self.kernel_client: _tp.Optional[_qtcc.QtKernelClient] = None
 
     def isRunning(self) -> bool:
         return bool(self.kernel_manager and self.kernel_client)
@@ -35,7 +39,9 @@ class QtConsoleWidget(_qtcjw.RichJupyterWidget):  # pylint: disable=abstract-met
 
     def shutdown(self) -> None:
         if not self.isRunning():
-            raise RuntimeError("Cannot shut down console which hasn't been started.")
+            raise RuntimeError(
+                "Cannot shut down console which hasn't been started."
+            )
 
         assert self.kernel_client and self.kernel_manager
 
