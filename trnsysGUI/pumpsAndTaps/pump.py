@@ -1,3 +1,4 @@
+import collections.abc as _cabc
 import typing as _tp
 
 import dataclasses_jsonschema as _dcj
@@ -6,13 +7,15 @@ import trnsysGUI.PortItemBase as _pib
 import trnsysGUI.common as _com
 import trnsysGUI.connection.hydraulicExport.singlePipe.createExportHydraulicSinglePipeConnection as _cehspc
 import trnsysGUI.createSinglePipePortItem as _cspi
+import trnsysGUI.hydraulicLoops.model as _hlmod
+import trnsysGUI.hydraulicLoops.names as _names
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
+import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.singlePipePortItem as _spi
 from . import _pumpsAndTabsBase as _patb
 from . import serialization as _ser
-import trnsysGUI.massFlowSolver.names as _mnames
-import trnsysGUI.hydraulicLoops.names as _names
 
 
 class Pump(
@@ -35,6 +38,21 @@ class Pump(
         modelInputPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
         modelOutputPort = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
         self._modelPump = _mfn.Pump(modelInputPort, modelOutputPort)
+
+    @property
+    def inputPort(self) -> _spi.SinglePipePortItem:
+        return self._getSingleSinglePortItem(self.inputs)
+
+    @property
+    def outputPort(self) -> _spi.SinglePipePortItem:
+        return self._getSingleSinglePortItem(self.outputs)
+
+    def _getSingleSinglePortItem(
+        self, portItems: _cabc.Sequence[_pib.PortItemBase]
+    ) -> _spi.SinglePipePortItem:
+        portItem = _com.getSingle(portItems)
+        assert isinstance(portItem, _spi.SinglePipePortItem)
+        return portItem
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         modelPortItemsToGraphicalPortItem = {
@@ -133,34 +151,27 @@ class Pump(
 
         return width, height
 
-    def exportPumpConsumptionName(self):
+    def exportPumpConsumptionName(self) -> str:
+        return _mnames.getInputVariableName(self, self._modelPump)
 
-        internalPiping = self.getInternalPiping()
-        node = _com.getSingle(internalPiping.nodes)
-        inputVariableName = _mnames.getInputVariableName(self, node)
-
-        return f"Pel{inputVariableName}"
-
-    def exportPumpPowerConsumption(self, loop):
-
-        internalPiping = self.getInternalPiping()
-        node = _com.getSingle(internalPiping.nodes)
-        inputVariableName = _mnames.getInputVariableName(self, node)
+    def exportPumpPowerConsumption(self, loop: _hlmod.HydraulicLoop) -> str:
+        varName = self.exportPumpConsumptionName()
         canonicalMassFlowRate = self._getCanonicalMassFlowRate()
 
-        result = f"***********************************************\n"
-        result += f"*** Pump Consumption of {inputVariableName} ***\n"
-        result += f"***********************************************\n"
+        result = f"""\
+***********************************************
+*** Pump Consumption of {varName}           ***
+***********************************************
 
-        result += f"EQUATIONS #\n"
-        result += f"{inputVariableName}=${inputVariableName} ! Comment this is the file is global\n"
-        result += f"{inputVariableName}Nom = {canonicalMassFlowRate}  ! Nominal mass flow rate, kg/h.\n"
-        densityLoop = f"${_names.getDensityName(loop.name.value)}"
-        result += f"dpPu{inputVariableName}Nom_bar = MIN(dpmax_bar,MAX(dpmin_bar, {densityLoop} * 0.1)) ! Pressure-drop of loop at nominal mass flow, bar \n"
-        result += f"fr{inputVariableName} = {inputVariableName}/{inputVariableName}Nom !  Flow rate fraction of nominal flow rate \n"
-        result += f"dpPu{inputVariableName}_bar = fr{inputVariableName}^2*dpPu{inputVariableName}Nom_bar ! Pressure-drop of loop at actual mass flow, bar \n"
-        result += f"PelFlow{inputVariableName}_kW = (({inputVariableName}/3600)/ {densityLoop}) * dpPu{inputVariableName}_bar*100 !required power to drive the flow in kW \n"
-        result += f"eta{inputVariableName} = MAX(1E-3,0.85*(-0.60625*fr{inputVariableName}^2+1.25*fr{inputVariableName})) ! pump efficiency (electric 85 %) \n"
-        result += f"Pel{inputVariableName} = GT({inputVariableName},0.1)*PelFlow{inputVariableName}_kW/eta{inputVariableName} !required pump electric power, kW \n"
-
+EQUATIONS #
+{varName}=${varName}
+{varName}Nom = {canonicalMassFlowRate}  ! Nominal mass flow rate, kg/h.
+densityLoop = f"${_names.getDensityName(loop.name.value)}"
+dpPu{varName}Nom_bar = MIN(dpmax_bar,MAX(dpmin_bar, {densityLoop} * 0.1)) ! Pressure-drop of loop at nominal mass flow, bar 
+fr{varName} = {varName}/{varName}Nom !  Flow rate fraction of nominal flow rate 
+dpPu{varName}_bar = fr{varName}^2*dpPu{varName}Nom_bar ! Pressure-drop of loop at actual mass flow, bar 
+PelFlow{varName}_kW = (({varName}/3600)/ {densityLoop}) * dpPu{varName}_bar*100 !required power to drive the flow in kW 
+eta{varName} = MAX(1E-3,0.85*(-0.60625*fr{varName}^2+1.25*fr{varName})) ! pump efficiency (electric 85 %) 
+Pel{varName} = GT({varName},0.1)*PelFlow{varName}_kW/eta{varName} !required pump electric power, kW 
+"""
         return result
