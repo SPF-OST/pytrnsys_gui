@@ -58,7 +58,6 @@ class Type1924_TesPlugFlow:
 
         line = "EQUATIONS 3\n"
         lines = lines + line
-<<<<<<<<< Temporary merge branch 1
         line = "Tdp%dIn = $%s\n" % (idPort, connectorPort[idPort - 1]["T"])
         lines = lines + line
         line = "Mfrdp%d = $%s\n" % (idPort, connectorPort[idPort - 1]["Mfr"])
@@ -135,7 +134,7 @@ class Type1924_TesPlugFlow:
         lines = lines + line
         line = "Cphx%d=$%s\n" % (idHx, connectHx[idHx - 1]["cp"])
         lines = lines + line
-        line = "Rhohx%d=$%s\n" % (idHx,  connectHx[idHx - 1]["rho"])
+        line = "Rhohx%d=$%s\n" % (idHx, connectHx[idHx - 1]["rho"])
         lines = lines + line
 
         return lines
@@ -145,7 +144,7 @@ class Type1924_TesPlugFlow:
 
         lines = "*********Constant values of HX=%d***********\n" % idHx
 
-        line = "CONSTANTS #\n"
+        line = "CONSTANTS 15\n"
         lines = lines + line
 
         line = "dInHx%d=0.05 ! m only if modHx%d=0\n" % (idHx, idHx)
@@ -154,7 +153,10 @@ class Type1924_TesPlugFlow:
         lines = lines + line
         line = "scaleHX%d=13 ! m only if modHx%d=0\n" % (idHx, idHx)
         lines = lines + line
-        line = "LHx%d = scaleHX%d * Vol / (2 * $PI * 0.0333) ! m only if modHx%d=0\n" % (idHx, idHx, idHx)
+        line = (
+            "LHx%d = scaleHX%d * Vol / (2 * $PI * 0.0333) ! m only if modHx%d=0\n"
+            % (idHx, idHx, idHx)
+        )
         lines = lines + line
         line = "LamHx%d=50 ! W/mK only if modHx%d=0\n" % (idHx, idHx)
         lines = lines + line
@@ -166,77 +168,28 @@ class Type1924_TesPlugFlow:
 
         line = "VHx%d=0. \n" % (idHx)
         lines = lines + line
-<<<<<<<<< Temporary merge branch 1
         line = "nCvHx%d=20 \n" % (idHx)
-=========
-        line = "LamHx%d_Tes%d=50 ! W/mK only if modHx%d=1\n" % (
-            idHx,
-            nTes,
-            idHx,
-        )
-        lines = lines + line
-        line = "brineConcHx%d_Tes%d=30 ! [0-100] only if modHx%d=1\n" % (
-            idHx,
-            nTes,
-            idHx,
-        )
->>>>>>>>> Temporary merge branch 2
         lines = lines + line
 
-        line = "modHx%d=0 ! modHX1, 0 = physical model, 1 = Drueck-model (Multiport)\n" % (idHx)
+        line = (
+            "modHx%d=0 ! modHX1, 0 = physical model, 1 = Drueck-model (Multiport)\n"
+            % (idHx)
+        )
         lines = lines + line
         line = "nNuHx%d=0.5 !  only if modHx%d=0\n" % (idHx, idHx)
         lines = lines + line
         line = "cNuHx%d=0.25 !  only if modHx%d=0\n" % (idHx, idHx)
         lines = lines + line
 
-<<<<<<<<< Temporary merge branch 1
         line = "dUaMfrHx%d=0.375 ! only if modHx%d=1\n" % (idHx, idHx)
-=========
-        line = (
-            "modHx%d_Tes%d=1 ! modHX1, 0 = physical model, 1 = Drueck-model (Multiport)\n"
-            % (idHx, nTes)
-        )
->>>>>>>>> Temporary merge branch 2
         lines = lines + line
         line = "dUadTHx%d=0.0 ! only if modHx%d=1\n" % (idHx, idHx)
         lines = lines + line
         line = "dUaTHx%d=0.458 ! only if modHx%d=1\n" % (idHx, idHx)
         lines = lines + line
-<<<<<<<<< Temporary merge branch 1
         line = "UaHx%d=1105*ratio ! kJ/hK only if modHx%d=1\n" % (idHx, idHx)
         lines = lines + line
         line = "startUpHx%d=0. ! only if modHx%d=1\n" % (idHx, idHx)
-=========
-
-        line = "dUaMfrHx%d_Tes%d=0.375 ! only if modHx%d=0\n" % (
-            idHx,
-            nTes,
-            idHx,
-        )
-        lines = lines + line
-        line = "dUadTHx%d_Tes%d=0.0 ! only if modHx%d=0\n" % (idHx, nTes, idHx)
-        lines = lines + line
-        line = "dUaTHx%d_Tes%d=0.458 ! only if modHx%d=0\n" % (
-            idHx,
-            nTes,
-            idHx,
-        )
-        lines = lines + line
-        line = "UaHx%d_Tes%d=1105*ratioTes%d ! kJ/hK only if modHx%d=0\n" % (
-            idHx,
-            nTes,
-            nTes,
-            idHx,
-        )
-        lines = lines + line
-
-        line = "startUpHx%d_Tes%d=0. ! only if modHx%d=0\n" % (
-            idHx,
-            nTes,
-            idHx,
-        )
->>>>>>>>> Temporary merge branch 2
         lines = lines + line
 
         return lines
@@ -285,15 +238,7 @@ class Type1924_TesPlugFlow:
                 lines = lines + line
                 line = "UaHx%d " % (idHx)
                 lines = lines + line
-<<<<<<<<< Temporary merge branch 1
                 line = "startUpHx%d ! Heax exchanger %d\n" % (idHx, idHx)
-=========
-                line = "startUpHx%d_Tes%d ! Heax exchanger %d\n" % (
-                    idHx,
-                    nTes,
-                    idHx,
-                )
->>>>>>>>> Temporary merge branch 2
                 lines = lines + line
             else:
                 line = "-1 -1 "
@@ -328,25 +273,14 @@ class Type1924_TesPlugFlow:
         line = "CONSTANTS 10\n"
         lines = lines + line
 
-<<<<<<<<< Temporary merge branch 1
         line = "Ufoam= 0.67 ! W/(m2K) 6 cm of foam of 0.04 W/(mK) \n"
         lines = lines + line
         line = "Ubot = 1.5 ! W/(m2K) 2 cm of foam of 0.04 W/(mK)\n"
-=========
-        line = "Ufoam_Tes%d= 0.67 ! W/(m2K) 6 cm of foam of 0.04 W/(mK) \n" % (
-            nTes
-        )
-        lines = lines + line
-        line = "Ubot_Tes%d = 1.5 ! W/(m2K) 2 cm of foam of 0.04 W/(mK)\n" % (
-            nTes
-        )
->>>>>>>>> Temporary merge branch 2
         lines = lines + line
         line = "Atop = Vol/Heigh ! m2\n"
         lines = lines + line
         line = "Diameter = (4*ATop/PI)^0.5 ! m \n"
         lines = lines + line
-<<<<<<<<< Temporary merge branch 1
         line = "ALat = Heigh*PI*Diameter ! m2\n"
         lines = lines + line
 
@@ -359,44 +293,6 @@ class Type1924_TesPlugFlow:
         line = "Uaz3 = Ufoam*ALat/3 !  W/k\n"
         lines = lines + line
         line = "UaTop = Ufoam*ATop !  W/k\n"
-=========
-        line = "ALat_Tes%d = Heigh_Tes%d*PI*Diameter_Tes%d ! m2\n" % (
-            nTes,
-            nTes,
-            nTes,
-        )
-        lines = lines + line
-
-        line = "UaBot_Tes%d= Ubot_Tes%d*ATop_Tes%d !  W/k \n" % (
-            nTes,
-            nTes,
-            nTes,
-        )
-        lines = lines + line
-        line = "Uaz1_Tes%d = Ufoam_Tes%d*ALat_Tes%d/3 !  W/k\n" % (
-            nTes,
-            nTes,
-            nTes,
-        )
-        lines = lines + line
-        line = "Uaz2_Tes%d = Ufoam_Tes%d*ALat_Tes%d/3 !  W/k\n" % (
-            nTes,
-            nTes,
-            nTes,
-        )
-        lines = lines + line
-        line = "Uaz3_Tes%d = Ufoam_Tes%d*ALat_Tes%d/3 !  W/k\n" % (
-            nTes,
-            nTes,
-            nTes,
-        )
-        lines = lines + line
-        line = "UaTop_Tes%d = Ufoam_Tes%d*ATop_Tes%d !  W/k\n" % (
-            nTes,
-            nTes,
-            nTes,
-        )
->>>>>>>>> Temporary merge branch 2
         lines = lines + line
 
         return lines
@@ -408,21 +304,9 @@ class Type1924_TesPlugFlow:
         lines = lines + line
         line = "RhoWat  ! 2: kg/m3, density of storage media\n"
         lines = lines + line
-<<<<<<<<< Temporary merge branch 1
         line = "CpWat   ! 3: kJ/kgK, specific heat of storage media\n"
         lines = lines + line
         line = "lamZ    ! 4: W/mK, effective vertical thermal conductivity of TES\n"
-=========
-        line = (
-            "CpWat_Tes%d   ! 3: kJ/kgK, specific heat of storage media\n"
-            % nTes
-        )
-        lines = lines + line
-        line = (
-            "lamZ_Tes%d    ! 4: W/mK, effective vertical thermal conductivity of TES\n"
-            % nTes
-        )
->>>>>>>>> Temporary merge branch 2
         lines = lines + line
         line = "Heigh   ! 5: m, storage height\n"
         lines = lines + line
@@ -448,7 +332,6 @@ class Type1924_TesPlugFlow:
         lines = "CONSTANTS #\n"
         line = "Vol=1          ! 1: m3, volume of store\n"
         lines = lines + line
-<<<<<<<<< Temporary merge branch 1
         # line = "RhoWat=RhoWat  ! 2: kg/m3, density of storage media\n"
         # lines = lines + line
         # line = "CpWat=CpWat    ! 3: kJ/kgK, specific heat of storage media\n"
@@ -458,28 +341,11 @@ class Type1924_TesPlugFlow:
         line = "Heigh=1.       ! 5: m, storage height\n"
         lines = lines + line
         line = "Tini=60.       ! 6: oC, initial temperature\n"
-=========
-        line = (
-            "RhoWat_Tes%d=RhoWat  ! 2: kg/m3, density of storage media\n"
-            % nTes
-        )
-        lines = lines + line
-        line = (
-            "CpWat_Tes%d=CpWat    ! 3: kJ/kgK, specific heat of storage media\n"
-            % nTes
-        )
-        lines = lines + line
-        line = (
-            "lamZ_Tes%d=0.6       ! 4: W/mK, effective vertical thermal conductivity of TES\n"
-            % nTes
-        )
->>>>>>>>> Temporary merge branch 2
         lines = lines + line
         line = "nCvMax=400     ! 7: -, minimum relative plug height\n"
         lines = lines + line
         line = "nCvMin=20      ! 8: -, maximum relative plug height\n"
         lines = lines + line
-<<<<<<<<< Temporary merge branch 1
         line = "maxTDiff=0.015 ! 9: K, maximum temperature difference between plugs\n"
         lines = lines + line
         line = "readMode=0     ! 10: 1: from table, 0: Tini and CapTot\n"
@@ -487,31 +353,6 @@ class Type1924_TesPlugFlow:
         line = "Tref=273.15    ! 11: oC, reference temperature\n"
         lines = lines + line
         line = "Tmax=100.       ! 6: oC, initial temperature\n"
-=========
-        line = (
-            "nCvMax_Tes%d=400     ! 7: -, minimum relative plug height\n"
-            % nTes
-        )
-        lines = lines + line
-        line = (
-            "nCvMin_Tes%d=20      ! 8: -, maximum relative plug height\n"
-            % nTes
-        )
-        lines = lines + line
-        line = (
-            "maxTDiff_Tes%d=0.015 ! 9: K, maximum temperature difference between plugs\n"
-            % nTes
-        )
-        lines = lines + line
-        line = (
-            "readMode_Tes%d=0     ! 10: 1: from table, 0: Tini and CapTot\n"
-            % nTes
-        )
-        lines = lines + line
-        line = "Tref_Tes%d=273.15    ! 11: oC, reference temperature\n" % nTes
-        lines = lines + line
-        line = "Tmax_Tes%d=100.       ! 6: oC, initial temperature\n" % nTes
->>>>>>>>> Temporary merge branch 2
         lines = lines + line
 
         line = self.getUaParValues(nTes, self.Ua)
@@ -572,7 +413,6 @@ class Type1924_TesPlugFlow:
             lines = lines + line
 
             for i in range(nHeatSources):
-<<<<<<<<< Temporary merge branch 1
                 line = "zAux%d=%.2f\n" % (i + 1, connectorAux[i]["zAux"])
                 lines = lines + line
                 line = "qAux%d=%.2f\n" % (i + 1, connectorAux[i]["qAux"])
@@ -628,7 +468,7 @@ class Type1924_TesPlugFlow:
         for i in range(self.nMaxAvgSensor):
             line = (
                 "zSenAvgBot%d zSenAvgTop%d ! %d-%d : relative position of lower and upper edge temeprature sensors\n"
-                % (i + 1, i + 1,  parId, parId + 1)
+                % (i + 1, i + 1, parId, parId + 1)
             )
             lines = lines + line
             parId = parId + 2
@@ -641,21 +481,13 @@ class Type1924_TesPlugFlow:
 
         lines = lines + "CONSTANTS 4\n"
 
-        line = (
-            "MoInsPlate=0 ! 0-2, Insulation Plate Mode: 0 = no insulation plate inside TES, 1 = insulation plate at fixed relative height, 2 = insulation plate at fixed temperature / density controlled \n"
-        )
+        line = "MoInsPlate=0 ! 0-2, Insulation Plate Mode: 0 = no insulation plate inside TES, 1 = insulation plate at fixed relative height, 2 = insulation plate at fixed temperature / density controlled \n"
         lines = lines + line
-        line = (
-            "zInsPlate=0  ! 0-1, relative position of fixed height insulation plate inside TES (only for Insulation Plate Mode = 1\n"
-        )
+        line = "zInsPlate=0  ! 0-1, relative position of fixed height insulation plate inside TES (only for Insulation Plate Mode = 1\n"
         lines = lines + line
-        line = (
-            "TinsPlate=0  ! oC, temperature at which moveable insulation plate floats in TES (only for Insulation Plate Mode = 2)\n"
-        )
+        line = "TinsPlate=0  ! oC, temperature at which moveable insulation plate floats in TES (only for Insulation Plate Mode = 2)\n"
         lines = lines + line
-        line = (
-            "UAinsPlate=0 ! W/K, overall heat transfer coefficient across moveable insulation plate (including heat transfer in gap between plate and wall and in wall at the respective height)\n"
-        )
+        line = "UAinsPlate=0 ! W/K, overall heat transfer coefficient across moveable insulation plate (including heat transfer in gap between plate and wall and in wall at the respective height)\n"
         lines = lines + line
 
         return lines
@@ -663,21 +495,13 @@ class Type1924_TesPlugFlow:
     def getInsulationPlatePar(self, nTes):
 
         lines = ""
-        line = (
-            "MoInsPlate ! 81: 0-2, Insulation Plate Mode: 0 = no insulation plate inside TES, 1 = insulation plate at fixed relative height, 2 = insulation plate at fixed temperature / density controlled \n"
-        )
+        line = "MoInsPlate ! 81: 0-2, Insulation Plate Mode: 0 = no insulation plate inside TES, 1 = insulation plate at fixed relative height, 2 = insulation plate at fixed temperature / density controlled \n"
         lines = lines + line
-        line = (
-            "zInsPlate  ! 82: 0-1, relative position of fixed height insulation plate inside TES (only for Insulation Plate Mode = 1\n"
-        )
+        line = "zInsPlate  ! 82: 0-1, relative position of fixed height insulation plate inside TES (only for Insulation Plate Mode = 1\n"
         lines = lines + line
-        line = (
-            "TinsPlate  ! 83: oC, temperature at which moveable insulation plate floats in TES (only for Insulation Plate Mode = 2)\n"
-        )
+        line = "TinsPlate  ! 83: oC, temperature at which moveable insulation plate floats in TES (only for Insulation Plate Mode = 2)\n"
         lines = lines + line
-        line = (
-            "UAinsPlate ! 84: W/K, overall heat transfer coefficient across moveable insulation plate (including heat transfer in gap between plate and wall and in wall at the respective height)\n"
-        )
+        line = "UAinsPlate ! 84: W/K, overall heat transfer coefficient across moveable insulation plate (including heat transfer in gap between plate and wall and in wall at the respective height)\n"
         lines = lines + line
 
         return lines
@@ -757,12 +581,12 @@ class Type1924_TesPlugFlow:
 
         return lines
 
+    def getInputsFromOtherDdck(self, inputs):
 
-    def getInputsFromOtherDdck(self,inputs):
+        lines = self.sLine + "**inputs from other ddck\n" + self.sLine
 
-        lines = self.sLine + "**inputs from other ddck\n" +self.sLine
-
-        line = "CONSTANTS #\n"; lines = lines + line
+        line = "CONSTANTS #\n"
+        lines = lines + line
         line = "RhoWat = $RhoWat  ! kg/m3, density of storage media\n"
         lines = lines + line
         line = "CpWat = $CpWat  ! kJ/kgK, specific heat of storage media\n"
@@ -779,7 +603,7 @@ class Type1924_TesPlugFlow:
         nHx = inputs["nHx"]
         nPorts = inputs["nPorts"]
 
-        lines = self.sLine + "**outputs to other ddck\n" +self.sLine
+        lines = self.sLine + "**outputs to other ddck\n" + self.sLine
 
         line = "***Temperatures at 10 equally distributed height \n"
         lines = lines + line
@@ -788,12 +612,18 @@ class Type1924_TesPlugFlow:
 
         counter = 21
         for i in range(10):
-           height = 0.05 + 0.1 * i
-           line = "$%s_T%d =[%d,%d] !temperature at %.2f \n" % (self.nameTes,i + 1, nUnit, counter, height)
-           lines = lines + line
-           counter = counter + 1
+            height = 0.05 + 0.1 * i
+            line = "$%s_T%d =[%d,%d] !temperature at %.2f \n" % (
+                self.nameTes,
+                i + 1,
+                nUnit,
+                counter,
+                height,
+            )
+            lines = lines + line
+            counter = counter + 1
 
-        line = "$%s_qHeatSource = qHeatSource \n"%self.nameTes
+        line = "$%s_qHeatSource = qHeatSource \n" % self.nameTes
         lines = lines + line
 
         return lines
@@ -812,16 +642,7 @@ class Type1924_TesPlugFlow:
         lines = lines + line
 
         for idPort in range(nPorts):
-<<<<<<<<< Temporary merge branch 1
             line = "Qdp%d=[%d,%d] ! \n" % (idPort + 1, nUnit, 30 + idPort + 1)
-=========
-            line = "Qdp%d_Tes%d=[%d,%d] ! \n" % (
-                idPort + 1,
-                nTes,
-                nUnit,
-                30 + idPort + 1,
-            )
->>>>>>>>> Temporary merge branch 2
             lines = lines + line
 
         nEq = 21
@@ -830,35 +651,14 @@ class Type1924_TesPlugFlow:
 
         line = "TAvg = [%d,180] ! Average storage temperature \n" % (nUnit)
         lines = lines + line
-        #line = "***Temperatures at 10 equally distributed height \n"
-        #lines = lines + line
-        #counter = 21
-        #for i in range(10):
+        # line = "***Temperatures at 10 equally distributed height \n"
+        # lines = lines + line
+        # counter = 21
+        # for i in range(10):
         #    height = 0.05 + 0.1 * i
         #    line = "T%d =[%d,%d] !temperature at %.2f \n" % (i + 1, nUnit, counter, height)
         #    lines = lines + line
         #    counter = counter + 1
-=========
-        line = "TAvg_Tes%d = [%d,180] ! Average storage temperature \n" % (
-            nTes,
-            nUnit,
-        )
-        lines = lines + line
-        line = "***Temperatures at 10 equallay distributed height \n"
-        lines = lines + line
-        counter = 21
-        for i in range(10):
-            height = 0.05 + 0.1 * i
-            line = "T%d_Tes%d =[%d,%d] !temperature at %.2f \n" % (
-                i + 1,
-                nTes,
-                nUnit,
-                counter,
-                height,
-            )
-            lines = lines + line
-            counter = counter + 1
->>>>>>>>> Temporary merge branch 2
 
         line = "***Temperatures at 10 sensors user defined height\n"
         lines = lines + line
@@ -883,16 +683,7 @@ class Type1924_TesPlugFlow:
 
         counter = 102
         for idHx in range(nHx):
-<<<<<<<<< Temporary merge branch 1
             line = "Qhx%dOut=[%d,%d] ! \n" % (idHx + 1, nUnit, counter + 2)
-=========
-            line = "Qhx%dOut_Tes%d=[%d,%d] ! \n" % (
-                idHx + 1,
-                nTes,
-                nUnit,
-                counter + 2,
-            )
->>>>>>>>> Temporary merge branch 2
             lines = lines + line
             counter = counter + 10
 
@@ -961,14 +752,7 @@ class Type1924_TesPlugFlow:
         line = "INPUTS %d\n" % nInputs
         lines = lines + line
 
-<<<<<<<<< Temporary merge branch 1
         inputsLine = "Qv QLoss QAcum QPorts QImb "
-=========
-        inputsLine = (
-            "Qv_Tes%d QLoss_Tes%d QAcum_Tes%d QPorts_Tes%d QImb_Tes%d "
-            % (nTes, nTes, nTes, nTes, nTes)
-        )
->>>>>>>>> Temporary merge branch 2
         for i in range(inputs["nPorts"]):
             nextInput = "Qdp%d " % (i + 1)
             inputsLine += nextInput
@@ -1112,7 +896,6 @@ class Type1924_TesPlugFlow:
             lines = lines + self.sLine + "\n"
             lines = lines + self.sLine
             lines = lines + "** outputs to energy balance in kWh\n"
-<<<<<<<<< Temporary merge branch 1
 
             lines = lines + self.sLine
             lines = lines + "EQUATIONS 3\n"
@@ -1202,7 +985,6 @@ class Type1924_TesPlugFlow:
 
         lines = lines + "\n"
         lines = lines + self.getOutputsToOtherDdck(self.inputs)
-
 
         line = (
             self.sLine + "****** Parameters of Type1924 *******\n" + self.sLine

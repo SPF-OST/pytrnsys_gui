@@ -217,10 +217,10 @@ class MainWindow(_qtw.QMainWindow):
         exportHydraulicsActionMenu.triggered.connect(self.exportHydraulicsDdck)
 
         exportHydCtrlActionMenu = _qtw.QAction(
-            "Export user_control_default.ddck and pump_consumption_file.ddck",
+            "Export user_control_default.ddck and pump_consumption_default.ddck",
             self,
         )
-		exportHydCtrlActionMenu.triggered.connect(self.exportHydraulicControl)
+        exportHydCtrlActionMenu.triggered.connect(self.exportHydraulicControl)
         exportHydCtrlActionMenu.triggered.connect(
             self.exportPumpConsumptionFile
         )
@@ -671,15 +671,11 @@ class MainWindow(_qtw.QMainWindow):
 
     def exportDiagram(self):
         fileName, _ = _qtw.QFileDialog.getSaveFileName(
-<<<<<<<<< Temporary merge branch 1
-            self, "Export PDF", None, "PDF buifiles (*.pdf);;SVG buifiles (*.svg);;All Files (*)", "PDF buifiles (*.svg)"
-=========
             self,
             "Export PDF",
             None,
             "PDF files (*.pdf);;SVG files (*.svg);;All Files (*)",
             "PDF files (*.svg)",
->>>>>>>>> Temporary merge branch 2
         )
         if fileName == "":
             return

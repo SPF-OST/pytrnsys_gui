@@ -59,7 +59,7 @@ PelMfrPuSh_kW = GT(MfrPuSh,0.1)*PelFlowMfrPuSh_kW/etaMfrPuSh !required pump elec
 ***********************************************
 
 EQUATIONS #
-MfrPuSolar=$MfrPuSolar ! Comment this is the file is global
+MfrPuSolar=$MfrPuSolar ! Comment this out if the file is global
 MfrPuSolarNom = 1000.0  ! Nominal mass flow rate, kg/h.
 dpPuMfrPuSolarNom_bar = MIN(dpmax_bar,MAX(dpmin_bar,MfrPuSolarNom/$Lloop4Rho * 0.1)) ! Pressure-drop of loop at nominal mass flow, bar 
 frMfrPuSolar = MfrPuSolar/MfrPuSolarNom !  Flow rate fraction of nominal flow rate 
