@@ -169,11 +169,17 @@ class Pump(
 EQUATIONS #
 {varName}=${varName}
 {varName}Nom = {canonicalMassFlowRate}  ! Nominal mass flow rate, kg/h.
-dpPu{varName}Nom_bar = MIN(dpmax_bar,MAX(dpmin_bar,{varName}Nom/{loopDensityGlobalVarName} * 0.1)) ! Pressure-drop of loop at nominal mass flow, bar 
-fr{varName} = {varName}/{varName}Nom !  Flow rate fraction of nominal flow rate 
-dpPu{varName}_bar = fr{varName}^2*dpPu{varName}Nom_bar ! Pressure-drop of loop at actual mass flow, bar 
-Pflow{varName}_kW = (({varName}/3600)/ {loopDensityGlobalVarName}) * dpPu{varName}_bar*100 !required power to drive the flow in kW 
-eta{varName} = MAX(1E-3,0.85*(-0.60625*fr{varName}^2+1.25*fr{varName})) ! pump efficiency (electric 85 %) 
-Pel{varName}_kW = GT({varName},0.1)*Pflow{varName}_kW/eta{varName} !required pump electric power, kW 
+
+! Pressure-drop of loop at nominal mass flow, bar
+dpPu{varName}Nom_bar = MIN(dpmax_bar,MAX(dpmin_bar,{varName}Nom/{loopDensityGlobalVarName} * 0.1))
+
+fr{varName} = {varName}/{varName}Nom !  Flow rate fraction of nominal flow rate
+dpPu{varName}_bar = fr{varName}^2*dpPu{varName}Nom_bar ! Pressure-drop of loop at actual mass flow, bar
+
+! Required power to drive the flow in kW
+Pflow{varName}_kW = (({varName}/3600)/ {loopDensityGlobalVarName}) * dpPu{varName}_bar*100
+
+eta{varName} = MAX(1E-3,0.85*(-0.60625*fr{varName}^2+1.25*fr{varName})) ! pump efficiency (electric 85 %)
+Pel{varName}_kW = GT({varName},0.1)*Pflow{varName}_kW/eta{varName} !required pump electric power, kW
 """
         return result
