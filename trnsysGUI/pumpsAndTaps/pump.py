@@ -152,8 +152,8 @@ class Pump(
         return width, height
 
     def exportPumpConsumptionName(self) -> str:
-    	inputVariableName=_mnames.getInputVariableName(self, self._modelPump)
-		return f"Pel{inputVariableName}_kW"
+        inputVariableName = _mnames.getInputVariableName(self, self._modelPump)
+        return f"Pel{inputVariableName}_kW"
 
     def exportPumpPowerConsumption(self, loop: _hlmod.HydraulicLoop) -> str:
         varName = self.exportPumpConsumptionName()
