@@ -9,7 +9,7 @@ class Variable(_dcj.JsonSchemaMixin):
     name: str
 
 
-Value = _tp.Union[Variable, float]  # /NOSONAR
+Value = _tp.Union[Variable, float]  # NOSONAR
 
 
 def getConvertedValueOrName(

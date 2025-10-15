@@ -132,34 +132,28 @@ class Pump(
 
         return width, height
 
-    def exportPumpConsumptionName(self):
+    def exportPumpConsumptionName(self) -> str:
+    	inputVariableName=_mnames.getInputVariableName(self, self._modelPump)
+		return f"Pel{inputVariableName}_kW"
 
-        internalPiping = self.getInternalPiping()
-        node = _com.getSingle(internalPiping.nodes)
-        inputVariableName = _mnames.getInputVariableName(self, node)
-
-        return f"Pel{inputVariableName}_kW"
-
-    def exportPumpPowerConsumption(self,loop):
-
-        internalPiping = self.getInternalPiping()
-        node = _com.getSingle(internalPiping.nodes)
-        inputVariableName = _mnames.getInputVariableName(self, node)
+    def exportPumpPowerConsumption(self, loop: _hlmod.HydraulicLoop) -> str:
+        varName = self.exportPumpConsumptionName()
         canonicalMassFlowRate = self._getCanonicalMassFlowRate()
 
-        result  = f"\n***********************************************\n"
-        result += f"*** Pump Consumption of {inputVariableName} ***\n"
-        result += f"***********************************************\n\n"
+        result = f"""\
+***********************************************
+*** Pump Consumption of {varName}           ***
+***********************************************
 
-        result += f"EQUATIONS #\n"
-        result += f"{inputVariableName}=${inputVariableName} ! Comment this is the file is global\n"
-        result += f"{inputVariableName}Nom = {canonicalMassFlowRate}  ! Nominal mass flow rate, kg/h.\n"
-        densityLoop = f"${_names.getDensityName(loop.name.value)}"
-        result += f"dpPu{inputVariableName}Nom_bar = MIN(dpmax_bar,MAX(dpmin_bar,{inputVariableName}Nom/{densityLoop} * 0.1)) ! Pressure-drop of loop at nominal mass flow, bar \n"
-        result += f"fr{inputVariableName} = {inputVariableName}/{inputVariableName}Nom !  Flow rate fraction of nominal flow rate \n"
-        result += f"dpPu{inputVariableName}_bar = fr{inputVariableName}^2*dpPu{inputVariableName}Nom_bar ! Pressure-drop of loop at actual mass flow, bar \n"
-        result += f"PelFlow{inputVariableName}_kW = (({inputVariableName}/3600)/ {densityLoop}) * dpPu{inputVariableName}_bar*100 !required power to drive the flow in kW \n"
-        result += f"eta{inputVariableName} = MAX(1E-3,0.85*(-0.60625*fr{inputVariableName}^2+1.25*fr{inputVariableName})) ! pump efficiency (electric 85 %) \n"
-        result += f"Pel{inputVariableName}_kW = GT({inputVariableName},0.1)*PelFlow{inputVariableName}_kW/eta{inputVariableName} !required pump electric power, kW \n"
-
+EQUATIONS #
+{varName}=${varName}
+{varName}Nom = {canonicalMassFlowRate}  ! Nominal mass flow rate, kg/h.
+densityLoop = f"${_names.getDensityName(loop.name.value)}"
+dpPu{varName}Nom_bar = MIN(dpmax_bar,MAX(dpmin_bar,{varName}Nom/{densityLoop} * 0.1)) ! Pressure-drop of loop at nominal mass flow, bar 
+fr{varName} = {varName}/{varName}Nom !  Flow rate fraction of nominal flow rate 
+dpPu{varName}_bar = fr{varName}^2*dpPu{varName}Nom_bar ! Pressure-drop of loop at actual mass flow, bar 
+Pflow{varName}_kW = (({varName}/3600)/ {densityLoop}) * dpPu{varName}_bar*100 !required power to drive the flow in kW 
+eta{varName} = MAX(1E-3,0.85*(-0.60625*fr{varName}^2+1.25*fr{varName})) ! pump efficiency (electric 85 %) 
+Pel{varName}_kW = GT({varName},0.1)*Pflow{varName}_kW/eta{varName} !required pump electric power, kW 
+"""
         return result

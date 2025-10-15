@@ -12,8 +12,8 @@ import typing as _tp
 import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
-
 import pytrnsys.trnsys_util.deckUtils as _du
+
 import trnsysGUI as _tgui
 import trnsysGUI.components.factory as _cfactory
 import trnsysGUI.connection.connectors.doublePipeConnectorBase as _dctor
@@ -78,7 +78,6 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
         self.projectFolder = projectFolder
 
         self.diagramName = os.path.split(self.projectFolder)[-1] + ".json"
-        self.diagramPath = os.path.join(self.projectFolder, self.diagramName)
         self.saveAsPath = _pl.Path()
         self.idGen = IdGenerator()
 
@@ -571,8 +570,6 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             return None
 
         fullExportText += blackBoxText
-
-        fullExportText += "CONSTANTS 1\nTRoomStore=15\n" #Now we need this always since TEs do not export it
         if exportTo == "mfs":
             fullExportText += exporter.exportMassFlows()
             fullExportText += exporter.exportDivSetting(simulationUnit - 10)
@@ -606,8 +603,8 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         if exportTo == "mfs":
             fullExportText += """\
 CONSTANTS 2
+TRoomStore=1
 Tcw=1
-weather_TcwAvg=1
 """
             fullExportText += "ENDS"
 
@@ -737,7 +734,9 @@ weather_TcwAvg=1
         fullExportText += exporter.exportMassFlows()
         fullExportText += exporter.exportDivSetting(simulationUnit - 10)
 
-        self.logger.info("------------------------> END OF EXPORT <------------------------")
+        self.logger.info(
+            "------------------------> END OF EXPORT <------------------------"
+        )
 
         if fullExportText[:1] == "\n":
             fullExportText = fullExportText[1:]

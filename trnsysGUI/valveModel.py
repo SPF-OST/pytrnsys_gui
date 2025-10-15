@@ -21,9 +21,9 @@ class TVentilModelVersion1(
     flippedH: bool
     flippedV: bool
     rotationN: int
-    # /NOSONAR  # pylint: disable=invalid-name
+    # NOSONAR  # pylint: disable=invalid-name
     IsTempering: _tp.Optional[bool] = None
-    # /NOSONAR  # pylint: disable=invalid-name
+    # NOSONAR  # pylint: disable=invalid-name
     PositionForMassFlowSolver: _tp.Optional[_tp.Union[str, float]] = None
 
     @classmethod
@@ -63,9 +63,9 @@ class ValveModel(
     blockItemModel: _bim.BlockItemBaseModel
     inputPortId: int
     outputPortIds: _tp.Tuple[int, int]
-    # /NOSONAR  # pylint: disable=invalid-name
+    # NOSONAR  # pylint: disable=invalid-name
     IsTempering: _tp.Optional[bool] = None
-    # /NOSONAR  # pylint: disable=invalid-name
+    # NOSONAR  # pylint: disable=invalid-name
     PositionForMassFlowSolver: _tp.Optional[_tp.Union[str, float]] = None
 
     @classmethod

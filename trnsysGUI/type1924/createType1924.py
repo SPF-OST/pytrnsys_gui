@@ -24,7 +24,9 @@ class Type1924_TesPlugFlow:
 
         self.setDefault()
 
-    def setInputs(self, inputs, connectorsPort, connectorsHx, connectorsAux, nameTes):
+    def setInputs(
+        self, inputs, connectorsPort, connectorsHx, connectorsAux, nameTes
+    ):
 
         self.inputs = inputs
         self.connectorsPort = connectorsPort
@@ -52,24 +54,28 @@ class Type1924_TesPlugFlow:
 
     @staticmethod
     def _getOnePortInputs(nTes, idPort, connectorPort):
-
-        #This should be replaced by nomrla connectors using @temp(Side1In)
         lines = ""
 
         line = "EQUATIONS 3\n"
         lines = lines + line
+<<<<<<<<< Temporary merge branch 1
         line = "Tdp%dIn = $%s\n" % (idPort, connectorPort[idPort - 1]["T"])
         lines = lines + line
         line = "Mfrdp%d = $%s\n" % (idPort, connectorPort[idPort - 1]["Mfr"])
         lines = lines + line
-        line = "Tdp%dInRev = $%s\n" % (idPort, connectorPort[idPort - 1]["Trev"])
+        line = "Tdp%dInRev = $%s\n" % (
+            idPort,
+            connectorPort[idPort - 1]["Trev"],
+        )
         lines = lines + line
 
         return lines
 
     def getOnePortParConn(self, idPort, nTes, connectorPort):
 
-        lines = "*********Connecting values of DIRECT PORT=%d***********\n" % (idPort + 1)
+        lines = "*********Connecting values of DIRECT PORT=%d***********\n" % (
+            idPort + 1
+        )
 
         line = "CONSTANTS 2\n"
         lines = lines + line
@@ -83,11 +89,16 @@ class Type1924_TesPlugFlow:
 
     def getOnePortPar(self, idPort, nTes):
 
-        lines = "*********Constant of DIRECT PORT=%d***********\n" % (idPort + 1)
+        lines = "*********Constant of DIRECT PORT=%d***********\n" % (
+            idPort + 1
+        )
 
         line = "CONSTANTS 1\n"
         lines = lines + line
-        line = "Dp%dStrat=0 ! 0: no forced stratification ; 1: force to stratify\n" % (idPort + 1)
+        line = (
+            "Dp%dStrat=0 ! 0: no forced stratification ; 1: force to stratify\n"
+            % (idPort + 1)
+        )
         lines = lines + line
 
         return lines
@@ -122,7 +133,7 @@ class Type1924_TesPlugFlow:
         lines = lines + line
         line = "zOuthx%d=%.2f\n" % (idHx, connectHx[idHx - 1]["zOut"])
         lines = lines + line
-        line = "Cphx%d=$%s\n" % (idHx,  connectHx[idHx - 1]["cp"])
+        line = "Cphx%d=$%s\n" % (idHx, connectHx[idHx - 1]["cp"])
         lines = lines + line
         line = "Rhohx%d=$%s\n" % (idHx,  connectHx[idHx - 1]["rho"])
         lines = lines + line
@@ -137,7 +148,7 @@ class Type1924_TesPlugFlow:
         line = "CONSTANTS #\n"
         lines = lines + line
 
-        line = "dInHx%d=0.05 ! m only if modHx%d=0\n" % (idHx,  idHx)
+        line = "dInHx%d=0.05 ! m only if modHx%d=0\n" % (idHx, idHx)
         lines = lines + line
         line = "dOutHx%d=0.06 ! m only if modHx%d=0\n" % (idHx, idHx)
         lines = lines + line
@@ -147,12 +158,29 @@ class Type1924_TesPlugFlow:
         lines = lines + line
         line = "LamHx%d=50 ! W/mK only if modHx%d=0\n" % (idHx, idHx)
         lines = lines + line
-        line = "brineConcHx%d=0 ! [0-100] only if modHx%d=0 TO BE MODIFIED IF GLYCOL USED\n" % (idHx, idHx)
+        line = (
+            "brineConcHx%d=0 ! [0-100] only if modHx%d=0 TO BE MODIFIED IF GLYCOL USED\n"
+            % (idHx, idHx)
+        )
         lines = lines + line
 
         line = "VHx%d=0. \n" % (idHx)
         lines = lines + line
+<<<<<<<<< Temporary merge branch 1
         line = "nCvHx%d=20 \n" % (idHx)
+=========
+        line = "LamHx%d_Tes%d=50 ! W/mK only if modHx%d=1\n" % (
+            idHx,
+            nTes,
+            idHx,
+        )
+        lines = lines + line
+        line = "brineConcHx%d_Tes%d=30 ! [0-100] only if modHx%d=1\n" % (
+            idHx,
+            nTes,
+            idHx,
+        )
+>>>>>>>>> Temporary merge branch 2
         lines = lines + line
 
         line = "modHx%d=0 ! modHX1, 0 = physical model, 1 = Drueck-model (Multiport)\n" % (idHx)
@@ -162,15 +190,53 @@ class Type1924_TesPlugFlow:
         line = "cNuHx%d=0.25 !  only if modHx%d=0\n" % (idHx, idHx)
         lines = lines + line
 
+<<<<<<<<< Temporary merge branch 1
         line = "dUaMfrHx%d=0.375 ! only if modHx%d=1\n" % (idHx, idHx)
+=========
+        line = (
+            "modHx%d_Tes%d=1 ! modHX1, 0 = physical model, 1 = Drueck-model (Multiport)\n"
+            % (idHx, nTes)
+        )
+>>>>>>>>> Temporary merge branch 2
         lines = lines + line
         line = "dUadTHx%d=0.0 ! only if modHx%d=1\n" % (idHx, idHx)
         lines = lines + line
         line = "dUaTHx%d=0.458 ! only if modHx%d=1\n" % (idHx, idHx)
         lines = lines + line
+<<<<<<<<< Temporary merge branch 1
         line = "UaHx%d=1105*ratio ! kJ/hK only if modHx%d=1\n" % (idHx, idHx)
         lines = lines + line
         line = "startUpHx%d=0. ! only if modHx%d=1\n" % (idHx, idHx)
+=========
+
+        line = "dUaMfrHx%d_Tes%d=0.375 ! only if modHx%d=0\n" % (
+            idHx,
+            nTes,
+            idHx,
+        )
+        lines = lines + line
+        line = "dUadTHx%d_Tes%d=0.0 ! only if modHx%d=0\n" % (idHx, nTes, idHx)
+        lines = lines + line
+        line = "dUaTHx%d_Tes%d=0.458 ! only if modHx%d=0\n" % (
+            idHx,
+            nTes,
+            idHx,
+        )
+        lines = lines + line
+        line = "UaHx%d_Tes%d=1105*ratioTes%d ! kJ/hK only if modHx%d=0\n" % (
+            idHx,
+            nTes,
+            nTes,
+            idHx,
+        )
+        lines = lines + line
+
+        line = "startUpHx%d_Tes%d=0. ! only if modHx%d=0\n" % (
+            idHx,
+            nTes,
+            idHx,
+        )
+>>>>>>>>> Temporary merge branch 2
         lines = lines + line
 
         return lines
@@ -219,7 +285,15 @@ class Type1924_TesPlugFlow:
                 lines = lines + line
                 line = "UaHx%d " % (idHx)
                 lines = lines + line
+<<<<<<<<< Temporary merge branch 1
                 line = "startUpHx%d ! Heax exchanger %d\n" % (idHx, idHx)
+=========
+                line = "startUpHx%d_Tes%d ! Heax exchanger %d\n" % (
+                    idHx,
+                    nTes,
+                    idHx,
+                )
+>>>>>>>>> Temporary merge branch 2
                 lines = lines + line
             else:
                 line = "-1 -1 "
@@ -254,14 +328,25 @@ class Type1924_TesPlugFlow:
         line = "CONSTANTS 10\n"
         lines = lines + line
 
+<<<<<<<<< Temporary merge branch 1
         line = "Ufoam= 0.67 ! W/(m2K) 6 cm of foam of 0.04 W/(mK) \n"
         lines = lines + line
         line = "Ubot = 1.5 ! W/(m2K) 2 cm of foam of 0.04 W/(mK)\n"
+=========
+        line = "Ufoam_Tes%d= 0.67 ! W/(m2K) 6 cm of foam of 0.04 W/(mK) \n" % (
+            nTes
+        )
+        lines = lines + line
+        line = "Ubot_Tes%d = 1.5 ! W/(m2K) 2 cm of foam of 0.04 W/(mK)\n" % (
+            nTes
+        )
+>>>>>>>>> Temporary merge branch 2
         lines = lines + line
         line = "Atop = Vol/Heigh ! m2\n"
         lines = lines + line
         line = "Diameter = (4*ATop/PI)^0.5 ! m \n"
         lines = lines + line
+<<<<<<<<< Temporary merge branch 1
         line = "ALat = Heigh*PI*Diameter ! m2\n"
         lines = lines + line
 
@@ -274,6 +359,44 @@ class Type1924_TesPlugFlow:
         line = "Uaz3 = Ufoam*ALat/3 !  W/k\n"
         lines = lines + line
         line = "UaTop = Ufoam*ATop !  W/k\n"
+=========
+        line = "ALat_Tes%d = Heigh_Tes%d*PI*Diameter_Tes%d ! m2\n" % (
+            nTes,
+            nTes,
+            nTes,
+        )
+        lines = lines + line
+
+        line = "UaBot_Tes%d= Ubot_Tes%d*ATop_Tes%d !  W/k \n" % (
+            nTes,
+            nTes,
+            nTes,
+        )
+        lines = lines + line
+        line = "Uaz1_Tes%d = Ufoam_Tes%d*ALat_Tes%d/3 !  W/k\n" % (
+            nTes,
+            nTes,
+            nTes,
+        )
+        lines = lines + line
+        line = "Uaz2_Tes%d = Ufoam_Tes%d*ALat_Tes%d/3 !  W/k\n" % (
+            nTes,
+            nTes,
+            nTes,
+        )
+        lines = lines + line
+        line = "Uaz3_Tes%d = Ufoam_Tes%d*ALat_Tes%d/3 !  W/k\n" % (
+            nTes,
+            nTes,
+            nTes,
+        )
+        lines = lines + line
+        line = "UaTop_Tes%d = Ufoam_Tes%d*ATop_Tes%d !  W/k\n" % (
+            nTes,
+            nTes,
+            nTes,
+        )
+>>>>>>>>> Temporary merge branch 2
         lines = lines + line
 
         return lines
@@ -285,9 +408,21 @@ class Type1924_TesPlugFlow:
         lines = lines + line
         line = "RhoWat  ! 2: kg/m3, density of storage media\n"
         lines = lines + line
+<<<<<<<<< Temporary merge branch 1
         line = "CpWat   ! 3: kJ/kgK, specific heat of storage media\n"
         lines = lines + line
         line = "lamZ    ! 4: W/mK, effective vertical thermal conductivity of TES\n"
+=========
+        line = (
+            "CpWat_Tes%d   ! 3: kJ/kgK, specific heat of storage media\n"
+            % nTes
+        )
+        lines = lines + line
+        line = (
+            "lamZ_Tes%d    ! 4: W/mK, effective vertical thermal conductivity of TES\n"
+            % nTes
+        )
+>>>>>>>>> Temporary merge branch 2
         lines = lines + line
         line = "Heigh   ! 5: m, storage height\n"
         lines = lines + line
@@ -297,7 +432,9 @@ class Type1924_TesPlugFlow:
         lines = lines + line
         line = "nCvMin  ! 8: -, maximum relative plug height\n"
         lines = lines + line
-        line = "maxTDiff  ! 9: K, maximum temperature difference between plugs\n"
+        line = (
+            "maxTDiff  ! 9: K, maximum temperature difference between plugs\n"
+        )
         lines = lines + line
         line = "readMode  ! 10: 1: from table, 0: Tini and CapTot\n"
         lines = lines + line
@@ -311,6 +448,7 @@ class Type1924_TesPlugFlow:
         lines = "CONSTANTS #\n"
         line = "Vol=1          ! 1: m3, volume of store\n"
         lines = lines + line
+<<<<<<<<< Temporary merge branch 1
         # line = "RhoWat=RhoWat  ! 2: kg/m3, density of storage media\n"
         # lines = lines + line
         # line = "CpWat=CpWat    ! 3: kJ/kgK, specific heat of storage media\n"
@@ -320,11 +458,28 @@ class Type1924_TesPlugFlow:
         line = "Heigh=1.       ! 5: m, storage height\n"
         lines = lines + line
         line = "Tini=60.       ! 6: oC, initial temperature\n"
+=========
+        line = (
+            "RhoWat_Tes%d=RhoWat  ! 2: kg/m3, density of storage media\n"
+            % nTes
+        )
+        lines = lines + line
+        line = (
+            "CpWat_Tes%d=CpWat    ! 3: kJ/kgK, specific heat of storage media\n"
+            % nTes
+        )
+        lines = lines + line
+        line = (
+            "lamZ_Tes%d=0.6       ! 4: W/mK, effective vertical thermal conductivity of TES\n"
+            % nTes
+        )
+>>>>>>>>> Temporary merge branch 2
         lines = lines + line
         line = "nCvMax=400     ! 7: -, minimum relative plug height\n"
         lines = lines + line
         line = "nCvMin=20      ! 8: -, maximum relative plug height\n"
         lines = lines + line
+<<<<<<<<< Temporary merge branch 1
         line = "maxTDiff=0.015 ! 9: K, maximum temperature difference between plugs\n"
         lines = lines + line
         line = "readMode=0     ! 10: 1: from table, 0: Tini and CapTot\n"
@@ -332,6 +487,31 @@ class Type1924_TesPlugFlow:
         line = "Tref=273.15    ! 11: oC, reference temperature\n"
         lines = lines + line
         line = "Tmax=100.       ! 6: oC, initial temperature\n"
+=========
+        line = (
+            "nCvMax_Tes%d=400     ! 7: -, minimum relative plug height\n"
+            % nTes
+        )
+        lines = lines + line
+        line = (
+            "nCvMin_Tes%d=20      ! 8: -, maximum relative plug height\n"
+            % nTes
+        )
+        lines = lines + line
+        line = (
+            "maxTDiff_Tes%d=0.015 ! 9: K, maximum temperature difference between plugs\n"
+            % nTes
+        )
+        lines = lines + line
+        line = (
+            "readMode_Tes%d=0     ! 10: 1: from table, 0: Tini and CapTot\n"
+            % nTes
+        )
+        lines = lines + line
+        line = "Tref_Tes%d=273.15    ! 11: oC, reference temperature\n" % nTes
+        lines = lines + line
+        line = "Tmax_Tes%d=100.       ! 6: oC, initial temperature\n" % nTes
+>>>>>>>>> Temporary merge branch 2
         lines = lines + line
 
         line = self.getUaParValues(nTes, self.Ua)
@@ -345,12 +525,15 @@ class Type1924_TesPlugFlow:
         parId = 21
         for i in range(self.nMaxPorts):
             if i <= nPorts - 1:
-                line = "zInDp%d zOutDp%d zero Dp%dStrat ! %d - %d: zIn, zOut, cp, strat\n" % (
-                    i + 1,
-                    i + 1,
-                    i + 1,
-                    parId,
-                    parId + 4,
+                line = (
+                    "zInDp%d zOutDp%d zero Dp%dStrat ! %d - %d: zIn, zOut, cp, strat\n"
+                    % (
+                        i + 1,
+                        i + 1,
+                        i + 1,
+                        parId,
+                        parId + 4,
+                    )
                 )
                 lines = lines + line
             else:
@@ -372,7 +555,10 @@ class Type1924_TesPlugFlow:
             line = "zSen%d " % (i + 1)
             lines = lines + line
 
-        line = "! %d-%d : relative storage temperature sensor heights \n" % (parId, parId + 10)
+        line = "! %d-%d : relative storage temperature sensor heights \n" % (
+            parId,
+            parId + 10,
+        )
         lines = lines + line
 
         return lines
@@ -386,9 +572,10 @@ class Type1924_TesPlugFlow:
             lines = lines + line
 
             for i in range(nHeatSources):
+<<<<<<<<< Temporary merge branch 1
                 line = "zAux%d=%.2f\n" % (i + 1, connectorAux[i]["zAux"])
                 lines = lines + line
-                line = "qAux%d=%.2f\n" % (i + 1,  connectorAux[i]["qAux"])
+                line = "qAux%d=%.2f\n" % (i + 1, connectorAux[i]["qAux"])
                 lines = lines + line
 
             line = "\n"
@@ -417,7 +604,9 @@ class Type1924_TesPlugFlow:
     def getHeighAvgSensorParValues(self, nTes):
 
         lines = (
-            self.sLine + "** USER DEFINED AVERAGED TEMPERATURE SENSOR HEIGHTS. To be changed by user \n" + self.sLine
+            self.sLine
+            + "** USER DEFINED AVERAGED TEMPERATURE SENSOR HEIGHTS. To be changed by user \n"
+            + self.sLine
         )
 
         line = "CONSTANTS 10\n"
@@ -531,7 +720,10 @@ class Type1924_TesPlugFlow:
             else:
                 line = "zero zero zero\n"
             lines = lines + line
-        lines = lines + "***************** 20 HEAT SOURCE INPUTS ******************\n"
+        lines = (
+            lines
+            + "***************** 20 HEAT SOURCE INPUTS ******************\n"
+        )
 
         for i in range(20):  # This adds 20 inputs
             if i <= nHeatSources - 1:
@@ -541,12 +733,22 @@ class Type1924_TesPlugFlow:
             lines = lines + line
         lines = lines + "\n"
 
-        lines = lines + "****************** INTIAL INPUTS***********************\n"
+        lines = (
+            lines + "****************** INTIAL INPUTS***********************\n"
+        )
 
         for i in range(69):
             line = "zero "
             lines = lines + line
-            if i == 9 or i == 19 or i == 29 or i == 39 or i == 49 or i == 59 or i == 69:
+            if (
+                i == 9
+                or i == 19
+                or i == 29
+                or i == 39
+                or i == 49
+                or i == 59
+                or i == 69
+            ):
                 line = "\n"
                 lines = lines + line
 
@@ -610,14 +812,23 @@ class Type1924_TesPlugFlow:
         lines = lines + line
 
         for idPort in range(nPorts):
+<<<<<<<<< Temporary merge branch 1
             line = "Qdp%d=[%d,%d] ! \n" % (idPort + 1, nUnit, 30 + idPort + 1)
+=========
+            line = "Qdp%d_Tes%d=[%d,%d] ! \n" % (
+                idPort + 1,
+                nTes,
+                nUnit,
+                30 + idPort + 1,
+            )
+>>>>>>>>> Temporary merge branch 2
             lines = lines + line
 
         nEq = 21
         line = "EQUATIONS #\n"
         lines = lines + line
 
-        line = "TAvg = [%d,180] ! Average storage temperature \n" % ( nUnit)
+        line = "TAvg = [%d,180] ! Average storage temperature \n" % (nUnit)
         lines = lines + line
         #line = "***Temperatures at 10 equally distributed height \n"
         #lines = lines + line
@@ -627,16 +838,40 @@ class Type1924_TesPlugFlow:
         #    line = "T%d =[%d,%d] !temperature at %.2f \n" % (i + 1, nUnit, counter, height)
         #    lines = lines + line
         #    counter = counter + 1
+=========
+        line = "TAvg_Tes%d = [%d,180] ! Average storage temperature \n" % (
+            nTes,
+            nUnit,
+        )
+        lines = lines + line
+        line = "***Temperatures at 10 equallay distributed height \n"
+        lines = lines + line
+        counter = 21
+        for i in range(10):
+            height = 0.05 + 0.1 * i
+            line = "T%d_Tes%d =[%d,%d] !temperature at %.2f \n" % (
+                i + 1,
+                nTes,
+                nUnit,
+                counter,
+                height,
+            )
+            lines = lines + line
+            counter = counter + 1
+>>>>>>>>> Temporary merge branch 2
 
         line = "***Temperatures at 10 sensors user defined height\n"
         lines = lines + line
         counter = 71
         for i in range(10):
-            line = "Tsen%d =[%d,%d] ! temperature at user defined sensor height Tsen%d \n" % (
-                i + 1,
-                nUnit,
-                counter,
-                i + 1,
+            line = (
+                "Tsen%d =[%d,%d] ! temperature at user defined sensor height Tsen%d \n"
+                % (
+                    i + 1,
+                    nUnit,
+                    counter,
+                    i + 1,
+                )
             )
             lines = lines + line
             counter = counter + 1
@@ -648,31 +883,47 @@ class Type1924_TesPlugFlow:
 
         counter = 102
         for idHx in range(nHx):
+<<<<<<<<< Temporary merge branch 1
             line = "Qhx%dOut=[%d,%d] ! \n" % (idHx + 1, nUnit, counter + 2)
+=========
+            line = "Qhx%dOut_Tes%d=[%d,%d] ! \n" % (
+                idHx + 1,
+                nTes,
+                nUnit,
+                counter + 2,
+            )
+>>>>>>>>> Temporary merge branch 2
             lines = lines + line
             counter = counter + 10
 
         line = "EQUATIONS 1\n"
         lines = lines + line
 
-        line = "qHeatSource = [%d,181] ! Heat input of all auxiliary heat sources [kW]\n" % (nUnit)
+        line = (
+            "qHeatSource = [%d,181] ! Heat input of all auxiliary heat sources [kW]\n"
+            % (nUnit)
+        )
         lines = lines + line
 
         line = "EQUATIONS 5\n"
         lines = lines + line
 
-        line = "Qv     = [%d,176] ! Heat input of all heat exchangers and auxiliary heat sources [kW]\n" % (
-            nUnit,
+        line = (
+            "Qv     = [%d,176] ! Heat input of all heat exchangers and auxiliary heat sources [kW]\n"
+            % (nUnit,)
         )
         lines = lines + line
         line = "QLoss  = [%d,177] ! Heat Losses of the Tes [kW]\n" % (nUnit)
         lines = lines + line
         line = "QAcum  = [%d,178] ! Sensible accumulated heat [kW]\n" % (nUnit)
         lines = lines + line
-        line = "QPorts = [%d,179] ! Heat Input by direct ports [kW]\n" % (nUnit)
+        line = "QPorts = [%d,179] ! Heat Input by direct ports [kW]\n" % (
+            nUnit
+        )
         lines = lines + line
-        line = "QImb   = [%d,64]  ! Heat Imbalance in Tes  IMB = sumQv - sumQLoss -sumQAcum + sumQPort\n" % (
-            nUnit,
+        line = (
+            "QImb   = [%d,64]  ! Heat Imbalance in Tes  IMB = sumQv - sumQLoss -sumQAcum + sumQPort\n"
+            % (nUnit,)
         )
         lines = lines + line
 
@@ -703,12 +954,21 @@ class Type1924_TesPlugFlow:
         line = "0  ! 5: Number of inputs to avoid integration\n"
         lines = lines + line
         # line = "0  ! 6: Number of inputs to avoid integration\n"; lines = lines + line
-        nInputs = 5 + inputs["nPorts"] + inputs["nHx"] + 1  # +inputs["nHeatSources"]
+        nInputs = (
+            5 + inputs["nPorts"] + inputs["nHx"] + 1
+        )  # +inputs["nHeatSources"]
 
         line = "INPUTS %d\n" % nInputs
         lines = lines + line
 
+<<<<<<<<< Temporary merge branch 1
         inputsLine = "Qv QLoss QAcum QPorts QImb "
+=========
+        inputsLine = (
+            "Qv_Tes%d QLoss_Tes%d QAcum_Tes%d QPorts_Tes%d QImb_Tes%d "
+            % (nTes, nTes, nTes, nTes, nTes)
+        )
+>>>>>>>>> Temporary merge branch 2
         for i in range(inputs["nPorts"]):
             nextInput = "Qdp%d " % (i + 1)
             inputsLine += nextInput
@@ -752,7 +1012,7 @@ class Type1924_TesPlugFlow:
         lines = lines + line
         line = "100     ! 6 Right axis maximum \n"
         lines = lines + line
-        line = "$nPlotsPerSim     ! 7 Number of plots per simulation \n"
+        line = "nPlotsPerSim     ! 7 Number of plots per simulation \n"
         lines = lines + line
         line = "12     ! 8 X-axis gridpoints\n"
         lines = lines + line
@@ -766,14 +1026,15 @@ class Type1924_TesPlugFlow:
         lines = lines + line
         line = "INPUTS 10     \n"
         lines = lines + line
-        lineNames = "$%s_T1 $%s_T2 $%s_T3 $%s_T4 $%s_T5 $%s_T6 $%s_T7 $%s_T8 $%s_T9 $%s_T10 \n" %(self.nameTes,self.nameTes,self.nameTes,self.nameTes,self.nameTes,self.nameTes,self.nameTes,self.nameTes,self.nameTes,self.nameTes)
-        lines = lines + lineNames
-        lines = lines + lineNames
+        line = "T1 T2 T3 T4 T5 T6 T7 T8 T9 T10 \n"
+        lines = lines + line
+        line = "T1 T2 T3 T4 T5 T6 T7 T8 T9 T10 \n"
+        lines = lines + line
         line = "LABELS  3         \n"
         lines = lines + line
         line = "Temperatures  \n"
         lines = lines + line
-        line = "Temperatures  \n"
+        line = "MassFlows  \n"
         lines = lines + line
         line = "%s\n" % (self.nameTes)
         lines = lines + line
@@ -793,9 +1054,14 @@ class Type1924_TesPlugFlow:
         nHx = inputs["nHx"]
         nHeatSources = inputs["nHeatSources"]
 
-        lines = self.sLine + "********** TYPE DEFINITION **********\n" + self.sLine
+        lines = (
+            self.sLine + "********** TYPE DEFINITION **********\n" + self.sLine
+        )
 
-        lines = lines + "UNIT %d TYPE %d     ! plug flow tank\n" % (nUnit, nType)
+        lines = lines + "UNIT %d TYPE %d     ! plug flow tank\n" % (
+            nUnit,
+            nType,
+        )
         lines = lines + "PARAMETERS 219 \n"
         lines = lines + self.getFirst12Par(nTes)
         lines = lines + self.getUaPar(nTes)
@@ -812,7 +1078,7 @@ class Type1924_TesPlugFlow:
         lines = lines + self.getInputs(inputs)
         lines = lines + self.getOutputs(inputs)
         lines = lines + self.getMonthyPrinter(nTes, nUnit, inputs)
-        lines = lines + self.getOnlinePlotter(nTes)
+        # lines = lines + self.getOnlinePlotter(nTes)
         return lines
 
     def getHead(self):
@@ -839,21 +1105,29 @@ class Type1924_TesPlugFlow:
             lines = lines + self.sLine
             lines = lines + "** To be checked: \n"
             lines = lines + "** check cp and rho values for the circuits \n"
-            lines = lines + "** default is cpwat and rhowat, for solarcirc usually cpbri and rhobri have to be used \n"
+            lines = (
+                lines
+                + "** default is cpwat and rhowat, for solarcirc usually cpbri and rhobri have to be used \n"
+            )
             lines = lines + self.sLine + "\n"
             lines = lines + self.sLine
             lines = lines + "** outputs to energy balance in kWh\n"
+<<<<<<<<< Temporary merge branch 1
 
             lines = lines + self.sLine
             lines = lines + "EQUATIONS 3\n"
 
             lines = lines + ("@energy(out, heat, %sLoss) = QLoss\n" % tankName)
-            lines = lines + ("@energy(out, heat, %sAcum) = QAcum\n" % (tankName))
-            lines = lines + ("@energy(in, el, %sAux)     = qHeatSource\n" % (tankName))
+            lines = lines + (
+                "@energy(out, heat, %sAcum) = QAcum\n" % (tankName)
+            )
+            lines = lines + (
+                "@energy(in, el, %sAux)     = qHeatSource\n" % (tankName)
+            )
 
-           # lines = lines + ("qSysOut_%sLoss = QLoss_Tes%d\n" % (tankName, self.inputs["nTes"]))
-           # lines = lines + ("qSysOut_%sAcum = QAcum_Tes%d\n" % (tankName, self.inputs["nTes"]))
-           # lines = lines + ("elSysIn_Q_%sAux = qHeatSource_Tes%d\n" % (tankName, self.inputs["nTes"]))
+        # lines = lines + ("qSysOut_%sLoss = QLoss_Tes%d\n" % (tankName, self.inputs["nTes"]))
+        # lines = lines + ("qSysOut_%sAcum = QAcum_Tes%d\n" % (tankName, self.inputs["nTes"]))
+        # lines = lines + ("elSysIn_Q_%sAux = qHeatSource_Tes%d\n" % (tankName, self.inputs["nTes"]))
 
         elif typeFile == "dck":
             self.extension = "dck"
@@ -861,7 +1135,13 @@ class Type1924_TesPlugFlow:
         else:
             raise ValueError("typeFile %s unknown (Must be dck or ddck)")
 
-        lines = lines + "\n" + self.sLine + "*** Inputs from hydraulic solver ****\n" + self.sLine
+        lines = (
+            lines
+            + "\n"
+            + self.sLine
+            + "*** Inputs from hydraulic solver ****\n"
+            + self.sLine
+        )
 
         nTes = self.inputs["nTes"]
         nHxs = self.inputs["nHx"]
@@ -870,7 +1150,9 @@ class Type1924_TesPlugFlow:
         nUnit = self.inputs["nUnit"]
 
         for idPort in range(nPorts):
-            line = self._getOnePortInputs(nTes, idPort + 1, self.connectorsPort)
+            line = self._getOnePortInputs(
+                nTes, idPort + 1, self.connectorsPort
+            )
             lines = lines + line
 
         for idHx in range(nHxs):
@@ -880,7 +1162,12 @@ class Type1924_TesPlugFlow:
         line = self.getHeatSourcesValues(nTes, nAux, self.connectorsAux)
         lines = lines + line
 
-        lines = lines + self.sLine + "**** Outputs to hydraulic solver ****\n" + self.sLine
+        lines = (
+            lines
+            + self.sLine
+            + "**** Outputs to hydraulic solver ****\n"
+            + self.sLine
+        )
 
         nEq = nPorts
         if nEq > 0:
@@ -917,7 +1204,9 @@ class Type1924_TesPlugFlow:
         lines = lines + self.getOutputsToOtherDdck(self.inputs)
 
 
-        line = self.sLine + "****** Parameters of Type1924 *******\n" + self.sLine
+        line = (
+            self.sLine + "****** Parameters of Type1924 *******\n" + self.sLine
+        )
         lines = lines + line
 
         lines = lines + "CONSTANTS #\n"
@@ -936,7 +1225,9 @@ class Type1924_TesPlugFlow:
             lines = lines + line
 
         for idHx in range(nHxs):
-            line = self.getOneHxParConnValues(nTes, idHx + 1, self.connectorsHx)
+            line = self.getOneHxParConnValues(
+                nTes, idHx + 1, self.connectorsHx
+            )
             lines = lines + line
 
         for idPort in range(nPorts):

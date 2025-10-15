@@ -189,27 +189,23 @@ ddTcwOffset = 36 ! Days of minimum surface temperature
 
         return f
 
-    def exportPumpConsumption(self):  # What the controller should give
+    def exportPumpConsumption(self) -> str:  # What the controller should give
 
-        pumps = [ip for ip in self._hasInternalPipings if isinstance(ip, _pump.Pump)]
+        pumps = [
+            ip for ip in self._hasInternalPipings if isinstance(ip, _pump.Pump)
+        ]
 
-        f ="""
+        formattedSummedPumpConsumptionNames = " + ".join(
+            p.exportPumpConsumptionName() for p in pumps
+        )
+
+        result = f"""\
 *******************************************
 *** Energy Balance
-*******************************************
-"""
-        f2=""
-        i=0
-        for pump in pumps:
-            if(i>0):
-                f2 +=" + "
-            f2 += pump.exportPumpConsumptionName()
-            i +=1
+******************************************
+EQUATIONS 1
+@energy(out, el, PuElTotal) = {formattedSummedPumpConsumptionNames}
 
-        f += "EQUATIONS 1\n"
-        f += f"@energy(out, el, PuElTotal) = " + f2 + "\n"
-
-        f += """
 *******************************************
 *** Calculation of pump consumption
 *******************************************
@@ -217,21 +213,19 @@ ddTcwOffset = 36 ! Days of minimum surface temperature
 CONSTANTS 2
 dpmin_bar = 0.1 ! minimal pressure-drop of loop at nominal mass flow, bar
 dpmax_bar = 15  ! maximum pressure-drop of loop at nominal mass flow, bar
+
 """
-
-
         for pump in pumps:
+            connection = pump.inputPort.getConnection()
+            loop = _com.getSingle(
+                l
+                for l in self._hydraulicLoops
+                if l.containsConnection(connection)
+            )
 
-            inputPort = _com.getSingle(pump.inputs)
-            connection = inputPort.getConnectionOrNone()
-            if not connection:
-                # error: can only export pump powers if diagram fully connected
-                pass
-            loop = _com.getSingle(l for l in self._hydraulicLoops if connection in l.connections)
+            result += pump.exportPumpPowerConsumption(loop)
 
-            f += pump.exportPumpPowerConsumption(loop)
-
-        return f
+        return result
 
     def exportDivSetting(self, unit):
         """

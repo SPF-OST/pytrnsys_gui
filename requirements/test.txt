@@ -7,9 +7,5 @@
 #
 -r test-3rd-party.txt
 -e file:.
-    # via -r requirements\test.in
 pytrnsys @ git+https://github.com/SPF-OST/pytrnsys.git
-    # via -r requirements\test.in
-
-# The following packages are considered to be unsafe in a requirements file:
-# setuptools
+shortpath83==0.12

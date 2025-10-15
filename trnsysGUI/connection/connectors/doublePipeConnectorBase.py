@@ -157,8 +157,8 @@ class DoublePipeBlockItemModel(
         cls,
         data: _dcj.JsonDict,
         validate=True,  # pylint: disable=duplicate-code
-        validate_enums: bool = True,  # /NOSONAR
-        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
+        validate_enums: bool = True,  # NOSONAR
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # NOSONAR
     ) -> "DoublePipeBlockItemModel":
         data.pop(".__BlockDict__")
         doublePipeBlockItemModel = super().from_dict(
@@ -168,10 +168,10 @@ class DoublePipeBlockItemModel(
 
     def to_dict(
         self,
-        omit_none: bool = True,  # /NOSONAR
+        omit_none: bool = True,  # NOSONAR
         validate: bool = False,
-        validate_enums: bool = True,  # /NOSONAR
-        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
+        validate_enums: bool = True,  # NOSONAR
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # NOSONAR
     ) -> _dcj.JsonDict:
         data = super().to_dict(
             omit_none, validate, validate_enums, schema_type

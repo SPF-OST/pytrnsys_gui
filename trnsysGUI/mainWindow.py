@@ -100,7 +100,7 @@ class MainWindow(_qtw.QMainWindow):
 
         exportHydCtrlAction = _qtw.QAction(
             _img.EXPORT_HYDRAULIC_CONTROL_PNG.icon(),
-            "Export ddck: hydraulic_control and pump_consumption",
+            "Export hydraulic_control_default.ddck and pump_consumption_file.ddck",
             self,
         )
         exportHydCtrlAction.triggered.connect(self.exportHydraulicControl)
@@ -216,9 +216,14 @@ class MainWindow(_qtw.QMainWindow):
         )
         exportHydraulicsActionMenu.triggered.connect(self.exportHydraulicsDdck)
 
-        exportHydCtrlActionMenu = _qtw.QAction("Export ddck user_control and pump_consumption", self)
-        exportHydCtrlActionMenu.triggered.connect(self.exportHydraulicControl)
-        exportHydCtrlActionMenu.triggered.connect(self.exportPumpConsumptionFile)
+        exportHydCtrlActionMenu = _qtw.QAction(
+            "Export user_control_default.ddck and pump_consumption_file.ddck",
+            self,
+        )
+		exportHydCtrlActionMenu.triggered.connect(self.exportHydraulicControl)
+        exportHydCtrlActionMenu.triggered.connect(
+            self.exportPumpConsumptionFile
+        )
 
         exportDdckPlaceHolderValuesJsonFileActionMenu = _qtw.QAction(
             "Export ddck placeholder values JSON file", self
@@ -666,11 +671,15 @@ class MainWindow(_qtw.QMainWindow):
 
     def exportDiagram(self):
         fileName, _ = _qtw.QFileDialog.getSaveFileName(
+<<<<<<<<< Temporary merge branch 1
+            self, "Export PDF", None, "PDF buifiles (*.pdf);;SVG buifiles (*.svg);;All Files (*)", "PDF buifiles (*.svg)"
+=========
             self,
             "Export PDF",
             None,
             "PDF files (*.pdf);;SVG files (*.svg);;All Files (*)",
             "PDF files (*.svg)",
+>>>>>>>>> Temporary merge branch 2
         )
         if fileName == "":
             return
@@ -699,10 +708,6 @@ class MainWindow(_qtw.QMainWindow):
 
             RecentProjectsHandler.save()
             e.accept()
-
-    def ensureSettingsExist(self):
-        if not _settings.Settings.tryLoadOrNone():
-            self.askUserForSettingsValuesAndSave()
 
     def askUserForSettingsValuesAndSave(self):
         newSettings = _sdlg.SettingsDlg.showDialogAndGetSettings(parent=self)

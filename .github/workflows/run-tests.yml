@@ -15,7 +15,7 @@ jobs:
   developer-install:
     runs-on: [ self-hosted, etna ]
 
-    defaults: 
+    defaults:
       run:
         working-directory: dev_install/pytrnsys_gui
 
@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           path: dev_install/pytrnsys_gui
-          
+
       - uses: actions/checkout@v4
         with:
           repository: SPF-OST/pytrnsys
@@ -40,12 +40,13 @@ jobs:
 
       - name: Install dependencies
         run: |
-          venv\Scripts\python -m pip install wheel
-          venv\Scripts\python -m pip install -r requirements/dev.txt
+          venv\Scripts\python -m pip install --upgrade pip
+          venv\Scripts\python -m pip install wheel uv
+          venv\Scripts\python -m uv pip install -r requirements\dev.txt
 
       - name: Generate UI code from Qt Creator Studio .ui files
         run: venv\Scripts\python dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py
-        
+
       - name: Tag install
         run: venv\Scripts\python setup.py egg_info -b dev
 
@@ -53,10 +54,10 @@ jobs:
         run: venv\Scripts\python -c "import trnsysGUI"
 
       - name: Run pip-compile-multi
-        run: venv\Scripts\pip-compile-multi -d requirements --no-upgrade
+        run: venv\Scripts\pip-compile-multi --uv -d requirements --no-upgrade
 
   test:
-    runs-on: [self-hosted, etna]
+    runs-on: [ self-hosted, etna ]
     
     env:
       PY_COLORS: "1"
@@ -76,11 +77,14 @@ jobs:
       - name: Create virtual environment
         run: py -3.12 -m venv venv
 
-      - name: Install dependencies
+      - name: Install packages to do with managing dependencies
         run: |
           venv\Scripts\python -m pip install --upgrade pip
-          venv\Scripts\python -m pip install wheel
-          venv\Scripts\python -m pip install -r requirements/test.txt
+          venv\Scripts\python -m pip install wheel uv
+
+      - name: Install dependencies
+        run: |
+          venv\Scripts\python -m uv pip install  . -r requirements\test.txt
 
       - name: Generate UI code from Qt Creator Studio .ui files
         run: venv\Scripts\python dev-tools/generateGuiClassesFromQtCreatorStudioUiFiles.py
@@ -101,7 +105,7 @@ jobs:
         run: venv\Scripts\python dev-tools/devTools.py --unit --keep-results
 
       - name: Post coverage report to Coveralls
-        uses: coverallsapp/github-action@v2
+        uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: test-results/coverage.lcov
@@ -116,7 +120,7 @@ jobs:
 
       - if: github.event_name == 'push' || env.PYTRNSYS_DEPENDENCY_CHANGED == 'true'
         name: Trigger build of executable for push
-        uses: peter-evans/repository-dispatch@v3
+        uses: peter-evans/repository-dispatch@ff45666b9427631e3450c54a1bcbee4d9ff4d7c0
         with:
           repository: SPF-OST/pytrnsys_gui
           token: ${{ secrets.GITHUB_TOKEN }}
