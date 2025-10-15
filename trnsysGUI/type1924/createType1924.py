@@ -41,7 +41,7 @@ class Type1924_TesPlugFlow:
 
         lines = ""
 
-        line = "EQUATIONS 3\n"
+        line = "EQUATIONS #\n"
         lines = lines + line
         line = "Thx%dIn = $%s\n" % (idHx, connectorHx[idHx - 1]["T"])
         lines = lines + line
@@ -56,7 +56,7 @@ class Type1924_TesPlugFlow:
     def _getOnePortInputs(nTes, idPort, connectorPort):
         lines = ""
 
-        line = "EQUATIONS 3\n"
+        line = "EQUATIONS #\n"
         lines = lines + line
         line = "Tdp%dIn = $%s\n" % (idPort, connectorPort[idPort - 1]["T"])
         lines = lines + line
@@ -76,7 +76,7 @@ class Type1924_TesPlugFlow:
             idPort + 1
         )
 
-        line = "CONSTANTS 2\n"
+        line = "CONSTANTS #\n"
         lines = lines + line
 
         line = "zInDp%d=%.2f\n" % (idPort + 1, connectorPort[idPort]["zIn"])
@@ -92,7 +92,7 @@ class Type1924_TesPlugFlow:
             idPort + 1
         )
 
-        line = "CONSTANTS 1\n"
+        line = "CONSTANTS #\n"
         lines = lines + line
         line = (
             "Dp%dStrat=0 ! 0: no forced stratification ; 1: force to stratify\n"
@@ -110,7 +110,7 @@ class Type1924_TesPlugFlow:
             + self.sLine
         )
 
-        line = "CONSTANTS 10\n"
+        line = "CONSTANTS #\n"
         lines = lines + line
 
         z = 0.05
@@ -125,7 +125,7 @@ class Type1924_TesPlugFlow:
 
         lines = "*********Connecting values of HX=%d***********\n" % idHx
 
-        line = "CONSTANTS 4\n"
+        line = "CONSTANTS #\n"
         lines = lines + line
 
         line = "zInhx%d=%.2f\n" % (idHx, connectHx[idHx - 1]["zIn"])
@@ -144,7 +144,7 @@ class Type1924_TesPlugFlow:
 
         lines = "*********Constant values of HX=%d***********\n" % idHx
 
-        line = "CONSTANTS 15\n"
+        line = "CONSTANTS #\n"
         lines = lines + line
 
         line = "dInHx%d=0.05 ! m only if modHx%d=0\n" % (idHx, idHx)
@@ -270,7 +270,7 @@ class Type1924_TesPlugFlow:
     def getUaParValues(self, nTes, Ua):
 
         lines = ""
-        line = "CONSTANTS 10\n"
+        line = "CONSTANTS #\n"
         lines = lines + line
 
         line = "Ufoam= 0.67 ! W/(m2K) 6 cm of foam of 0.04 W/(mK) \n"
@@ -449,7 +449,7 @@ class Type1924_TesPlugFlow:
             + self.sLine
         )
 
-        line = "CONSTANTS 10\n"
+        line = "CONSTANTS #\n"
         lines = lines + line
         z = 0.05
         for i in range(self.nMaxAvgSensor):
@@ -479,7 +479,7 @@ class Type1924_TesPlugFlow:
 
         lines = "************* MOVING PLATE *******************\n"
 
-        lines = lines + "CONSTANTS 4\n"
+        lines = lines + "CONSTANTS #\n"
 
         line = "MoInsPlate=0 ! 0-2, Insulation Plate Mode: 0 = no insulation plate inside TES, 1 = insulation plate at fixed relative height, 2 = insulation plate at fixed temperature / density controlled \n"
         lines = lines + line
@@ -687,7 +687,7 @@ class Type1924_TesPlugFlow:
             lines = lines + line
             counter = counter + 10
 
-        line = "EQUATIONS 1\n"
+        line = "EQUATIONS #\n"
         lines = lines + line
 
         line = (
@@ -696,7 +696,7 @@ class Type1924_TesPlugFlow:
         )
         lines = lines + line
 
-        line = "EQUATIONS 5\n"
+        line = "EQUATIONS #\n"
         lines = lines + line
 
         line = (
@@ -724,7 +724,7 @@ class Type1924_TesPlugFlow:
 
         nPrinterUnit = nUnit + 1
         lines = ""
-        line = "CONSTANTS 1 \n"
+        line = "CONSTANTS #\n"
         lines = lines + line
         line = "unitPrinter = %d \n" % (nPrinterUnit)
         lines = lines + line
@@ -796,7 +796,7 @@ class Type1924_TesPlugFlow:
         lines = lines + line
         line = "100     ! 6 Right axis maximum \n"
         lines = lines + line
-        line = "nPlotsPerSim     ! 7 Number of plots per simulation \n"
+        line = "$nPlotsPerSim     ! 7 Number of plots per simulation \n"
         lines = lines + line
         line = "12     ! 8 X-axis gridpoints\n"
         lines = lines + line
@@ -818,7 +818,7 @@ class Type1924_TesPlugFlow:
         lines = lines + line
         line = "Temperatures  \n"
         lines = lines + line
-        line = "MassFlows  \n"
+        line = "Unused  \n"
         lines = lines + line
         line = "%s\n" % (self.nameTes)
         lines = lines + line
@@ -862,7 +862,7 @@ class Type1924_TesPlugFlow:
         lines = lines + self.getInputs(inputs)
         lines = lines + self.getOutputs(inputs)
         lines = lines + self.getMonthyPrinter(nTes, nUnit, inputs)
-        # lines = lines + self.getOnlinePlotter(nTes)
+        lines = lines + self.getOnlinePlotter(nTes)
         return lines
 
     def getHead(self):
@@ -898,7 +898,7 @@ class Type1924_TesPlugFlow:
             lines = lines + "** outputs to energy balance in kWh\n"
 
             lines = lines + self.sLine
-            lines = lines + "EQUATIONS 3\n"
+            lines = lines + "EQUATIONS #\n"
 
             lines = lines + ("@energy(out, heat, %sLoss) = QLoss\n" % tankName)
             lines = lines + (
@@ -1017,7 +1017,7 @@ class Type1924_TesPlugFlow:
             lines = lines + line
 
         lines = lines + "********** HEAT EXCHANGER CONSTANTS*******\n"
-        lines = lines + "CONSTANTS 1\n"
+        lines = lines + "CONSTANTS #\n"
         lines = lines + "nHxUsed=%d \n" % (nHxs)
 
         for idHx in range(nHxs):

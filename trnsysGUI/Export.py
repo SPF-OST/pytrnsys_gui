@@ -202,7 +202,7 @@ ddTcwOffset = 36 ! Days of minimum surface temperature
         result = f"""\
 *******************************************
 *** Energy Balance
-******************************************
+*******************************************
 EQUATIONS 1
 @energy(out, el, PuElTotal) = {formattedSummedPumpConsumptionNames}
 
