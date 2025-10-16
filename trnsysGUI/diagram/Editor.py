@@ -521,8 +521,8 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
                 singlePipeEnergyBalanceEquations = f"""\
 EQUATIONS 2
 *** single pipes
-qSysOut_PipeLoss = {SinglePipeTotals.DISSIPATED}
-qSysOut_{SinglePipeTotals.PIPE_INTERNAL_CHANGE} = {SinglePipeTotals.PIPE_INTERNAL_CHANGE}
+@energy(out, heat, PipeLoss) = {SinglePipeTotals.DISSIPATED}
+@energy(out, heat, PipeAcum) = {SinglePipeTotals.PIPE_INTERNAL_CHANGE}
 
 """
             simulatedDoublePipes = [
@@ -579,6 +579,11 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             exportTo=exportTo
         )
 
+        fullExportText += """\
+CONSTANTS 1
+TRoomStore = 10        
+
+"""
         fullExportText += exporter.exportParametersFlowSolver(
             simulationUnit, simulationType, descConnLength
         )
@@ -600,10 +605,10 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             self.printerUnitnr + 1, 15
         )
 
+
         if exportTo == "mfs":
             fullExportText += """\
-CONSTANTS 2
-TRoomStore=1
+CONSTANTS 1            
 Tcw=1
 """
             fullExportText += "ENDS"
