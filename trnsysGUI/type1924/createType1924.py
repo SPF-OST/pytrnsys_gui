@@ -810,9 +810,9 @@ class Type1924_TesPlugFlow:
         lines = lines + line
         line = "INPUTS 10     \n"
         lines = lines + line
-        line = "T1 T2 T3 T4 T5 T6 T7 T8 T9 T10 \n"
+        line = "Tsen1 Tsen2 Tsen3 Tsen4 Tsen5 Tsen6 Tsen7 Tsen8 Tsen9 Tsen10 \n"
         lines = lines + line
-        line = "T1 T2 T3 T4 T5 T6 T7 T8 T9 T10 \n"
+        line = "Tsen1 Tsen2 Tsen3 Tsen4 Tsen5 Tsen6 Tsen7 Tsen8 Tsen9 Tsen10 \n"
         lines = lines + line
         line = "LABELS  3         \n"
         lines = lines + line
