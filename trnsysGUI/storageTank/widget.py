@@ -503,7 +503,11 @@ class StorageTank(
         auxiliaryPorts = self._getAuxiliaryPortForExport(inputs)
 
         tool.setInputs(
-            inputs, directPairsPorts, heatExchangerPorts, auxiliaryPorts
+            inputs,
+            directPairsPorts,
+            heatExchangerPorts,
+            auxiliaryPorts,
+            self.displayName,
         )
 
         projectDirPath = _pl.Path(self.editor.projectFolder)

@@ -1,8 +1,0 @@
-{
-  "qSysIn_Src": "$Q_{src}$",
-  "qSysOut_Snk": "$Q_{snk}$",
-  "qSysOut_dpToFFieldTot": "$Q_{ex,env}$",
-  "qSysOut_dpPipeIntTot": "$Q_{fluid}$",
-  "qSysOut_dpSoilIntTot": "$Q_{ex,soil}$",
-  "TInQSrc1": "T_{src,ret}"
-}
