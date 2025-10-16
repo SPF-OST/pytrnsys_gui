@@ -15,7 +15,7 @@
 *************************************
 ** outputs to energy balance in kWh
 *************************************
-EQUATIONS 3
+EQUATIONS #
 @energy(out, heat, TesDhwLoss) = QLoss
 @energy(out, heat, TesDhwAcum) = QAcum
 @energy(in, el, TesDhwAux)     = qHeatSource
@@ -23,15 +23,15 @@ EQUATIONS 3
 *************************************
 *** Inputs from hydraulic solver ****
 *************************************
-EQUATIONS 3
+EQUATIONS #
 Tdp1In = $TMixAux_TesDhw
 Mfrdp1 = $MTesDhwDpL90_10_A
 Tdp1InRev = $TTesDhw_TeeAuxRt
-EQUATIONS 3
+EQUATIONS #
 Tdp2In = $TDivDhw_TesDhw1
 Mfrdp2 = $MTesDhwDpR1_99_A
 Tdp2InRev = $TTesDhw_DivDhwOut1
-EQUATIONS 3
+EQUATIONS #
 Tdp3In = $TDivDhw_TesDhw2
 Mfrdp3 = $MTesDhwDpR65_95_A
 Tdp3InRev = $TTesDhw_DivDhwOut2
@@ -81,33 +81,33 @@ TRoomStore=15 !
 VStoreRef = 0.763
 ratio = Vol / VStoreRef
 *********Connecting values of DIRECT PORT=1***********
-CONSTANTS 2
+CONSTANTS #
 zInDp1=0.90
 zOutDp1=0.10
 *********Connecting values of DIRECT PORT=2***********
-CONSTANTS 2
+CONSTANTS #
 zInDp2=0.01
 zOutDp2=0.99
 *********Connecting values of DIRECT PORT=3***********
-CONSTANTS 2
+CONSTANTS #
 zInDp3=0.65
 zOutDp3=0.95
 *********Constant of DIRECT PORT=1***********
-CONSTANTS 1
+CONSTANTS #
 Dp1Strat=0 ! 0: no forced stratification ; 1: force to stratify
 *********Constant of DIRECT PORT=2***********
-CONSTANTS 1
+CONSTANTS #
 Dp2Strat=0 ! 0: no forced stratification ; 1: force to stratify
 *********Constant of DIRECT PORT=3***********
-CONSTANTS 1
+CONSTANTS #
 Dp3Strat=0 ! 0: no forced stratification ; 1: force to stratify
 ********** HEAT EXCHANGER CONSTANTS*******
-CONSTANTS 1
+CONSTANTS #
 nHxUsed=0 
 *************************************
 ** USER DEFINED TEMPERATURE SENSOR HEIGHTS. To be changed by user 
 *************************************
-CONSTANTS 10
+CONSTANTS #
 zSen1=0.05
 zSen2=0.15
 zSen3=0.25
@@ -121,7 +121,7 @@ zSen10=0.95
 *************************************
 ** USER DEFINED AVERAGED TEMPERATURE SENSOR HEIGHTS. To be changed by user 
 *************************************
-CONSTANTS 10
+CONSTANTS #
 zSenAvgBot1 = 0.05
 zSenAvgTop1 = 0.15
 zSenAvgBot2 = 0.25
@@ -143,7 +143,7 @@ maxTDiff=0.015 ! 9: K, maximum temperature difference between plugs
 readMode=0     ! 10: 1: from table, 0: Tini and CapTot
 Tref=273.15    ! 11: oC, reference temperature
 Tmax=100.       ! 6: oC, initial temperature
-CONSTANTS 10
+CONSTANTS #
 Ufoam= 0.67 ! W/(m2K) 6 cm of foam of 0.04 W/(mK) 
 Ubot = 1.5 ! W/(m2K) 2 cm of foam of 0.04 W/(mK)
 Atop = Vol/Heigh ! m2
@@ -155,7 +155,7 @@ Uaz2 = Ufoam*ALat/3 !  W/k
 Uaz3 = Ufoam*ALat/3 !  W/k
 UaTop = Ufoam*ATop !  W/k
 ************* MOVING PLATE *******************
-CONSTANTS 4
+CONSTANTS #
 MoInsPlate=0 ! 0-2, Insulation Plate Mode: 0 = no insulation plate inside TES, 1 = insulation plate at fixed relative height, 2 = insulation plate at fixed temperature / density controlled 
 zInsPlate=0  ! 0-1, relative position of fixed height insulation plate inside TES (only for Insulation Plate Mode = 1
 TinsPlate=0  ! oC, temperature at which moveable insulation plate floats in TES (only for Insulation Plate Mode = 2)
@@ -267,15 +267,15 @@ Tsen7 =[50,77] ! temperature at user defined sensor height Tsen7
 Tsen8 =[50,78] ! temperature at user defined sensor height Tsen8 
 Tsen9 =[50,79] ! temperature at user defined sensor height Tsen9 
 Tsen10 =[50,80] ! temperature at user defined sensor height Tsen10 
-EQUATIONS 1
+EQUATIONS #
 qHeatSource = [50,181] ! Heat input of all auxiliary heat sources [kW]
-EQUATIONS 5
+EQUATIONS #
 Qv     = [50,176] ! Heat input of all heat exchangers and auxiliary heat sources [kW]
 QLoss  = [50,177] ! Heat Losses of the Tes [kW]
 QAcum  = [50,178] ! Sensible accumulated heat [kW]
 QPorts = [50,179] ! Heat Input by direct ports [kW]
 QImb   = [50,64]  ! Heat Imbalance in Tes  IMB = sumQv - sumQLoss -sumQAcum + sumQPort
-CONSTANTS 1 
+CONSTANTS #
 unitPrinter = 51 
 ASSIGN temp\TESTesDhw_MO.dat unitPrinter
 UNIT 51 TYPE 46
@@ -300,18 +300,18 @@ PARAMETERS 12
 100     ! 4 Left axis maximum -
 0     ! 5 Right axis minimum 
 100     ! 6 Right axis maximum 
-nPlotsPerSim     ! 7 Number of plots per simulation 
+$nPlotsPerSim     ! 7 Number of plots per simulation 
 12     ! 8 X-axis gridpoints
 1     ! 9 Shut off Online w/o removing 
 -1     ! 10 Logical unit for output file 
 0     ! 11 Output file units
 0     ! 12 Output file delimiter
 INPUTS 10     
-T1 T2 T3 T4 T5 T6 T7 T8 T9 T10 
-T1 T2 T3 T4 T5 T6 T7 T8 T9 T10 
+Tsen1 Tsen2 Tsen3 Tsen4 Tsen5 Tsen6 Tsen7 Tsen8 Tsen9 Tsen10 
+Tsen1 Tsen2 Tsen3 Tsen4 Tsen5 Tsen6 Tsen7 Tsen8 Tsen9 Tsen10 
 LABELS  3         
 Temperatures  
-MassFlows  
+Unused  
 TesDhw
 
 

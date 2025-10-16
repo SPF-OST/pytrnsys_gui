@@ -39,7 +39,9 @@ EQUATIONS #
 **********************************
 
 EQUATIONS #
-PelHVAC_kW    = $AshpPelAuxTot_kW+$type888_PelContr_kW+$PelPuSh_kW+$PelPuDHW_kW+$TesDhw_qHeatSource+$TesSh_qHeatSource
+!PelHVAC_kW    = $AshpPelAuxTot_kW + $type888_PelContr_kW + $PelPuSh_kW + $PelPuDHW_kW + $TesDhw_qHeatSource + $TesSh_qHeatSource
+PelHVAC_kW    = $AshpPelAuxTot_kW + $type888_PelContr_kW + $elSysOut_PuElTotal + $TesDhw_qHeatSource + $TesSh_qHeatSource
+
 PelHH_kW      = $PelHH_kW
 PelPVAC_kW    = $PelPVAC_kW
 PvPelArrayMPP_kW = $PvPelArrayMPP_kW

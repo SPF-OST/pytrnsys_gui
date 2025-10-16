@@ -31,24 +31,29 @@
 ! Dependence on temperatures from the storages
 ****************************************************************
 
-EQUATIONS 7
-$userControl_TTesDhwHpOff = $TesDhw_T6
-$userControl_TTesDhwHpOn  = $TesDhw_T9
-$userControl_TTesDhwBot   = $TesDhw_T1
-$userControl_TTesDhwTop   = $TesDhw_T9
-$userControl_TTesShBot    = $TesSh_T1
-$userControl_TTesShTop    = $TesSh_T9
+EQUATIONS #
+!Necessary for type888
+$userControl_TTesDhwUpAuxOn   = $TesDhw_T9 ! upper Store temperature measurement for Warm water
+$userControl_TTesDhwBotAuxOff = $TesDhw_T6 ! lower store temperature measurement for Warm water
+$userControl_TTesSHUpAuxOn     = $TesSh_T9 ! upper temperature measured for room heating (on)
+$userControl_TTesSHBotAuxOff   = $TesSh_T1  ! lower temperature measured for room heating (off)
+
+!other control needs.
 $userControl_TsensorTesSh = $TesSh_T8
 
-EQUATIONS 3
+
+
+
+
+EQUATIONS #
 !dependencies from type888 control
 BoHS             = $type888_BoHS !heating season
 HpForDHWIsNeeded = $type888_HpForDhwIsNeeded
 HpForSHIsNeeded  = $type888_HpForSHIsNeeded
 
 EQUATIONS #
-myTroomSet     = $mfb_TroomSet
-myTroomRc      = $mfb_TroomRc
+TroomSet = $bui_TroomSet
+Troom    = $bui_Troom
 
 ***************************************************************
 ** outputs to hydraulic solver
@@ -57,18 +62,28 @@ myTroomRc      = $mfb_TroomRc
 
 EQUATIONS #
 ! Massflowrates
-$MfrPuAux  = $MfrHpPD*hpOnRc
-$MfrPuSh   = $mfb_MfrBuiNom*PIDRadBui*BoHS
+
+$MfrPuCond = $PID_HPCond_Mfr*hpOnRc
+$MfrPuSh   = $bui_MfrBuiNom*PIDRadBui*BoHS
 $MfrWtSp   = $dhw_MfrDHWset
 $MfrPuCirc = 50  ! kg/h for recirculation in DHH loop when no tapping water is active
 $MfrPuDHW  = $HxDwh_MfrSrcDhwHx
 $MfrWtTp   = -$MfrWtSp
 EQUATIONS #
 ! mixing valves
-$xFracMixAux        = HpForDHWIsNRc
-$xFracDivDhw        = NOT(GT($MfrWtSp,0))
-$xFracDivDhwOut     = NOT(GT($MfrWtSp,0))
-!$xFracDivSolarDhwSh = (AND(xFracDivSolarDhwShRc,GT(TTesDhwBotRc+15,TTesShBotRc))+NOT(xFracDivSolarDhwShRc)*LT(TTesShBotRc,TTesDhwBotRc))*BoHS
+$xFracMixAux    = HpForDHWIsNRc
+$xFracDivDhw    = NOT(GT($MfrWtSp,0))
+$xFracDivDhwOut = NOT(GT($MfrWtSp,0))
+
+*******************************************************
+** PID controller for heat pump condenser *
+*******************************************************
+
+EQUATIONS #
+$HpIsOn_forPID = $userControl_hpIsOn
+$MfrHpCondNom_forPID = $AshpMfrHpCondNom
+$TCondIn_forPID = $AshpTCondIn
+$TCondOut_forPID = $AshpTCondOut
 
 ***********************************
 ** outputs to other ddck
@@ -76,7 +91,7 @@ $xFracDivDhwOut     = NOT(GT($MfrWtSp,0))
 
 EQUATIONS #
 $userControl_hpIsOn    = hpOnRc !Recall value
-$userControl_PIDRadBui = PIDRadBui
+!$userControl_PIDRadBui = PIDRadBui
 
 *************************************
 ***** Control defintion
@@ -126,8 +141,8 @@ iGainRad		! 3: Integral gain PID band
 0     			! 6: Saturation mode
 0				! 7: Minimum value controller action in saturation mode
 INPUTS 3
-myTroomSet		! Set temperature
-myTroomRc		! Building: 1- (air temperature of zone)  TAIR   1 ->Feedback room temperature
+TroomSet		! Set temperature
+TroomRc		! Building: 1- (air temperature of zone)  TAIR   1 ->Feedback room temperature
 0,0     		! Control inversion option 1: increasing, 2: decreasing action
 *** INITIAL INPUT VALUES
 22 18 inversionHeat
@@ -143,39 +158,43 @@ PIDRadBui  = MIN(GT(PIDBuiOut,PIDRadBuiMin)*PIDBuiOut,1)
 ***********************************
 
 UNIT 18 TYPE 993
-PARAMETERS 1     
-5   ! 1: number of variables to be remembered
-INPUTS 5
-hpOn $userControl_TTesDhwBot $userControl_TTesShBot  $type888_HpForDHWIsNeeded $xFracDivSolarDhwSh
-0.0 0.0 0.0 0.0 0.0
+PARAMETERS 1
+3  ! 1: number of variables to be remembered
+INPUTS #
+hpOn $type888_HpForDHWIsNeeded Troom
+0.0 0.0 0.0
 EQUATIONS #   ! outputs of Input Value Recall
-hpOnRc = [18,1]
-TTesDhwBotRc = [18,2]
-TTesShBotRc = [18,3]
-HpForDHWIsNRc= [18,4]
-xFracDivSolarDhwShRc = [18,5]
+hpOnRc        = [18,1]
+HpForDHWIsNRc = [18,2]
+TroomRc       = [18,3]
+
+
+***********************************
+** Begin TYPE Online plotter
+***********************************
+
 
 UNIT 89 TYPE 65     ! Online Plotter Control
 PARAMETERS 12     
-10    ! 1 Nb. of left-axis variables
-10    ! 2 Nb. of right-axis variables
+10  ! 1 Nb. of left-axis variables
+10  ! 2 Nb. of right-axis variables
 0   ! 3 Left axis minimum
-2    ! 4 Left axis maximum
-0     ! 5 Right axis minimum
+2   ! 4 Left axis maximum
+0   ! 5 Right axis minimum
 2   ! 6 Right axis maximum
 $nPlotsPerSim ! 7 Number of plots per simulation
-12    ! 8 X-axis gridpoints
-1     ! 9 Shut off Online w/o removing
--1    ! 10 Logical unit for output file
-0     ! 11 Output file units
-0     ! 12 Output file delimiter
+12  ! 8 X-axis gridpoints
+1   ! 9 Shut off Online w/o removing
+-1  ! 10 Logical unit for output file
+0   ! 11 Output file units
+0   ! 12 Output file delimiter
 INPUTS 20     
-$xFracMixAux $xFracDivDhw $xFracDivDhwOut $xFracDivSolarDhwSh 0,0 0,0  0,0 0,0 0,0 0,0
+$xFracMixAux $xFracDivDhw $xFracDivDhwOut 0,0 0,0 0,0  0,0 0,0 0,0 0,0
  0,0 0,0 0,0  0,0 0,0 0,0 0,0 0,0  0,0 0,0
 **
-$xFracMixAux $xFracDivDhw $xFracDivDhwOut $xFracDivSolarDhwSh 0,0 0,0  0,0 0,0 0,0 0,0
+$xFracMixAux $xFracDivDhw $xFracDivDhwOut 0,0 0,0 0,0  0,0 0,0 0,0 0,0
  0,0 0,0 0,0  0,0 0,0 0,0 0,0 0,0  0,0 0,0
 LABELS  3     
-Temperatures     
-Boolean     
+Boolean
+NotUsed
 userControl

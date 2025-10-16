@@ -10,14 +10,10 @@
 *************************************
 EQUATIONS 2
 *** single pipes
-!qSysOut_PipeLoss = PipeLossTot
-!qSysOut_spPipeIntTot = spPipeIntTot
 @energy(out, heat, PipeLoss) = PipeLossTot
 @energy(out, heat, PipeAcum) = spPipeIntTot
 
 
-CONSTANTS 1
-TRoomStore = 15 ! used to calculate pipe losses
 
 
 
@@ -27,7 +23,7 @@ TTesDhwDpL90_10H=TTesDhwDpL90_10
 TTesDhwDpR1_99H=TTesDhwDpR1_99
 TTesDhwDpR65_95H=TTesDhwDpR65_95
 TTesShDpR1_99H=TTesShDpR1_99
-TTesShDpL99_35H=TTesShDpL99_35
+TTesShDpL99_1H=TTesShDpL99_1
 THxDhwSide1H=THxDhwSide1
 THxDhwSide2H=THxDhwSide2
 TRadFloorH=TRadFloor
@@ -36,6 +32,9 @@ TAshpH=TAshp
 *** Default global PARAMETERS for single pipes
 CONSTANTS 1
 spTIni = 20
+
+CONSTANTS 1
+TRoomStore = 10        
 
 UNIT 450 TYPE 9352
 PARAMETERS 200
@@ -47,7 +46,7 @@ mfrTolSwitchThreshold
 36 33 0 0      !2 : TesDhwDpR1_99
 35 34 0 0      !3 : TesDhwDpR65_95
 47 44 0 0      !4 : TesShDpR1_99
-27 31 0 0      !5 : TesShDpL99_35
+27 31 0 0      !5 : TesShDpL99_1
 38 39 0 0      !6 : HxDhwSide1
 42 40 0 0      !7 : HxDhwSide2
 37 36 35 3     !8 : DivDhw
@@ -65,7 +64,7 @@ mfrTolSwitchThreshold
 30 31 32 2     !20 : TeeAuxRt
 30 29 0 0      !21 : Ashp
 28 27 26 3     !22 : MixAux
-29 28 0 8      !23 : PuAux
+29 28 0 8      !23 : PuCond
 12 11 0 0      !24 : PiTeeCirc1_PuCirc
 11 13 0 0      !25 : PiPuCirc_TeeCirc2
 22 1 0 0       !26 : MixAux_TesDhw
@@ -95,7 +94,7 @@ mfrTolSwitchThreshold
 INPUTS 49! for Type 9351
 0,0 0,0 0,0 0,0 0,0 0,0 0,0 xFracDivDhw MfrWtTp MfrWtSp 
 MfrPuCirc 0,0 0,0 MfrPuDhw 0,0 xFracMixSh xFracDivDhwOut MfrPuSh 0,0 0,0 
-0,0 xFracMixAux MfrPuAux 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+0,0 xFracMixAux MfrPuCond 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
 *** Initial Inputs
@@ -114,8 +113,8 @@ MTesDhwDpR65_95_A=[450,7]
 MTesDhwDpR65_95_B=[450,8]
 MTesShDpR1_99_A=[450,10]
 MTesShDpR1_99_B=[450,11]
-MTesShDpL99_35_A=[450,13]
-MTesShDpL99_35_B=[450,14]
+MTesShDpL99_1_A=[450,13]
+MTesShDpL99_1_B=[450,14]
 MHxDhwSide1_A=[450,16]
 MHxDhwSide1_B=[450,17]
 MHxDhwSide2_A=[450,19]
@@ -156,8 +155,8 @@ MAshp_B=[450,62]
 MMixAux_A=[450,64]
 MMixAux_B=[450,65]
 MMixAux_C=[450,66]
-MPuAux_A=[450,67]
-MPuAux_B=[450,68]
+MPuCond_A=[450,67]
+MPuCond_B=[450,68]
 MPiTeeCirc1_PuCirc_A=[450,70]
 MPiTeeCirc1_PuCirc_B=[450,71]
 MPiPuCirc_TeeCirc2_A=[450,73]
@@ -276,7 +275,7 @@ TWtTp = TTeeCirc1_WtTp
 
 ! WtSp
 EQUATIONS 1
-TWtSp = weather_Tcw
+TWtSp = weather_TcwAvg
 
 UNIT 452 TYPE 2221
 PARAMETERS 2
@@ -440,12 +439,12 @@ PARAMETERS 2
 mfrSolverAbsTol
 spTIni
 INPUTS 3
-MPuAux_A TAshp_PuAux TPuAux_MixAux
+MPuCond_A TAshp_PuAux TPuAux_MixAux
 ***
 0 spTIni spTIni
 EQUATIONS 2
-TPuAux = [462,1]
-MPuAux = MPuAux_A
+TPuCond = [462,1]
+MPuCond = MPuCond_A
 
 UNIT 463 TYPE 931
 ! PiTeeCirc1_PuCirc
@@ -532,7 +531,7 @@ INPUTS 4
 TMixAux ! input flow temperature [deg C]
 MMixAux_TesSh_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
-TTesShDpL99_35H ! reverse flow input temperature [deg C]
+TTesShDpL99_1H ! reverse flow input temperature [deg C]
 ***Initial values
 20 0.0 20 20
 
@@ -553,7 +552,7 @@ Lloop1Rho ! density [kg/m^3]
 Lloop1Cp ! specific heat [kJ/(kg*K)]
 spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
-TPuAux ! input flow temperature [deg C]
+TPuCond ! input flow temperature [deg C]
 MPuAux_MixAux_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TMixAux ! reverse flow input temperature [deg C]
@@ -580,7 +579,7 @@ INPUTS 4
 TAshpH ! input flow temperature [deg C]
 MAshp_PuAux_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
-TPuAux ! reverse flow input temperature [deg C]
+TPuCond ! reverse flow input temperature [deg C]
 ***Initial values
 20 0.0 20 20
 
@@ -625,7 +624,7 @@ Lloop1Rho ! density [kg/m^3]
 Lloop1Cp ! specific heat [kJ/(kg*K)]
 spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
-TTesShDpL99_35H ! input flow temperature [deg C]
+TTesShDpL99_1H ! input flow temperature [deg C]
 MTesSh_TeeAuxRt_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeAuxRt ! reverse flow input temperature [deg C]
@@ -1088,7 +1087,7 @@ spPipeConvectedTot = PPiTeeCirc1_PuCircConv_kW+PPiPuCirc_TeeCirc2Conv_kW+PMixAux
 PipeLossTot = PPiTeeCirc1_PuCirc_kW+PPiPuCirc_TeeCirc2_kW+PMixAux_TesDhw_kW+PMixAux_TesSh_kW+PPuAux_MixAux_kW+PAshp_PuAux_kW+PTeeAuxRt_Ashp_kW+PTesSh_TeeAuxRt_kW+PTesDhw_TeeAuxRt_kW+PTesDhw_DivDhwOut1_kW+PTesDhw_DivDhwOut2_kW+PDivDhw_TesDhw2_kW+PDivDhw_TesDhw1_kW+PPuDhw_DivDhw_kW+PDivDhwOut_HxDhw_kW+PHxDhw_PuDhw_kW+PHxDhw_TeeCirc1_kW+PTeeCirc1_WtTp_kW+PTeeCirc2_HxDhw_kW+PWtSp_TeeCirc2_kW+PTesSh_MixSh_kW+PMixSh_RadFloor_kW+PTeeSh_MixSh_kW+PTeeSh_TesSh_kW+PPuSh_TeeSh_kW+PRadFloor_PuSh_kW
 spPipeIntTot = (spPipeEnIntTot - [100,1]) / dtSim / 3600 ! kW
 spImbalance = spPipeConvectedTot - PipeLossTot - spPipeIntTot
-ASSIGN PvAshpDhwShMfh_Mfr.prt 489
+ASSIGN PV_ASHP_SH_DHW_MFB_Mfr.prt 489
 
 UNIT 489 TYPE 25! User defined Printer
 PARAMETERS 10
@@ -1116,7 +1115,7 @@ MDivDhw_TesDhw1 MPuDhw_DivDhw MDivDhwOut_HxDhw MHxDhw_PuDhw MHxDhw_TeeCirc1 MTee
 MTesSh_MixSh MMixSh_RadFloor MTeeSh_MixSh MTeeSh_TesSh MPuSh_TeeSh MRadFloor_PuSh
 
 
-ASSIGN PvAshpDhwShMfh_T.prt 490
+ASSIGN PV_ASHP_SH_DHW_MFB_T.prt 490
 
 UNIT 490 TYPE 25! User defined Printer
 PARAMETERS 10
