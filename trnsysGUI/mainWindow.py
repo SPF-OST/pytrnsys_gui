@@ -100,7 +100,7 @@ class MainWindow(_qtw.QMainWindow):
 
         exportHydCtrlAction = _qtw.QAction(
             _img.EXPORT_HYDRAULIC_CONTROL_PNG.icon(),
-            "Export hydraulic_control_default.ddck and pump_consumption_file.ddck",
+            "Export user_control_default.ddck and pump_consumption_file.ddck",
             self,
         )
         exportHydCtrlAction.triggered.connect(self.exportHydraulicControl)
