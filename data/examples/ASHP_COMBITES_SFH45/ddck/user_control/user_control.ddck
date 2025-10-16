@@ -13,7 +13,7 @@ HpForSHIsNeeded  = $type888_HpForSHIsNeeded
 
 EQUATIONS # !dependencied from building -> mfb and type56
 TroomSet  = $bui_TroomSet
-Troom     = $buiModel_Troom
+Troom     = $bui_Troom
 
 EQUATIONS #
 T_set_MixDhw = $dhw_Tdhwset
@@ -31,7 +31,7 @@ $MfrWtSp   = $dhw_MfrDHWset
 $MfrWtTp   = -$MfrWtSp
 $MfrPuSh   = $bui_MfrBuiNom*PIDRadBui*BoHS
 ***diverter valves***
-$xFracMixHp = HpForDHWIsNeededRc
+$xFracMixHp = HpForSHIsNeededRc ! Dc-ERROR 16.10.25
 
 *******************************************************
 ** PID controller for heat pump condenser *
@@ -48,7 +48,7 @@ $TCondOut_forPID = $AshpTCondOut
 ***************************************************************
 EQUATIONS #
 $userControl_TTesDhwUpAuxOn    = $CombiTes_T9 ! upper Store temperature measurement for Warm water
-$userControl_TTesDhwBotAuxOff  = $CombiTes_T6 ! lower store temperature measurement for Warm water
+$userControl_TTesDhwBotAuxOff  = $CombiTes_T7 ! lower store temperature measurement for Warm water
 $userControl_TTesSHUpAuxOn     = $CombiTes_T3 ! upper temperature measured for room heating (on)
 $userControl_TTesSHBotAuxOff   = $CombiTes_T1 ! lower temperature measured for room heating (off)
 
@@ -132,11 +132,12 @@ $xFracMixSh =  1.-[442,5]
 
 UNIT 18 TYPE 993
 PARAMETERS 1
-3   ! 1: number of variables to be remembered
-INPUTS 3
-hpOn  HpForDHWIsNeeded Troom
-0.0 0.0 0.0
+4   ! 1: number of variables to be remembered
+INPUTS 4
+hpOn  HpForDHWIsNeeded Troom HpForSHIsNeeded
+0.0 0.0 0.0 0.0
 EQUATIONS #   ! outputs of Input Value Recall
 hpOnRc = [18,1]
 HpForDHWIsNeededRc= [18,2]
-TroomRc = [18,2]
+TroomRc = [18,3] !DC-ERROR 16.10.25
+HpForSHIsNeededRc= [18,4]

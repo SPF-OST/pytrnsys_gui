@@ -9,6 +9,6 @@ if __name__ == "__main__":
     pathConfig = "./"
     tool = pParallelTrnsys.ProcessParallelTrnsys()
     tool.readConfig(pathConfig, "process.config")
-    tool.readConfig(pathConfig, "process_compare.config")
+    # tool.readConfig(pathConfig, "process_compare.config")
 
     tool.process()

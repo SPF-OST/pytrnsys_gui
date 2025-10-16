@@ -1,5 +1,5 @@
 *************************************
-**BEGIN combiTes.ddck
+**BEGIN CombiTes.ddck
 *************************************
 
 *************************************
@@ -15,29 +15,29 @@
 *************************************
 ** outputs to energy balance in kWh
 *************************************
-EQUATIONS #
-@energy(out, heat, combiTesLoss) = QLoss
-@energy(out, heat, combiTesAcum) = QAcum
-@energy(in, el, combiTesAux)     = qHeatSource
+EQUATIONS 3
+@energy(out, heat, CombiTesLoss) = QLoss
+@energy(out, heat, CombiTesAcum) = QAcum
+@energy(in, el, CombiTesAux)     = qHeatSource
 
 *************************************
 *** Inputs from hydraulic solver ****
 *************************************
-EQUATIONS #
+EQUATIONS 3
 Tdp1In = $TMixHp_Tes2
-Mfrdp1 = $McombiTesDpL99_60_A
+Mfrdp1 = $MCombiTesDpL99_60_A
 Tdp1InRev = $TTes2_Tee
-EQUATIONS #
+EQUATIONS 3
 Tdp2In = $TMixHp_Tes22
-Mfrdp2 = $McombiTesDpL35_1_A
+Mfrdp2 = $MCombiTesDpL35_1_A
 Tdp2InRev = $TTes2_Tee2
-EQUATIONS #
+EQUATIONS 3
 Tdp3In = $TTee5_Tes2
-Mfrdp3 = $McombiTesDpR3_35_A
+Mfrdp3 = $MCombiTesDpR3_35_A
 Tdp3InRev = $TTes2_MixSh
-EQUATIONS #
+EQUATIONS 3
 Thx1In = $TTee3_Tes2
-Mfrhx1 = $McombiTesDhw_A
+Mfrhx1 = $MCombiTesDhw_A
 Thx1InRev = $TTes2_MixDhw
 CONSTANTS 2
 zAux1=0.00
@@ -48,12 +48,12 @@ qAux1=0.00
 *************************************
 EQUATIONS 3
 *** direct port outputs
-$TcombiTesDpL99_60=[50,1]
-$TcombiTesDpL35_1=[50,3]
-$TcombiTesDpR3_35=[50,5]
+$TCombiTesDpL99_60=[50,1]
+$TCombiTesDpL35_1=[50,3]
+$TCombiTesDpR3_35=[50,5]
 EQUATIONS 1
 *** heat exchanger outputs
-$TcombiTesDhw=[50,102]
+$TCombiTesDhw=[50,102]
 
 *************************************
 **inputs from other ddck
@@ -68,17 +68,17 @@ PI = $PI
 *************************************
 ***Temperatures at 10 equally distributed height 
 EQUATIONS #
-$combiTes_T1 =[50,21] !temperature at 0.05 
-$combiTes_T2 =[50,22] !temperature at 0.15 
-$combiTes_T3 =[50,23] !temperature at 0.25 
-$combiTes_T4 =[50,24] !temperature at 0.35 
-$combiTes_T5 =[50,25] !temperature at 0.45 
-$combiTes_T6 =[50,26] !temperature at 0.55 
-$combiTes_T7 =[50,27] !temperature at 0.65 
-$combiTes_T8 =[50,28] !temperature at 0.75 
-$combiTes_T9 =[50,29] !temperature at 0.85 
-$combiTes_T10 =[50,30] !temperature at 0.95 
-$combiTes_qHeatSource = qHeatSource 
+$CombiTes_T1 =[50,21] !temperature at 0.05 
+$CombiTes_T2 =[50,22] !temperature at 0.15 
+$CombiTes_T3 =[50,23] !temperature at 0.25 
+$CombiTes_T4 =[50,24] !temperature at 0.35 
+$CombiTes_T5 =[50,25] !temperature at 0.45 
+$CombiTes_T6 =[50,26] !temperature at 0.55 
+$CombiTes_T7 =[50,27] !temperature at 0.65 
+$CombiTes_T8 =[50,28] !temperature at 0.75 
+$CombiTes_T9 =[50,29] !temperature at 0.85 
+$CombiTes_T10 =[50,30] !temperature at 0.95 
+$CombiTes_qHeatSource = qHeatSource 
 *************************************
 ****** Parameters of Type1924 *******
 *************************************
@@ -88,34 +88,34 @@ TRoomStore=15 !
 VStoreRef = 0.763
 ratio = Vol / VStoreRef
 *********Connecting values of DIRECT PORT=1***********
-CONSTANTS #
+CONSTANTS 2
 zInDp1=0.99
 zOutDp1=0.60
 *********Connecting values of DIRECT PORT=2***********
-CONSTANTS #
+CONSTANTS 2
 zInDp2=0.35
 zOutDp2=0.01
 *********Connecting values of DIRECT PORT=3***********
-CONSTANTS #
+CONSTANTS 2
 zInDp3=0.03
 zOutDp3=0.35
 *********Connecting values of HX=1***********
-CONSTANTS #
+CONSTANTS 4
 zInhx1=0.01
 zOuthx1=0.99
 Cphx1=$Lloop2Cp
 Rhohx1=$Lloop2Rho
 *********Constant of DIRECT PORT=1***********
-CONSTANTS #
+CONSTANTS 1
 Dp1Strat=0 ! 0: no forced stratification ; 1: force to stratify
 *********Constant of DIRECT PORT=2***********
-CONSTANTS #
+CONSTANTS 1
 Dp2Strat=0 ! 0: no forced stratification ; 1: force to stratify
 *********Constant of DIRECT PORT=3***********
-CONSTANTS #
+CONSTANTS 1
 Dp3Strat=0 ! 0: no forced stratification ; 1: force to stratify
 ********** HEAT EXCHANGER CONSTANTS*******
-CONSTANTS #
+CONSTANTS 1
 nHxUsed=1 
 *********Constant values of HX=1***********
 CONSTANTS #
@@ -138,7 +138,7 @@ startUpHx1=0. ! only if modHx1=1
 *************************************
 ** USER DEFINED TEMPERATURE SENSOR HEIGHTS. To be changed by user 
 *************************************
-CONSTANTS #
+CONSTANTS 10
 zSen1=0.05
 zSen2=0.15
 zSen3=0.25
@@ -152,7 +152,7 @@ zSen10=0.95
 *************************************
 ** USER DEFINED AVERAGED TEMPERATURE SENSOR HEIGHTS. To be changed by user 
 *************************************
-CONSTANTS #
+CONSTANTS 10
 zSenAvgBot1 = 0.05
 zSenAvgTop1 = 0.15
 zSenAvgBot2 = 0.25
@@ -174,7 +174,7 @@ maxTDiff=0.015 ! 9: K, maximum temperature difference between plugs
 readMode=0     ! 10: 1: from table, 0: Tini and CapTot
 Tref=273.15    ! 11: oC, reference temperature
 Tmax=100.       ! 6: oC, initial temperature
-CONSTANTS #
+CONSTANTS 10
 Ufoam= 0.67 ! W/(m2K) 6 cm of foam of 0.04 W/(mK) 
 Ubot = 1.5 ! W/(m2K) 2 cm of foam of 0.04 W/(mK)
 Atop = Vol/Heigh ! m2
@@ -186,7 +186,7 @@ Uaz2 = Ufoam*ALat/3 !  W/k
 Uaz3 = Ufoam*ALat/3 !  W/k
 UaTop = Ufoam*ATop !  W/k
 ************* MOVING PLATE *******************
-CONSTANTS #
+CONSTANTS 4
 MoInsPlate=0 ! 0-2, Insulation Plate Mode: 0 = no insulation plate inside TES, 1 = insulation plate at fixed relative height, 2 = insulation plate at fixed temperature / density controlled 
 zInsPlate=0  ! 0-1, relative position of fixed height insulation plate inside TES (only for Insulation Plate Mode = 1
 TinsPlate=0  ! oC, temperature at which moveable insulation plate floats in TES (only for Insulation Plate Mode = 2)
@@ -300,17 +300,17 @@ Tsen9 =[50,79] ! temperature at user defined sensor height Tsen9
 Tsen10 =[50,80] ! temperature at user defined sensor height Tsen10 
 EQUATIONS 1
 Qhx1Out=[50,104] ! 
-EQUATIONS #
+EQUATIONS 1
 qHeatSource = [50,181] ! Heat input of all auxiliary heat sources [kW]
-EQUATIONS #
+EQUATIONS 5
 Qv     = [50,176] ! Heat input of all heat exchangers and auxiliary heat sources [kW]
 QLoss  = [50,177] ! Heat Losses of the Tes [kW]
 QAcum  = [50,178] ! Sensible accumulated heat [kW]
 QPorts = [50,179] ! Heat Input by direct ports [kW]
 QImb   = [50,64]  ! Heat Imbalance in Tes  IMB = sumQv - sumQLoss -sumQAcum + sumQPort
-CONSTANTS #
+CONSTANTS 1 
 unitPrinter = 51 
-ASSIGN temp\TEScombiTes_MO.dat unitPrinter
+ASSIGN temp\TESCombiTes_MO.dat unitPrinter
 UNIT 51 TYPE 46
 PARAMETERS 5
 unitPrinter ! 1: Logical unit number, -
@@ -321,30 +321,3 @@ unitPrinter ! 1: Logical unit number, -
 INPUTS 10
 Qv QLoss QAcum QPorts QImb Qdp1 Qdp2 Qdp3 Qhx1Out qHeatSource 
 Qv QLoss QAcum QPorts QImb Qdp1 Qdp2 Qdp3 Qhx1Out qHeatSource 
-*************************************
-********** Online Plotter ***********
-*************************************
-
-UNIT 501 TYPE 65     ! Online Plotter HX 
-PARAMETERS 12   
-10     ! 1 Nb. of left-axis variables 
-0     ! 2 Nb. of right-axis variables
-0     ! 3 Left axis minimum 
-100     ! 4 Left axis maximum -
-0     ! 5 Right axis minimum 
-100     ! 6 Right axis maximum 
-$nPlotsPerSim     ! 7 Number of plots per simulation 
-12     ! 8 X-axis gridpoints
-1     ! 9 Shut off Online w/o removing 
--1     ! 10 Logical unit for output file 
-0     ! 11 Output file units
-0     ! 12 Output file delimiter
-INPUTS 10     
-Tsen1 Tsen2 Tsen3 Tsen4 Tsen5 Tsen6 Tsen7 Tsen8 Tsen9 Tsen10 
-Tsen1 Tsen2 Tsen3 Tsen4 Tsen5 Tsen6 Tsen7 Tsen8 Tsen9 Tsen10 
-LABELS  3         
-Temperatures  
-Unused  
-combiTes
-
-

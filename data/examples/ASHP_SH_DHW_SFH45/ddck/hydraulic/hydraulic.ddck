@@ -26,8 +26,9 @@ TTesShDpR99_1H=TTesShDpR99_1
 TRadH=TRad
 
 *** Default global PARAMETERS for single pipes
-CONSTANTS 1
+CONSTANTS #
 spTIni = 20
+TroomStore = 15
 
 UNIT 450 TYPE 9352
 PARAMETERS 152
@@ -405,7 +406,7 @@ MTesSh_Tee2 = MTesSh_Tee2_A
 
 ! WtSp
 EQUATIONS 1
-TWtSp = Tcw
+TWtSp = weather_TcwAvg
 
 EQUATIONS 1
 TWtTp = TVal2_WtTp
