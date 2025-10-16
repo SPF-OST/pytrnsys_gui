@@ -33,7 +33,7 @@
 
 EQUATIONS #
 TroomSet  = $bui_TroomSet
-Troom     = $buiModel_Troom
+Troom     = $bui_Troom
 
 *******************************************
 ** outputs to other ddck

@@ -45,13 +45,13 @@ EQUATIONS #
 ***********************************
 
 EQUATIONS #
-Troom     = $type5998_Troom
-TroomStar = $type5998_TroomStar
-QPeak_kW  = $mfb_QPeak_kW
-TBuiFlNom = $mfb_TBuiFlNom
-TBuiRtNom = $mfb_TBuiRtNom
-MfrBuiRdNom = $mfb_MfrBuiNom
-TroomSet    = $type5998_TroomSet
+Troom     = $bui_Troom
+TroomStar = $bui_TroomStar
+QPeak_kW  = $bui_QPeak_kW
+TBuiFlNom = $bui_TBuiFlNom
+TBuiRtNom = $bui_TBuiRtNom
+MfrBuiRdNom = $bui_MfrBuiNom
+TroomSet    = $bui_TroomSet
 
 ***********************************
 ** outputs to other ddck

@@ -44,6 +44,7 @@ TTesDhwBotAuxOff = $userControl_TTesDhwBotAuxOff  ! lower store temperature meas
 TTesSHUpAuxOn    = $userControl_TTesSHUpAuxOn     ! upper temperature measured for room heating (on)
 TTesSHBotAuxOff  = $userControl_TTesSHBotAuxOff   ! lower temperature measured for room heating (off)
 
+
 !TwwStAuxOFF = tDhwSet+offsetDhw  ! Stop heating DHW if  TTesDhwBotAuxOff > TWWStAuxOFF
 !TwwStAuxON  = tDhwSet+onsetDhw   ! Start heating DHW if TTesDhwUpAuxOn   < TwwStAuxON
 
@@ -68,7 +69,7 @@ $type888_BoHS             = [2,1]!*NOT(isSummer)     ! Boolean for heating seaso
 $type888_isSummer         = GE(MOD(time,8760),4344)*LE(MOD(time,8760),5832)!
 $type888_HpForDHWIsNeeded = [2,2]
 $type888_HpForSHIsNeeded  = [2,3]
-$type888_TRdSet           = Max([2,4],$buiModel_Troom) !CHANGED DC      ! space heating flow setpoint,  �C
+$type888_TRdSet           = Max([2,4],$bui_Troom) !CHANGED DC      ! space heating flow setpoint,  �C
 $type888_tScSet           = [2,5]
 $type888_TSetSh           = [2,7]
 $type888_PelContr_kW      = PelContr_kW
@@ -151,12 +152,12 @@ MoScTww     ! 25 MoScTww:
 MoScTrh     ! 26 MoScTrh: 
 INPUTS 14     
 Tamb24      ! 1: Tamb ->TambHS is used for determination of heating season
-TTesDhwUpAuxOn    ! 2: TwwStUp: upper Store temperature measurement for Warm water
-TTesDhwBotAuxOff    ! 3: TwwStLo: lower store temperature measurement for Warm water
-TwwStAuxON  ! 4: TwwON: temperature of store (upper) below which auxiliary is on for WW-Mode
-TwwStauxOff ! 5: TwwOFF: temperature of store (lower) above which auxiliary is off for WW-Mode
-TTesSHUpAuxOn    ! 6: TrhStUp:upper temperature measured for room heating (on)
-TTesSHBotAuxOff  ! 7 : TrhStLo: lower temperature measured for room heating (off)
+TTesDhwUpAuxOn   ! 2: TwwStUp: upper Store temperature measurement for Warm water
+TTesDhwBotAuxOff ! 3: TwwStLo: lower store temperature measurement for Warm water
+TwwStAuxON       ! 4: TwwON: temperature of store (upper) below which auxiliary is on for WW-Mode
+TwwStauxOff      ! 5: TwwOFF: temperature of store (lower) above which auxiliary is off for WW-Mode
+TTesSHUpAuxOn    ! 6: TrhStUp: upper temperature measured for room heating (on)
+TTesSHBotAuxOff  ! 7: TrhStLo: lower temperature measured for room heating (off)
 dt_rh_on    ! 8: TrhON: Heat source will be turned on for room heating whenever TTesSHUpAuxOn drops below TrhON (or TsetRH+TrhON if room heating mode MoRH = 3)
 dt_rh_off   ! 9: TrhOFF: Heat source will be turned off for room heating whenever TTesSHBotAuxOn rises above TrhOFF (or TsetRH+TrhOFF if room heating mode MoRH = 3)
 tRoomSet    ! 10: TroomSet: room set-point for heating curve calculation
@@ -180,7 +181,34 @@ Tamb     ! T_ambient
 EQUATIONS 1     
 Tamb24 = [4,1]      ! 24h average of Tamb, �C
 
+*************************************
+********** Online Plotter ***********
+*************************************
 
+UNIT 501 TYPE 65     ! Online Plotter HX
+PARAMETERS 12
+6     ! 1 Nb. of left-axis variables
+2     ! 2 Nb. of right-axis variables
+0     ! 3 Left axis minimum
+100     ! 4 Left axis maximum -
+-0.5     ! 5 Right axis minimum
+1.5    ! 6 Right axis maximum
+$nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS #
+TTesDhwUpAuxOn TTesDhwBotAuxOff TwwStAuxON TwwStauxOff TTesSHUpAuxOn TTesSHBotAuxOff
+$type888_HpForDHWIsNeeded $type888_HpForSHIsNeeded
+**
+TTesDhwUpAuxOn TTesDhwBotAuxOff TwwStAuxON TwwStauxOff TTesSHUpAuxOn TTesSHBotAuxOff
+$type888_HpForDHWIsNeeded $type888_HpForSHIsNeeded
+LABELS  3
+Temperatures
+boolean
+control_type888
 
 *******************************
 **END Control-Cooling-888.ddck

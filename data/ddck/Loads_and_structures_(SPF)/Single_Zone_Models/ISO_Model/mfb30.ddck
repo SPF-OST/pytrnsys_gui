@@ -23,17 +23,17 @@
 ***********************************
 
 EQUATIONS #
-$mfb_TBuiFlNom = 30
-$mfb_TBuiRtNom = 25
-$mfb_AreaBui   = AreaBui
-$mfb_scaleBuilding = scaleBuilding
-$mfb_PGainPer   = PGainPer
-$mfb_PGainEquip = PGainEquip
-$mfb_PGainLight = PGainLight
-$mfb_QPeak_kW   = 14.6       ! kW in Zurich (this is approx. the peak hourly demand)
-$mfb_MfrBuiNom  = MfrBuiNom  ! Nominal mass flow of heat distribution system [kg/h]
-$mfb_TroomSet   = 23*realUserBehaviour + 21*NOT(realUserBehaviour)     ! Setpoint for Room temperature, °C
-$mfb_TroomSet   = 24 ! Setpoint for Room temperature in cooling mode, °C
+$bui_TBuiFlNom = 30
+$bui_TBuiRtNom = 25
+$bui_AreaBui   = AreaBui
+$bui_scaleBuilding = scaleBuilding
+$bui_PGainPer   = PGainPer
+$bui_PGainEquip = PGainEquip
+$bui_PGainLight = PGainLight
+$bui_QPeak_kW   = 14.6       ! kW in Zurich (this is approx. the peak hourly demand)
+$bui_MfrBuiNom  = MfrBuiNom  ! Nominal mass flow of heat distribution system [kg/h]
+$bui_TroomSet   = 23*realUserBehaviour + 21*NOT(realUserBehaviour)     ! Setpoint for Room temperature, °C
+$bui_TroomSetCool = 24 ! Setpoint for Room temperature in cooling mode, °C
 
 ***********************************
 ** Case definition
@@ -47,7 +47,7 @@ useAHU            = 1 !Air handling unit (1 means with, 0 wihtout AHU)
 CONSTANTS #
 scaleBuilding   = 1
 factorMfrBuiNom = 1 !adapt this factor to achieve the nominal DeltaT you need in the dustribution loop
-MfrBuiNom       = scaleBuilding*factorMfrBuiNom*$mfb_QPeak_kW/($cpWat*($mfb_TBuiFlNom-$mfb_TBuiRtNom))*3600 ! Nominal mass flow of heat distribution system [kg/h]
+MfrBuiNom       = scaleBuilding*factorMfrBuiNom*$bui_QPeak_kW/($cpWat*($bui_TBuiFlNom-$bui_TBuiRtNom))*3600 ! Nominal mass flow of heat distribution system [kg/h]
 
 
 EQUATIONS 6	! Shading Factor (Blinds, other Buildings etc.)

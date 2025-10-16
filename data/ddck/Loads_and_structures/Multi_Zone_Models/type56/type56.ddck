@@ -92,8 +92,8 @@ Npers           = $intGains_Npers
 ***********************************
 
 EQUATIONS #
-$buiModel_Troom     = TRoom
-$buiModel_TroomStar = TRoomStar
+$bui_Troom     = TRoom
+$bui_TroomStar = TRoomStar
 
 CONSTANTS #
 TIdCoolSet = 100

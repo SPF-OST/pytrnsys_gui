@@ -46,7 +46,7 @@ EQUATIONS #
 
 EQUATIONS #
 AFloor  = $bui_AreaBui ! m2 of heated surface area
-Troom   = $buiModel_Troom
+Troom   = $bui_Troom
 
 ***********************************
 ** outputs to other ddck

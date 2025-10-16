@@ -23,33 +23,32 @@
 ***********************************
 
 EQUATIONS #
-$mfb_TBuiFlNom = 45
-$mfb_TBuiRtNom = 40
-$mfb_AreaBui   = AreaBui
-$mfb_scaleBuilding = scaleBuilding
-$mfb_PGainPer   = PGainPer
-$mfb_PGainEquip = PGainEquip
-$mfb_PGainLight = PGainLight
-$mfb_QPeak_kW   = 36.2      ! kW in Zurich (this is approx. the peak hourly demand)
-$mfb_MfrBuiNom  = MfrBuiNom ! Nominal mass flow of heat distribution system [kg/h]
-$mfb_TroomSet     = TroomSet   ! Setpoint for Room temperature in heating mode, °C
-$mfb_TroomSetCool = TroomSetCool ! Setpoint for Room temperature in cooling mode, °C
+$bui_TBuiFlNom = 45
+$bui_TBuiRtNom = 40
+$bui_AreaBui   = AreaBui
+$bui_scaleBuilding = scaleBuilding
+$bui_PGainPer   = PGainPer
+$bui_PGainEquip = PGainEquip
+$bui_PGainLight = PGainLight
+$bui_QPeak_kW   = 36.2      ! kW in Zurich (this is approx. the peak hourly demand)
+$bui_MfrBuiNom  = MfrBuiNom ! Nominal mass flow of heat distribution system [kg/h]
+$bui_TroomSet     = 23*realUserBehaviour + 21*NOT(realUserBehaviour)  ! Setpoint for Room temperature in heating mode, °C
+$bui_TroomSetCool = 24 ! Setpoint for Room temperature in cooling mode, °C
 
 ***********************************
 ** Case definition
 ***********************************
 
-CONSTANTS 4
+CONSTANTS #
 realUserBehaviour = 1 !User behaviour for window ventialtion and shading, 1 means realistic, 0 means ideal
 useAHU            = 0 !Air handling unit (1 means with, 0 wihtout AHU)
-TroomSet          = 23*realUserBehaviour + 21*NOT(realUserBehaviour)     ! Setpoint for Room temperature, °C
-TroomSetCool      = 24.00                                                ! Setpoint for Room temperature for cooling, °C
+                                              ! Setpoint for Room temperature for cooling, °C
 
 
 CONSTANTS #
 scaleBuilding   = 1
 factorMfrBuiNom = 1 !adapt this factor to achieve the nominal DeltaT you need in the dustribution loop
-MfrBuiNom       = scaleBuilding*factorMfrBuiNom*$mfb_QPeak_kW/($cpWat*($mfb_TBuiFlNom-$mfb_TBuiRtNom))*3600 ! Nominal mass flow of heat distribution system [kg/h]
+MfrBuiNom       = scaleBuilding*factorMfrBuiNom*$bui_QPeak_kW/($cpWat*($bui_TBuiFlNom-$bui_TBuiRtNom))*3600 ! Nominal mass flow of heat distribution system [kg/h]
 
 EQUATIONS #	! Shading Factor (Blinds, other Buildings etc.)
 win_g = 0.62	! g-value windows

@@ -39,7 +39,7 @@ buivWind  = $weather_vWind
 buiTamb   = $weather_Tamb
 buiTamb24 = $type888_tAmb24 !average temperature over a period (It can the average over 24, 48 or 96 h that define the heating season on/off)
 time      = $Time
-!myScaleBuilding = $mfb_scaleBuilding not necessary since mfb must be in same folder or use same name in config to chares all names.
+TroomSetCool = $bui_TroomSetCool !defined in e.g. mfb30, mfb90, sfh45 both for ISO and type56 models
 
 EQUATIONS #
 PheatBui_kJh    = $heatDisSys_PHeatBui_kJh
@@ -54,8 +54,8 @@ PBuiIntGain_kJh = $intGains_PbuiIntGain_kJh !from internal gains calculation
 !$type5998_TroomSetCool = TroomSetCool ! Setpoint for Room temperature for cooling, °C
 
 EQUATIONS #
-$buiModel_Troom      = Troom
-$buiModel_TroomStar  = TroomStar
+$bui_Troom      = Troom
+$bui_TroomStar  = TroomStar
 
 ***********************************
 ** Body of ddck
