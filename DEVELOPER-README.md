@@ -9,7 +9,7 @@
    ```commandline
       New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
    ```
-1. Enable long paths in git:
+1. Enable long paths in git (system is for CI servers, global is for User):
    ```commandline
       git config --system core.longpaths true
       git config --global core.longpaths true
@@ -24,7 +24,7 @@
       pytrnsys/
       pytrnsys_gui/
     ```
-1. 
+1. Make sure Inkscape is installed, and the Inkscape/bin is added to the system environmental variables.
 
 ##### Recommended
 * [PyCharm Community IDE](https://www.jetbrains.com/pycharm/download)
