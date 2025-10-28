@@ -4,7 +4,15 @@
 
 ##### Required
 
-1. [Python 3.12](https://www.python.org/ftp/python/3.12.2/python-3.12.2-amd64.exe)
+1. [Python 3.12](https://www.python.org/ftp/python/3.12.2/python-3.12.2-amd64.exe): !!ENSURE LONG PATHS ARE ENABLED!!
+1. Enable long paths in the Terminal:
+   ```commandline
+      New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
+   ```
+1. Enable long paths in git:
+   ```commandline
+      git config --system core.longpaths true
+   ```
 1. Local clones of the following GIT repositories:
     1. `https://github.com/SPF-OST/pytrnsys.git`
     1. `https://github.com/SPF-OST/pytrnsys_gui.git`
@@ -15,6 +23,7 @@
       pytrnsys/
       pytrnsys_gui/
     ```
+1. 
 
 ##### Recommended
 * [PyCharm Community IDE](https://www.jetbrains.com/pycharm/download)
