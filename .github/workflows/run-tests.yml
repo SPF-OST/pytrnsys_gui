@@ -13,7 +13,7 @@ on:
 
 jobs:
   developer-install:
-    runs-on: [ self-hosted, development ]
+    runs-on: [ self-hosted, Etzel ]
 
     defaults:
       run:
@@ -57,7 +57,7 @@ jobs:
         run: venv\Scripts\pip-compile-multi --uv -d requirements --no-upgrade
 
   test:
-    runs-on: [ self-hosted, development ]
+    runs-on: [ self-hosted, Etzel ]
     
     env:
       PY_COLORS: "1"
