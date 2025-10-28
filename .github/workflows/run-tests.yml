@@ -57,7 +57,7 @@ jobs:
         run: venv\Scripts\pip-compile-multi --uv -d requirements --no-upgrade
 
   test:
-    runs-on: [ self-hosted, etna ]
+    runs-on: [ self-hosted, development ]
     
     env:
       PY_COLORS: "1"

@@ -12,6 +12,7 @@
 1. Enable long paths in git:
    ```commandline
       git config --system core.longpaths true
+      git config --global core.longpaths true
    ```
 1. Local clones of the following GIT repositories:
     1. `https://github.com/SPF-OST/pytrnsys.git`
