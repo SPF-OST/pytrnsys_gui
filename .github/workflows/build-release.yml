@@ -10,7 +10,7 @@ on:
 
 jobs:
   build-release:
-    runs-on: [self-hosted, etna]
+    runs-on: [self-hosted, development]
     env:
       NORMAL_PUSH_TO_MASTER: ${{github.event_name == 'repository_dispatch' && github.event.client_payload.type == 'build-executable-push'}}
       TAG_PUSH_TO_MASTER: ${{github.event_name == 'push'}}
