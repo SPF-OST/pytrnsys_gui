@@ -1,0 +1,46 @@
+{
+    "Ashp": {
+        "In": {
+            "@cp": "Lloop3Cp",
+            "@mfr": "MAshp_A",
+            "@rho": "Lloop3Rho",
+            "@temp": "TTee_Ashp"
+        },
+        "Out": {
+            "@revtemp": "TAshp_PuCond",
+            "@temp": "TAshp"
+        }
+    },
+    "Coll": {
+        "In": {
+            "@cp": "Lloop4Cp",
+            "@mfr": "MColl_A",
+            "@rho": "Lloop4Rho",
+            "@temp": "TPump_Coll"
+        },
+        "Out": {
+            "@revtemp": "TColl_combiTes",
+            "@temp": "TColl"
+        }
+    },
+    "Rad": {
+        "In": {
+            "@cp": "Lloop1Cp",
+            "@mfr": "MRad_A",
+            "@rho": "Lloop1Rho",
+            "@temp": "TVal3_Rad"
+        },
+        "Out": {
+            "@revtemp": "TRad_Pump",
+            "@temp": "TRad"
+        }
+    },
+    "WtTp": {
+        "In": {
+            "@cp": "Lloop2Cp",
+            "@mfr": "MWtTp_A",
+            "@rho": "Lloop2Rho",
+            "@temp": "TMixDhw_WtTp"
+        }
+    }
+}

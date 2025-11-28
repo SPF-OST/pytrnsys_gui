@@ -22,6 +22,8 @@ import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.temperatures as _temps
 import trnsysGUI.temperatures.hydraulic as _thyd
+import trnsysGUI.pumpsAndTaps.pump as _pump
+import trnsysGUI.common as _com
 
 _UNUSED_INDEX = 0
 
@@ -186,6 +188,44 @@ ddTcwOffset = 36 ! Days of minimum surface temperature
             f = "EQUATIONS " + str(equationNr) + "\n" + f + "\n"
 
         return f
+
+    def exportPumpConsumption(self) -> str:  # What the controller should give
+
+        pumps = [
+            ip for ip in self._hasInternalPipings if isinstance(ip, _pump.Pump)
+        ]
+
+        formattedSummedPumpConsumptionNames = " + ".join(
+            p.exportPumpConsumptionName() for p in pumps
+        )
+
+        result = f"""\
+*******************************************
+*** Energy Balance
+*******************************************
+EQUATIONS 1
+@energy(out, el, PuElTotal) = {formattedSummedPumpConsumptionNames}
+
+*******************************************
+*** Calculation of pump consumption
+*******************************************
+
+CONSTANTS 2
+dpmin_bar = 0.1 ! minimal pressure-drop of loop at nominal mass flow, bar
+dpmax_bar = 15  ! maximum pressure-drop of loop at nominal mass flow, bar
+
+"""
+        for pump in pumps:
+            connection = pump.inputPort.getConnection()
+            loop = _com.getSingle(
+                l
+                for l in self._hydraulicLoops
+                if l.containsConnection(connection)
+            )
+
+            result += pump.exportPumpPowerConsumption(loop)
+
+        return result
 
     def exportDivSetting(self, unit):
         """

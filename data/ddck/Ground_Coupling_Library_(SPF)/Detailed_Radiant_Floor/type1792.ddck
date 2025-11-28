@@ -1,0 +1,276 @@
+**************************************
+**BEGIN type1792.ddck 
+**************************************
+    
+******************************************************************
+** Author : Daniel Carbonell
+** Creation date  : 30.09.2016
+** Last changes   : 18.05.2022
+**                : 10.24 DC udpates for defaultVisibility "local"
+******************************************************************
+
+***************************************************************************
+** Description: Radiant floor model
+** Source: SPF model
+** Multi-layer one-dimensional radiant floor model
+** This ddck is used for heating applications
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+
+EQUATIONS #
+TRdFl    = @temp(In)
+MfrBuiRd = @mfr(In)
+cp       = @cp(In)
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+EQUATIONS #
+@temp(Out) = [42,1]		! return temperature from space heat distribution system, °C
+TRdRt = [42,1]
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+******************************************************************************************
+
+EQUATIONS #
+@energy(out, heat, buiDemand) = PheatBui_kW
+
+***********************************
+** inputs from other ddck
+***********************************
+
+EQUATIONS #
+AFloor  = $bui_AreaBui ! m2 of heated surface area
+Troom   = $bui_Troom
+
+***********************************
+** outputs to other ddck
+***********************************
+
+EQUATIONS #
+$heatDisSys_PHeatBui_kJh      = PheatBui_kW*$kWTokJh      ! Heat to Building from heating distribution system: kW -> kJ/h
+$heatDisSys_PheatBuiRad_kJh   = PheatBuiRad_kW*$kWTokJh   ! total useful radiation
+$heatDisSys_PheatBuiConv_kJh  = PheatBuiConv_kW*$kWTokJh  ! total useful convection
+
+!CONSTANTS #
+!flowPerTube = 15                              ! kg/h per tube of LFloorPipe distance
+!MfrBuiRdNom    = flowPerTube*nParallelPipe	   ! Nominal mass flow of heat distribution system [kg/h]
+
+***************************************************************
+** recall values for control
+***************************************************************
+
+UNIT 45 TYPE 993
+PARAMETERS 1
+1   ! 1: number of variables to be remembered
+INPUTS 1
+Troom
+0.0
+EQUATIONS #   ! outputs of Input Value Recall
+TroomRc = [45,1]
+
+*******************************************************
+** Definition of radiant floor ************************
+*******************************************************
+
+CONSTANTS #
+dxBetweenTubes = 0.144
+LFloorPipe = 50 									! 50 m/pipe. If mass flow rate per tube is too small adapt this value
+LFloorPipeTotal = 7*AFloor							! m tube/m2 * m2 => 1 m / 15 cm distance = 7 m/m2
+dFloorPipe = 0.015 
+nParallelPipe = LFloorPipeTotal/LFloorPipe+1		! usually distance 10-15 cm
+indexPipeLayer = 2 									! from bottom !!!! IT SHOULD BE CHANGED !!!!!
+pipeFloorWallThick = 0.002 							! 2 mm thickness
+lambdaFloorPipe = 0.4 								! W/mK multi layer tube (pastic PE-RT +  aluminium (oxygen tight) + PE-HD)
+alphaMode = 0 										! calculated internally -1 alpha for all Cv, 1 using tin, 0 fixed
+accelerator = 0
+nCvFloorPipe = 100
+TiniFloor = 30
+epsilonWood = 0.9 
+nMatType1792 = 4 									! LAYERS FROM TOP TO BOTTOM : (1) wood, (2) beton, (3) pipe, (4) insulation
+nParType1792 = 15+nMatType1792*5
+bocoDown = 0 										! U and T below the floor
+
+CONSTANTS #
+thickInsFloor = 0.042
+lambdaInsFloor = 0.037
+cpInsFloor = 2.1		! kJ/kgK
+rhoInsFloor = 280
+nCvInsFloor = 1
+thickBetonPipe = dFloorPipe
+nCvBetonPipe = 1
+thickBeton = 0.04 - thickBetonPipe
+lambdaBeton = 2
+cpBeton = 0.950			! kJ/kgK
+rhoBeton = 250 
+nCvBeton = 1 
+thickWood = 0.01
+lambdaWood = 0.1
+cpWood = 2.3
+rhoWood = 600
+nCvWood = 1
+epsilonDown = 0
+
+EQUATIONS #	!TRY WITH RC to see if It problems are solved
+TfloorUp = TroomRc
+TBelowFloor = TroomRc		!To avoid bot losses we use U=0 (adiabatic) since losses has been already included in the building model
+TviewUp = TroomRc
+TviewDown = 0
+UBelowFloor = 0.0 			! adiabatic
+UconvUp = -1
+
+UNIT 42 TYPE 1792		! Radiant floor
+PARAMETERS nParType1792
+AFloor					! [m^2] total area of floor
+dxBetweenTubes       	! [m] total length of heating pipe 
+dFloorPipe       		! [m] diameter of heating pipe
+nParallelPipe    		! [-] number of parallel pipes
+indexPipeLayer   		! [-] index pipe layer from the bottom
+pipeFloorWallThick		! [m] thickness of pipe wall
+lambdaFloorPipe  		! [W/m/K] heat conductivity pipe wall
+alphaMode        		! [-] Mode of forced heat transfer coefficient computation
+accelerator		 		! calculation acceleration		
+cp            		! [kJ/K/kg] specific heat of fluid
+nCvFloorPipe     		! [-] number of control volumes (cells) in fluid model
+TiniFloor        		! [°C] initial floor temperature
+epsilonWood      		! [-] emissivity of layer at the interface to the room
+epsilonDown     		! [-] number of different materials
+nMatType1792
+******
+thickWood 
+lambdaWood
+cpWood    		    
+rhoWood           
+nCvWood   
+******
+thickBeton				! [m] thickness of material
+lambdaBeton				! [W/m/K] heat conduction coefficient of material
+cpBeton					! [kJ/K/kg] -> [J/K/kg]  specific heat of material
+rhoBeton				! [kg/m^3]
+nCvBeton				! [-] number of control volumes for this material
+*****
+thickBetonPipe			! [m] thickness of material
+lambdaBeton				! [W/m/K] heat conduction coefficient of material
+cpBeton					! [kJ/K/kg] -> [J/K/kg]  specific heat of material
+rhoBeton				! [kg/m^3]
+nCvBetonPipe			! [-] number of control volumes for this material
+**********
+thickInsFloor			! [m] thickness of material
+lambdaInsFloor			! [W/m/K] heat conduction coefficient of material
+cpInsFLoor				! [kJ/K/kg] -> [J/K/kg]  specific heat of material
+rhoInsFloor				! [kg/m^3]
+nCvInsFloor				! [-] number of control volumes for this material
+******
+INPUTS 8
+TRdFl			! supply Temperature
+MfrBuiRd		! mass flow rate	[kg/h
+TfloorUp		! room air temperature  Top	[°C]
+TBelowFloor		! ground temperature at 1 m depth	[°C] 
+TviewUp			! room field temperature	[°C]
+TviewDown		! lower room field temperature
+UconvUp			! upper room U value (if set to negtive value-->internal calculation)
+UBelowFloor		! room field temperature below if bocoDown=1, if bocoDown=0 UA between floor and ground (TfloorBot)	[°C]
+
+*** INITIAL INPUT VALUES     
+35 MfrBuiRd 21 21 21 21 -1 0
+
+EQUATIONS #
+mFlowPerRadFloorTube = [42,2] 
+PRdIn_kW    = [42,4]/1000 					! heat injected by fluid to floor W -> kW
+PtotBui_kW  = [42,3]/1000      				! Heat to Building from radiant floor: W --> kW
+PheatBui_kW = PRdIn_kW*GT(PRdIn_kW,0)  		! total heat (without cooling)  Heat to Building from Radiator: W --> kW
+PcoolBui_kW = -PRdIn_kW*LE(PRdIn_kW,0)  	! total cooling
+QAcumRadiator    = -[42,5]/1000     		! Total Accumulated Heat in radiant floor, such that in+acum=out
+RadFloorLoss_kW  =  [42,6]/1000
+TWood            = [42,7]
+PheatBuiRad_kW   = [42,9]/1000  			! total useful radiation
+PheatBuiConv_kW  = [42,10]/1000 			! total useful convection
+PheatBuiRadBot_kW = [42,11]/1000  			! loss
+PheatBuiConvBot_kW = [42,12]/1000 			! loss
+PheatBuiBot_KW     = PheatBuiRadBot_kW+PheatBuiConvBot_kW		! we assume losses below are inputs to lower flat.
+ImbRad             = PRdIn_KW+QAcumRadiator-PtotBui_kW
+TfloorLayerBot = [42,13]
+ 
+EQUATIONS 2
+PheatBuiRad = [42,9]*3.6		!W -> kJ/h
+PheatBuiConv = [42,10]*3.6		!W -> kJ/h
+     
+
+*******************************
+** Monthly printers
+*******************************
+CONSTANTS 1
+unitPrinterHeat = 123
+
+ASSIGN    temp\HEATING_DISTR_MO.dat   unitPrinterHeat
+
+UNIT 123 Type 46		! Printegrator Monthly Values for System
+PARAMETERS 6    
+unitPrinterHeat		! 1: Logical unit number, -
+-1					! 2: Logical unit for monthly summaries, -
+1					! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1					! 4: Printing & integrating interval, h. -1 for monthly integration
+1					! 5: Number of inputs to avoid integration, -
+1					! 6: Output number to avoid integration
+INPUTS #
+$Time  PheatBui_kW  PRdIn_kW  QAcumRadiator
+***************
+$Time  PheatBui_kW  PRdIn_kW   QAcumRadiatorc
+
+*******************************
+** hourly printer
+*******************************
+CONSTANTS 1
+unitPrinterHeatHr = 517
+
+ASSIGN temp\HEATING_DISTR_HR.dat      unitPrinterHeatHr
+UNIT 517 Type 46		! Printegrator hourly Values for System
+PARAMETERS 6    
+unitPrinterHeatHr		! 1: Logical unit number, -
+-1						! 2: Logical unit for monthly summaries, -
+1						! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1						! 4: Printing & integrating interval, h. -1 for monthly integration
+1						! 5: Number of inputs to avoid integration, -
+1						! 6: Output number to avoid integration
+
+INPUTS #
+$Time TRdFl @temp(Out) ImbRad
+MfrBuiRd PRdIn_KW  PheatBui_kW
+***
+$Time TRdFl @temp(Out) ImbRad
+MfrBuiRd PRdIn_KW  PheatBui_kW
+	
+!UNIT 59 TYPE 65		! Online Plotter Building (element OpB)
+!PARAMETERS 12
+!4					! 1: Nb. of left-axis variables
+!7					! 2: Nb. of right-axis variables
+!-5				! 3: Left axis minimum
+!60				! 4: Left axis maximum
+!-10				! 5: Right axis minimum
+!50				! 6: Right axis maximum
+!nPlotsPerSim		! 7: Number of plots per simulation
+!12				! 8: X-axis gridpoints
+!0					! 9: Shut off Online w/o removing
+!-1				! 10: Logical unit for output file
+!0					! 11: Output file units
+!0					! 12: Output file delimiter
+!INPUTS 11
+!Tamb  TroomRc  TRdFl @temp(Out)
+!BoHS RadFloorLoss_kW PIDRadBui MfrBuiRd   PRdIn_KW    PheatBuiRad_kW   ImbRad
+!*******
+!Tamb  TroomRc  TRdFl @temp(Out)
+!BoHS RadFloorLoss_kW PIDRadBui MfrBuiRd   PRdIn_KW    PheatBuiRad_kW  ImbRad
+!****
+!LABELS  3
+!Temperatures
+!Power
+!RadFloor
+
+*******************************
+**END type1792.ddck
+*******************************

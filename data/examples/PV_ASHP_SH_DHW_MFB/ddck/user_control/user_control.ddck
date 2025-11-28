@@ -1,0 +1,200 @@
+**************************************
+**BEGIN user_control.ddck
+**************************************
+
+*******************************************************************
+** Author         : Dani Carbonell
+** Creation date  : 21.04.2018
+** Last changes   : 11.10.2024
+**                : 10.24 DC udpates for defaultVisibility "local"
+********************************************************************
+
+*************************************************************************************************************
+** Description: Custom control for Pv ASHP to supply SH and DHW to Multi-family residential buildings (MFB).
+** Source: no type(s) are used. Custom control
+*************************************************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+**None
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+******************************************************************************************
+**None
+
+********************************************************************************************
+** inputs from other ddck
+********************************************************************************************
+
+****************************************************************
+! Dependence on temperatures from the storages
+****************************************************************
+
+EQUATIONS #
+!Necessary for type888
+$userControl_TTesDhwUpAuxOn   = $TesDhw_T9 ! upper Store temperature measurement for Warm water
+$userControl_TTesDhwBotAuxOff = $TesDhw_T6 ! lower store temperature measurement for Warm water
+$userControl_TTesSHUpAuxOn     = $TesSh_T9 ! upper temperature measured for room heating (on)
+$userControl_TTesSHBotAuxOff   = $TesSh_T1  ! lower temperature measured for room heating (off)
+
+!other control needs.
+$userControl_TsensorTesSh = $TesSh_T8
+
+
+
+
+
+EQUATIONS #
+!dependencies from type888 control
+BoHS             = $type888_BoHS !heating season
+HpForDHWIsNeeded = $type888_HpForDhwIsNeeded
+HpForSHIsNeeded  = $type888_HpForSHIsNeeded
+
+EQUATIONS #
+TroomSet = $bui_TroomSet
+Troom    = $bui_Troom
+
+***************************************************************
+** outputs to hydraulic solver
+** inputs necessary for the mass flow solver from hydraulic.ddck
+***************************************************************
+
+EQUATIONS #
+! Massflowrates
+
+$MfrPuCond = $PID_HPCond_Mfr*hpOnRc
+$MfrPuSh   = $bui_MfrBuiNom*PIDRadBui*BoHS
+$MfrWtSp   = $dhw_MfrDHWset
+$MfrPuCirc = 50  ! kg/h for recirculation in DHH loop when no tapping water is active
+$MfrPuDHW  = $HxDwh_MfrSrcDhwHx
+$MfrWtTp   = -$MfrWtSp
+EQUATIONS #
+! mixing valves
+$xFracMixAux    = HpForDHWIsNRc
+$xFracDivDhw    = NOT(GT($MfrWtSp,0))
+$xFracDivDhwOut = NOT(GT($MfrWtSp,0))
+
+*******************************************************
+** PID controller for heat pump condenser *
+*******************************************************
+
+EQUATIONS #
+$HpIsOn_forPID = $userControl_hpIsOn
+$MfrHpCondNom_forPID = $AshpMfrHpCondNom
+$TCondIn_forPID = $AshpTCondIn
+$TCondOut_forPID = $AshpTCondOut
+
+***********************************
+** outputs to other ddck
+***********************************
+
+EQUATIONS #
+$userControl_hpIsOn    = hpOnRc !Recall value
+!$userControl_PIDRadBui = PIDRadBui
+
+*************************************
+***** Control defintion
+*************************************
+
+EQUATIONS 1
+hpOn   = OR(HpForDHWIsNeeded,HpForSHIsNeeded)
+
+************************************************************
+***** Tempering valves adapted from hydraulic_control.ddck
+************************************************************
+
+CONSTANTS 1
+T_set_MixSh = $type888_TRdSet
+
+UNIT 441 TYPE 811 ! Passive Divider for heating
+PARAMETERS 1
+5 !Nb.of iterations before fixing the value
+INPUTS 4
+$TTesSh_MixSh
+$TTeeSh_MixSh
+$MMixSh_RadFloor
+T_set_MixSh
+*** INITIAL INPUT VALUES
+35.0 21.0 800.0 T_set_MixSh
+EQUATIONS 1
+$xFracMixSh =  1.-[441,5]
+
+************************************************************************
+**** CONTROL RADIANT FLOOR
+************************************************************************
+
+CONSTANTS 3
+pGainRad = 0.6
+iGainRad = 0.05
+inversionHeat = 2
+*******************************************************
+** PID controller for mass flow in space heating loop *
+*******************************************************
+UNIT 41 TYPE 320		! PID Controller for Radiator mass flow (Idea: instead of thermostatic valves a PID controler is taken to reduce mass flow if the room temperature gets too high)
+PARAMETERS 7
+3				! 1: Temperature width of PID band
+pGainRad		! 2: Proportional gain PID band
+iGainRad		! 3: Integral gain PID band
+0				! 4: Differential gain PID band
+0.5				! 5: Proportional gain P-band
+0     			! 6: Saturation mode
+0				! 7: Minimum value controller action in saturation mode
+INPUTS 3
+TroomSet		! Set temperature
+TroomRc		! Building: 1- (air temperature of zone)  TAIR   1 ->Feedback room temperature
+0,0     		! Control inversion option 1: increasing, 2: decreasing action
+*** INITIAL INPUT VALUES
+22 18 inversionHeat
+
+EQUATIONS #
+PIDRadBuiMin = 0.15																		! 0.05		!0.01
+PIDBuiOut =  [41,1]
+PIDRadBui  = MIN(GT(PIDBuiOut,PIDRadBuiMin)*PIDBuiOut,1)
+
+
+***********************************
+** Begin TYPE Recall
+***********************************
+
+UNIT 18 TYPE 993
+PARAMETERS 1
+3  ! 1: number of variables to be remembered
+INPUTS #
+hpOn $type888_HpForDHWIsNeeded Troom
+0.0 0.0 0.0
+EQUATIONS #   ! outputs of Input Value Recall
+hpOnRc        = [18,1]
+HpForDHWIsNRc = [18,2]
+TroomRc       = [18,3]
+
+
+***********************************
+** Begin TYPE Online plotter
+***********************************
+
+
+UNIT 89 TYPE 65     ! Online Plotter Control
+PARAMETERS 12     
+10  ! 1 Nb. of left-axis variables
+10  ! 2 Nb. of right-axis variables
+0   ! 3 Left axis minimum
+2   ! 4 Left axis maximum
+0   ! 5 Right axis minimum
+2   ! 6 Right axis maximum
+$nPlotsPerSim ! 7 Number of plots per simulation
+12  ! 8 X-axis gridpoints
+1   ! 9 Shut off Online w/o removing
+-1  ! 10 Logical unit for output file
+0   ! 11 Output file units
+0   ! 12 Output file delimiter
+INPUTS 20     
+$xFracMixAux $xFracDivDhw $xFracDivDhwOut 0,0 0,0 0,0  0,0 0,0 0,0 0,0
+ 0,0 0,0 0,0  0,0 0,0 0,0 0,0 0,0  0,0 0,0
+**
+$xFracMixAux $xFracDivDhw $xFracDivDhwOut 0,0 0,0 0,0  0,0 0,0 0,0 0,0
+ 0,0 0,0 0,0  0,0 0,0 0,0 0,0 0,0  0,0 0,0
+LABELS  3     
+Boolean
+NotUsed
+userControl

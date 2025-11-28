@@ -1,0 +1,74 @@
+*******************************
+**BEGIN grid_connection.ddck
+*******************************
+    
+************************************************************************
+** Author         : Jeremias Schmidli (SCJ)
+** Creation date  : 09.20
+** Last changes   : 10.24 DC udpates for defaultVisibility "local"
+*************************************************************************
+
+************************************************************************************
+** Description: Grid connection for pv (when no battery is present)
+** Source : no type(s) involved.
+** This file needs adaptation for each case
+*************************************************************************************
+
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+** None
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+** None
+
+****************************************
+** outputs to energy balance in kWh
+****************************************
+
+EQUATIONS #
+@energy(in, el, Grid)      = PelFromGrid_kW
+@energy(out, el, PvToGrid) = PvToGrid_kW
+@energy(out, el, InvLoss)  = PelLossesDCAC
+
+**********************************
+** inputs from other ddck
+**********************************
+
+EQUATIONS #
+!PelHVAC_kW    = $AshpPelAuxTot_kW + $type888_PelContr_kW + $PelPuSh_kW + $PelPuDHW_kW + $TesDhw_qHeatSource + $TesSh_qHeatSource
+PelHVAC_kW    = $AshpPelAuxTot_kW + $type888_PelContr_kW + $elSysOut_PuElTotal + $TesDhw_qHeatSource + $TesSh_qHeatSource
+
+PelHH_kW      = $PelHH_kW
+PelPVAC_kW    = $PelPVAC_kW
+PvPelArrayMPP_kW = $PvPelArrayMPP_kW
+inverterEffDCAC = $inverterEffDCAC
+**********************************
+** outputs to other ddck
+**********************************
+
+EQUATIONS #
+$PelHVAC_kW      = PelHVAC_kW         ! HVAC  electricity consumption [kW]
+$PelUsedTotal_kW = PelUsedTotal_kW    ! Total HVAC and HH electricity consumption [kW]
+
+**********************************
+** Generic constants
+**********************************
+
+EQUATIONS #
+PelUsedTotal_kW = PelHVAC_kW + PelHH_kW    ! Total HVAC and HH electricity consumption [kW]
+PvToHH_kW      = MIN(PelPVAC_kW,PelHH_kW)
+PvToHVAC_kW    = MIN(PelPVAC_kW-PvToHH_kW,PelHVAC_kW)
+
+PvExcess_kW    = MAX(PelPVAC_kW-PvToHH_kW-PvToHVAC_kW,0)
+PvToGrid_kW    = PvExcess_kW
+PelFromGrid_kW = MAX(PelUsedTotal_kW-PvToHH_kW-PvToHVAC_kW,0.0)
+
+** Calculate ACDC inverter losses
+PelLossesDCAC =  $PvPelArrayMPP_kW*(1-inverterEffDCAC)
+
+
+

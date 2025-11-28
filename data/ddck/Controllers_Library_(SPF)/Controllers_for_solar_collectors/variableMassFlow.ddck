@@ -1,0 +1,94 @@
+*******************************
+**BEGIN variableMassFlow.ddck
+*******************************
+    
+***************************************************************************
+** Contact person : Dani Carbonell    
+** Creation date  : 23.04.2018
+** Last changes   : 11.24 DC udpates for defaultVisibility "local"
+***************************************************************************
+
+**************************************************************************************
+** Description: Control of solar thermal collector mass flow rate
+** Source: SPF model
+***************************************************************************************
+
+***********************************
+** Connectors with hydraulic solver
+***********************************
+**None
+***********************************
+** outputs to hydraulic solver
+***********************************
+**None
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+!EQUATIONS 1
+!@energy(out, el, CtrlDemand) = PelContr_kW
+
+*******************************************
+** inputs from other ddck
+*******************************************
+
+EQUATIONS #
+AcollAp = $AcollAp
+TProPID = $tCollOut
+TCollIn = $tCollIn
+
+***********************************
+** outputs to other ddck
+***********************************
+
+!MfrCPri = pumpColOn*MfrPDRc		! MfrCPri = MfrPD*pumpColOn;
+EQUATIONS #
+$solarController_mfr = MfrPD
+
+
+***********************************
+** control
+***********************************
+
+CONSTANTS #
+MfrCPriSpec = 75		! Coll. Prim. loop spec. mass flow [kg/hm2]
+tMaxCol = 110     		! Upper collector temp. limit for pump running
+MfrColNom = MfrCPriSpec*AcollAp
+MfrColMin = 0.4*MfrColNom		! minimum mass flow rate
+dMfrColMax = 4*MfrColNom
+dMfrColMin = -dMfrColMax
+dTCollDf = 5
+
+EQUATIONS #
+TCollSet = (TCollIn+dTCollDf)	! Set delta T over the collector
+
+
+UNIT 157 TYPE 889		! Adapted PD-controller
+PARAMETERS 9
+1				! 1: mode of timesteps: 1= use previous value, 0 = use current value
+MfrColMin     	! 2: lowest possible output value
+MfrColNom     	! 3: highest possible output value
+-1     			! 4: mode of action: 1 = positive, (increase in manipulated value causes increase in process variable), -1 = negative
+MfrColNom     	! 5: By how much shall the manipulated variable be changed per hour if the process variable is 1 unit off?
+4     			! 6: A high value for D counteracts overshoot / counteracts high rates of increase or decrease in the process variable.
+120     		! 7: maximum rate of setpoint change per hour
+dMfrColMax     	! 8: maximum rate of increase of the manipulated variable (positive value)
+dMfrColMin		! 9: maximum rate of decrease of the manipulated variable (negative value)
+INPUTS 5
+TProPID     	! 1: process variable
+TCollSet		! 2: setpoint
+0,0     		! 3: freeze manipulated variable (1) or let act (0)
+0,0     		! 4: Manual (1) or automatic (0) manipulated variable
+MfrPD   		! 5: manual manipulated variable
+! INITIAL INPUT VALUES
+0.0   0.0   0.0   0.0    0.0
+! OUTUPUTS
+! 1: manipulated variable, 2: current setpoint, 3: current deviation
+
+EQUATIONS #		! Collector ON-Signal and mass flow
+MfrPD = [157,1]
+
+*******************************
+**END variableMassFlow.ddck
+*******************************
