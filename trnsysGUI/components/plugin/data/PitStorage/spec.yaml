@@ -1,5 +1,5 @@
 defaultName: pitStore
-description: Pit Storage
+description: Pit Storage (three ports)
 connections:
   - name: Medium
     input:
