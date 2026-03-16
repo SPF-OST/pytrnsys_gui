@@ -1,0 +1,144 @@
+*******************************
+**BEGIN type652.ddck (DHW Heat exchanger)
+*******************************
+
+************************************************************************
+** Author         : Mattia Battaglia
+** Creation date  : 12.19   
+** Last changes   : 18.05.2022
+**                : 10.24 DC udpates for defaultVisibility "local"
+*************************************************************************
+
+************************************************************************************
+** Description:
+** Source : TESS v17. In TESS v18 this model is updated as type 1337 or type 1379
+** HX with constant efficiency used for dhw external heat exchanger.
+** Mass flow is controlled internally and has to be used in the control for the pump.
+*************************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+EQUATIONS 6
+** Source
+TSource   = @temp(Side1In)
+MfrSource = ABS(@mfr(Side1In))
+cpSource  = @cp(Side1In)
+** Load
+TLoad   = @temp(Side2In)
+MfrLoad = ABS(@mfr(Side2In))
+cpLoad  = @cp(Side2In)
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+EQUATIONS 2
+@temp(Side1Out) = TsourceOut		!Source side outlet temperature	C
+@temp(Side2Out) = [501,7]			!Load side outlet temperature	C
+
+*************************************************************************************************
+** Dependencies with other types
+*************************************************************************************************
+
+EQUATIONS #
+TDhwSetPoint = $dhw_Tdhwset
+minFlow = 70
+MaxMfrSrc = 700*$WtTpscaleDHW
+MinMfrSrc = minFlow*$WtTpscaleDHW
+
+***********************************
+** outputs to other ddck
+***********************************
+EQUATIONS 1     
+$HxDwh_MfrSrcDhwHx = MAX(MaxMfrSrc*(1-fractionOfBypass)-MinMfrSrc,0)+MinMfrSrc	! Mass flow for the pump in the tes-to-dhw-hex-loop
+
+***********************************
+** Generic variables
+***********************************
+CONSTANTS 1
+HX_efficiency = 1
+
+UNIT 501 TYPE 652
+PARAMETERS 4
+HX_efficiency	 	! 1: Effectiveness of Heat Exchanger
+cpSource			! 2: Specific Heat of Hot-Side Fluid
+cpLoad				! 3: Specific Heat of Cold-Side Fluid
+1000				! 4: Number of Possible Steps
+INPUTS 6
+TSource			        ! Hot-Side Inlet Temperature
+MfrSource		        ! Hot-Side Flowrate
+TLoad			        ! Cold-Side Inlet Temperature
+MfrLoad			        ! Cold-Side Flowrate
+TDhwSetPoint			! Cold-Side Set Temperature
+0,0						! Modulation Control
+*** INITIAL INPUT VALUES
+20.0 0.0 10.0 0.0 14.0 0
+
+EQUATIONS #
+TsourceOut = [501,5]	! Source-side outlet temperature	C
+!MfrSource = [501,6]		! Source side flow rate	kg/hr
+MrfLoad = [501,8]		! Load side flow rate	kg/hr
+Q_kJh = [501,10]		! Heat transfer rate	kJ/hr
+Q_kW = Q_kJh/3600       ! Heat transfer rate	kW
+
+***********************************
+** TYPE Recall
+***********************************
+UNIT 18 TYPE 993
+PARAMETERS 1
+1		! 1: number of variables to be remembered
+INPUTS 1
+TSource
+0.0
+EQUATIONS 1		! outputs of Input Value Recall
+TSourceInRc = [18,1]
+
+***********************************
+** TYPE 652 for bypass calculation
+***********************************
+
+UNIT 500 TYPE 652
+PARAMETERS 4
+HX_efficiency		! 1: Effectiveness of Heat Exchanger
+cpSource	    	! 2: Specific Heat of Hot-Side Fluid
+cpLoad				! 3: Specific Heat of Cold-Side Fluid
+1000				! 4: Number of Possible Steps
+INPUTS 6
+TSourceInRc 		! Hot-Side Inlet Temperature
+MaxMfrSrc		    ! Hot-Side Flowrate
+TLoad		        ! Cold-Side Inlet Temperature
+MfrLoad     		! Cold-Side Flowrate
+TDhwSetPoint		! Cold-Side Set Temperature
+0,0					! Modulation Control
+*** INITIAL INPUT VALUES
+20 0 10 0 14 0
+
+EQUATIONS 1
+fractionOfBypass = [500,9]		! Overall heat transfer coefficient	kJ/hr.K
+
+
+!UNIT 502 TYPE 65		! Online Plotter HX
+!PARAMETERS 12
+!5					! 1: Nb. of left-axis variables
+!5					! 2: Nb. of right-axis variables
+!0					! 3: Left axis minimum
+!6000				! 4: Left axis maximum
+!0					! 5: Right axis minimum
+!60					! 6: Right axis maximum
+!nPlotsPerSim		! 7: Number of plots per simulation
+!12					! 8: X-axis gridpoints
+!-1					! 9: Shut off Online w/o removing
+!-1					! 10: Logical unit for output file
+!0					! 11: Output file units
+!0					! 12: Output file delimiter
+!INPUTS 10
+!MfrSourceDHWHXIn MfrPuCirc MfrLoadDHWHXIn HTR_HXDHWHX MfrSrcDHWHXUsed  TSourceDHWHXIn TLoadDHWHXIn TsourceDHWHXOut TsourceDHWHXOutT TLoadDHWHXOut
+!MfrSourceDHWHXIn MfrPuCirc MfrLoadDHWHXIn HTR_HXDHWHX MfrSrcDHWHXUsed  TSourceDHWHXIn TLoadDHWHXIn TsourceDHWHXOut TsourceDHWHXOutT TLoadDHWHXOut
+!LABELS  3
+!MassFlows
+!Temperatures
+!HX
+
+*******************************
+**END Const_eff_HX_dhw_contr.ddck
+*******************************

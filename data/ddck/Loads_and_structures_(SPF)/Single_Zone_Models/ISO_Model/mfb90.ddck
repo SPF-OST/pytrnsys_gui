@@ -1,0 +1,92 @@
+*******************************
+**BEGIN mfb90.ddck
+*******************************
+    
+*************************************************************************
+** Contact person : Mattia Battaglia
+** Creation date  : 29.04.2020
+** Last changes   : 29.04.2020, MB 
+**				 	20.10.2020, SCJ - move air exchange to type5998.ddck
+**                  11.10.2024  DC refactor for defaultVisivility = local
+**************************************************************************
+
+*****************************************************************************************
+** Description: 
+** parametrization of SPF Multi-family bulding MFB90 (90 kWh/m2 of heated surface area).
+** Parameters were fitted to fit the IDA-ICE results
+** To be used together with type5998.ddck
+** The whole ddck is "global" respect to type5998 so it should be placed in the same folder as type5998.ddck
+*****************************************************************************************
+
+***********************************
+** outputs to other ddck
+***********************************
+
+EQUATIONS #
+$bui_TBuiFlNom = 45
+$bui_TBuiRtNom = 40
+$bui_AreaBui   = AreaBui
+$bui_scaleBuilding = scaleBuilding
+$bui_PGainPer   = PGainPer
+$bui_PGainEquip = PGainEquip
+$bui_PGainLight = PGainLight
+$bui_QPeak_kW   = 36.2      ! kW in Zurich (this is approx. the peak hourly demand)
+$bui_MfrBuiNom  = MfrBuiNom ! Nominal mass flow of heat distribution system [kg/h]
+$bui_TroomSet     = 23*realUserBehaviour + 21*NOT(realUserBehaviour)  ! Setpoint for Room temperature in heating mode, °C
+$bui_TroomSetCool = 24 ! Setpoint for Room temperature in cooling mode, °C
+
+***********************************
+** Case definition
+***********************************
+
+CONSTANTS #
+realUserBehaviour = 1 !User behaviour for window ventialtion and shading, 1 means realistic, 0 means ideal
+useAHU            = 0 !Air handling unit (1 means with, 0 wihtout AHU)
+                                              ! Setpoint for Room temperature for cooling, °C
+
+
+CONSTANTS #
+scaleBuilding   = 1
+factorMfrBuiNom = 1 !adapt this factor to achieve the nominal DeltaT you need in the dustribution loop
+MfrBuiNom       = scaleBuilding*factorMfrBuiNom*$bui_QPeak_kW/($cpWat*($bui_TBuiFlNom-$bui_TBuiRtNom))*3600 ! Nominal mass flow of heat distribution system [kg/h]
+
+EQUATIONS #	! Shading Factor (Blinds, other Buildings etc.)
+win_g = 0.62	! g-value windows
+win_g_shd = 0.063	! g-value of the window when shaded with blinds
+shd_fix_N = 0.93	! Berücksichtigt Fensterleibung, andere Gebäude, Balkone etc. (kann direkt aus Lesosai oder SIA380/1 übernommen werden)
+shd_fix_S = 0.44	! Berücksichtigt Fensterleibung, andere Gebäude, Balkone etc. (kann direkt aus Lesosai oder SIA380/1 übernommen werden)
+shd_fix_E = 0.89	! Berücksichtigt Fensterleibung, andere Gebäude, Balkone etc. (kann direkt aus Lesosai oder SIA380/1 übernommen werden)
+shd_fix_W = 0.82	! Berücksichtigt Fensterleibung, andere Gebäude, Balkone etc. (kann direkt aus Lesosai oder SIA380/1 übernommen werden)
+	
+CONSTANTS #
+********Fitted parameters***********
+Cm             = 814754369.89*scaleBuilding ! J/K Internal capacity of the building J/K, 165000*(floor surface), "moyen" / mittlere therm. Kapazität
+Am             = 4390*scaleBuilding      ! m2 effective mass area, 2.5*(floor surface), "moyen" / mittlere therm. Kapazität
+UaWin          = 296.7*scaleBuilding    !  Igor Thermal transmission coefficient of doors, windows, curtains walls and glazed walls W/K
+Htr_op         = 1092.9*scaleBuilding *1.031! Igor W/K, UA value of walls
+PGainPer       = 1478*scaleBuilding *1.031	! Maximale Wärmeeintrag durch Personen [W] Mattia:1440
+PGainEquip     = 8976*scaleBuilding	! Maximaler Wärmeeintrag durch Geräte [W] Mattia:7649.2
+PGainLight     = 0!  7649.2*0.75	Maximaler Wärmeeintrag durch Beleuchtung [W]
+ScaleVfrWindow = 0.6667
+ScaleVfrVent   = 0.6542
+VfrInfRealAHU  = 0* AreaBui*scaleBuilding / 3600		! Infiltration  [m3/s](from m3/hm2) for real user behavior and AHU
+VfrInfRealnoAHU = 0.15 * AreaBui*scaleBuilding / 3600	! Infiltration  [m3/s](from m3/hm2) for real user behavior and no AHU
+VfrInfIdealAHU  = 0.165* AreaBui*scaleBuilding / 3600	! Infiltration  [m3/s](from m3/hm2) for ideal user behavior and AHU
+VfrInfIdealnoAHU = 0.7*0.94* AreaBui*scaleBuilding / 3600	! Infiltration  [m3/s](from m3/hm2)for ideal user behavior and no AHU
+VfrVent          = 0.25*scaleBuilding	! Ventilation  [m3/s]
+
+CONSTANTS #
+alphaWindow = 7.5
+heightWindow = 1.43*scaleBuilding
+widthWindow = 0.88*scaleBuilding
+numberWindows = 33*scaleBuilding
+
+
+CONSTANTS #
+*******Scaled values***********
+AreaBui = 1169*scaleBuilding ! Conditioned floor area m2
+volBui = 2902*scaleBuilding  ! m2
+AsolN = 41*scaleBuilding  ! effective reception areas of the windows of the north
+AsolS = 78.6*scaleBuilding
+AsolE = 23.2*scaleBuilding
+AsolW = 23.5*scaleBuilding

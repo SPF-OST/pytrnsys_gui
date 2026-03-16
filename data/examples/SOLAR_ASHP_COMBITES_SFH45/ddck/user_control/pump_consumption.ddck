@@ -1,0 +1,100 @@
+**************************************
+**BEGIN pump_consumption_default.ddck
+**************************************
+
+*****************************
+** Author:  exported by GUI
+************************************
+
+***************************************************************************
+** Description: electrical consumption of circulation pumps
+** Source: no type(s) used
+** The nominal mass flow rates are taken from GUI,if not precise adapt here
+****************************************************************************
+
+*******************************************
+*** Energy Balance
+*******************************************
+EQUATIONS 1
+@energy(out, el, PuElTotal) = PelMfrPuCond + PelMfrPuSh + PelMfrPuSolar
+
+*******************************************
+*** Calculation of pump consumption
+*******************************************
+CONSTANTS 2
+dpmin_bar = 0.1 ! minimal pressure-drop of loop at nominal mass flow, bar
+dpmax_bar = 15  ! maximum pressure-drop of loop at nominal mass flow, bar
+***********************************************
+*** Pump Consumption of MfrPuCond ***
+***********************************************
+
+EQUATIONS #
+MfrPuCond=$MfrPuCond ! Comment this is the file is global
+MfrPuCondNom = 800.0  ! Nominal mass flow rate, kg/h.
+dpPuMfrPuCondNom_bar = MIN(dpmax_bar,MAX(dpmin_bar,MfrPuCondNom/$Lloop3Rho * 0.1)) ! Pressure-drop of loop at nominal mass flow, bar
+frMfrPuCond = MfrPuCond/MfrPuCondNom !  Flow rate fraction of nominal flow rate
+dpPuMfrPuCond_bar = frMfrPuCond^2*dpPuMfrPuCondNom_bar ! Pressure-drop of loop at actual mass flow, bar
+PelFlowMfrPuCond_kW = ((MfrPuCond/3600)/ $Lloop3Rho) * dpPuMfrPuCond_bar*100 !required power to drive the flow in kW
+etaMfrPuCond = MAX(1E-3,0.85*(-0.60625*frMfrPuCond^2+1.25*frMfrPuCond)) ! pump efficiency (electric 85 %)
+PelMfrPuCond = GT(MfrPuCond,0.1)*PelFlowMfrPuCond_kW/etaMfrPuCond !required pump electric power, kW
+
+***********************************************
+*** Pump Consumption of MfrPuSh ***
+***********************************************
+
+EQUATIONS #
+MfrPuSh=$MfrPuSh ! Comment this is the file is global
+MfrPuShNom = 800.0  ! Nominal mass flow rate, kg/h.
+dpPuMfrPuShNom_bar = MIN(dpmax_bar,MAX(dpmin_bar,MfrPuShNom/$Lloop1Rho * 0.1)) ! Pressure-drop of loop at nominal mass flow, bar
+frMfrPuSh = MfrPuSh/MfrPuShNom !  Flow rate fraction of nominal flow rate
+dpPuMfrPuSh_bar = frMfrPuSh^2*dpPuMfrPuShNom_bar ! Pressure-drop of loop at actual mass flow, bar
+PelFlowMfrPuSh_kW = ((MfrPuSh/3600)/ $Lloop1Rho) * dpPuMfrPuSh_bar*100 !required power to drive the flow in kW
+etaMfrPuSh = MAX(1E-3,0.85*(-0.60625*frMfrPuSh^2+1.25*frMfrPuSh)) ! pump efficiency (electric 85 %)
+PelMfrPuSh = GT(MfrPuSh,0.1)*PelFlowMfrPuSh_kW/etaMfrPuSh !required pump electric power, kW
+
+***********************************************
+*** Pump Consumption of MfrPuSolar ***
+
+***********************************************
+EQUATIONS #
+MfrPuSolar=$MfrPuSolar ! Comment this is the file is global
+MfrPuSolarNom = 75*$AcollAp  ! Nominal mass flow rate, kg/h.
+dpPuMfrPuSolarNom_bar = MIN(dpmax_bar,MAX(dpmin_bar,MfrPuSolarNom/$Lloop4Rho * 0.1)) ! Pressure-drop of loop at nominal mass flow, bar
+frMfrPuSolar = MfrPuSolar/MfrPuSolarNom !  Flow rate fraction of nominal flow rate
+dpPuMfrPuSolar_bar = frMfrPuSolar^2*dpPuMfrPuSolarNom_bar ! Pressure-drop of loop at actual mass flow, bar
+PelFlowMfrPuSolar_kW = ((MfrPuSolar/3600)/ $Lloop4Rho) * dpPuMfrPuSolar_bar*100 !required power to drive the flow in kW
+etaMfrPuSolar = MAX(1E-3,0.85*(-0.60625*frMfrPuSolar^2+1.25*frMfrPuSolar)) ! pump efficiency (electric 85 %)
+PelMfrPuSolar = GT(MfrPuSolar,0.1)*PelFlowMfrPuSolar_kW/etaMfrPuSolar !required pump electric power, kW
+
+**************************************
+**END pump_consumption_default.ddck
+**************************************
+
+
+!@onlinePlotter(MfrPuSh,MfrPuShNom,0,2000;dpPuMfrPuShNom_bar,frMfrPuSh,0,1)
+
+UNIT 59 TYPE 65		! Online Plotter Building (element OpB)
+PARAMETERS 12
+2				! 1: Nb. of left-axis variables
+6				! 2: Nb. of right-axis variables
+0				! 3: Left axis minimum
+1500				! 4: Left axis maximum
+-1			! 5: Right axis minimum
+1				! 6: Right axis maximum
+$nPlotsPerSim	! 7: Number of plots per simulation
+12				! 8: X-axis gridpoints
+0				! 9: Shut off Online w/o removing
+-1				! 10: Logical unit for output file
+0				! 11: Output file units
+0				! 12: Output file delimiter
+INPUTS 8
+MfrPuSh MfrPuShNom
+dpPuMfrPuShNom_bar frMfrPuSh dpPuMfrPuSh_bar PelFlowMfrPuSh_kW etaMfrPuSh PelMfrPuSh
+*******
+MfrPuSh MfrPuShNom
+dpPuMfrPuShNom_bar frMfrPuSh dpPuMfrPuSh_bar PelFlowMfrPuSh_kW etaMfrPuSh PelMfrPuSh
+****
+LABELS  3
+Massflowrates
+eff
+Pump
