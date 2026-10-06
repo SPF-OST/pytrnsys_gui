@@ -712,6 +712,15 @@ F{{fluid.name}}Cp = {{cp}} ! [kJ/(kg*K)]
         )
 
     def exportHydraulicLoops(self) -> str:
+        # For loops using loop-wide defaults the pipe diameter is sized with
+        # the correlation D [mm] = 0.92 * Q^0.45 (Q in [l/h]). This is the
+        # economic optimum pipe diameter for turbulent flow,
+        #   D_opt [in] = 3.9 * q_f[ft^3/s]^0.45 * rho[lb/ft^3]^0.13,
+        # see M. S. Peters, K. D. Timmerhaus: "Plant Design and Economics
+        # for Chemical Engineers", McGraw-Hill (based on R. P. Genereaux,
+        # "Fluid-flow design methods", Ind. Eng. Chem. 29(4), 1937),
+        # evaluated for water (rho = 62.4 lb/ft^3 gives a coefficient of
+        # ~0.95 in [mm] and [l/h]).
         template = """\
 ** Hydraulic loops
 EQUATIONS {{nEquations}}
@@ -724,11 +733,20 @@ EQUATIONS {{nEquations}}
 {% set loopDia = names.getDefaultDiameterName(loopName) -%}
 {% set loopUVal = names.getDefaultUValueName(loopName) -%}
 {% set loopNPipes = names.getNumberOfPipesName(loopName) -%}
+{% set loopPNom = names.getNominalPowerName(loopName) -%}
+{% set loopDTNom = names.getNominalTemperatureDifferenceName(loopName) -%}
+{% set loopMfrNom = names.getNominalMassFlowRateName(loopName) -%}
+{% set loopVfrNom = names.getNominalVolumeFlowRateName(loopName) -%}
 ** {{loopName}}
 {% if hydraulicLoop.connectionsDefinitionMode.useLoopWideDefaults() -%}
 {{loopNPipes}} = {{hydraulicLoop.connections | length}}
 {{loopLen}} = {{values.DEFAULT_LENGTH_IN_M}} ! [m]
-{{loopDia}} = {{values.DEFAULT_DIAMETER_IN_CM / 100}} ! [m]
+** Pipe sizing: diameter flow rate correlation D [mm] = 0.92 * Q^0.45, Q in [l/h]
+{{loopPNom}} = {{values.DEFAULT_NOMINAL_POWER_IN_KW}} ! [kW] nominal power
+{{loopDTNom}} = {{values.DEFAULT_NOMINAL_TEMPERATURE_DIFFERENCE_IN_K}} ! [K] nominal temperature difference
+{{loopMfrNom}} = {{loopPNom}}/({{loopCp}}*{{loopDTNom}})*3600 ! [kg/h] nominal mass flow rate
+{{loopVfrNom}} = {{loopMfrNom}}/{{loopRho}}*1000 ! [l/h] nominal volume flow rate
+{{loopDia}} = 0.92*{{loopVfrNom}}^0.45/1000 ! [m]
 {{loopUVal}} = {{values.DEFAULT_U_VALUE_IN_W_PER_M2_K * 60*60/1000}} ! [kJ/(h*m^2*K)] (= {{values.DEFAULT_U_VALUE_IN_W_PER_M2_K}} W/(m^2*K))
 {% endif -%}
 {{loopRho}} = F{{fluid.name}}Rho
@@ -739,7 +757,7 @@ EQUATIONS {{nEquations}}
         loops = self._hydraulicLoops
 
         nEquations = sum(
-            6 if l.connectionsDefinitionMode.useLoopWideDefaults() else 2
+            10 if l.connectionsDefinitionMode.useLoopWideDefaults() else 2
             for l in loops
         )
 

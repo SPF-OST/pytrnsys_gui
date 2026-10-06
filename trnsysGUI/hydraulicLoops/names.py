@@ -20,3 +20,19 @@ def getDefaultLengthName(loopName: str) -> str:
 
 def getNumberOfPipesName(loopName: str) -> str:
     return f"{loopName}NPipes"
+
+
+def getNominalPowerName(loopName: str) -> str:
+    return f"{loopName}PNom"
+
+
+def getNominalTemperatureDifferenceName(loopName: str) -> str:
+    return f"{loopName}dTNom"
+
+
+def getNominalVolumeFlowRateName(loopName: str) -> str:
+    return f"{loopName}VfrNom"
+
+
+def getNominalMassFlowRateName(loopName: str) -> str:
+    return f"{loopName}MfrNom"

@@ -400,16 +400,24 @@ FbrineRho = RHOBRI ! [kg/m^3]
 FbrineCp = CPBRI_SI*0.001 ! [kJ/(kg*K)]
 FwaterRho = RHOWAT ! [kg/m^3]
 FwaterCp = CPWAT_SI*0.001 ! [kJ/(kg*K)]
-EQUATIONS 12
+EQUATIONS 20
 loop2NPipes = 3
 loop2Len = 2.0 ! [m]
-loop2Dia = 0.02 ! [m]
+loop2PNom = 10.0 ! [kW] nominal power
+loop2dTNom = 10.0 ! [K] nominal temperature difference
+loop2MfrNom = loop2PNom/(Lloop2Cp*loop2dTNom)*3600 ! [kg/h] nominal mass flow rate
+loop2VfrNom = loop2MfrNom/Lloop2Rho*1000 ! [l/h] nominal volume flow rate
+loop2Dia = 0.92*loop2VfrNom^0.45/1000 ! [m]
 loop2UVal = 9.99972 ! [kJ/(h*m^2*K)] (= 2.7777 W/(m^2*K))
 Lloop2Rho = FbrineRho
 Lloop2Cp = FbrineCp
 loop4NPipes = 7
 loop4Len = 2.0 ! [m]
-loop4Dia = 0.02 ! [m]
+loop4PNom = 10.0 ! [kW] nominal power
+loop4dTNom = 10.0 ! [K] nominal temperature difference
+loop4MfrNom = loop4PNom/(Lloop4Cp*loop4dTNom)*3600 ! [kg/h] nominal mass flow rate
+loop4VfrNom = loop4MfrNom/Lloop4Rho*1000 ! [l/h] nominal volume flow rate
+loop4Dia = 0.92*loop4VfrNom^0.45/1000 ! [m]
 loop4UVal = 9.99972 ! [kJ/(h*m^2*K)] (= 2.7777 W/(m^2*K))
 Lloop4Rho = FwaterRho
 Lloop4Cp = FwaterCp
