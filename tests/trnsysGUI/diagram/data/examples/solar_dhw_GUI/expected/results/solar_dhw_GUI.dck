@@ -400,7 +400,7 @@ FbrineRho = RHOBRI ! [kg/m^3]
 FbrineCp = CPBRI_SI*0.001 ! [kJ/(kg*K)]
 FwaterRho = RHOWAT ! [kg/m^3]
 FwaterCp = CPWAT_SI*0.001 ! [kJ/(kg*K)]
-EQUATIONS 20
+EQUATIONS 28
 loop2NPipes = 3
 loop2Len = 2.0 ! [m]
 loop2PNom = 10.0 ! [kW] nominal power
@@ -408,7 +408,11 @@ loop2dTNom = 10.0 ! [K] nominal temperature difference
 loop2MfrNom = loop2PNom/(Lloop2Cp*loop2dTNom)*3600 ! [kg/h] nominal mass flow rate
 loop2VfrNom = loop2MfrNom/Lloop2Rho*1000 ! [l/h] nominal volume flow rate
 loop2Dia = 0.92*loop2VfrNom^0.45/1000 ! [m]
-loop2UVal = 9.99972 ! [kJ/(h*m^2*K)] (= 2.7777 W/(m^2*K))
+loop2LamIns = 0.035 ! [W/(m*K)] thermal conductivity of insulation
+loop2DN = loop2Dia*1000 ! [mm] nominal diameter (taken as inner diameter)
+loop2sIns = LE(loop2LamIns,0.03)*(30+10*GE(loop2DN,20)+10*GE(loop2DN,40)+10*GE(loop2DN,65)+20*GE(loop2DN,100))+GT(loop2LamIns,0.03)*(40+10*GE(loop2DN,20)+10*GE(loop2DN,40)+20*GE(loop2DN,65)+20*GE(loop2DN,100)+20*GE(loop2DN,175)) ! [mm] insulation thickness
+loop2ULin = 2*PI*loop2LamIns/LN((loop2Dia+2*loop2sIns/1000)/loop2Dia) ! [W/(m*K)] heat loss coefficient per pipe length
+loop2UVal = loop2ULin/(PI*loop2Dia)*3.6 ! [kJ/(h*m^2*K)] U-value w.r.t. inner pipe surface
 Lloop2Rho = FbrineRho
 Lloop2Cp = FbrineCp
 loop4NPipes = 7
@@ -418,7 +422,11 @@ loop4dTNom = 10.0 ! [K] nominal temperature difference
 loop4MfrNom = loop4PNom/(Lloop4Cp*loop4dTNom)*3600 ! [kg/h] nominal mass flow rate
 loop4VfrNom = loop4MfrNom/Lloop4Rho*1000 ! [l/h] nominal volume flow rate
 loop4Dia = 0.92*loop4VfrNom^0.45/1000 ! [m]
-loop4UVal = 9.99972 ! [kJ/(h*m^2*K)] (= 2.7777 W/(m^2*K))
+loop4LamIns = 0.035 ! [W/(m*K)] thermal conductivity of insulation
+loop4DN = loop4Dia*1000 ! [mm] nominal diameter (taken as inner diameter)
+loop4sIns = LE(loop4LamIns,0.03)*(30+10*GE(loop4DN,20)+10*GE(loop4DN,40)+10*GE(loop4DN,65)+20*GE(loop4DN,100))+GT(loop4LamIns,0.03)*(40+10*GE(loop4DN,20)+10*GE(loop4DN,40)+20*GE(loop4DN,65)+20*GE(loop4DN,100)+20*GE(loop4DN,175)) ! [mm] insulation thickness
+loop4ULin = 2*PI*loop4LamIns/LN((loop4Dia+2*loop4sIns/1000)/loop4Dia) ! [W/(m*K)] heat loss coefficient per pipe length
+loop4UVal = loop4ULin/(PI*loop4Dia)*3.6 ! [kJ/(h*m^2*K)] U-value w.r.t. inner pipe surface
 Lloop4Rho = FwaterRho
 Lloop4Cp = FwaterCp
 UNIT 23 TYPE 929 !Changed automatically

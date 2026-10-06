@@ -36,3 +36,19 @@ def getNominalVolumeFlowRateName(loopName: str) -> str:
 
 def getNominalMassFlowRateName(loopName: str) -> str:
     return f"{loopName}MfrNom"
+
+
+def getNominalDiameterName(loopName: str) -> str:
+    return f"{loopName}DN"
+
+
+def getInsulationThermalConductivityName(loopName: str) -> str:
+    return f"{loopName}LamIns"
+
+
+def getInsulationThicknessName(loopName: str) -> str:
+    return f"{loopName}sIns"
+
+
+def getLinearHeatLossCoefficientName(loopName: str) -> str:
+    return f"{loopName}ULin"
