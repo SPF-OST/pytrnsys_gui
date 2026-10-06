@@ -17,7 +17,12 @@ class RecentProjectsHandler:
     def initWithExistingRecentProjects(cls):
         """Initialize the deque with recent projects saved in the settings.json"""
         cls.recentProjects.clear()
-        recentProjectsFromFile = _settings.Settings.load().recentProjects
+
+        settings = _settings.Settings.tryLoadOrNone()
+        if not settings:
+            return
+
+        recentProjectsFromFile = settings.recentProjects
         cls.recentProjects.extend(_pl.Path(p) for p in recentProjectsFromFile)
 
     @classmethod
