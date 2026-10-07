@@ -1,0 +1,269 @@
+*******************************
+** BEGIN Type1357_NightCoolingEq.ddck
+*******************************
+
+*****************************************
+** Contact person : Mikel Arenas
+** Creation date  : 24.09.2026
+** Last changes   :
+*****************************************
+
+************************************************************************************************************************
+** Description: 
+** Solar Collector Tested to the EN12975 Standard with Bi-Axial IAMS.
+** Variant of Type1357.ddck: during night cooling ($SolarControlNightCooling = 1) Type1357 gets no flow and the
+** outlet temperature is computed with the analytical EN12975 loss equation (see "Night cooling model"), which
+** additionally includes the longwave sky term with c4_night. Type1357.ddck does night cooling with the Type itself.
+************************************************************************************************************************
+
+************************************************************************************************************************
+** Details: 
+** Refer to the document ".\TESS Models\Documentation\12-SolarLibraryMathematicalReference.pdf" for detailed
+** documentation on this type.
+************************************************************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+EQUATIONS #
+Cp     = @cp(In)
+TIn    = @temp(In)
+MfrIn  = @mfr(In)
+
+EQUATIONS #
+MfrInType  = MfrIn*NOT($SolarControlNightCooling)
+MfrInNight = MfrIn*$SolarControlNightCooling
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+EQUATIONS #
+@temp(Out) = TOut
+
+TOut = TOutType*NOT($SolarControlNightCooling) + TOutNight*$SolarControlNightCooling
+***********************************
+** outputs to other ddck
+***********************************
+
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+******************************************************************************************
+
+
+***********************************
+** Dependencies with other ddck
+***********************************
+
+***********************************
+** CONSTANTS
+***********************************
+EQUATIONS #
+EmSky     = 0.736 + 0.00577 * $tambDewPoint
+IT_kJhm2  = $ITShaded_surfUser_1
+IT_Wm2    = IT_kJhm2/3.6
+IT_kWm2   = IT_kJhm2/3600	             ! Incident total radiation on collector plane, kW/m2
+IT_kW     = IT_kWm2 * ACollAp
+
+CONSTANTS #
+! Parameters
+ACollAp = NbModTot * AMod
+!Inputs
+AziAg      = 0
+EmGnd      = 0.95
+
+MfrNomNorm = 20                 ! [kg/h/m2]
+MfrNom     = MfrNomNorm*ACollAp                   ! 15*460 = 6900 kg/h
+MfrMin     = 0.2 * MfrNom                ! 1380
+MfrMax     = 10  * MfrNom                ! 13800
+
+CONSTANTS 1
+Mode_ctrl  = 4     ! Daytime control mode (overwritten by "deck CollMode_ctrl" in the config). 0: manual. Rest: with set-point
+
+EQUATIONS #
+! At night the Type gets no flow (mode 0) and the analytical model below gives the outlet temperature
+Mode_ctrl_act = Mode_ctrl*NOT($SolarControlNightCooling)
+
+***********************************
+** Begin TYPE
+***********************************
+CONSTANTS 1
+unitReadIAM=26
+ASSIGN  ..\..\..\common_ddcks\Coll\SolarCollectorIAM.txt  unitReadIAM
+
+UNIT 17 TYPE 1357
+PARAMETERS #
+AMod          ! 1: Collector Module Area (aperture or gross) [m^2] ([0.,+Inf])
+NbModTot      ! 2: Total Number of Modules [-] ([1,+Inf])
+NbModSr       ! 3: Number of Modules in Series [-] ([1,+Inf])
+Cp            ! 4: Fluid Specific Heat [kJ/kg.K] ([0.0,+Inf])
+unitReadIAM   ! 5: Logical Unit for IAM Data [-] ([10,+Inf])
+NbTrsvAng     ! 6: Number of Transverse Angles [-] ([1,100])
+NbLgtdAng     ! 7: Number of Longitudinal Angles [-] ([1,100])
+LgwRadMode    ! 8: Long wave Radiation Mode [-] ([1,4])
+c0            ! 9:  Collector Efficiency Coefficient c0 [-] ([0.,1.])
+c1            ! 10: Collector Efficiency Coefficient c1 [kJ/hr.m^2.K] ([0.,+Inf])
+c2            ! 11: Collector Efficiency Coefficient c2 [kJ/hr.m^2.K^2] ([0.,+Inf])
+c3            ! 12: Collector Efficiency Coefficient c3 [kJ/m^3.K] ([0.,+Inf])
+c4            ! 13: Collector Efficiency Coefficient c4 [-] ([0.,+Inf])
+c5            ! 14: Collector Efficiency Coefficient c5 [kJ/m^2.K] ([0.,+Inf])
+c6            ! 15: Collector Efficiency Coefficient c6 [s/m] ([0.,+Inf])
+Kd            ! 16: Diffuse Radiation Coefficient (Kd) [-] ([0.,1.])
+InitArrayTemp ! 17: Initial Array Temperature [C] ([-Inf,+Inf])
+NbNodes       ! 18: Number of Nodes per Collector [-] ([1,1000])
+100           ! 19: Number of Sub Timesteps [-] ([1,10000])
+
+INPUTS #
+TIn                 ! 1: Inlet Temperature [C] ([-Inf,+Inf])
+MfrInType              ! 2: Array Inlet Flowrate [kg/hr] ([0.0,+Inf])
+$Tamb                   ! 3: Ambient Temperature [C] ([-Inf,+Inf])
+$Tsky                   ! 4: Sky Temperature [C] ([-Inf,+Inf])
+$IBShaded_surfUser_1          ! 5: Beam Radiation on the Tilted Surface [kJ/hr.m^2] ([0.0,+Inf])
+$IDSShaded_surfUser_1          ! 6: Sky Diffuse Radiation on Tilt [kJ/hr.m^2] ([0.0,+Inf])
+$IDGShaded_surfUser_1         ! 7: Ground Diffuse Radiation on Tilt [kJ/hr.m^2] ([0.0,+Inf])
+$slopeSurfUser_1        ! 8: Collector Slope [degrees] ([-360,+360])
+$AI_surfUser_1          ! 9: Incidence Angle [degrees] ([-360,+360])
+AziAg                   ! 10: Collector Azimuth Angle [degrees] ([-360,+360])
+$AISZ                   ! 11: Solar Zenith Angle [degrees] ([0,90])
+$AISA                   ! 12: Solar Azimuth Angle [degrees] ([0,90])
+$vWind                  ! 13: Wind Velocity [m/s] ([0.,+Inf])
+EmSky                   ! 14: Emissivity of the Sky [-] ([0.,1.])
+EmGnd                   ! 15: Emissivity of the Ground [-] ([0.,1.])
+Mode_ctrl_act           ! 16: Collector Outlet Temperature Control [-] ([0,4])
+                              ! 0 = run at specified inlet flow rate and calculate outlet temperature
+                              ! 1 = modulate Mfr to maintain outlet temperature but turn off if the setpoint can't be maintained
+                              ! 2 = modulate Mfr keep outlet as close to the setpoint as possible if the collector is gaining energy but turn off the collector if the collector is losing energy
+                              ! 3 = modulate Mfr keep outlet as close to the setpoint as possible if the collector is either gaining or losing energy
+                              ! 4 = modulate Mfr keep outlet as close to the setpoint as possible if the collector is gaining energy but turn off the collector if the collector is losing energy and set to the minimum flow rate if the outlet temperature is less than desired
+$TSetColl             ! 17: Outlet Temperature Setpoint [C] ([-Inf,+Inf])
+MfrMin                ! 18: Minimum Array Flow Rate [kg/hr] ([0.,+Inf])
+MfrMax                ! 19: Maximum Array Flow Rate [kg/hr] ([0.,+Inf])
+
+**** initial values
+20 0 10 10 0 0 0 45 45 0 45 45 0 0.9 0.9 0 100 200 6000
+
+EQUATIONS #
+TOutType   = [17, 1] ! Outlet Temperature [C] ([-Inf,+Inf])
+MfrOut  = [17, 2] ! Outlet Flowrate [kg/hr] ([0.0,+Inf])
+P_kJh   = [17, 3] ! Useful Energy Gain [kJ/hr] ([0.0,+Inf])
+TOutSer = [17, 9] ! Outlet Temperature of the solar collector array for collectors connected in series [C] ([-Inf,+Inf])
+P_kW    = P_kJh/3600
+P_kWm2  = P_kW/(AMod*NbModTot)
+
+P_kW_calc    = MfrIn*Cp/3600*(TOut - TIn)
+P_kW_calc_pos = P_kW_calc*GT(P_kW_calc,0)
+P_kW_calc_neg = P_kW_calc*LT(P_kW_calc,0)
+
+P_kWm2_calc = P_kW_calc/(AMod*NbModTot)
+
+!PColl_Loss       = PColl_kW_calc - $HxCollQ_Coll_kW -$CoolerQ_Coolcoll_kW
+Eff            = P_kW_calc/(IT_kW+1e-30)   ! Collector efficiency: radiation / thermal outlet
+
+
+***********************************
+** Night cooling model
+***********************************
+
+CONSTANTS #
+Sigma = 5.67e-08 !3.6*5.67e-08
+EmSkyNight = 1
+c4_night = 0.1
+
+CONSTANTS 1
+NightConvOn = 1    ! 1: losses driven by Tm-Tamb (c1, c2, c3) included. 0: longwave term only (overwritten by "deck CollNightConvOn" in the config)
+
+EQUATIONS #
+TAmb_K = $Tamb+273.15
+TSky_K = $Tsky+273.15
+FSky = (1.+COS($slopeSurfUser_1))/2
+FGnd = 1.-FSky
+
+EIncident_Longwave = FSky*EmSkyNight*Sigma*TSky_K**4 + FGnd*EmGnd*Sigma*TAmb_K**4
+E_Longwave_W_m2 = c4_night*(EIncident_Longwave-Sigma*TAmb_K**4)
+E_Longwave_kW = E_Longwave_W_m2 * ACollAp/1000
+
+** Full EN12975 quasi-steady loss equation without irradiance (c5 capacitance term neglected), all in kJ/hr:
+**   MfrIn*Cp*(TOut-TIn) = ACollAp*(-(c1+c3*u)*dTm - c2*dTm**2 + c4_night*(EL-Sigma*Tamb**4))
+** with dTm = Tm-Tamb and Tm = (TIn+TOut)/2. Substituting TOut = TIn + 2*(dTm-dTIn) gives
+**   ACollAp*c2*dTm**2 + BNight*dTm - CNight = 0, solved in the numerically stable form (also valid for c2 = 0).
+
+EQUATIONS #
+dTInAmbNight   = TIn - $Tamb
+aLinNight      = NightConvOn*(c1 + c3*$vWind)           ! [kJ/hr.m^2.K]
+c2Night        = NightConvOn*c2                         ! [kJ/hr.m^2.K^2]
+ELw_kJhm2      = E_Longwave_W_m2*3.6                    ! [kJ/hr.m^2]
+mCpNight       = MfrIn*Cp                               ! [kJ/hr.K]
+BNight         = 2*mCpNight + ACollAp*aLinNight
+CNight         = 2*mCpNight*dTInAmbNight + ACollAp*ELw_kJhm2
+DNight         = MAX(BNight**2 + 4*ACollAp*c2Night*CNight, 0)
+dTmAmbNight    = GT(BNight,0)*2*CNight/(BNight + DNight**0.5 + 1e-30)   ! BNight = 0 only without flow and without c1-c3 losses: Tm undefined, set to Tamb
+TmNight        = $Tamb + dTmAmbNight
+PNightConv_kW  = -ACollAp*(aLinNight*dTmAmbNight + c2Night*dTmAmbNight**2)/3600   ! losses driven by Tm-Tamb (c1, c2, c3: radiation + conduction + convection)
+PNight_kW      = PNightConv_kW + E_Longwave_kW                                ! total night cooling power
+
+! kW -> kJ/h handled above (MfrIn in kg/h, Cp in kJ/kg.K); no temperature change without flow
+TOutNight = TIn + GT(MfrIn,0)*2*(dTmAmbNight - dTInAmbNight)
+
+
+
+***********************************
+** Monthly printer
+***********************************
+CONSTANTS 1
+unitPrinterColl = 53
+ASSIGN temp\COLL_MO.Prt unitPrinterColl
+UNIT 52 TYPE 46
+PARAMETERS 5
+unitPrinterColl ! 1: Logical unit number, -
+-1  ! 2: Logical unit for monthly summaries
+1   ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1  ! 4: Printing & integrating interval, h. -1 for monthly integration
+0   ! 5: Number of inputs to avoid integration
+INPUTS #
+Eff P_kW P_kW_calc P_kW_calc_pos P_kW_calc_neg P_kWm2_calc IT_kW IT_kWm2 TIn TOut MfrOut
+Eff P_kW P_kW_calc P_kW_calc_pos P_kW_calc_neg P_kWm2_calc IT_kW IT_kWm2 TIn TOut MfrOut
+
+***********************************
+** Hourly printer
+***********************************
+CONSTANTS 1
+unitHourlyColl = 43
+ASSIGN    temp\COLL_HR.Prt    unitHourlyColl
+UNIT 34 TYPE 46		! Printegrator Monthly Values for System
+PARAMETERS #
+unitHourlyColl   	! 1: Logical unit number, -
+-1            		! 2: Logical unit for monthly summaries, -
+1             		! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1             		! 4: Printing & integrating interval, h. -1 for monthly integration
+0             		! 5: Number of inputs to avoid integration, -
+!2             		! 6: Output number to avoid integration
+!2             		! 7: Output number to avoid integration
+INPUTS #
+Eff P_kW P_kW_calc P_kW_calc_pos P_kW_calc_neg P_kWm2_calc E_Longwave_kW PNightConv_kW PNight_kW TmNight IT_kW IT_kWm2 TIn TOut TOutType TOutNight MfrOut MfrIn MfrInType MfrInNight Mode_ctrl_act
+Eff P_kW P_kW_calc P_kW_calc_pos P_kW_calc_neg P_kWm2_calc E_Longwave_kW PNightConv_kW PNight_kW TmNight IT_kW IT_kWm2 TIn TOut TOutType TOutNight MfrOut MfrIn MfrInType MfrInNight Mode_ctrl_act
+
+***********************************
+** Online Plotter
+***********************************
+!UNIT 103 TYPE 65		!Changed automatically
+!PARAMETERS 12
+!6    				! 1: Nb. of left-axis variables
+!3    				! 2: Nb. of right-axis variables
+!0     			    ! 3: Left axis minimum
+!20000 			    ! 4: Left axis maximum
+!0     				! 5: Right axis minimum
+!200  				! 6: Right axis maximum
+!2          		    ! 7: Number of plots per simulation
+!12     		        ! 8: X-axis gridpoints
+!1     				! 9: Shut off Online w/o removing
+!-1     			    ! 10: Logical unit for output file
+!0     				! 11: Output file units
+!0     				! 12: Output file delimiter
+!INPUTS #
+!PColl_kW_calc PColl_Loss IT_Coll_kW MfrIn MfrOut $MfrPHx_Coll $CollIsOn TIn TOut
+!******
+!PColl_kW_calc PColl_Loss IT_Coll_kW MfrIn MfrOut $MfrPHx_Coll $CollIsOn TIn TOut
+!LABELS  3
+!Power
+!Temperatures
+!Collector
