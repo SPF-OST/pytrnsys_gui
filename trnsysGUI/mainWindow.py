@@ -88,6 +88,12 @@ class MainWindow(_qtw.QMainWindow):
         )
         zoomOutAction.triggered.connect(self.setZoomOut)
 
+        zoomToFitAction = _qtw.QAction(
+            _img.ZOOM_FIT_SVG.icon(), "Zoom to fit (Ctrl+0)", self
+        )
+        zoomToFitAction.triggered.connect(self.setZoomToFit)
+        zoomToFitAction.setShortcut("Ctrl+0")
+
         toggleConnLabels = _qtw.QAction(
             _img.LABEL_TOGGLE_PNG.icon(), "Toggle labels", self
         )
@@ -135,6 +141,7 @@ class MainWindow(_qtw.QMainWindow):
         tb.addAction(loadDiaAction)
         tb.addAction(zoomInAction)
         tb.addAction(zoomOutAction)
+        tb.addAction(zoomToFitAction)
         tb.addAction(toggleConnLabels)
         tb.addAction(runMassflowSolverAction)
         tb.addAction(openVisualizerAction)
@@ -494,6 +501,9 @@ class MainWindow(_qtw.QMainWindow):
     def setZoomOut(self):
         self.logger.info("Setting zoom out")
         self.editor.diagramView.scale(0.8, 0.8)
+
+    def setZoomToFit(self) -> None:
+        self.editor.diagramView.fitDiagramInView()
 
     def setZoom0(self):
         self.logger.info("Setting zoom 0")

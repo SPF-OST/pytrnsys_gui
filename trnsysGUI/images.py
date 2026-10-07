@@ -183,6 +183,9 @@ CRYSTALIZER_SVG = _ia.createForPackageResource(
 ZOOM_0_PNG = _ia.createForPackageResource(
     _ia.PngImageAccessor, "images/zoom-0.png"
 )
+ZOOM_FIT_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/zoom-fit.svg"
+)
 ZOOM_IN_PNG = _ia.createForPackageResource(
     _ia.PngImageAccessor, "images/zoom-in.png"
 )

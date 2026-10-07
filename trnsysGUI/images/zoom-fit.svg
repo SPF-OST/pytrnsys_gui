@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <g fill="none" stroke="#444444" stroke-linecap="round">
+    <!-- Magnifying glass, as in zoom-in.png and zoom-out.png -->
+    <circle cx="192" cy="192" r="168" stroke-width="48"/>
+    <line x1="344" y1="344" x2="480" y2="480" stroke-width="64"/>
+    <!-- Corners of a frame -->
+    <g stroke-width="32" stroke-linecap="square" stroke-linejoin="miter">
+      <polyline points="112,152 112,112 152,112"/>
+      <polyline points="232,112 272,112 272,152"/>
+      <polyline points="272,232 272,272 232,272"/>
+      <polyline points="152,272 112,272 112,232"/>
+    </g>
+  </g>
+</svg>

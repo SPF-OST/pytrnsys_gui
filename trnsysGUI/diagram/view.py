@@ -15,6 +15,9 @@ import trnsysGUI.components.ddckFolderHelpers as _dfh
 if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
 
+_FIT_MARGIN_FRACTION = 0.03
+_MAX_FIT_SCALE = 2.0
+
 
 class View(_qtw.QGraphicsView):
     """
@@ -30,6 +33,48 @@ class View(_qtw.QGraphicsView):
 
         self.adjustSize()
         self.setRenderHint(_qtg.QPainter.Antialiasing)
+
+        self._hasBeenShown = False
+
+    def showEvent(self, event: _qtg.QShowEvent) -> None:
+        super().showEvent(event)
+
+        if self._hasBeenShown:
+            return
+        self._hasBeenShown = True
+
+        # Fit once the view has its final size, i.e. after pending layouting
+        _qtc.QTimer.singleShot(0, self.fitDiagramInView)
+
+    def getDiagramSceneRect(self) -> _qtc.QRectF:
+        """The rectangle enclosing the block items and connections
+
+        Helper items such as the alignment lines are ignored.
+        """
+        diagramRect = _qtc.QRectF()
+        for item in self._editor.trnsysObj:
+            itemRect = item.boundingRect() | item.childrenBoundingRect()
+            diagramRect |= item.mapRectToScene(itemRect)
+        return diagramRect
+
+    def fitDiagramInView(self) -> None:
+        diagramRect = self.getDiagramSceneRect()
+        if diagramRect.isEmpty():
+            return
+
+        margin = _FIT_MARGIN_FRACTION * max(
+            diagramRect.width(), diagramRect.height()
+        )
+        diagramRect.adjust(-margin, -margin, margin, margin)
+
+        self.fitInView(diagramRect, _qtc.Qt.KeepAspectRatio)
+
+        # Don't blow up small diagrams.
+        scale = self.transform().m11()
+        if scale > _MAX_FIT_SCALE:
+            self.resetTransform()
+            self.scale(_MAX_FIT_SCALE, _MAX_FIT_SCALE)
+            self.centerOn(diagramRect.center())
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasFormat("component/name"):
