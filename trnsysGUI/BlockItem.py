@@ -158,7 +158,7 @@ class BlockItem(
             newScenePos=newPos,
             descr="Move BlockItem",
         )
-        self.editor.parent().undoStack.push(command)
+        self.editor.mainWindow.undoStack.push(command)
 
     # Transform related
     def changeSize(self):

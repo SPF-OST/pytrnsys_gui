@@ -70,6 +70,8 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
     def __init__(self, parent, projectFolder, jsonPath, loadValue, logger):
         super().__init__(parent)
 
+        self.mainWindow = parent
+
         self.forceOverwrite = False
         self.logger = logger
 
@@ -305,7 +307,7 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
                     "Can only connect port items. Also, they have to be of the same type."
                 )
 
-            self.parent().undoStack.push(command)
+            self.mainWindow.undoStack.push(command)
 
     def _createCreateSinglePipeConnectionCommand(
         self, startPort: SinglePipePortItem, endPort: SinglePipePortItem
@@ -996,7 +998,7 @@ Tcw=1
                 )
 
         self.diagramName = newName
-        self.parent().currentFile = newName
+        self.mainWindow.currentFile = newName
 
     def setConnLabelVis(self, isVisible: bool) -> None:
         for c in self.trnsysObj:

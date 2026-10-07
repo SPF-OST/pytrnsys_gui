@@ -693,7 +693,7 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
     def createDeleteUndoCommandAndAddToStack(self) -> None:
         deleteConnectionCommand = self.createDeleteUndoCommand()
-        self.parent.parent().undoStack.push(deleteConnectionCommand)
+        self.parent.mainWindow.undoStack.push(deleteConnectionCommand)
 
     def createDeleteUndoCommand(
         self, parentCommand: _tp.Optional[_qtw.QUndoCommand] = None

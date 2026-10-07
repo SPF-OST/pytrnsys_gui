@@ -98,4 +98,4 @@ class View(_qtw.QGraphicsView):
         command = _dbc.DeleteBlockCommand(
             blockItem, self._editor, undoNamesHelper
         )
-        self._editor.parent().undoStack.push(command)
+        self._editor.mainWindow.undoStack.push(command)
