@@ -406,7 +406,7 @@ MTesSh_Tee2 = MTesSh_Tee2_A
 
 ! WtSp
 EQUATIONS 1
-TWtSp = weather_TcwAvg
+TWtSp = weatherTcwAvg
 
 EQUATIONS 1
 TWtTp = TVal2_WtTp

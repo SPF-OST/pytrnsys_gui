@@ -50,7 +50,7 @@ CONSTANTS #
 TStagMax = 160
 
 EQUATIONS #
-Stag = NOT(StagRec)*GT(TStagRec,TStagMax)*GT($IT_H, 0) + StagRec*GT($IT_H, 0)
+Stag = NOT(StagRec)*GT(TStagRec,TStagMax)*GT($weatherIT_H, 0) + StagRec*GT($weatherIT_H, 0)
 StagDays = GT(Stag,StagRec)*(StagDaysRec+1) + LE(Stag,StagRec)*StagDaysRec
 
 ***********************************
@@ -69,9 +69,9 @@ unitPrintStagnation		! 1: Logical unit number, -
 1						! 4: Printing & integrating interval, h. -1 for monthly integration
 0						! 5: Number of inputs to avoid integration, -
 INPUTS #
-TStag $IT_H Stag StagDays
+TStag $weatherIT_H Stag StagDays
 **
-TStag $IT_H Stag StagDays
+TStag $weatherIT_H Stag StagDays
 
 ***************************************************
 **END Stagnation.ddck

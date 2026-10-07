@@ -46,24 +46,24 @@ $AcollAp  = AcollAp
 ** inputs from other ddck
 ***********************************
 CONSTANTS #
-C_tilt = $weather_slopeSurfUser_1		! Collector tilt angle / slope [�]
-C_azim = $weather_aziSurfUser_1			! Collector azimuth  (0:s, 90:w, 270: e) [�]
+C_tilt = $weatherslopeSurfUser_1		! Collector tilt angle / slope [�]
+C_azim = $weatheraziSurfUser_1			! Collector azimuth  (0:s, 90:w, 270: e) [�]
 
 EQUATIONS #
-IT_Coll_kJhm2 = $weather_IT_SurfUser_1		! Incident total radiation on collector plane, kJ/hm2
-IB_Coll_kJhm2 = $weather_IB_SurfUser_1		! incident beam radiation on collector plane, kJ/hm2
-ID_Coll_kJhm2 = $weather_ID_SurfUser_1		! diffuse and ground reflected irradiance on collector tilt
-AI_Coll       = $weather_AI_SurfUser_1				! incident angle on collector plane, �
-vWind         = $weather_vWind
-AISZ     	  = $weather_AISZ
-AISA     	  = $weather_AISA
-IT_Coll_Wm2   =  $weather_IT_SurfUser_1/3.6
-IT_Coll_kWm2  = $weather_IT_SurfUser_1/3600
-tAmbDewPoint  = $weather_tAmbDewPoint
-tSky          = $weather_tSky
-tAmb          = $weather_tAmb
-RHamb_100     = $weather_RHamb_100	   ! relative humidity  of the ambient air [0;100]
-pamb_bar      = $weather_pamb_bar	   ! pressure of the ambient air, [bar]
+IT_Coll_kJhm2 = $weatherIT_SurfUser_1		! Incident total radiation on collector plane, kJ/hm2
+IB_Coll_kJhm2 = $weatherIB_SurfUser_1		! incident beam radiation on collector plane, kJ/hm2
+ID_Coll_kJhm2 = $weatherID_SurfUser_1		! diffuse and ground reflected irradiance on collector tilt
+AI_Coll       = $weatherAI_SurfUser_1				! incident angle on collector plane, �
+vWind         = $weathervWind
+AISZ     	  = $weatherAISZ
+AISA     	  = $weatherAISA
+IT_Coll_Wm2   =  $weatherIT_SurfUser_1/3.6
+IT_Coll_kWm2  = $weatherIT_SurfUser_1/3600
+tAmbDewPoint  = $weathertAmbDewPoint
+tSky          = $weathertSky
+tAmb          = $weathertAmb
+RHamb_100     = $weatherRHamb_100	   ! relative humidity  of the ambient air [0;100]
+pamb_bar      = $weatherpamb_bar	   ! pressure of the ambient air, [bar]
 
 
 ******************************************************************************************

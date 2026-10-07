@@ -30,7 +30,7 @@ TcombiTesDpR3_35H=TcombiTesDpR3_35
 CONSTANTS 1
 spTIni = 20
 CONSTANTS #
-TWtSp = weather_TcwAvg
+TWtSp = weatherTcwAvg
 TroomStore = 15
 
 UNIT 450 TYPE 9352

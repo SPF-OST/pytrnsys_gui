@@ -31,6 +31,6 @@ unitPrinter    ! 1: Logical unit number, -
 1     ! 5: Number of inputs to avoid integration, -
 1     ! 6: Output number to avoid integration
 INPUTS #
-$TIME $weather_IT_H_Wm2 $weather_IT_surfUser_2_Wm2 $weather_IT_surfUser_1_Wm2 $weather_tAmb
+$TIME $weatherIT_H_Wm2 $weatherIT_surfUser_2_Wm2 $weatherIT_surfUser_1_Wm2 $weathertAmb
 *****
-$TIME $weather_IT_H_Wm2 $weather_IT_surfUser_2_Wm2 $weather_IT_surfUser_1_Wm2 $weather_tAmb
+$TIME $weatherIT_H_Wm2 $weatherIT_surfUser_2_Wm2 $weatherIT_surfUser_1_Wm2 $weathertAmb

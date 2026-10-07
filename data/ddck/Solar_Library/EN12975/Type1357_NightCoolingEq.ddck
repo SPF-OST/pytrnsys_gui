@@ -31,8 +31,8 @@ TIn    = @temp(In)
 MfrIn  = @mfr(In)
 
 EQUATIONS #
-MfrInType  = MfrIn*NOT($SolarControlNightCooling)
-MfrInNight = MfrIn*$SolarControlNightCooling
+MfrInType  = MfrIn*NOT(SolarControlNightCooling)
+MfrInNight = MfrIn*SolarControlNightCooling
 
 ***********************************
 ** outputs to hydraulic solver
@@ -40,7 +40,7 @@ MfrInNight = MfrIn*$SolarControlNightCooling
 EQUATIONS #
 @temp(Out) = TOut
 
-TOut = TOutType*NOT($SolarControlNightCooling) + TOutNight*$SolarControlNightCooling
+TOut = TOutType*NOT(SolarControlNightCooling) + TOutNight*SolarControlNightCooling
 ***********************************
 ** outputs to other ddck
 ***********************************
@@ -52,17 +52,33 @@ TOut = TOutType*NOT($SolarControlNightCooling) + TOutNight*$SolarControlNightCoo
 
 
 ***********************************
-** Dependencies with other ddck
+** inputs from other ddck
 ***********************************
+CONSTANTS #
+C_tilt = $weatherslopeSurfUser_1			! Collector tilt angle / slope [deg]
+
+EQUATIONS #
+IT_Coll_kJhm2  = $ITShaded_surfUser_1		! Incident total radiation on collector plane, kJ/hm2
+IB_Coll_kJhm2  = $IBShaded_surfUser_1		! Incident beam radiation on collector plane, kJ/hm2
+IDS_Coll_kJhm2 = $IDSShaded_surfUser_1		! Sky diffuse radiation on collector plane, kJ/hm2
+IDG_Coll_kJhm2 = $IDGShaded_surfUser_1		! Ground diffuse radiation on collector plane, kJ/hm2
+AI_Coll        = $weatherAI_surfUser_1			! Incident angle on collector plane, deg
+vWind          = $weathervWind
+AISZ           = $weatherAISZ
+AISA           = $weatherAISA
+tAmbDewPoint   = $weathertAmbDewPoint
+tSky           = $weatherTsky
+tAmb           = $weatherTamb
+TSetColl       = $TSetColl			! Outlet temperature setpoint, C
+SolarControlNightCooling = $SolarControlNightCooling	! 1: night cooling active, 0: normal operation
 
 ***********************************
 ** CONSTANTS
 ***********************************
 EQUATIONS #
-EmSky     = 0.736 + 0.00577 * $tambDewPoint
-IT_kJhm2  = $ITShaded_surfUser_1
-IT_Wm2    = IT_kJhm2/3.6
-IT_kWm2   = IT_kJhm2/3600	             ! Incident total radiation on collector plane, kW/m2
+EmSky     = 0.736 + 0.00577 * tAmbDewPoint
+IT_Wm2    = IT_Coll_kJhm2/3.6
+IT_kWm2   = IT_Coll_kJhm2/3600	             ! Incident total radiation on collector plane, kW/m2
 IT_kW     = IT_kWm2 * ACollAp
 
 CONSTANTS #
@@ -82,14 +98,14 @@ Mode_ctrl  = 4     ! Daytime control mode (overwritten by "deck CollMode_ctrl" i
 
 EQUATIONS #
 ! At night the Type gets no flow (mode 0) and the analytical model below gives the outlet temperature
-Mode_ctrl_act = Mode_ctrl*NOT($SolarControlNightCooling)
+Mode_ctrl_act = Mode_ctrl*NOT(SolarControlNightCooling)
 
 ***********************************
 ** Begin TYPE
 ***********************************
 CONSTANTS 1
 unitReadIAM=26
-ASSIGN  ..\..\..\common_ddcks\Coll\SolarCollectorIAM.txt  unitReadIAM
+ASSIGN PATH$\Solar_Library\EN12975\database\SolarCollectorIAM.txt unitReadIAM
 
 UNIT 17 TYPE 1357
 PARAMETERS #
@@ -116,17 +132,17 @@ NbNodes       ! 18: Number of Nodes per Collector [-] ([1,1000])
 INPUTS #
 TIn                 ! 1: Inlet Temperature [C] ([-Inf,+Inf])
 MfrInType              ! 2: Array Inlet Flowrate [kg/hr] ([0.0,+Inf])
-$Tamb                   ! 3: Ambient Temperature [C] ([-Inf,+Inf])
-$Tsky                   ! 4: Sky Temperature [C] ([-Inf,+Inf])
-$IBShaded_surfUser_1          ! 5: Beam Radiation on the Tilted Surface [kJ/hr.m^2] ([0.0,+Inf])
-$IDSShaded_surfUser_1          ! 6: Sky Diffuse Radiation on Tilt [kJ/hr.m^2] ([0.0,+Inf])
-$IDGShaded_surfUser_1         ! 7: Ground Diffuse Radiation on Tilt [kJ/hr.m^2] ([0.0,+Inf])
-$slopeSurfUser_1        ! 8: Collector Slope [degrees] ([-360,+360])
-$AI_surfUser_1          ! 9: Incidence Angle [degrees] ([-360,+360])
+tAmb                    ! 3: Ambient Temperature [C] ([-Inf,+Inf])
+tSky                    ! 4: Sky Temperature [C] ([-Inf,+Inf])
+IB_Coll_kJhm2           ! 5: Beam Radiation on the Tilted Surface [kJ/hr.m^2] ([0.0,+Inf])
+IDS_Coll_kJhm2          ! 6: Sky Diffuse Radiation on Tilt [kJ/hr.m^2] ([0.0,+Inf])
+IDG_Coll_kJhm2          ! 7: Ground Diffuse Radiation on Tilt [kJ/hr.m^2] ([0.0,+Inf])
+C_tilt                  ! 8: Collector Slope [degrees] ([-360,+360])
+AI_Coll                 ! 9: Incidence Angle [degrees] ([-360,+360])
 AziAg                   ! 10: Collector Azimuth Angle [degrees] ([-360,+360])
-$AISZ                   ! 11: Solar Zenith Angle [degrees] ([0,90])
-$AISA                   ! 12: Solar Azimuth Angle [degrees] ([0,90])
-$vWind                  ! 13: Wind Velocity [m/s] ([0.,+Inf])
+AISZ                    ! 11: Solar Zenith Angle [degrees] ([0,90])
+AISA                    ! 12: Solar Azimuth Angle [degrees] ([0,90])
+vWind                   ! 13: Wind Velocity [m/s] ([0.,+Inf])
 EmSky                   ! 14: Emissivity of the Sky [-] ([0.,1.])
 EmGnd                   ! 15: Emissivity of the Ground [-] ([0.,1.])
 Mode_ctrl_act           ! 16: Collector Outlet Temperature Control [-] ([0,4])
@@ -135,7 +151,7 @@ Mode_ctrl_act           ! 16: Collector Outlet Temperature Control [-] ([0,4])
                               ! 2 = modulate Mfr keep outlet as close to the setpoint as possible if the collector is gaining energy but turn off the collector if the collector is losing energy
                               ! 3 = modulate Mfr keep outlet as close to the setpoint as possible if the collector is either gaining or losing energy
                               ! 4 = modulate Mfr keep outlet as close to the setpoint as possible if the collector is gaining energy but turn off the collector if the collector is losing energy and set to the minimum flow rate if the outlet temperature is less than desired
-$TSetColl             ! 17: Outlet Temperature Setpoint [C] ([-Inf,+Inf])
+TSetColl              ! 17: Outlet Temperature Setpoint [C] ([-Inf,+Inf])
 MfrMin                ! 18: Minimum Array Flow Rate [kg/hr] ([0.,+Inf])
 MfrMax                ! 19: Maximum Array Flow Rate [kg/hr] ([0.,+Inf])
 
@@ -173,9 +189,9 @@ CONSTANTS 1
 NightConvOn = 1    ! 1: losses driven by Tm-Tamb (c1, c2, c3) included. 0: longwave term only (overwritten by "deck CollNightConvOn" in the config)
 
 EQUATIONS #
-TAmb_K = $Tamb+273.15
-TSky_K = $Tsky+273.15
-FSky = (1.+COS($slopeSurfUser_1))/2
+TAmb_K = tAmb+273.15
+TSky_K = tSky+273.15
+FSky = (1.+COS(C_tilt))/2
 FGnd = 1.-FSky
 
 EIncident_Longwave = FSky*EmSkyNight*Sigma*TSky_K**4 + FGnd*EmGnd*Sigma*TAmb_K**4
@@ -188,8 +204,8 @@ E_Longwave_kW = E_Longwave_W_m2 * ACollAp/1000
 **   ACollAp*c2*dTm**2 + BNight*dTm - CNight = 0, solved in the numerically stable form (also valid for c2 = 0).
 
 EQUATIONS #
-dTInAmbNight   = TIn - $Tamb
-aLinNight      = NightConvOn*(c1 + c3*$vWind)           ! [kJ/hr.m^2.K]
+dTInAmbNight   = TIn - tAmb
+aLinNight      = NightConvOn*(c1 + c3*vWind)           ! [kJ/hr.m^2.K]
 c2Night        = NightConvOn*c2                         ! [kJ/hr.m^2.K^2]
 ELw_kJhm2      = E_Longwave_W_m2*3.6                    ! [kJ/hr.m^2]
 mCpNight       = MfrIn*Cp                               ! [kJ/hr.K]
@@ -197,7 +213,7 @@ BNight         = 2*mCpNight + ACollAp*aLinNight
 CNight         = 2*mCpNight*dTInAmbNight + ACollAp*ELw_kJhm2
 DNight         = MAX(BNight**2 + 4*ACollAp*c2Night*CNight, 0)
 dTmAmbNight    = GT(BNight,0)*2*CNight/(BNight + DNight**0.5 + 1e-30)   ! BNight = 0 only without flow and without c1-c3 losses: Tm undefined, set to Tamb
-TmNight        = $Tamb + dTmAmbNight
+TmNight        = tAmb + dTmAmbNight
 PNightConv_kW  = -ACollAp*(aLinNight*dTmAmbNight + c2Night*dTmAmbNight**2)/3600   ! losses driven by Tm-Tamb (c1, c2, c3: radiation + conduction + convection)
 PNight_kW      = PNightConv_kW + E_Longwave_kW                                ! total night cooling power
 

@@ -50,7 +50,7 @@ HourOfDay       = [10,11]
 ** Control logic
 ***********************************
 EQUATIONS #
-NightCooling = NightCoolingOn * GT(TNightCool, TNightCoolMax) * GE(MonthOfCalendar, 6) * LE(MonthOfCalendar, 9) * LE($IT_H, 0)
+NightCooling = NightCoolingOn * GT(TNightCool, TNightCoolMax) * GE(MonthOfCalendar, 6) * LE(MonthOfCalendar, 9) * LE($weatherIT_H, 0)
 
 ***********************************
 ** Hourly printer
@@ -68,9 +68,9 @@ unitPrintNightCooling		! 1: Logical unit number, -
 1						! 4: Printing & integrating interval, h. -1 for monthly integration
 0						! 5: Number of inputs to avoid integration, -
 INPUTS #
-TNightCool TNightCoolMax MonthOfCalendar NightCooling $IT_H
+TNightCool TNightCoolMax MonthOfCalendar NightCooling $weatherIT_H
 **
-TNightCool TNightCoolMax MonthOfCalendar NightCooling $IT_H
+TNightCool TNightCoolMax MonthOfCalendar NightCooling $weatherIT_H
 
 ***************************************************
 **BEGIN NightCooling.ddck

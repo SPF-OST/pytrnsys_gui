@@ -1,0 +1,163 @@
+*******************************
+** BEGIN Type5b.ddck
+*******************************
+
+************************************************************************************************************************
+** Description: 
+** Heat Exchanger: Counter Flow
+************************************************************************************************************************
+
+************************************************************************************************************************
+** Details: 
+** A zero capacitance sensible heat exchanger is modeled in various configurations. In this instance, a counter flow
+** heat exchanger is modeled. Given the hot and cold side inlet temperatures and flow rates, the effectiveness is
+** calculated for a given fixed value of the overall heat transfer coefficient.
+************************************************************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+EQUATIONS #
+CpSide1 = @cp(Side1In)
+TSide1In = @temp(Side1In)
+MSide1 = @mfr(Side1In)
+
+CpSide2 = @cp(Side2In)
+TSide2In = @temp(Side2In)
+MSide2 = @mfr(Side2In)
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+EQUATIONS #
+@temp(Side1Out) = TSide1Out
+@temp(Side2Out) = TSide2Out
+
+***********************************
+** outputs to other ddck
+***********************************
+
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+******************************************************************************************
+
+
+***********************************
+** Dependencies with other ddck
+***********************************
+
+
+***********************************
+** Begin CONSTANTS
+***********************************
+EQUATIONS #
+Mode = 2.0
+QNom = 1000 ! [kW]
+LMTDNom = 5 ! [K]
+UA_kW_K = QNom / LMTDNom ! [kW/K]
+UA = UA_kW_K*3600 ! [kJ/hr.K]
+
+***********************************
+** Begin TYPE
+***********************************
+UNIT 1 TYPE 5
+PARAMETERS 4
+Mode    ! 1: 1 Parallel flow, 2 Counter flow mode, 3 Cold side mixed, 4 Hot side mixed, 5 Both unmixed, 6 Both mixed  [-] ([2,2]).
+CpSide1 ! 2: Specific heat of source side fluid [kJ/kg.K] ([0,+Inf])
+CpSide2 ! 3: Specific heat of load side fluid [kJ/kg.K] ([0,+Inf])
+UA      ! 4: Not used [-] ([0,+Inf])
+
+INPUTS 5
+TSide1In ! 1: Source side inlet temperature [C] ([-Inf,+Inf])
+MSide1 ! 2: Source side flow rate [kg/hr] ([0,+Inf])
+TSide2In ! 3: Load side inlet temperature [C] ([-Inf,+Inf])
+MSide2 ! 4: Load side flow rate [kg/hr] ([0,+Inf])
+UA ! 5: Overall heat transfer coefficient of exchanger [kJ/hr.K] ([0,+Inf])
+
+** initial values
+20.0 ! 1: Source side inlet temperature  initial value
+100.0 ! 2: Source side flow rate  initial value
+20.0 ! 3: Load side inlet temperature  initial value
+100.0 ! 4: Load side flow rate  initial value
+10.0 ! 5: Overall heat transfer coefficient of exchanger  initial value
+
+EQUATIONS # ! 6
+TSide1Out   = [1, 1] ! Source side outlet temperature [C] ([-Inf,+Inf])
+MSide1Out   = [1, 2] ! Source side flow rate [kg/hr] ([-Inf,+Inf])
+TSide2Out   = [1, 3] ! Load side outlet temperature [C] ([-Inf,+Inf])
+MSide2Out   = [1, 4] ! Load side flow rate [kg/hr] ([-Inf,+Inf])
+Q           = [1, 5] ! Heat transfer rate [kJ/hr] ([-Inf,+Inf])
+HxQ_kW        = Q/3600 ! Heat transfer rate [kW] ([-Inf,+Inf])
+HxEff         = [1, 6] ! Effectiveness [-] ([-Inf,+Inf])
+
+***********************************
+** Calculations
+***********************************
+EQUATIONS #
+checkM = NEWARN(AND(GE(MSide1,0),GE(MSide2,0)), 1, 2)
+on = GT(MSide1,0)*GT(MSide2,0)*GT(TSide1In,TSide2Out)*GT(TSide1Out,TSide2In)
+
+ignoreValue = 999999
+
+TDeltaA = on*(TSide1In-TSide2Out) + NOT(on)*ignoreValue
+TDeltaB = on*(TSide1Out-TSide2In) + NOT(on)*ignoreValue
+EqTDelta = LT(ABS(TDeltaA-TDeltaB), 1e-3)
+
+LogTDeltaDelta = NOT(EqTDelta)*(LOG(TDeltaA) - LOG(TDeltaB)) + EqTDelta*ignoreValue
+
+HxLMTD = on*(TDeltaA-TDeltaB)/LogTDeltaDelta
+
+QSide1_kW = MSide1 * CpSide1 * (TSide1Out-TSide1In)/3600
+QSide2_kW = MSide2 * CpSide2 * (TSide2Out-TSide2In)/3600
+
+***********************************
+** Monthly printer
+***********************************
+CONSTANTS 1
+unitMo= 35
+
+ASSIGN temp\HX_MO.prt unitMo
+UNIT 39 TYPE 46		! Printegrator Monthly Values for System
+PARAMETERS #
+unitMo              ! 1: Logical unit number, -
+-1            		! 2: Logical unit for monthly summaries, -
+1             		! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1             		! 4: Printing & integrating interval, h. -1 for monthly integration
+2            		! 5: Number of inputs to avoid integration, -
+4            		! 6: Output number to avoid integration
+5            		! 7: Output number to avoid integration
+INPUTS #
+HxQ_kW QSide1_kW QSide2_kW HxEff HxLMTD
+HxQ_kW QSide1_kW QSide2_kW HxEff HxLMTD
+
+***********************************
+** Hourly printer
+***********************************
+CONSTANTS 1
+unitHo= 33
+
+ASSIGN temp\HX_HR.prt unitHo
+UNIT 34 TYPE 46		! Printegrator Monthly Values for System
+PARAMETERS #
+unitHo              ! 1: Logical unit number, -
+-1            		! 2: Logical unit for monthly summaries, -
+1             		! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1             		! 4: Printing & integrating interval, h. -1 for monthly integration
+7            		! 5: Number of inputs to avoid integration, -
+5            		! 6: Output number to avoid integration
+6            		! 7: Output number to avoid integration
+7            		! 8: Output number to avoid integration
+8            		! 9: Output number to avoid integration
+9            		! 10 Output number to avoid integration
+10            		! 11: Output number to avoid integration
+11            		! 12: Output number to avoid integration
+INPUTS #
+HxQ_kW QSide1_kW QSide2_kW HxEff HxLMTD TSide1In TSide1Out MSide1 TSide2In TSide2Out MSide2
+HxQ_kW QSide1_kW QSide2_kW HxEff HxLMTD TSide1In TSide1Out MSide1 TSide2In TSide2Out MSide2
+
+
+***********************************
+** Online Plotter
+***********************************
+

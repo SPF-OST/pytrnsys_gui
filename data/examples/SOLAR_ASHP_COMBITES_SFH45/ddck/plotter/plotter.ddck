@@ -48,11 +48,11 @@ Custom
 !0					! 11: Output file units
 !0					! 12: Output file delimiter
 !INPUTS 14
-!weather_IT_H weather_IT_N weather_IT_W weather_IT_E weather_IT_S weather_IT_surfUser_1 weather_IT_surfUser_3
-!weather_IB_H weather_IB_N weather_IB_W weather_IB_E weather_IB_S weather_IB_surfUser_1 weather_IB_surfUser_3
+!weatherIT_H weatherIT_N weatherIT_W weatherIT_E weatherIT_S weatherIT_surfUser_1 weatherIT_surfUser_3
+!weatherIB_H weatherIB_N weatherIB_W weatherIB_E weatherIB_S weatherIB_surfUser_1 weatherIB_surfUser_3
 !*******
-!weather_IT_H weather_IT_N weather_IT_W weather_IT_E weather_IT_S weather_IT_surfUser_1 weather_IT_surfUser_3
-!weather_IB_H weather_IB_N weather_IB_W weather_IB_E weather_IB_S weather_IB_surfUser_1 weather_IB_surfUser_3
+!weatherIT_H weatherIT_N weatherIT_W weatherIT_E weatherIT_S weatherIT_surfUser_1 weatherIT_surfUser_3
+!weatherIB_H weatherIB_N weatherIB_W weatherIB_E weatherIB_S weatherIB_surfUser_1 weatherIB_surfUser_3
 !****
 !LABELS  3
 !Power

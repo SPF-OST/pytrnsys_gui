@@ -25,10 +25,10 @@
 ** Dependencies with other ddck
 ***********************************
 EQUATIONS #
-$IB = $IB_surfUser_1/SIN($AI_surfUser_1+1e-6)
-Slope = $slopeSurfUser_1
-Azi = $aziSurfUser_1
-SlopeField = $slopeSurfUser_2
+$IB = $weatherIB_surfUser_1/SIN($weatherAI_surfUser_1+1e-6)
+Slope = $weatherslopeSurfUser_1
+Azi = $weatheraziSurfUser_1
+SlopeField = $weatherslopeSurfUser_2
 
 ***********************************
 ** Begin CONSTANTS
@@ -56,12 +56,12 @@ SlopeField       ! 8: Slope of collector field [degrees] ([-90,+90])
 INPUTS #
 $ITMasked_surfUser_1  ! 1: Tilted surface radiation [kJ/hr.m^2] ([0.0,+Inf])
 $IBMasked_surfUser_1  ! 2: Incident beam radiation [kJ/hr.m^2] ([0.0,+Inf])
-$AISZ           ! 3: Solar zenith angle [degrees] ([0.0,90.0])
-$AISA           ! 4: Solar azimuth angle [degrees] ([-360,+360])
+$weatherAISZ           ! 3: Solar zenith angle [degrees] ([0.0,90.0])
+$weatherAISA           ! 4: Solar azimuth angle [degrees] ([-360,+360])
 $ITMasked_H           ! 5: Total horizontal radiation [kJ/hr.m^2] ([0.0,+Inf])
 $IDMasked_H           ! 6: Horizontal diffuse radiation [kJ/hr.m^2] ([0.0,+Inf])
-$IB_surfUser_2  ! 7: Beam radiation on field [kJ/hr.m^2] ([0.0,+Inf])
-$groundRef      ! 8: Ground reflectance [-] ([0.0,1.0])
+$weatherIB_surfUser_2  ! 7: Beam radiation on field [kJ/hr.m^2] ([0.0,+Inf])
+$weathergroundRef      ! 8: Ground reflectance [-] ([0.0,1.0])
 
 ** initial values
 0.0 ! 1: Tilted surface radiation  initial value
@@ -98,26 +98,26 @@ unitPrinterShadesMo ! 1: Logical unit number, -
 0   ! 5: Number of inputs to avoid integration
 INPUTS #
 $ITShaded_surfUser_1
-$IT_surfUser_1
+$weatherIT_surfUser_1
 $IBShaded_surfUser_1
-$IB_surfUser_1
+$weatherIB_surfUser_1
 $IDShaded_surfUser_1
-$ID_surfUser_1
+$weatherID_surfUser_1
 $IDSShaded_surfUser_1
-$IDS_surfUser_1
+$weatherIDS_surfUser_1
 $IDGShaded_surfUser_1
-$IDG_surfUser_1
+$weatherIDG_surfUser_1
 ***
 $ITShaded_surfUser_1
-$IT_surfUser_1
+$weatherIT_surfUser_1
 $IBShaded_surfUser_1
-$IB_surfUser_1
+$weatherIB_surfUser_1
 $IDShaded_surfUser_1
-$ID_surfUser_1
+$weatherID_surfUser_1
 $IDSShaded_surfUser_1
-$IDS_surfUser_1
+$weatherIDS_surfUser_1
 $IDGShaded_surfUser_1
-$IDG_surfUser_1
+$weatherIDG_surfUser_1
 
 ***********************************
 ** Hourly printer
@@ -134,26 +134,26 @@ unitPrinterShadesHo ! 1: Logical unit number, -
 0   ! 5: Number of inputs to avoid integration
 INPUTS #
 $ITShaded_surfUser_1
-$IT_surfUser_1
+$weatherIT_surfUser_1
 $IBShaded_surfUser_1
-$IB_surfUser_1
+$weatherIB_surfUser_1
 $IDShaded_surfUser_1
-$ID_surfUser_1
+$weatherID_surfUser_1
 $IDSShaded_surfUser_1
-$IDS_surfUser_1
+$weatherIDS_surfUser_1
 $IDGShaded_surfUser_1
-$IDG_surfUser_1
+$weatherIDG_surfUser_1
 ***
 $ITShaded_surfUser_1
-$IT_surfUser_1
+$weatherIT_surfUser_1
 $IBShaded_surfUser_1
-$IB_surfUser_1
+$weatherIB_surfUser_1
 $IDShaded_surfUser_1
-$ID_surfUser_1
+$weatherID_surfUser_1
 $IDSShaded_surfUser_1
-$IDS_surfUser_1
+$weatherIDS_surfUser_1
 $IDGShaded_surfUser_1
-$IDG_surfUser_1
+$weatherIDG_surfUser_1
 
 ***********************************
 ** Online Plotter

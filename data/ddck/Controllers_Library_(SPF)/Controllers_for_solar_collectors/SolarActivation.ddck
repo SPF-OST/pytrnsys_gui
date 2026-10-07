@@ -24,7 +24,7 @@ EQUATIONS #
 THigh = $CollTOut
 TLow = $T1_Tes1 !MAX($TNetReturn, $TTesBottom)
 TMon = $CollTOut
-Ghi = $IT_H
+Ghi = $weatherIT_H
 
 
 ***********************************

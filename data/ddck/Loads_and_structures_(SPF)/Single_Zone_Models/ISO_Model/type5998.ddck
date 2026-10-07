@@ -31,12 +31,12 @@
 ***********************************
 
 EQUATIONS #
-buiIT_N   = $weather_IT_N
-buiIT_W   = $weather_IT_W
-buiIT_E   = $weather_IT_E
-buiIT_S   = $weather_IT_S
-buivWind  = $weather_vWind
-buiTamb   = $weather_Tamb
+buiIT_N   = $weatherIT_N
+buiIT_W   = $weatherIT_W
+buiIT_E   = $weatherIT_E
+buiIT_S   = $weatherIT_S
+buivWind  = $weathervWind
+buiTamb   = $weatherTamb
 buiTamb24 = $type888_tAmb24 !average temperature over a period (It can the average over 24, 48 or 96 h that define the heating season on/off)
 time      = $Time
 TroomSetCool = $bui_TroomSetCool !defined in e.g. mfb30, mfb90, sfh45 both for ISO and type56 models

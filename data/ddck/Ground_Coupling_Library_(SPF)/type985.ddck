@@ -29,11 +29,11 @@
 ***********************************
 
 EQUATIONS #
-TambAvg    = $city_TambAvg      ! Average ambient temperature over the year (C)
-tTambShift = $city_tTambShift   ! time shift for coldest average temp. according to sine-curve fit (h)
-dTambAmpl  = $city_dTambAmpl    ! amplitude of sine-curve that fits ambient temp. over the year (K)
-TambD      = $city_TambD
-Tamb       = $weather_Tamb
+TambAvg    = $weatherTambAvg      ! Average ambient temperature over the year (C)
+tTambShift = $weathertTambShift   ! time shift for coldest average temp. according to sine-curve fit (h)
+dTambAmpl  = $weatherdTambAmpl    ! amplitude of sine-curve that fits ambient temp. over the year (K)
+TambD      = $weatherTambD
+Tamb       = $weatherTamb
 TBuiFlNom  = $bui_TBuiFlNom
 TBuiRtNom  = $bui_TBuiFlNom
 UGrFloor   = $bui_UGrFloor

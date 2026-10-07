@@ -55,12 +55,12 @@ NOpen ! 2: Number of openings in file [-] ([1,40])
 NAng ! 3: Number of surface angles [-] ([1,80])
 
 INPUTS 6
-$AISA ! 1: Solar azimuth angle [degrees] ([-Inf,+Inf])
-$AISZ ! 2: Solar zenith angle [degrees] ([-Inf,+Inf])
-$IT_H ! 3: Total radiation on horizontal [kJ/hr.m^2] ([0,+Inf])
-$ID_H ! 4: Diffuse radiation on horizontal [kJ/hr.m^2] ([0,+Inf])
-$IB_surfUser_1 ! 5: Beam radiation for opening [kJ/hr.m^2] ([0,+Inf])
-$ID_surfUser_1 ! 6: Diffuse radiation for opening [kJ/hr.m^2] ([0,+Inf])
+$weatherAISA ! 1: Solar azimuth angle [degrees] ([-Inf,+Inf])
+$weatherAISZ ! 2: Solar zenith angle [degrees] ([-Inf,+Inf])
+$weatherIT_H ! 3: Total radiation on horizontal [kJ/hr.m^2] ([0,+Inf])
+$weatherID_H ! 4: Diffuse radiation on horizontal [kJ/hr.m^2] ([0,+Inf])
+$weatherIB_surfUser_1 ! 5: Beam radiation for opening [kJ/hr.m^2] ([0,+Inf])
+$weatherID_surfUser_1 ! 6: Diffuse radiation for opening [kJ/hr.m^2] ([0,+Inf])
 
 ** initial values
 -90.0 ! 1: Solar azimuth angle  initial value
@@ -110,9 +110,9 @@ $IBMasked_H
 FracIDMasked_H
 $IDMasked_H
 $ITMasked_H
-$IB_surfUser_1
-$IT_surfUser_1
-$ID_surfUser_1
+$weatherIB_surfUser_1
+$weatherIT_surfUser_1
+$weatherID_surfUser_1
 ***
 AngSun
 FracIBMasked1
@@ -125,9 +125,9 @@ $IBMasked_H
 FracIDMasked_H
 $IDMasked_H
 $ITMasked_H
-$IB_surfUser_1
-$IT_surfUser_1
-$ID_surfUser_1
+$weatherIB_surfUser_1
+$weatherIT_surfUser_1
+$weatherID_surfUser_1
 
 
 ***********************************
@@ -155,9 +155,9 @@ $IBMasked_H
 FracIDMasked_H
 $IDMasked_H
 $ITMasked_H
-$IB_surfUser_1
-$IT_surfUser_1
-$ID_surfUser_1
+$weatherIB_surfUser_1
+$weatherIT_surfUser_1
+$weatherID_surfUser_1
 ***
 AngSun
 FracIBMasked1
@@ -170,9 +170,9 @@ $IBMasked_H
 FracIDMasked_H
 $IDMasked_H
 $ITMasked_H
-$IB_surfUser_1
-$IT_surfUser_1
-$ID_surfUser_1
+$weatherIB_surfUser_1
+$weatherIT_surfUser_1
+$weatherID_surfUser_1
 
 
 

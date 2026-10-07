@@ -1,0 +1,29 @@
+*******************************
+**BEGIN CHU_IDAweb_2023.ddck
+*******************************
+
+*****************************************
+** Weather data section. V1.2
+** Last Changes: Jeremias Schmidli
+** Ddck generated: 2021-09-28
+******************************************
+
+** Normal Building Simulation     
+** City Name = Chur, IDAweb (CHU)  
+
+CONSTANTS #
+Lat = 46.87     ! latitude, deg
+TambD = -10     ! ambient design temperature of heating system, deg C
+TambAvg = 11.72    ! average outdoor temperature, deg C
+dTambAmpl = 9.64   ! amplitude of outside temperature, K
+tTambShift = 521     ! Offset of outside air temperature minimum, h
+altid = 556     ! elevation, meters above sealevel
+formatWeatherData = 1 ! 1 = user format, 2 = Standard weather file in the TMY2 format
+unitWeatherData = 38
+
+ASSIGN PATH$\Weather\MeteoSwiss\SMA\CHU_IDAweb_2023.99 unitWeatherData
+
+
+*******************************
+**END CHU_IDAweb_2023.ddck
+*******************************

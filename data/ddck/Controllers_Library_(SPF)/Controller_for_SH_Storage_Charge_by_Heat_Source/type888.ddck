@@ -58,8 +58,8 @@ tDhwSet       = $dhw_TdhwSet
 EQUATIONS #
 !The followng are conneted automatically
 time          = $TIME
-TambD         = $city_TambD
-tAmb          = $weather_Tamb
+TambD         = $weatherTambD
+tAmb          = $weatherTamb
 ***********************************
 ** outputs to other ddck
 ***********************************

@@ -39,7 +39,7 @@ EQUATIONS #
 ** inputs from other ddck
 ***********************************
 CONSTANTS #
-TAvgCold       = $weather_TcwAvg		! Standard cold water temperature (�C)   TcwAvg  from weatherData
+TAvgCold       = $weatherTcwAvg		! Standard cold water temperature (�C)   TcwAvg  from weatherData
 unitReadDhw    = $dhw_unitReadDhw
 
 ***********************************
@@ -53,7 +53,7 @@ $dhw_TdhwSet   = TdhwSetProfile
 CONSTANTS #
 scaleDHW = 1
 dtDHWdata = 1/30.	! timestep of DHW data-file
-TAvgColdAbove0 = MAX($weather_TcwAvg,0.1)
+TAvgColdAbove0 = MAX($weatherTcwAvg,0.1)
 
 **
 UNIT 16 TYPE 9		! Data Reader Water DrawOff

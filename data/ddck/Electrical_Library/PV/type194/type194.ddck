@@ -39,8 +39,8 @@ EQUATIONS #
 
 CONSTANTS #
 
-slopePvRoof = $weather_slopeSurfUser_2
-PvRoof_azim = $weather_aziSurfUser_2
+slopePvRoof = $weatherslopeSurfUser_2
+PvRoof_azim = $weatheraziSurfUser_2
 
 MaxPInv = $inverter_MaxPInv
 MaxVInv = $inverter_MaxVInv
@@ -49,18 +49,18 @@ unitReadInvPv = $unitReadInverter
 
 EQUATIONS #
 
-ASolarZenith = $weather_AISZ !
-IT_PvRoof    = $weather_IT_surfUser_2  ! Incident total radiation on collector plane, kJ/hm2
-IB_PvRoof    = $weather_IB_surfUser_2  ! incident beam radiation on collector plane, kJ/hm2
-ID_PvRoof    = $weather_ID_surfUser_2  ! diffuse and ground reflected irradiance on collector tilt
-IDS_PvRoof   = $weather_IDS_surfUser_2
-IDG_PvRoof   = $weather_IDG_surfUser_2
-AI_PvRoof    = $weather_AI_surfUser_2  ! incident angle on collector plane,
-Tamb         = $weather_Tamb
-vWind        = $weather_vwind
-IT_H_kW      = $weather_IT_H_kW ! for printing
-IB_H_kW      = $weather_IB_H_kW ! for printing
-IT_PV_Wm2    = $weather_IT_surfUser_2/3.6
+ASolarZenith = $weatherAISZ !
+IT_PvRoof    = $weatherIT_surfUser_2  ! Incident total radiation on collector plane, kJ/hm2
+IB_PvRoof    = $weatherIB_surfUser_2  ! incident beam radiation on collector plane, kJ/hm2
+ID_PvRoof    = $weatherID_surfUser_2  ! diffuse and ground reflected irradiance on collector tilt
+IDS_PvRoof   = $weatherIDS_surfUser_2
+IDG_PvRoof   = $weatherIDG_surfUser_2
+AI_PvRoof    = $weatherAI_surfUser_2  ! incident angle on collector plane,
+Tamb         = $weatherTamb
+vWind        = $weathervwind
+IT_H_kW      = $weatherIT_H_kW ! for printing
+IB_H_kW      = $weatherIB_H_kW ! for printing
+IT_PV_Wm2    = $weatherIT_surfUser_2/3.6
 
 ***********************************
 ** outputs to other ddck

@@ -276,7 +276,7 @@ MPuCond_Val = MPuCond_Val_A
 
 ! WtSp
 EQUATIONS 1
-TWtSp = weather_TcwAvg
+TWtSp = weatherTcwAvg
 
 EQUATIONS 1
 TWtTp = TMixDhw_WtTp

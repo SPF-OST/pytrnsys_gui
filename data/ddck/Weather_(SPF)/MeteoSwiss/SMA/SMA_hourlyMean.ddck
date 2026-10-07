@@ -14,18 +14,18 @@
 ********************************************************************
 
 CONSTANTS #
-$city_Lat = 47.38     ! Latitude, °
-$city_TambD = -13.2     ! ambient design temperature of heating system, °C
-$city_TambAvg = 9.99    ! average outdoor temperature, °C
-$city_dTambAmpl = 9.3   ! amplitude of outside temperature, K
-$city_tTambShift = 488  ! Offset of outside air temperature minimum , h
-$city_ddTcwOffset = 40  ! time shift of minimum cold water temperature, d
-$city_altid = 556
-$city_formatWeatherData  = 1  ! 1 = user format, 2 = Standard weather file in the TMY2 format
-$city_unitWeatherData    = 38
+Lat = 47.38     ! Latitude, °
+TambD = -13.2     ! ambient design temperature of heating system, °C
+TambAvg = 9.99    ! average outdoor temperature, °C
+dTambAmpl = 9.3   ! amplitude of outside temperature, K
+tTambShift = 488  ! Offset of outside air temperature minimum , h
+ddTcwOffset = 40  ! time shift of minimum cold water temperature, d
+altid = 556
+formatWeatherData  = 1  ! 1 = user format, 2 = Standard weather file in the TMY2 format
+unitWeatherData    = 38
 
-!ASSIGN PATH$\Weather_(SPF)\MeteoSwiss\SMA\SMA_hourlyMean.99 $city_unitWeatherData !_(SPF) not accepted by pytrnsys
-ASSIGN PATH$\Weather\MeteoSwiss\SMA\SMA_hourlyMean.99 $city_unitWeatherData
+!ASSIGN PATH$\Weather_(SPF)\MeteoSwiss\SMA\SMA_hourlyMean.99 unitWeatherData !_(SPF) not accepted by pytrnsys
+ASSIGN PATH$\Weather\MeteoSwiss\SMA\SMA_hourlyMean.99 unitWeatherData
 
 *******************************
 **END City.ddck

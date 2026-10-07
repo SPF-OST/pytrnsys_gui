@@ -42,32 +42,32 @@ EQUATIONS 1
 ***********************************
 
 EQUATIONS #
-IT_H   = $weather_IT_H
-IT_N   = $weather_IT_N
-IT_W   = $weather_IT_W
-IT_E   = $weather_IT_E
-IT_S   = $weather_IT_S
-vWind  = $weather_vWind
-Tamb   = $weather_Tamb
+IT_H   = $weatherIT_H
+IT_N   = $weatherIT_N
+IT_W   = $weatherIT_W
+IT_E   = $weatherIT_E
+IT_S   = $weatherIT_S
+vWind  = $weathervWind
+Tamb   = $weatherTamb
 Tamb24 = $type888_tAmb24 !average temperature over a period (It can the average over 24, 48 or 96 h that define the heating season on/off)
-RHamb_100 = $weather_RHamb_100
-Tsky      = $weather_Tsky
-AISZ      = $weather_AISZ
-AISA      = $weather_AISA
-IT_surfUser_1 = $weather_IT_surfUser_1 !IT_S60
-IT_surfUser_3 = $weather_IT_surfUser_3 !IT_N20
-IB_N    = $weather_IB_N
-IB_S    = $weather_IB_S
-IB_E    = $weather_IB_E
-IB_W    = $weather_IB_W
-IB_surfUser_1 = $weather_IB_surfUser_1 !IB_S60
-IB_surfUser_3 = $weather_IB_surfUser_3 !IB_N20
-AI_N   = $weather_AI_N
-AI_S   = $weather_AI_S
-AI_E   = $weather_AI_E
-AI_W   = $weather_AI_W
-AI_surfUser_1 = $weather_AI_surfUser_1 !AI_S60
-AI_surfUser_3 = $weather_AI_surfUser_3 !AI_N20
+RHamb_100 = $weatherRHamb_100
+Tsky      = $weatherTsky
+AISZ      = $weatherAISZ
+AISA      = $weatherAISA
+IT_surfUser_1 = $weatherIT_surfUser_1 !IT_S60
+IT_surfUser_3 = $weatherIT_surfUser_3 !IT_N20
+IB_N    = $weatherIB_N
+IB_S    = $weatherIB_S
+IB_E    = $weatherIB_E
+IB_W    = $weatherIB_W
+IB_surfUser_1 = $weatherIB_surfUser_1 !IB_S60
+IB_surfUser_3 = $weatherIB_surfUser_3 !IB_N20
+AI_N   = $weatherAI_N
+AI_S   = $weatherAI_S
+AI_E   = $weatherAI_E
+AI_W   = $weatherAI_W
+AI_surfUser_1 = $weatherAI_surfUser_1 !AI_S60
+AI_surfUser_3 = $weatherAI_surfUser_3 !AI_N20
 
 
 Vbui    = $bui_Vbui

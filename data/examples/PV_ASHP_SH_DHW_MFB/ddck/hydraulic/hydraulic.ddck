@@ -275,7 +275,7 @@ TWtTp = TTeeCirc1_WtTp
 
 ! WtSp
 EQUATIONS 1
-TWtSp = weather_TcwAvg
+TWtSp = weatherTcwAvg
 
 UNIT 452 TYPE 2221
 PARAMETERS 2

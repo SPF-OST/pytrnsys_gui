@@ -17,7 +17,7 @@
 ** inputs from hydraulic solver
 ***********************************
 EQUATIONS 5
-TEvapIn   = $weather_TAmb
+TEvapIn   = $weatherTAmb
 MfrEvapIn = ABS(MfrHpEvapNom)     
 TCondIn   = @temp(In)
 MfrCondIn = ABS(@mfr(In))
@@ -47,7 +47,7 @@ EQUATIONS 4
 
 EQUATIONS 2
 HpIsOn  = $userControl_hpIsOn		! control signal for the heat pump. this is coming from the control file PvAshpDhwShMFh_controller.ddck
-RHamb_1 = $weather_RHamb_1
+RHamb_1 = $weatherRHamb_1
 
 ***********************************
 ** outputs to other ddck
