@@ -1,0 +1,78 @@
+***************************************************
+**BEGIN Stagnation.ddck
+**************************************************
+
+*****************************************
+** Contact person : Mikel Arenas
+** Creation date  : 18.12.2025
+** Last changes   :
+*****************************************
+
+***************************************************************************
+** This controller rules the stagnation of the solar thermal system:
+**      1. When the system is not in stagnation mode, the stagnation mode is activated
+**      when the temperatures reaches a set-point value.
+**      2. When the system is in stagnation mode, the mode is deactivated when the radiation
+**      is 0 W/m2.
+***************************************************************************
+
+***********************************
+** Inputs from other ddcks
+***********************************
+EQUATIONS #
+TStag = $CollTOut
+
+***********************************
+** Recall values
+***********************************
+UNIT 1 TYPE 150 ! Recall
+PARAMETERS #
+3
+1 0
+1 0
+1 0
+INPUTS #
+Stag StagDays TStag
+*
+0 0 0
+
+EQUATIONS #
+StagRec = [1,1]
+StagDaysRec = [1,2]
+TStagRec = [1,3]
+
+***********************************
+** Control logic
+***********************************
+
+** Stagnation temperature
+CONSTANTS #
+TStagMax = 160
+
+EQUATIONS #
+Stag = NOT(StagRec)*GT(TStagRec,TStagMax)*GT($IT_H, 0) + StagRec*GT($IT_H, 0)
+StagDays = GT(Stag,StagRec)*(StagDaysRec+1) + LE(Stag,StagRec)*StagDaysRec
+
+***********************************
+** Hourly printer
+***********************************
+CONSTANTS 1
+unitPrintStagnation = 33
+
+ASSIGN    temp\STAGNATION_HR.Prt    unitPrintStagnation
+
+UNIT 34 TYPE 46		! Printegrator Monthly Values for System
+PARAMETERS #
+unitPrintStagnation		! 1: Logical unit number, -
+-1						! 2: Logical unit for monthly summaries, -
+1						! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1						! 4: Printing & integrating interval, h. -1 for monthly integration
+0						! 5: Number of inputs to avoid integration, -
+INPUTS #
+TStag $IT_H Stag StagDays
+**
+TStag $IT_H Stag StagDays
+
+***************************************************
+**END Stagnation.ddck
+**************************************************

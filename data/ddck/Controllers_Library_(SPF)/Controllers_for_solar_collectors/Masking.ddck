@@ -1,0 +1,182 @@
+*******************************
+** BEGIN Type67.ddck
+*******************************
+
+************************************************************************************************************************
+** Description: 
+** Shading Mask
+************************************************************************************************************************
+
+************************************************************************************************************************
+** Details: 
+** Type67 reads a file containing the angular heights of obstructions that shade a series of openings. For each opening,
+** a numerical ID in ascending order is provided on the first line of the data file. The second line contains the slope
+** of each opening. The third line contains the azimuth of each opening. The fourth line contains a series of absolute
+** surface angles; angles for which obstruction heights will later be provided. The fifth and subsequent lines of the
+** data file each contain the angular height of an arbitrary obstruction as seen from the center of an aperture while
+** looking in the direction of one of the above provided surface azimuth angles. Type67 takes two inputs that give the
+** angle of the sun, two inputs that give total and diffuse radiation on the horizontal and then two inputs for each
+** opening that give the beam and diffuse radiation on each opening. The components returns ten outputs for each opening
+** in the file. The first output is the fraction of beam radiation that is visible from the opening. The second is the
+** shaded beam radiation on the opening. The third output is the fraction of diffuse radiation incident on the surface.
+** The fourth and fifth outputs give the shaded diffuse and shaded total radiation respectively (both on the plane of
+** the opening). Outputs six through ten (for each opening) give the same values in the plane of the horizontal.
+************************************************************************************************************************
+
+
+
+***********************************
+** outputs to other ddck
+***********************************
+
+
+***********************************
+** Dependencies with other ddck
+***********************************
+
+
+***********************************
+** Begin CONSTANTS
+***********************************
+EQUATIONS #
+NOpen = 1
+NAng = 16
+
+***********************************
+** Begin TYPE
+***********************************
+CONSTANTS #
+unitShadingData = 40
+ASSIGN C:\Daten\GIT\DigiSolar\Simulations\common_ddcks\Shading\Type67-ShadingMasks.dat unitShadingData
+UNIT 1 TYPE 67
+PARAMETERS 3
+unitShadingData ! 1: Logical unit for data file [-] ([10,+Inf])
+NOpen ! 2: Number of openings in file [-] ([1,40])
+NAng ! 3: Number of surface angles [-] ([1,80])
+
+INPUTS 6
+$AISA ! 1: Solar azimuth angle [degrees] ([-Inf,+Inf])
+$AISZ ! 2: Solar zenith angle [degrees] ([-Inf,+Inf])
+$IT_H ! 3: Total radiation on horizontal [kJ/hr.m^2] ([0,+Inf])
+$ID_H ! 4: Diffuse radiation on horizontal [kJ/hr.m^2] ([0,+Inf])
+$IB_surfUser_1 ! 5: Beam radiation for opening [kJ/hr.m^2] ([0,+Inf])
+$ID_surfUser_1 ! 6: Diffuse radiation for opening [kJ/hr.m^2] ([0,+Inf])
+
+** initial values
+-90.0 ! 1: Solar azimuth angle  initial value
+90.0 ! 2: Solar zenith angle  initial value
+0.0 ! 3: Total radiation on horizontal  initial value
+0.0 ! 4: Diffuse radiation on horizontal  initial value
+0.0 ! 5: Beam radiation for opening  initial value
+0.0 ! 6: Diffuse radiation for opening  initial value
+
+EQUATIONS #
+AngSun =                    [1, 1] ! Solar altitude angle [degrees] ([-Inf,+Inf])
+FracIBMasked_surfUser_1 =   [1, 2] ! Fraction of beam visible for surf. [-] ([-Inf,+Inf])
+$IBMasked_surfUser_1 =      [1, 3] ! Shaded beam rad. for surf. [kJ/hr.m^2] ([-Inf,+Inf])
+FracIDMasked_surfUser_1 =   [1, 4] ! Fraction of diffuse visible for surf. [-] ([-Inf,+Inf])
+$IDMasked_surfUser_1 =      [1, 5] ! Shaded diffuse rad. on surf.  [kJ/hr.m^2] ([-Inf,+Inf])
+$ITMasked_surfUser_1  =     [1, 6] ! Shaded total rad. for surf. [kJ/hr.m^2] ([-Inf,+Inf])
+FracIBMasked_H =            [1, 7] ! Fraction of beam visible on horiz. for mask [-] ([-Inf,+Inf])
+$IBMasked_H =               [1, 8] ! Shaded beam rad. on horiz. for mask [kJ/hr.m^2] ([-Inf,+Inf])
+FracIDMasked_H =            [1, 9] ! Fraction of diffuse visible on horiz. for mask [-] ([-Inf,+Inf])
+$IDMasked_H =               [1, 10] ! Shaded diffuse rad. on horiz. for mask [kJ/hr.m^2] ([-Inf,+Inf])
+$ITMasked_H =               [1, 11] ! Shaded total rad. on horiz. for mask [kJ/hr.m^2] ([-Inf,+Inf])
+
+
+
+***********************************
+** Monthly printer
+***********************************
+CONSTANTS 1
+unitPrinterMaskingMo = 53
+ASSIGN temp\MASKING_MO.Prt unitPrinterMaskingMo
+UNIT 52 TYPE 46
+PARAMETERS 5
+unitPrinterMaskingMo ! 1: Logical unit number, -
+-1  ! 2: Logical unit for monthly summaries
+1   ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1  ! 4: Printing & integrating interval, h. -1 for monthly integration
+0   ! 5: Number of inputs to avoid integration
+INPUTS #
+AngSun
+FracIBMasked_surfUser_1
+$IBMasked_surfUser_1
+FracIDMasked_surfUser_1
+$IDMasked_surfUser_1
+$ITMasked_surfUser_1
+FracIBMasked_H
+$IBMasked_H
+FracIDMasked_H
+$IDMasked_H
+$ITMasked_H
+$IB_surfUser_1
+$IT_surfUser_1
+$ID_surfUser_1
+***
+AngSun
+FracIBMasked1
+$IBMasked_surfUser_1
+FracIDMasked1
+$IDMasked_surfUser_1
+$ITMasked_surfUser_1
+FracIBMasked_H
+$IBMasked_H
+FracIDMasked_H
+$IDMasked_H
+$ITMasked_H
+$IB_surfUser_1
+$IT_surfUser_1
+$ID_surfUser_1
+
+
+***********************************
+** Hourly printer
+***********************************
+CONSTANTS 1
+unitPrinterMaskingHo = 54
+ASSIGN temp\MASKING_HO.Prt unitPrinterMaskingHo
+UNIT 53 TYPE 46
+PARAMETERS 5
+unitPrinterMaskingHo ! 1: Logical unit number, -
+-1  ! 2: Logical unit for monthly summaries
+1   ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1  ! 4: Printing & integrating interval, h. -1 for monthly integration
+0   ! 5: Number of inputs to avoid integration
+INPUTS #
+AngSun
+FracIBMasked_surfUser_1
+$IBMasked_surfUser_1
+FracIDMasked_surfUser_1
+$IDMasked_surfUser_1
+$ITMasked_surfUser_1
+FracIBMasked_H
+$IBMasked_H
+FracIDMasked_H
+$IDMasked_H
+$ITMasked_H
+$IB_surfUser_1
+$IT_surfUser_1
+$ID_surfUser_1
+***
+AngSun
+FracIBMasked1
+$IBMasked_surfUser_1
+FracIDMasked1
+$IDMasked_surfUser_1
+$ITMasked_surfUser_1
+FracIBMasked_H
+$IBMasked_H
+FracIDMasked_H
+$IDMasked_H
+$ITMasked_H
+$IB_surfUser_1
+$IT_surfUser_1
+$ID_surfUser_1
+
+
+
+***********************************
+** Online Plotter
+***********************************
+

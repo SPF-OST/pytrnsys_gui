@@ -1,0 +1,122 @@
+***************************************************
+**Solar controller
+**************************************************
+
+*****************************************
+** Contact person : Mikel Arenas
+** Creation date  : 18.12.2025
+** Last changes   :
+*****************************************
+
+***************************************************************************
+** This controller rules the activation of the primary and secondary loop pump
+** of the solar collectors:
+**      Primary loop: minimum radiation and collector outlet not too high.
+**      Secondary loop: primary loop and temperature difference.
+***************************************************************************
+
+
+***********************************
+** Inputs from other ddcks
+***********************************
+
+EQUATIONS #
+THigh = $CollTOut
+TLow = $T1_Tes1 !MAX($TNetReturn, $TTesBottom)
+TMon = $CollTOut
+Ghi = $IT_H
+
+
+***********************************
+** Outputs to other ddcks
+***********************************
+
+EQUATIONS #
+PuPriOn = GT(PuPriRad*PuPriTHigh*NOT(Stag) + NightCooling, 0)  ! Activation of primary loop pump: minimum radiation and collector outlet not too high
+PuSecOn = GT(PuPriOn*PuColSecTemp + NightCooling, 0)  ! Activation of secondary loop pump: primary loop pump and temperature difference
+
+
+***********************************
+** Primary loop pump
+***********************************
+
+EQUATIONS #
+TCollMax = 150 !Outlet temperature in which the collector stops
+TCollMin = 130 !Temperature in which the collector starts again
+GhiMin = 100
+PuPriRad = GT(Ghi, GhiMin)             ! Minimum radiation
+
+UNIT 60 TYPE 2
+PARAMETERS 2
+5               ! 1 No. of oscillations
+999         ! 2 High limit cut-out
+INPUTS 6
+THigh           ! 1 Upper input temperature Th
+$zero               ! 2 Lower input temperature Tl
+TMon            ! 3 Monitoring temperature Tin
+NotPuPriTHigh    ! 4 70,1 Input control function
+!puColOnPri      ! 4 70,1 Input control function
+TCollMax         ! 5 Upper dead band dT
+TCollMin         ! 6 Lower dead band dT
+0.0 20.0 0.0 0 TCollMax TCollMin
+
+EQUATIONS #
+NotPuPriTHigh = [60,1]
+PuPriTHigh = NOT([60,1]) ! Temperature difference
+
+
+***********************************
+** Secondary loop pump
+***********************************
+
+** Temperature difference
+CONSTANTS #
+DtOn = 15       ! Upper dead band collector pump ON
+DtOff = -10     ! Upper dead band collector pump OFF
+TMonMax = 999   ! Maximum monitored temperature
+
+UNIT 55 TYPE 2
+PARAMETERS 2
+5               ! 1 No. of oscillations
+TMonMax         ! 2 High limit cut-out
+INPUTS 6
+THigh           ! 1 Upper input temperature Th
+TLow            ! 2 Lower input temperature Tl
+TMon            ! 3 Monitoring temperature Tin
+PuColSecTemp    ! 4 70,1 Input control function
+!puColOnPri      ! 4 70,1 Input control function
+DtOn            ! 5 Upper dead band dT
+DtOff           ! 6 Lower dead band dT
+0.0 20.0 0.0 0 DtOn DtOff
+
+EQUATIONS #
+PuColSecTemp = [55,1] ! Temperature difference
+
+
+*************************************
+********** Online Plotter ***********
+*************************************
+
+UNIT 501 TYPE 65     ! Online Plotter HX
+PARAMETERS 12
+#                   ! 1 Nb. of left-axis variables
+#                   ! 2 Nb. of right-axis variables
+0                   ! 3 Left axis minimum
+200                 ! 4 Left axis maximum -
+0                   ! 5 Right axis minimum
+2                   ! 6 Right axis maximum
+$nPlotsPerSim       ! 7 Number of plots per simulation
+12                  ! 8 X-axis gridpoints
+1                   ! 9 Shut off Online w/o removing
+-1                  ! 10 Logical unit for output file
+0                   ! 11 Output file units
+0                   ! 12 Output file delimiter
+INPUTS #
+THigh TLow TMon TMonMax GhiMin | PuPriOn PuSecOn
+THigh TLow TMon TMonMax GhiMin | PuPriOn PuSecOn
+LABELS  3
+Temperatures
+MassFlows
+Solar_control
+
+

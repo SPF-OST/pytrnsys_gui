@@ -1,0 +1,161 @@
+*******************************
+** BEGIN Type30a.ddck
+*******************************
+
+************************************************************************************************************************
+** Description: 
+** Collector Array Shading: Flat-Plate Mode
+************************************************************************************************************************
+
+************************************************************************************************************************
+** Details: 
+** This component determines incident radiation upon an array of collectors that shade one another. There are two
+** possible modes to Type30. This instance (MODE 1) considers fixed, flat plate collectors in a sloped field Incident
+** shaded total, beam, and diffuse radiation are output.
+************************************************************************************************************************
+
+
+***********************************
+** outputs to other ddck
+***********************************
+
+
+
+***********************************
+** Dependencies with other ddck
+***********************************
+EQUATIONS #
+$IB = $IB_surfUser_1/SIN($AI_surfUser_1+1e-6)
+Slope = $slopeSurfUser_1
+Azi = $aziSurfUser_1
+SlopeField = $slopeSurfUser_2
+
+***********************************
+** Begin CONSTANTS
+***********************************
+ModeShade = 1
+HShade = 3
+RowSep = 3 !HShade*(COS(Slope)+SIN(Slope)/TAN(90-ABS($Lat)-23.5)) ! No shadows in winter solstice at 12:00
+LRow = 10
+NRow = 10
+
+***********************************
+** Begin TYPE
+***********************************
+UNIT 1 TYPE 30
+PARAMETERS #
+ModeShade       ! 1: Mode [-] ([1]). For flat-plate collectors
+HShade          ! 2: Collector height (the true height of the collector) [m] ([0.0,+Inf])
+LRow            ! 3: Collector row length [m] ([0.0,+Inf])
+Slope           ! 4: Collector slope [degrees] ([-360,+360])
+RowSep          ! 5: Collector row separation (including one collector) [m] ([0.0,+Inf])
+NRow            ! 6: Number of rows [-] ([1,+Inf])
+Azi             ! 7: Collector array azimuth [degrees] ([-360,+360])
+SlopeField       ! 8: Slope of collector field [degrees] ([-90,+90])
+
+INPUTS #
+$ITMasked_surfUser_1  ! 1: Tilted surface radiation [kJ/hr.m^2] ([0.0,+Inf])
+$IBMasked_surfUser_1  ! 2: Incident beam radiation [kJ/hr.m^2] ([0.0,+Inf])
+$AISZ           ! 3: Solar zenith angle [degrees] ([0.0,90.0])
+$AISA           ! 4: Solar azimuth angle [degrees] ([-360,+360])
+$ITMasked_H           ! 5: Total horizontal radiation [kJ/hr.m^2] ([0.0,+Inf])
+$IDMasked_H           ! 6: Horizontal diffuse radiation [kJ/hr.m^2] ([0.0,+Inf])
+$IB_surfUser_2  ! 7: Beam radiation on field [kJ/hr.m^2] ([0.0,+Inf])
+$groundRef      ! 8: Ground reflectance [-] ([0.0,1.0])
+
+** initial values
+0.0 ! 1: Tilted surface radiation  initial value
+0.0 ! 2: Incident beam radiation  initial value
+45.0 ! 3: Solar zenith angle  initial value
+0.0 ! 4: Solar azimuth angle  initial value
+0.0 ! 5: Total horizontal radiation  initial value
+0.0 ! 6: Horizontal diffuse radiation  initial value
+0.0 ! 7: Beam radiation on field  initial value
+0.2 ! 8: Ground reflectance  initial value
+
+EQUATIONS #
+$ITShaded_surfUser_1 = [1, 1]   ! Total shaded radiation [kJ/hr.m^2] ([-Inf,+Inf])
+$IBShaded_surfUser_1 = [1, 2]   ! Shaded beam radiation [kJ/hr.m^2] ([-Inf,+Inf])
+$IDShaded_surfUser_1 = [1, 3]   ! Shaded diffuse radiation [kJ/hr.m^2] ([-Inf,+Inf])
+$IDSShaded_surfUser_1 = [1, 4]  ! Shaded diffuse radiation: sky portion [kJ/hr.m^2] ([-Inf,+Inf])
+$IDGShaded_surfUser_1 = MAX([1, 5], 0)  ! Shaded diffuse radiation: ground reflected portion [kJ/hr.m^2] ([-Inf,+Inf])
+
+
+
+
+***********************************
+** Monthly printer
+***********************************
+CONSTANTS 1
+unitPrinterShadesMo = 53
+ASSIGN temp\SHADES_MO.Prt unitPrinterShadesMo
+UNIT 52 TYPE 46
+PARAMETERS 5
+unitPrinterShadesMo ! 1: Logical unit number, -
+-1  ! 2: Logical unit for monthly summaries
+1   ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1  ! 4: Printing & integrating interval, h. -1 for monthly integration
+0   ! 5: Number of inputs to avoid integration
+INPUTS #
+$ITShaded_surfUser_1
+$IT_surfUser_1
+$IBShaded_surfUser_1
+$IB_surfUser_1
+$IDShaded_surfUser_1
+$ID_surfUser_1
+$IDSShaded_surfUser_1
+$IDS_surfUser_1
+$IDGShaded_surfUser_1
+$IDG_surfUser_1
+***
+$ITShaded_surfUser_1
+$IT_surfUser_1
+$IBShaded_surfUser_1
+$IB_surfUser_1
+$IDShaded_surfUser_1
+$ID_surfUser_1
+$IDSShaded_surfUser_1
+$IDS_surfUser_1
+$IDGShaded_surfUser_1
+$IDG_surfUser_1
+
+***********************************
+** Hourly printer
+***********************************
+CONSTANTS 1
+unitPrinterShadesHo = 54
+ASSIGN temp\SHADES_HO.Prt unitPrinterShadesHo
+UNIT 53 TYPE 46
+PARAMETERS 5
+unitPrinterShadesHo ! 1: Logical unit number, -
+-1  ! 2: Logical unit for monthly summaries
+1   ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1  ! 4: Printing & integrating interval, h. -1 for monthly integration
+0   ! 5: Number of inputs to avoid integration
+INPUTS #
+$ITShaded_surfUser_1
+$IT_surfUser_1
+$IBShaded_surfUser_1
+$IB_surfUser_1
+$IDShaded_surfUser_1
+$ID_surfUser_1
+$IDSShaded_surfUser_1
+$IDS_surfUser_1
+$IDGShaded_surfUser_1
+$IDG_surfUser_1
+***
+$ITShaded_surfUser_1
+$IT_surfUser_1
+$IBShaded_surfUser_1
+$IB_surfUser_1
+$IDShaded_surfUser_1
+$ID_surfUser_1
+$IDSShaded_surfUser_1
+$IDS_surfUser_1
+$IDGShaded_surfUser_1
+$IDG_surfUser_1
+
+***********************************
+** Online Plotter
+***********************************
+
