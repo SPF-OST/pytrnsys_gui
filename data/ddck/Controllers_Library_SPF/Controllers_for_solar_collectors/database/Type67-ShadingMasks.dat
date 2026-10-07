@@ -1,0 +1,58 @@
+   001    ! Opening (or "orientation") unique ID (for compatibility with SimCad)
+   090    ! Opening slope
+   000    ! Opening azimuth (0 = facing Equator, East is negative)
+-180.0 -157.5 -135.0 -112.5  -90.0  -67.5  -45.0  -22.5    0.0   22.5   45.0   67.5   90.0  112.5  135.0  157.5    ! View angles - ALWAYS (-180:step:180-step)
+0.000    ! Obstruction height for opening 1, view angle  1 (i.e. between -180   and -157.5 degrees or N   and NNE for Northern Hemisphere)
+0.000    ! Obstruction height for opening 1, view angle  2 (i.e. between -157.5 and -135   degrees or NNE and NE  for Northern Hemisphere)
+0.000    ! Obstruction height for opening 1, view angle  3 (i.e. between -135   and -112.5 degrees or NE  and ENE for Northern Hemisphere)
+0.000    ! Obstruction height for opening 1, view angle  4 (i.e. between -112.5 and  -90   degrees or ENE and E   for Northern Hemisphere)
+0.000    ! Obstruction height for opening 1, view angle  5 (i.e. between  -90   and  -67.5 degrees or E   and ESE for Northern Hemisphere)
+0.000    ! Obstruction height for opening 1, view angle  6 (i.e. between  -67.5 and  -45   degrees or ESE and SE  for Northern Hemisphere)
+45.00    ! Obstruction height for opening 1, view angle  7 (i.e. between  -45   and  -22.5 degrees or SE  and SSE for Northern Hemisphere)
+0.000    ! Obstruction height for opening 1, view angle  8 (i.e. between  -22.5 and    0   degrees or SSE and S   for Northern Hemisphere)
+0.000    ! Obstruction height for opening 1, view angle  9 (i.e. between    0   and   22.5 degrees or S   and SSW for Northern Hemisphere)
+60.00    ! Obstruction height for opening 1, view angle 10 (i.e. between   22.5 and   45   degrees or SSW and SW  for Northern Hemisphere)
+0.000    ! Obstruction height for opening 1, view angle 11 (i.e. between   45   and   67.5 degrees or SW  and WSW for Northern Hemisphere)
+0.000    ! Obstruction height for opening 1, view angle 12 (i.e. between   67.5 and   90   degrees or WSW and W   for Northern Hemisphere)
+0.000    ! Obstruction height for opening 1, view angle 13 (i.e. between   90   and  112.5 degrees or W   and WNW for Northern Hemisphere)
+0.000    ! Obstruction height for opening 1, view angle 14 (i.e. between  112.5 and  135   degrees or WNW and NW  for Northern Hemisphere)
+0.000    ! Obstruction height for opening 1, view angle 15 (i.e. between  135   and  157.5 degrees or NW  and NNW for Northern Hemisphere)
+0.000    ! Obstruction height for opening 1, view angle 16 (i.e. between  157.5 and  180   degrees or NNW and N   for Northern Hemisphere)
+
+--- Comments (these lines are ignored by Type 68) ---
+
+1st line: ID's for the NO openings (unique identifier, for compatibility with SimCad)
+
+2nd line: slope of each opening (0 deg = horizontal, 90 deg = vertical)
+
+3rd line: Azimuth of each opening. Convention is the same as for Type 16 
+          0= towards equator, positive towards West. 
+          In Northern hemisphere, 0=South, positive angles are clockwise (from South to West)
+          In Southern hemisphere, 0=North, positive angles are counterclockwise (from North to West)
+
+4th line: values of NS view angles (Evenly spaced values, must start at -180.0 and end at 180-step !). 
+
+          The values are absolute azimuth angles (0 = facing equator, etc.)
+          (positive values clockwise for Northern hemisphere)
+          The number of view angles you can provide is limited by the maximum line width (1000 char by default)
+          SEE THE NOTES ABOUT VIEW ANGLES HERE BELOW
+
+Lines 5 to (4+NS): 
+          Obstruction height angles for each view angle, opening 1
+
+Lines (5+NS) to (4+2*NS): 
+          Obstruction height angles for each view angle, opening 2
+
+...
+
+Lines ((NO-1)*NS+5) to (NO*NS+4):
+          Obstruction height angles for each view angle, opening NO
+
+
+NOTES: - Type 68 will adjust the obstruction height to take into account the opening itself 
+         for view angles that are "behind the opening". E.g. for a vertical wall obstruction 
+         height is 90 when abs(SunAzimuth-SurfaceAzimuth)>90
+       - The first view angle should always be -180.0. The obstruction angle profile is entered 
+         using a step-like approximation, so the obstruction angle provided for a given view 
+         angle is kept constant between that view angle and the next given view angle. 
+         You must provide values from -180 to (180-view angle step)

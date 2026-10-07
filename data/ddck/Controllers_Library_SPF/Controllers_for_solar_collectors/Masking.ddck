@@ -50,7 +50,7 @@ MaskingOn = 1    ! 1: shading mask on, 0: off, outputs = unmasked radiation (ove
 ***********************************
 CONSTANTS #
 unitShadingData = 40
-ASSIGN C:\Daten\GIT\DigiSolar\Simulations\common_ddcks\Shading\Type67-ShadingMasks.dat unitShadingData
+ASSIGN PATH$\Controllers_Library_SPF\Controllers_for_solar_collectors\database\Type67-ShadingMasks.dat unitShadingData
 UNIT 1 TYPE 67
 PARAMETERS 3
 unitShadingData ! 1: Logical unit for data file [-] ([10,+Inf])

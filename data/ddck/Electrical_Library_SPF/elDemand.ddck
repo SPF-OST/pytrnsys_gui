@@ -50,8 +50,7 @@ $PelHH_kW = frPelHH*PelHhDr_kW    !kW, um Faktor fr korrigierter HH-Strom
 CONSTANTS 1
 unitReadEl_3=20
 
-!ASSIGN  PATH$\Electrical_Library_(SPF)\Profiles\MFH_30_electricity_profile_2min.txt unitReadEl_3 This is not accepted by pytrnsys. The "(" seems to be a problem
-ASSIGN  PATH$\Electrical_Library\Profiles\MFH_30_electricity_profile_2min.txt unitReadEl_3
+ASSIGN  PATH$\Electrical_Library_SPF\Profiles\MFH_30_electricity_profile_2min.txt unitReadEl_3
 
 
 UNIT 77 TYPE 9    !, Data Reader Household Electricity

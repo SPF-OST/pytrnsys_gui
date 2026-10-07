@@ -24,8 +24,7 @@ altid = 556
 formatWeatherData  = 1  ! 1 = user format, 2 = Standard weather file in the TMY2 format
 unitWeatherData    = 38
 
-!ASSIGN PATH$\Weather_(SPF)\MeteoSwiss\SMA\SMA_hourlyMean.99 unitWeatherData !_(SPF) not accepted by pytrnsys
-ASSIGN PATH$\Weather\MeteoSwiss\SMA\SMA_hourlyMean.99 unitWeatherData
+ASSIGN PATH$\Weather_SPF\MeteoSwiss\SMA\SMA_hourlyMean.99 unitWeatherData
 
 *******************************
 **END City.ddck

@@ -12,8 +12,8 @@
 ** Description: PID Control for mass flow rate in heating distribution loop
 ** Source: SPF model
 ** This file needs local data from type977. Both files should be located on same folder or names equally using e.g.:
-** PROJECT$ HVAC_Library_(SPF)\Air-Source_Heat_Pump\BiQuadraticFit\type977 as Ashp
-** PROJECT$ HVAC_Library_(SPF)\Air-Source_Heat_Pump\BiQuadraticFit\PID_HpCond as Ashp
+** PROJECT$ HVAC_Library_SPF\Air-Source_Heat_Pump\BiQuadraticFit\type977 as Ashp
+** PROJECT$ HVAC_Library_SPF\Air-Source_Heat_Pump\BiQuadraticFit\PID_HpCond as Ashp
  ***************************************************************************************
 
 

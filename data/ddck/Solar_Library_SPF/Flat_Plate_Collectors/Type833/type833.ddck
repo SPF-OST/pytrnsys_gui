@@ -193,7 +193,7 @@ CoHTransMode     	! 15: convective heat transfer coefficient to absorber with fr
 
 !**ASSIGN PATH$\Solar_Library\Flat_Plate\Type833\iam_data\IAM_Sample_SPFC910.iam
 !**ASSIGN PATH$\Solar_Library\Flat_Plate\database\IAM_Sample_SPFC910.iam
-!**ASSIGN PATH$\Solar_Library_(SPF)\Flat_Plate_Collectors\Type833\iam_data\IAM_Sample_SPFC910.iam
+!**ASSIGN PATH$\Solar_Library_SPF\Flat_Plate_Collectors\Type833\iam_data\IAM_Sample_SPFC910.iam
 
 EQUATIONS #		! Collector Outputs
 Pcoll = [74,3]     										! kJ/h: Power of collector outlet
