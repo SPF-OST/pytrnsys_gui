@@ -42,6 +42,9 @@ EQUATIONS #
 NOpen = 1
 NAng = 16
 
+CONSTANTS 1
+MaskingOn = 1    ! 1: shading mask on, 0: off, outputs = unmasked radiation (overwritten by "deck ShadingMaskingOn" in the config)
+
 ***********************************
 ** Begin TYPE
 ***********************************
@@ -73,15 +76,20 @@ $weatherID_surfUser_1 ! 6: Diffuse radiation for opening [kJ/hr.m^2] ([0,+Inf])
 EQUATIONS #
 AngSun =                    [1, 1] ! Solar altitude angle [degrees] ([-Inf,+Inf])
 FracIBMasked_surfUser_1 =   [1, 2] ! Fraction of beam visible for surf. [-] ([-Inf,+Inf])
-$IBMasked_surfUser_1 =      [1, 3] ! Shaded beam rad. for surf. [kJ/hr.m^2] ([-Inf,+Inf])
+$IBMasked_surfUser_1 =      MaskingOn*[1, 3] + NOT(MaskingOn)*$weatherIB_surfUser_1 ! Shaded beam rad. for surf. [kJ/hr.m^2] ([-Inf,+Inf])
 FracIDMasked_surfUser_1 =   [1, 4] ! Fraction of diffuse visible for surf. [-] ([-Inf,+Inf])
-$IDMasked_surfUser_1 =      [1, 5] ! Shaded diffuse rad. on surf.  [kJ/hr.m^2] ([-Inf,+Inf])
-$ITMasked_surfUser_1  =     [1, 6] ! Shaded total rad. for surf. [kJ/hr.m^2] ([-Inf,+Inf])
+$IDMasked_surfUser_1 =      MaskingOn*[1, 5] + NOT(MaskingOn)*$weatherID_surfUser_1 ! Shaded diffuse rad. on surf.  [kJ/hr.m^2] ([-Inf,+Inf])
+$ITMasked_surfUser_1  =     MaskingOn*[1, 6] + NOT(MaskingOn)*$weatherIT_surfUser_1 ! Shaded total rad. for surf. [kJ/hr.m^2] ([-Inf,+Inf])
 FracIBMasked_H =            [1, 7] ! Fraction of beam visible on horiz. for mask [-] ([-Inf,+Inf])
-$IBMasked_H =               [1, 8] ! Shaded beam rad. on horiz. for mask [kJ/hr.m^2] ([-Inf,+Inf])
+$IBMasked_H =               MaskingOn*[1, 8] + NOT(MaskingOn)*$weatherIB_H ! Shaded beam rad. on horiz. for mask [kJ/hr.m^2] ([-Inf,+Inf])
 FracIDMasked_H =            [1, 9] ! Fraction of diffuse visible on horiz. for mask [-] ([-Inf,+Inf])
-$IDMasked_H =               [1, 10] ! Shaded diffuse rad. on horiz. for mask [kJ/hr.m^2] ([-Inf,+Inf])
-$ITMasked_H =               [1, 11] ! Shaded total rad. on horiz. for mask [kJ/hr.m^2] ([-Inf,+Inf])
+$IDMasked_H =               MaskingOn*[1, 10] + NOT(MaskingOn)*$weatherID_H ! Shaded diffuse rad. on horiz. for mask [kJ/hr.m^2] ([-Inf,+Inf])
+$ITMasked_H =               MaskingOn*[1, 11] + NOT(MaskingOn)*$weatherIT_H ! Shaded total rad. on horiz. for mask [kJ/hr.m^2] ([-Inf,+Inf])
+
+! Sky and ground diffuse split (Type67 only gives the total diffuse): the same visible fraction is applied to both
+FracIDMaskedAct_surfUser_1 = MaskingOn*FracIDMasked_surfUser_1 + NOT(MaskingOn)
+$IDSMasked_surfUser_1 = FracIDMaskedAct_surfUser_1*$weatherIDS_surfUser_1 ! Shaded sky diffuse rad. on surf. [kJ/hr.m^2]
+$IDGMasked_surfUser_1 = FracIDMaskedAct_surfUser_1*$weatherIDG_surfUser_1 ! Shaded ground diffuse rad. on surf. [kJ/hr.m^2]
 
 
 

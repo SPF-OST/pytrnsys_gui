@@ -39,6 +39,9 @@ RowSep = 3 !HShade*(COS(Slope)+SIN(Slope)/TAN(90-ABS($Lat)-23.5)) ! No shadows i
 LRow = 10
 NRow = 10
 
+CONSTANTS 1
+RowsOn = 1       ! 1: row shading on, 0: off, outputs = masked radiation (overwritten by "deck ShadingRowsOn" in the config)
+
 ***********************************
 ** Begin TYPE
 ***********************************
@@ -74,11 +77,11 @@ $weathergroundRef      ! 8: Ground reflectance [-] ([0.0,1.0])
 0.2 ! 8: Ground reflectance  initial value
 
 EQUATIONS #
-$ITShaded_surfUser_1 = [1, 1]   ! Total shaded radiation [kJ/hr.m^2] ([-Inf,+Inf])
-$IBShaded_surfUser_1 = [1, 2]   ! Shaded beam radiation [kJ/hr.m^2] ([-Inf,+Inf])
-$IDShaded_surfUser_1 = [1, 3]   ! Shaded diffuse radiation [kJ/hr.m^2] ([-Inf,+Inf])
-$IDSShaded_surfUser_1 = [1, 4]  ! Shaded diffuse radiation: sky portion [kJ/hr.m^2] ([-Inf,+Inf])
-$IDGShaded_surfUser_1 = MAX([1, 5], 0)  ! Shaded diffuse radiation: ground reflected portion [kJ/hr.m^2] ([-Inf,+Inf])
+$ITShaded_surfUser_1 = RowsOn*[1, 1] + NOT(RowsOn)*$ITMasked_surfUser_1   ! Total shaded radiation [kJ/hr.m^2] ([-Inf,+Inf])
+$IBShaded_surfUser_1 = RowsOn*[1, 2] + NOT(RowsOn)*$IBMasked_surfUser_1   ! Shaded beam radiation [kJ/hr.m^2] ([-Inf,+Inf])
+$IDShaded_surfUser_1 = RowsOn*[1, 3] + NOT(RowsOn)*$IDMasked_surfUser_1   ! Shaded diffuse radiation [kJ/hr.m^2] ([-Inf,+Inf])
+$IDSShaded_surfUser_1 = RowsOn*[1, 4] + NOT(RowsOn)*$IDSMasked_surfUser_1  ! Shaded diffuse radiation: sky portion [kJ/hr.m^2] ([-Inf,+Inf])
+$IDGShaded_surfUser_1 = RowsOn*MAX([1, 5], 0) + NOT(RowsOn)*$IDGMasked_surfUser_1  ! Shaded diffuse radiation: ground reflected portion [kJ/hr.m^2] ([-Inf,+Inf])
 
 
 
