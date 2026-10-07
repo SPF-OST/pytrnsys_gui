@@ -34,6 +34,7 @@ from trnsysGUI.menus.hydraulicModesMenu import hydraulicModes as hm
 from trnsysGUI.messageBox import MessageBox
 from trnsysGUI.recentProjectsHandler import RecentProjectsHandler
 from trnsysGUI.storageTank.widget import StorageTank
+from trnsysGUI.variablePlot import VariablePlotTab
 
 
 class MainWindow(_qtw.QMainWindow):
@@ -585,7 +586,12 @@ class MainWindow(_qtw.QMainWindow):
         self.undoStack.clear()
 
         self.editor = self._createDiagramEditor(project)
-        self.setCentralWidget(self.editor)
+
+        tabWidget = _qtw.QTabWidget()
+        tabWidget.addTab(self.editor, "Diagram")
+        self.variablePlotTab = VariablePlotTab(self)
+        tabWidget.addTab(self.variablePlotTab, "Variable Plot")
+        self.setCentralWidget(tabWidget)
 
         if wasRunning:
             self.editor.start()

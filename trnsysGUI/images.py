@@ -82,6 +82,24 @@ LABEL_TOGGLE_PNG = _ia.createForPackageResource(
 OUTBOX_PNG = _ia.createForPackageResource(
     _ia.PngImageAccessor, "images/outbox.png"
 )
+PLOT_CASCADE_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/plotCascade.svg"
+)
+PLOT_NEW_WINDOW_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/plotNewWindow.svg"
+)
+PLOT_REFRESH_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/plotRefresh.svg"
+)
+PLOT_SYNC_CURSOR_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/plotSyncCursor.svg"
+)
+PLOT_SYNC_ZOOM_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/plotSyncZoom.svg"
+)
+PLOT_TILE_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/plotTile.svg"
+)
 PROCESS_SIMULATION_PNG = _ia.createForPackageResource(
     _ia.PngImageAccessor, "images/processSimulation.png"
 )
