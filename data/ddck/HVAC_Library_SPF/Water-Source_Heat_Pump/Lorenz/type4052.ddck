@@ -1,0 +1,160 @@
+*******************************
+**BEGIN type4052.ddck
+*******************************
+
+*****************************************
+** Contact person : M. Arenas
+** Creation date  : 08.10.2026
+** Last changes   : 08.10.2026
+*****************************************
+
+***************************************************************************
+** Description:
+** Water-water heat pump / chiller with the Lorenz model (Type 4052).
+** COP = min(COPMax, eta * T_LM_H / (T_LM_H - T_LM_C)), with the log mean temperatures of both sides shifted by the
+** approach temperatures DtAppEvap and DtAppCond.
+** eta can depend on the lift L = T_LM_H - T_LM_C (K). EtaModel (same numbering as fortrnsys/lib/lorenzEta.f90 and
+** ETA_MODELS in heatPumpFitting/yumHeatPump/LorenzFit.py):
+**   0 constant eta = a, 1 linear a + b*L, 2 quadratic a + b*L + c*L^2, 3 power a*L^b, 4 logarithmic a + b*ln(L),
+**   5 inverse a + b/L, 6 saturation a*(1-exp(-L/b)), 7 ratio a + b*T_LM_C/T_LM_H
+** The heat pump data (EtaModel, EtaA, EtaB, EtaC, DtAppEvap, DtAppCond, COPMax, QLoadMin_kW, QLoadMax_kW,
+** DTLoadMax) come from a database ddck included before this one with the same "as" name, e.g.
+** database/Komotini/Komotini.
+** Needs the Type 4052 DLL with the eta models (fortrnsys PR #94: 12 parameters, eta as output 10).
+**
+** Mode 2 (heating): load = condenser, the type controls the condenser outlet to TWanted.
+** Mode 1 (cooling): load = evaporator, the type controls the evaporator outlet to TWanted.
+** useMassFlowIn 1: the load is given by the load side mass flow, 0: by QWanted (W).
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+EQUATIONS 6
+TEvapIn   = @temp(EvapIn)
+TCondIn   = @temp(CondIn)
+MfrEvapIn = ABS(@mfr(EvapIn))
+MfrCondIn = ABS(@mfr(CondIn))
+CpEvap    = @cp(EvapIn)*1000   ! J/kgK
+CpCond    = @cp(CondIn)*1000   ! J/kgK
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+EQUATIONS 2
+@temp(EvapOut) = TEvapOut
+@temp(CondOut) = TCondOut
+
+******************************************************************************************
+** outputs to energy balance in kWh
+******************************************************************************************
+EQUATIONS 3
+@energy(in, el, HpComp)   = PelComp_kW
+@energy(in, heat, HpEvap) = QEvap_kW
+@energy(out, heat, HpCond) = QCond_kW
+
+**********************************
+** inputs from other ddck
+**********************************
+EQUATIONS 3
+TWanted = $TSetHp      ! wanted outlet temperature on the load side (degC)
+QWanted = $QWantedHp   ! wanted load (W), only used with useMassFlowIn = 0
+On      = $OnHp        ! activation signal (-)
+
+***********************************
+** Definition of the heat pump type
+***********************************
+CONSTANTS 2
+Mode = 2            ! 1: cooling, load on the evaporator. 2: heating, load on the condenser
+useMassFlowIn = 1   ! 1: load from the load side mass flow, 0: from QWanted
+
+EQUATIONS 2
+QLoadMin = QLoadMin_kW*1000   ! W
+QLoadMax = QLoadMax_kW*1000   ! W
+
+UNIT 162 TYPE 4052   ! Lorenz heat pump model
+PARAMETERS 12
+EtaA            ! 1 Lorenz efficiency, coefficient a of the eta model
+CpEvap          ! 2 Specific heat in the evaporator (J/kg/K)
+CpCond          ! 3 Specific heat in the condenser (J/kg/K)
+DTLoadMax       ! 4 Max delta T on the load side (K)
+QLoadMin        ! 5 Min load capacity (W)
+QLoadMax        ! 6 Max load capacity (W)
+COPMax          ! 7 Max COP
+useMassFlowIn   ! 8 1: use the load side mass flow, 0: use QWanted
+Mode            ! 9 1: cooling, 2: heating
+EtaModel        ! 10 eta model (0-7)
+EtaB            ! 11 coefficient b of the eta model
+EtaC            ! 12 coefficient c of the eta model (quadratic)
+INPUTS 9
+TEvapIn         ! 1 Inlet evaporator temperature (degC)
+TCondIn         ! 2 Inlet condenser temperature (degC)
+DtAppEvap       ! 3 Temperature difference between fluid and refrigerant in the evaporator (K)
+DtAppCond       ! 4 Temperature difference between fluid and refrigerant in the condenser (K)
+QWanted         ! 5 Wanted load (W)
+TWanted         ! 6 Wanted outlet temperature on the load side (degC)
+MfrEvapIn       ! 7 Mass flow rate of the evaporator (kg/h)
+MfrCondIn       ! 8 Mass flow rate of the condenser (kg/h)
+On              ! 9 Activation signal (-)
+20 20 5 5 0 20 0 0 0
+
+EQUATIONS 10   ! Heat pump outputs
+TEvapOut   = [162,1]
+TCondOut   = [162,2]
+QEvap_kW   = [162,3]/1000
+QCond_kW   = [162,4]/1000
+PelComp_kW = [162,5]/1000
+Eer        = [162,6]
+Cop        = [162,7]
+MfrEvap    = [162,8]   ! kg/h
+MfrCond    = [162,9]   ! kg/h
+EtaLorenz  = [162,10]  ! eta used by the type (-)
+
+***********************************
+** Time step printer
+***********************************
+CONSTANTS 1
+unitStepHp = 333
+
+ASSIGN temp\HP_DT.Prt unitStepHp
+
+UNIT 334 TYPE 25
+PARAMETERS 10
+$dtSim          ! 1 Printing interval
+$START          ! 2 Start time
+$STOP           ! 3 Stop time
+unitStepHp      ! 4 Logical unit
+0               ! 5 Units printing mode
+0               ! 6 Relative or absolute start time
+-1              ! 7 Overwrite or Append
+-1              ! 8 Print header
+0               ! 9 Delimiter
+1               ! 10 Print labels
+INPUTS 13
+TEvapIn TEvapOut TCondIn TCondOut MfrEvapIn MfrCondIn Cop Eer EtaLorenz QEvap_kW QCond_kW PelComp_kW On
+**
+TEvapIn TEvapOut TCondIn TCondOut MfrEvapIn MfrCondIn Cop Eer EtaLorenz QEvap_kW QCond_kW PelComp_kW On
+
+***********************************
+** Monthly printer
+***********************************
+CONSTANTS 1
+unitMonthlyHp = 335
+
+ASSIGN temp\HP_MO.Prt unitMonthlyHp
+
+UNIT 336 TYPE 46
+PARAMETERS 5
+unitMonthlyHp   ! 1: Logical unit number, -
+-1              ! 2: Logical unit for monthly summaries, -
+1               ! 3: Relative or absolute start time
+-1              ! 4: Printing & integrating interval, h. -1 for monthly integration
+0               ! 5: Number of inputs to avoid integration, -
+INPUTS 3
+QEvap_kW QCond_kW PelComp_kW
+**
+QEvap_kW QCond_kW PelComp_kW
+
+*******************************
+**END type4052.ddck
+*******************************
