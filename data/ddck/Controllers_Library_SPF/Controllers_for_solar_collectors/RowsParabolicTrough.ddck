@@ -1,0 +1,160 @@
+*******************************
+** BEGIN Type1262.ddck
+*******************************
+
+************************************************************************************************************************
+** Description: 
+** Concentrating Collector Shading: Parabolic Trough Rows (TESS Solar Library)
+************************************************************************************************************************
+
+************************************************************************************************************************
+** Details: 
+** This component determines the beam radiation upon an array of single-axis tracking parabolic trough collectors
+** arranged in consecutive rows that shade one another (based on Stuetzle, 2002). The model assumes a North-South
+** tracking axis (collectors track east to west during the day) on flat, horizontal ground. The 1st row is the
+** easternmost row: it is unshaded in the morning, the last (westernmost) row is unshaded in the afternoon.
+**
+** Shading fraction of an inner row (Eq. 12.6-1, code version):
+**    fShade = MIN(1, MAX(0, 1 - S/W * COS(zenith)/COS(incidence)))
+**
+** Only BEAM radiation is shaded. Diffuse radiation is passed through unchanged, so the output interface
+** ($I*Shaded_surfUser_1) is the same as in the Type30 ddck (RowsFlatPlate.ddck).
+**
+** Requirements on the weather ddck:
+**    surfUser_1 must be the trough aperture: Type15 tracking mode 3 (rotation about a user-defined axis),
+**    axis slope = 0, axis azimuth = 0  -> horizontal N-S axis.
+**
+** Known issue in Type1262.f90 (TESS, v17): output 7 (avg. beam over all rows) is computed as
+**    IB * fShadeAvg  instead of  IB * (1 - fShadeAvg).
+** Output 7 is therefore NOT used here; the row-averaged shaded beam is computed from output 8.
+************************************************************************************************************************
+
+
+***********************************
+** outputs to other ddck
+***********************************
+
+
+
+***********************************
+** Dependencies with other ddck
+***********************************
+EQUATIONS #
+AIPTC = MIN(MAX($weatherAI_surfUser_1, 0), 90)   ! Incidence angle on aperture, clamped to [0,90] (Type1262 stops with a fatal error outside this range, e.g. at night)
+SlopePTC = $weatherslopeSurfUser_1                ! Not used by Type1262 (flat ground assumed), kept for information
+AziPTC = $weatheraziSurfUser_1                    ! Not used by Type1262 (N-S axis assumed), kept for information
+
+***********************************
+** Begin CONSTANTS
+***********************************
+WApPTC = 1.8       ! Collector aperture width [m]
+RowSepPTC = 5.5    ! Distance between collector axes of adjacent rows, measured horizontally [m] (must be > WApPTC)
+NRowPTC = 10       ! Number of rows [-]
+
+CONSTANTS 1
+RowsOn = 1       ! 1: row shading on, 0: off, outputs = masked radiation (overwritten by "deck ShadingRowsOn" in the config)
+
+***********************************
+** Begin TYPE
+***********************************
+UNIT 1 TYPE 1262
+PARAMETERS #
+WApPTC          ! 1: Collector aperture width [m] ([0.0,+Inf])
+RowSepPTC       ! 2: Collector row spacing [m] ([WApPTC,+Inf])
+NRowPTC         ! 3: Number of rows [-] ([1,+Inf])
+
+INPUTS #
+$IBMasked_surfUser_1  ! 1: Incident beam radiation on unshaded aperture [kJ/hr.m^2] ([0.0,+Inf])
+$weatherAISZ           ! 2: Solar zenith angle [degrees] ([-180,+180])
+$weatherAISA           ! 3: Solar azimuth angle [degrees] ([-180,+180])
+AIPTC                  ! 4: Incidence angle on aperture [degrees] ([0.0,90.0])
+
+** initial values
+0.0 ! 1: Incident beam radiation  initial value
+45.0 ! 2: Solar zenith angle  initial value
+0.0 ! 3: Solar azimuth angle  initial value
+45.0 ! 4: Incidence angle  initial value
+
+EQUATIONS #
+$IBShaded1stRow_surfUser_1 = RowsOn*[1, 1] + NOT(RowsOn)*$IBMasked_surfUser_1     ! Shaded beam radiation: 1st (east) row [kJ/hr.m^2]
+$fShade1stRow_surfUser_1 = RowsOn*[1, 2]                                           ! Shading fraction: 1st (east) row [-]
+$IBShadedInRow_surfUser_1 = RowsOn*[1, 3] + NOT(RowsOn)*$IBMasked_surfUser_1      ! Shaded beam radiation: inner rows [kJ/hr.m^2]
+$fShadeInRow_surfUser_1 = RowsOn*[1, 4]                                            ! Shading fraction: inner rows [-]
+$IBShadedLastRow_surfUser_1 = RowsOn*[1, 5] + NOT(RowsOn)*$IBMasked_surfUser_1    ! Shaded beam radiation: last (west) row [kJ/hr.m^2]
+$fShadeLastRow_surfUser_1 = RowsOn*[1, 6]                                          ! Shading fraction: last (west) row [-]
+$fShadeRows_surfUser_1 = RowsOn*[1, 8]                                             ! Shading fraction: average over all rows [-]
+
+** Interface identical to RowsFlatPlate.ddck (row-averaged values for the whole field)
+$IBShaded_surfUser_1 = $IBMasked_surfUser_1*(1-$fShadeRows_surfUser_1)            ! Shaded beam radiation, avg over all rows [kJ/hr.m^2] (replaces buggy output [1, 7])
+$IDShaded_surfUser_1 = $IDMasked_surfUser_1                                        ! Diffuse radiation, not shaded by Type1262 [kJ/hr.m^2]
+$IDSShaded_surfUser_1 = $IDSMasked_surfUser_1                                      ! Diffuse radiation: sky portion, not shaded [kJ/hr.m^2]
+$IDGShaded_surfUser_1 = $IDGMasked_surfUser_1                                      ! Diffuse radiation: ground reflected portion, not shaded [kJ/hr.m^2]
+$ITShaded_surfUser_1 = $ITMasked_surfUser_1 - $IBMasked_surfUser_1 + $IBShaded_surfUser_1   ! Total radiation with shaded beam [kJ/hr.m^2]
+
+
+
+
+***********************************
+** Monthly printer
+***********************************
+CONSTANTS 1
+unitPrinterShadesPTCMo = 55
+ASSIGN temp\SHADESPTC_MO.Prt unitPrinterShadesPTCMo
+UNIT 52 TYPE 46
+PARAMETERS 5
+unitPrinterShadesPTCMo ! 1: Logical unit number, -
+-1  ! 2: Logical unit for monthly summaries
+1   ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1  ! 4: Printing & integrating interval, h. -1 for monthly integration
+0   ! 5: Number of inputs to avoid integration
+INPUTS #
+$IBShaded_surfUser_1
+$weatherIB_surfUser_1
+$IBShaded1stRow_surfUser_1
+$IBShadedInRow_surfUser_1
+$IBShadedLastRow_surfUser_1
+$ITShaded_surfUser_1
+$weatherIT_surfUser_1
+***
+$IBShaded_surfUser_1
+$weatherIB_surfUser_1
+$IBShaded1stRow_surfUser_1
+$IBShadedInRow_surfUser_1
+$IBShadedLastRow_surfUser_1
+$ITShaded_surfUser_1
+$weatherIT_surfUser_1
+
+***********************************
+** Hourly printer
+***********************************
+CONSTANTS 1
+unitPrinterShadesPTCHo = 56
+ASSIGN temp\SHADESPTC_HO.Prt unitPrinterShadesPTCHo
+UNIT 53 TYPE 46
+PARAMETERS 5
+unitPrinterShadesPTCHo ! 1: Logical unit number, -
+-1  ! 2: Logical unit for monthly summaries
+1   ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1  ! 4: Printing & integrating interval, h. -1 for monthly integration
+0   ! 5: Number of inputs to avoid integration
+INPUTS #
+$IBShaded_surfUser_1
+$weatherIB_surfUser_1
+$IBShaded1stRow_surfUser_1
+$IBShadedInRow_surfUser_1
+$IBShadedLastRow_surfUser_1
+$ITShaded_surfUser_1
+$weatherIT_surfUser_1
+***
+$IBShaded_surfUser_1
+$weatherIB_surfUser_1
+$IBShaded1stRow_surfUser_1
+$IBShadedInRow_surfUser_1
+$IBShadedLastRow_surfUser_1
+$ITShaded_surfUser_1
+$weatherIT_surfUser_1
+
+***********************************
+** Online Plotter
+***********************************
+

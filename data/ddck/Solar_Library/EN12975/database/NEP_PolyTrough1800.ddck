@@ -1,0 +1,33 @@
+******************************
+**BEGIN Type1357_Constants.ddck
+*******************************
+
+*****************************************
+** Solar Thermal Data for NEP PolyTrough 1800 collector.
+** Source: SPF Factsheet C1549, test date 12.2012, EN12975:2006
+** Concentrating parabolic trough, N-S axis tracking
+*****************************************
+
+CONSTANTS #
+!Parameters
+AMod          = 18.450      ! 1: Collector Module Area (aperture) [m^2] ([0.,+Inf])
+NbModTot      = 2500        ! 2: Total Number of Modules [-] ([1,+Inf])
+NbModSr       = 1           ! 3: Number of Modules in Series [-] ([1,+Inf])
+NbTrsvAng     = 9           ! 6: Number of Transverse Angles [-] ([1,100])
+NbLgtdAng     = 9           ! 7: Number of Longitudinal Angles [-] ([1,100])
+LgwRadMode    = 2           ! 8: Long wave Radiation Mode [-] ([1,4])
+c0            = 0.600       ! 9:  Collector Efficiency Coefficient c0 [-] ([0.,1.]) (aperture, G reference)
+c1            = 0.36*3.6    ! 10: Collector Efficiency Coefficient c1 [kJ/hr.m^2.K] ([0.,+Inf])
+c2            = 0.0011*3.6  ! 11: Collector Efficiency Coefficient c2 [kJ/hr.m^2.K^2] ([0.,+Inf])
+c3            = 0           ! 12: Collector Efficiency Coefficient c3 [kJ/m^3.K] ([0.,+Inf]) (not given)
+c4            = 0           ! 13: Collector Efficiency Coefficient c4 [-] ([0.,+Inf]) (not given)
+c5            = 7.2/18.450  ! 14: Collector Efficiency Coefficient c5 [kJ/m^2.K] ([0.,+Inf]) (7.2 kJ/K thermal capacity / 18.45 m2 aperture)
+c6            = 0           ! 15: Collector Efficiency Coefficient c6 [s/m] ([0.,+Inf]) (not given)
+Kd            = 0           ! 16: Diffuse Radiation Coefficient (Kd) [-] ([0.,1.]) (concentrating collector, DNI only)
+InitArrayTemp = 20          ! 17: Initial Array Temperature [C] ([-Inf,+Inf])
+NbNodes       = 50          ! 18: Number of Nodes per Collector [-] ([1,1000])
+
+
+*******************************
+**END Type1357_Constants.ddck
+*******************************

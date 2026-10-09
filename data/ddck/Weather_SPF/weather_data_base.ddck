@@ -160,6 +160,8 @@ aziSurfUser_3   = 70. ! Azimuth of surface-7
 slopeSurfUser_4 = 10. ! Slope of surface-8
 aziSurfUser_4   = 70. ! Azimuth of surface-8
 
+ModeTracking = 1
+
 ***************************************
 ** TYPE 109 TRNSYS
 **************************************
@@ -169,7 +171,7 @@ PARAMETERS 4
 myFormatWeatherData  ! 1 = user format, 2 = Standard weather file in the TMY2 format  FROM CITY...
 myUnitWeatherData    ! 2 Logical unit 
 4     ! 3 Sky model for diffuse radiation: 1: Isotropic sky model; 2: Hay and Davies model; 3: Reindl model; 4: Perez model
-1     ! 4 Tracking mode: 1: Fixed surface; 2: single-axis tracking,vertical axis (fixed slope); 3: single-axis tracking in the plane of the surface; 4 two axis tracking
+ModeTracking     ! 4 Tracking mode: 1: Fixed surface; 2: single-axis tracking,vertical axis (fixed slope); 3: single-axis tracking in the plane of the surface; 4 two axis tracking
 INPUTS 17 ! these inputs don't accept numbers but variables
 0,0
 0,0
