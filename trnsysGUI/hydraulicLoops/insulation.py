@@ -17,8 +17,6 @@ class _ThicknessClass:
 # function of the nominal diameter (DN) and of the thermal conductivity of
 # the insulation material (<= 0.03 W/(m*K) and > 0.03 to <= 0.05 W/(m*K)).
 # See Anhang 4 in MuKEn: https://energiehub-gebaeude.ch/wp-content/uploads/2025/09/MuKEn2025_d-2025-08-29.pdf
-# "Minimale Dämmstärke für Heizungs- und Warmwasserleitungen" (based on the
-# MuKEn and SIA 380/1 / SIA 384/1:2009).
 _THICKNESS_CLASSES: _tp.Sequence[_ThicknessClass] = [
     _ThicknessClass(10, 30, 40),  # DN 10 - 15
     _ThicknessClass(20, 40, 50),  # DN 20 - 32
