@@ -104,7 +104,7 @@ TDeltaA = on*(TSide1In-TSide2Out) + NOT(on)*ignoreValue
 TDeltaB = on*(TSide1Out-TSide2In) + NOT(on)*ignoreValue
 EqTDelta = LT(ABS(TDeltaA-TDeltaB), 1e-3)
 
-LogTDeltaDelta = NOT(EqTDelta)*(LOG(TDeltaA) - LOG(TDeltaB)) + EqTDelta*ignoreValue
+LogTDeltaDelta = NOT(EqTDelta)*(LN(TDeltaA) - LN(TDeltaB)) + EqTDelta*ignoreValue
 
 LMTD = on*(TDeltaA-TDeltaB)/LogTDeltaDelta
 
