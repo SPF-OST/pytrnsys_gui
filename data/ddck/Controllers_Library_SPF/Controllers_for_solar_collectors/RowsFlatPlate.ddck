@@ -63,7 +63,7 @@ $weatherAISZ           ! 3: Solar zenith angle [degrees] ([0.0,90.0])
 $weatherAISA           ! 4: Solar azimuth angle [degrees] ([-360,+360])
 $ITMasked_H           ! 5: Total horizontal radiation [kJ/hr.m^2] ([0.0,+Inf])
 $IDMasked_H           ! 6: Horizontal diffuse radiation [kJ/hr.m^2] ([0.0,+Inf])
-$weatherIB_surfUser_2  ! 7: Beam radiation on field [kJ/hr.m^2] ([0.0,+Inf])
+$weatherIB_surfUser_3  ! 7: Beam radiation on field [kJ/hr.m^2] ([0.0,+Inf])
 $weathergroundRef      ! 8: Ground reflectance [-] ([0.0,1.0])
 
 ** initial values
