@@ -1,0 +1,26 @@
+*********************************************
+** BEGIN Komotini.ddck
+*********************************************
+
+********************************************************************************
+** Heat pump data for the Komotini high temperature heat pump (Lorenz model, Type 4052)
+** Data: komotiniLorenz.exp (108 points, source 80-165 degC, sink 136.76 -> 161-185 degC, QCond 192-385 kW)
+** Data fitted with heatPumpFitting https://github.com/SPF-OST/heatPumpFitting (heatPumpFitLorenzKomotini.py)
+** Method: Lorenz, eta model saturation eta = a*(1-exp(-L/b)), approach temperatures fixed to 8 K
+** Fit: RMS COP = 0.0224, mean error COP = 1.03 %, max error COP = 4.50 %
+** Author: Mikel Arenas
+******************************************************************************
+CONSTANTS 10
+EtaModel = 6          ! saturation
+EtaA = 0.713268       ! a
+EtaB = 150.727        ! b (K)
+EtaC = 0              ! not used by the saturation model
+DtAppEvap = 8         ! K
+DtAppCond = 8         ! K
+COPMax = 15
+QLoadMin_kW = 0
+QLoadMax_kW = 400     ! max QCond in the data: 385 kW
+DTLoadMax = 60        ! K, max condenser dT in the data: 48 K
+*********************************************
+** END Komotini.ddck
+*********************************************
