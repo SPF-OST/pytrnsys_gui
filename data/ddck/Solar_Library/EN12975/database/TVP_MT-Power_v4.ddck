@@ -8,7 +8,7 @@
 
 CONSTANTS #
 !Parameters
-AMod          = 1.84        ! 1: Collector Module Area (aperture) [m^2] ([0.,+Inf]) (from the TVP pdf)
+AMod          = 1.96        ! 1: Collector Module Area (aperture) [m^2] ([0.,+Inf]) (from the TVP pdf)
 NbModTot      = 2500        ! 2: Total Number of Modules [-] ([1,+Inf])
 NbModSr       = 1           ! 3: Number of Modules in Series [-] ([1,+Inf])
 NbTrsvAng     = 9           ! 6: Number of Transverse Angles [-] ([1,100])
