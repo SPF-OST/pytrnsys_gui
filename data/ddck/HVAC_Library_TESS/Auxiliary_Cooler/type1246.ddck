@@ -1,0 +1,150 @@
+*******************************
+**BEGIN type1246.ddck
+*******************************
+
+*****************************************
+** Contact person : M. Arenas
+** Creation date  : 18.10.2026
+** Last changes   : 18.10.2026
+*****************************************
+
+***************************************************************************
+** Description:
+** Auxiliary fluid cooler (TESS Type 1246, HVAC Library), e.g. the dry cooler that protects a solar loop against
+** overheating. When the control function is on, the fluid is cooled down to Tset, limited by the rated capacity
+** (TESSLibs 18 HVAC Library Mathematical Reference, 8.68). Inputs, outputs and parameters as in
+** C:\Trnsys18\Studio\Proformas\HVAC Library (TESS)\Auxiliary Cooler\Type1246.tmf and Type1246.f90.
+** Control with hysteresis (Type 2): on when the control temperature TCtrl is above TOn, off below TOff.
+** TCtrl is the inlet temperature by default; e.g. "deck <name>TCtrl CollTOut" to use the collector outlet.
+** Default values: DIGISOLAR D1.3 Demo-4 Komotini (450 kW, on above 160 degC, cools down to 135 degC).
+** Values overwritten from the config, e.g. "deck <name>PCoolNom_kW 450", "deck <name>TOn 160".
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+EQUATIONS #
+TIn = @temp(In)
+MIn = ABS(@mfr(In))
+Cp = @cp(In)
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+EQUATIONS #
+@temp(Out) = TOut
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+EQUATIONS #
+@energy(out, heat, :) = PCool_kW
+
+***********************************
+** Dependencies with other ddck
+***********************************
+EQUATIONS #
+TAmb = $weatherTamb   ! surrounding temperature for the losses [C] (no losses with UA = 0)
+TCtrl = TIn           ! control temperature for the on/off hysteresis [C], overwritten from the config
+
+***********************************
+** Constants
+***********************************
+CONSTANTS #
+PCoolNom_kW = 450     ! rated capacity [kW]
+TSet = 135            ! outlet set temperature when the cooler is on [C]
+TOn = 160             ! the cooler switches on when TCtrl is above TOn [C]
+TOff = 150            ! and switches off again when TCtrl is below TOff [C]
+UALoss = 0            ! loss coefficient of the cooler to the surroundings [kJ/hK]
+PCoolNom = PCoolNom_kW*3600   ! [kJ/h]
+
+***********************************
+** Control: on/off with hysteresis
+***********************************
+UNIT 62 TYPE 2
+PARAMETERS 2
+5               ! 1 No. of oscillations
+999             ! 2 High limit cut-out
+INPUTS 6
+TCtrl           ! 1 Upper input temperature Th
+$zero           ! 2 Lower input temperature Tl
+TCtrl           ! 3 Monitoring temperature Tin
+CoolOn          ! 4 Input control function
+TOn             ! 5 Upper dead band dT
+TOff            ! 6 Lower dead band dT
+0.0 20.0 0.0 0 TOn TOff
+
+EQUATIONS #
+CoolOn = [62,1]   ! 1: cooler on, 0: off
+
+***********************************
+** Beginning TYPE
+***********************************
+UNIT 61 TYPE 1246
+PARAMETERS 2
+PCoolNom        ! 1: Rated Capacity [kJ/hr]
+Cp              ! 2: Specific Heat of Fluid [kJ/kg.K]
+INPUTS 6
+TIn             ! 1: Inlet Fluid Temperature [C]
+MIn             ! 2: Inlet Flowrate [kg/hr]
+CoolOn          ! 3: Control Function [0..1], fraction of the rated capacity available
+TSet            ! 4: Set Point Temperature [C]
+UALoss          ! 5: Overall Loss Coefficient [kJ/hr.K]
+TAmb            ! 6: Temperature of Surroundings [C]
+*** INITIAL INPUT VALUES
+20.0 0.0 0.0 135.0 0.0 20.0
+
+***********************************
+** Outputs
+***********************************
+EQUATIONS #
+TOut = [61,1]                 ! Outlet Fluid Temperature [C]
+MOut = [61,2]                 ! Outlet Flowrate [kg/h]
+PCool_kW = [61,3]/3600        ! Cooling rate, including thermal losses [kW] (positive when cooling)
+PLoss_kW = [61,4]/3600        ! Thermal losses to the surroundings [kW]
+PCoolUseful_kW = [61,5]/3600  ! Useful cooling rate, energy removed from the flow [kW]
+
+***********************************
+** Monthly printer
+***********************************
+CONSTANTS #
+unitPrintCooler = 63
+
+ASSIGN temp\COOLER_MO.Prt unitPrintCooler
+
+UNIT 64 TYPE 46
+PARAMETERS #
+unitPrintCooler     ! 1: Logical unit number, -
+-1                  ! 2: Logical unit for monthly summaries, -
+1                   ! 3: Relative or absolute start time
+-1                  ! 4: Printing & integrating interval, h. -1 for monthly integration
+0                   ! 5: Number of inputs to avoid integration, -
+INPUTS #
+PCool_kW PCoolUseful_kW PLoss_kW CoolOn
+**
+PCool_kW PCoolUseful_kW PLoss_kW CoolOn
+
+***********************************
+** Hourly printer
+***********************************
+CONSTANTS #
+unitPrintCoolerHr = 65
+
+ASSIGN temp\COOLER_HR.Prt unitPrintCoolerHr
+
+UNIT 66 TYPE 46
+PARAMETERS #
+unitPrintCoolerHr   ! 1: Logical unit number, -
+-1                  ! 2: Logical unit for monthly summaries, -
+1                   ! 3: Relative or absolute start time
+1                   ! 4: Printing & integrating interval, h. -1 for monthly integration
+0                   ! 5: Number of inputs to avoid integration, -
+INPUTS #
+PCool_kW PCoolUseful_kW PLoss_kW CoolOn TIn TOut MIn TCtrl
+**
+PCool_kW PCoolUseful_kW PLoss_kW CoolOn TIn TOut MIn TCtrl
+
+*******************************
+**END type1246.ddck
+*******************************

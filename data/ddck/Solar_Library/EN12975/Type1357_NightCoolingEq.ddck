@@ -56,6 +56,7 @@ TOut = TOutType*NOT(SolarControlNightCooling) + TOutNight*SolarControlNightCooli
 ***********************************
 CONSTANTS #
 C_tilt = $weatherslopeSurfUser_1			! Collector tilt angle / slope [deg]
+AziAg = $weatheraziSurfUser_1
 
 EQUATIONS #
 IT_Coll_kJhm2  = $ITShaded_surfUser_1		! Incident total radiation on collector plane, kJ/hm2
@@ -84,8 +85,6 @@ IT_kW     = IT_kWm2 * ACollAp
 CONSTANTS #
 ! Parameters
 ACollAp = NbModTot * AMod
-!Inputs
-AziAg      = 0
 EmGnd      = 0.95
 
 MfrNomNorm = 20                 ! [kg/h/m2]

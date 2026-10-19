@@ -1,0 +1,155 @@
+*******************************
+**BEGIN Type6.ddck 
+*******************************
+
+*****************************************
+** Contact person : Mattia Battaglia    
+** Creation date  : 10.01.2010
+** Last changes   : 18.05.2022
+**                : 14.10.2026 M. Arenas: copied from systems/common/ddck/Bolr/type6.ddck into the library.
+**                  Set temperature and rated capacity as local values (overwritten from the config with
+**                  "deck <name>Tset ..." and "deck <name>PBoiNom_kW ..."), local weather name, input 5 comment
+*****************************************
+
+***************************************************************************
+** Description: 
+** Simple Boiler model (Type 6, auxiliary heater): heats the flow up to Tset, limited by the rated capacity.
+** Used e.g. after a demand mixing point to make sure the demand always gets its set temperature.
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+EQUATIONS #
+TIn = @temp(In, TPiAuxIn)
+MIn = @mfr(In, MfrPiAuxIn)
+Cp = @cp(In)
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+EQUATIONS #
+@temp(Out, TBoilerOut) = TOut
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+EQUATIONS #
+@energy(in, heat, :) = POut_kW 
+
+***********************************
+** Dependencies with other ddck
+***********************************
+EQUATIONS #
+on = 1
+Tset = 60                  ! set temperature [C], overwritten from the config, e.g. "deck BolrTset TProSet"
+tRoomStore = $weatherTamb  ! surrounding temperature for the losses [C] (no losses with UA = 0)
+
+***********************************
+** Beginning TYPE
+***********************************
+CONSTANTS #
+PBoiNom_kW = 50000         ! rated capacity [kW]: by default large, so that Tset is always reached
+PBoiNom = PBoiNom_kW*3600  ! 360000*10
+MflowBoilerNom = 3000
+
+UNIT 219 TYPE 6
+PARAMETERS #
+PBoiNom		! 1: Rated Capacity   kJ/h
+Cp 			    ! 2: Fluid Specific Heat   kJ/kgK
+0				! 3: Loss UA value
+1				! 4: Efficiency
+INPUTS #
+TIn  		! 1: Inlet Fluid Temperature   C
+MIn		    ! 2: Inlet Fluid Flow Rate   kg/h
+on		    ! 3: Input Control Signal   (between 0 and 1)
+Tset		! 4: Setpoint Temperature   C
+tRoomStore	! 5: Environment temperature for the losses   C
+**** INITIAL INPUT VALUES
+50 0.0 0.0 95 0.78
+
+***********************************
+** Outputs 
+***********************************
+EQUATIONS #
+TOut = [219,1]						! Outlet Fluid Temperature
+MfrBout = [219,2]					! Outlet Fluid Flow Rate 
+PIn_kW = [219,3]/3600			! Fluid Energy 
+PLoss_kW = [219,4]/3600		! Losses to Surroundings 
+POut_kW = [219,5]/3600
+
+***********************************
+** Monthly printer
+***********************************
+CONSTANTS #
+unitPrintBoiler = 31
+
+ASSIGN temp\BOILER_MO.Prt unitPrintBoiler
+
+UNIT 32 TYPE 46      
+PARAMETERS #
+unitPrintBoiler		! 1: Logical unit number, -
+-1					! 2: Logical unit for monthly summaries, -
+1					! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1					! 4: Printing & integrating interval, h. -1 for monthly integration
+1					! 5: Number of inputs to avoid integration, -
+1					! 6: Output number to avoid integration
+INPUTS #
+$Time  POut_kW  PIn_kW  PLoss_kW
+**
+$Time  POut_kW  PIn_kW  PLoss_kW
+
+***********************************
+** Hourly printer
+***********************************
+CONSTANTS #
+unitPrintBoilerHr = 33
+
+ASSIGN    temp\BOILER_HR.Prt    unitPrintBoilerHr
+
+UNIT 34 TYPE 46		! Printegrator Monthly Values for System
+PARAMETERS #
+unitPrintBoilerHr		! 1: Logical unit number, -
+-1						! 2: Logical unit for monthly summaries, -
+1						! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1						! 4: Printing & integrating interval, h. -1 for monthly integration
+3						! 5: Number of inputs to avoid integration, -
+1						! 6: Output number to avoid integration
+5						! 7: Output number to avoid integration
+6						! 8: Output number to avoid integration
+INPUTS #
+$Time  POut_kW  PIn_kW  PLoss_kW TIn TOut
+**
+$Time  POut_kW  PIn_kW  PLoss_kW TIn TOut
+
+***********************************
+** Online plotter
+***********************************
+
+UNIT 89 TYPE 65		! Online Plotter Auxiliary (Element Hp)
+PARAMETERS #
+3					! 1: Nb. of left-axis variables
+5					! 2: Nb. of right-axis variables
+-10					! 3: Left axis minimum
+100					! 4: Left axis maximum
+0					! 5: Right axis minimum
+50					! 6: Right axis maximum
+$nPlotsPerSim		! 7: Number of plots per simulation
+12					! 8: X-axis gridpoints
+1					! 9: Shut off Online w/o removing
+-1					! 10: Logical unit for output file
+0					! 11: Output file units
+0					! 12: Output file delimiter
+INPUTS #
+TIn TOut Tset POut_kW  PIn_kW  PLoss_kW MIn  on
+**
+TIn TOut Tset POut_kW  PIn_kW  PLoss_kW MIn on 
+LABELS  3     
+Temperatures     
+Power     
+Boiler   
+
+*******************************
+**END Type6.dck
+*******************************

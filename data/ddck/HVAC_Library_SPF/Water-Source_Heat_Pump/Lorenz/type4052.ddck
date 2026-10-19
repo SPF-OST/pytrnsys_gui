@@ -5,7 +5,7 @@
 *****************************************
 ** Contact person : M. Arenas
 ** Creation date  : 08.10.2026
-** Last changes   : 08.10.2026
+** Last changes   : 14.10.2026, hourly printer (HP_HR.Prt) with the variables of the time step printer
 *****************************************
 
 ***************************************************************************
@@ -130,6 +130,26 @@ unitStepHp      ! 4 Logical unit
 -1              ! 8 Print header
 0               ! 9 Delimiter
 1               ! 10 Print labels
+INPUTS 13
+TEvapIn TEvapOut TCondIn TCondOut MfrEvapIn MfrCondIn Cop Eer EtaLorenz QEvap_kW QCond_kW PelComp_kW On
+**
+TEvapIn TEvapOut TCondIn TCondOut MfrEvapIn MfrCondIn Cop Eer EtaLorenz QEvap_kW QCond_kW PelComp_kW On
+
+***********************************
+** Hourly printer: hourly means of the time step printer variables
+***********************************
+CONSTANTS 1
+unitHourlyHp = 337
+
+ASSIGN temp\HP_HR.Prt unitHourlyHp
+
+UNIT 338 TYPE 46
+PARAMETERS 5
+unitHourlyHp    ! 1: Logical unit number, -
+-1              ! 2: Logical unit for monthly summaries, -
+1               ! 3: Relative or absolute start time
+1               ! 4: Printing & integrating interval, h. -1 for monthly integration
+0               ! 5: Number of inputs to avoid integration, -
 INPUTS 13
 TEvapIn TEvapOut TCondIn TCondOut MfrEvapIn MfrCondIn Cop Eer EtaLorenz QEvap_kW QCond_kW PelComp_kW On
 **

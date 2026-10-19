@@ -1,0 +1,14 @@
+The parameters are fitted using the Lorenz model (TRNSYS types 4050, 4051, 4052) in heating mode (Mode = 2)
+Date: Thu Oct  8 17:06:23 2026
+Author: mikel.arenas
+
+Eta model: saturation (eta = a*(1-exp(-L/b))), L = T_LM_H - T_LM_C in K
+EtaA      = 0.713268 ! fitted, Lorenz efficiency coefficient
+EtaB      = 150.727 ! fitted, Lorenz efficiency coefficient
+! eta range in the data: 0.0454 - 0.3616
+DtAppEvap = 8.0000 ! fixed, temperature difference between fluid and refrigerant in evaporator (K)
+DtAppCond = 8.0000 ! fixed, temperature difference between fluid and refrigerant in condenser (K)
+
+RMS COP = 0.0224
+Mean error COP = 1.03 %
+Max error COP = 4.50 %
