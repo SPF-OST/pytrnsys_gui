@@ -1,0 +1,39 @@
+******************************
+**BEGIN Type1357_Constants.ddck
+*******************************
+
+*****************************************
+** Solar Thermal Data for Soliterm PTC 1800 collector.
+** Source: Solar Keymark Certificate SK0805570 (TUV Cyprus), test report C1867ISO, date 06.01.2022, ISO 9806
+** Concentrating parabolic trough, N-S axis tracking
+** Performance parameters related to gross area AG = 9.13 m^2 (aperture area Aa = 9.08 m^2)
+*****************************************
+
+CONSTANTS #
+!Parameters
+AMod          = 9.13        ! 1: Collector Module Area (gross AG) [m^2] ([0.,+Inf])
+NbModTot      = 2500        ! 2: Total Number of Modules [-] ([1,+Inf])
+NbModSr       = 1           ! 3: Number of Modules in Series [-] ([1,+Inf])
+NbTrsvAng     = 9           ! 6: Number of Transverse Angles [-] ([1,100])
+NbLgtdAng     = 9           ! 7: Number of Longitudinal Angles [-] ([1,100])
+LgwRadMode    = 2           ! 8: Long wave Radiation Mode [-] ([1,4])
+c0            = 0.682       ! 9:  Collector Efficiency Coefficient c0 [-] ([0.,1.]) (eta0,b, gross area, beam reference)
+c1            = 0.31*3.6    ! 10: Collector Efficiency Coefficient c1 [kJ/hr.m^2.K] ([0.,+Inf]) (a1 = 0.31 W/m^2.K)
+c2            = 0.003*3.6   ! 11: Collector Efficiency Coefficient c2 [kJ/hr.m^2.K^2] ([0.,+Inf]) (a2 = 0.003 W/m^2.K^2)
+c3            = 0           ! 12: Collector Efficiency Coefficient c3 [kJ/m^3.K] ([0.,+Inf]) (a3 = 0)
+c4            = 0           ! 13: Collector Efficiency Coefficient c4 [-] ([0.,+Inf]) (a4 = 0)
+c5            = 5.256       ! 14: Collector Efficiency Coefficient c5 [kJ/m^2.K] ([0.,+Inf]) (a5 = 5256 J/m^2.K)
+c6            = 0           ! 15: Collector Efficiency Coefficient c6 [s/m] ([0.,+Inf]) (a6 = 0)
+Kd            = 0.13        ! 16: Diffuse Radiation Coefficient (Kd) [-] ([0.,1.])
+InitArrayTemp = 20          ! 17: Initial Array Temperature [C] ([-Inf,+Inf])
+NbNodes       = 50          ! 18: Number of Nodes per Collector [-] ([1,1000])
+
+! Bi-axial incidence angle modifier (IAM) data file for this collector
+CONSTANTS 1
+unitReadIAM = 26
+ASSIGN PATH$\Solar_Library\EN12975\database\ParabolicTroughIAM.txt unitReadIAM
+
+
+*******************************
+**END Type1357_Constants.ddck
+*******************************

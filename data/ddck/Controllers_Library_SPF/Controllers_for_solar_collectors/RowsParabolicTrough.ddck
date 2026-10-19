@@ -43,7 +43,6 @@ EQUATIONS #
 AIPTC = MIN(MAX($weatherAI_surfUser_1, 0), 90)   ! Incidence angle on aperture, clamped to [0,90] (Type1262 stops with a fatal error outside this range, e.g. at night)
 SlopePTC = $weatherslopeSurfUser_1                ! Not used by Type1262 (flat ground assumed), kept for information
 AziPTC = $weatheraziSurfUser_1                    ! Not used by Type1262 (N-S axis assumed), kept for information
-
 ***********************************
 ** Begin CONSTANTS
 ***********************************
