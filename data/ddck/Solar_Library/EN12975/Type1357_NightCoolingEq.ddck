@@ -102,9 +102,8 @@ Mode_ctrl_act = Mode_ctrl*NOT(SolarControlNightCooling)
 ***********************************
 ** Begin TYPE
 ***********************************
-CONSTANTS 1
-unitReadIAM=26
-ASSIGN PATH$\Solar_Library\EN12975\database\SolarCollectorIAM.txt unitReadIAM
+** unitReadIAM and the IAM data file (ASSIGN) are defined in the collector database ddck,
+** so each collector uses its own incidence angle modifier.
 
 UNIT 17 TYPE 1357
 PARAMETERS #

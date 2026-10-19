@@ -25,6 +25,11 @@ Kd            = 0.96        ! 16: Diffuse Radiation Coefficient (Kd) [-] ([0.,1.
 InitArrayTemp = 20          ! 17: Initial Array Temperature [C] ([-Inf,+Inf])
 NbNodes       = 50          ! 18: Number of Nodes per Collector [-] ([1,1000])
 
+! Bi-axial incidence angle modifier (IAM) data file for this collector
+CONSTANTS 1
+unitReadIAM = 26
+ASSIGN PATH$\Solar_Library\EN12975\database\SolarCollectorIAM.txt unitReadIAM
+
 
 *******************************
 **END Type1357_Constants.ddck
