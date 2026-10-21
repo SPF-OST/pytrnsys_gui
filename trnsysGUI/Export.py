@@ -714,14 +714,13 @@ F{{fluid.name}}Cp = {{cp}} ! [kJ/(kg*K)]
 
     def exportHydraulicLoops(self) -> str:
         # For loops using loop-wide defaults the pipe diameter is sized with
-        # the correlation D [mm] = 0.92 * Q^0.45 (Q in [l/h]). This is the
-        # economic optimum pipe diameter for turbulent flow,
+        # the economic optimum pipe diameter for turbulent flow,
         #   D_opt [in] = 3.9 * q_f[ft^3/s]^0.45 * rho[lb/ft^3]^0.13,
         # see M. S. Peters, K. D. Timmerhaus: "Plant Design and Economics
         # for Chemical Engineers", McGraw-Hill (based on R. P. Genereaux,
-        # "Fluid-flow design methods", Ind. Eng. Chem. 29(4), 1937),
-        # evaluated for water (rho = 62.4 lb/ft^3 gives a coefficient of
-        # ~0.95 in [mm] and [l/h]).
+        # "Fluid-flow design methods", Ind. Eng. Chem. 29(4), 1937).
+        # Converted to SI units this reads
+        #   D_opt [m] = 0.343 * q_f[m^3/s]^0.45 * rho[kg/m^3]^0.13.
         # The U-value of the pipes then follows from the minimum insulation
         # thickness for the pipe's nominal diameter, see the `insulation`
         # module.
@@ -749,12 +748,12 @@ EQUATIONS {{nEquations}}
 {% if hydraulicLoop.connectionsDefinitionMode.useLoopWideDefaults() -%}
 {{loopNPipes}} = {{hydraulicLoop.connections | length}}
 {{loopLen}} = {{values.DEFAULT_LENGTH_IN_M}} ! [m]
-** Pipe sizing: diameter flow rate correlation D [mm] = 0.92 * Q^0.45, Q in [l/h]
+** Pipe sizing: economic optimum diameter (Peters & Timmerhaus) D = 0.343 * q^0.45 * rho^0.13, D in [m], q in [m^3/s], rho in [kg/m^3]
 {{loopPNom}} = {{values.DEFAULT_NOMINAL_POWER_IN_KW}} ! [kW] nominal power
 {{loopDTNom}} = {{values.DEFAULT_NOMINAL_TEMPERATURE_DIFFERENCE_IN_K}} ! [K] nominal temperature difference
 {{loopMfrNom}} = {{loopPNom}}/({{loopCp}}*{{loopDTNom}})*3600 ! [kg/h] nominal mass flow rate
-{{loopVfrNom}} = {{loopMfrNom}}/{{loopRho}}*1000 ! [l/h] nominal volume flow rate
-{{loopDia}} = 0.92*{{loopVfrNom}}^0.45/1000 ! [m]
+{{loopVfrNom}} = {{loopMfrNom}}/{{loopRho}}/3600 ! [m^3/s] nominal volume flow rate
+{{loopDia}} = 0.343*{{loopVfrNom}}^0.45*{{loopRho}}^0.13 ! [m]
 ** Pipe insulation: minimum thickness by DN and thermal conductivity (<= 0.03 or <= 0.05 W/(m*K))
 {{loopLamIns}} = {{values.DEFAULT_INSULATION_THERMAL_CONDUCTIVITY_IN_W_PER_M_K}} ! [W/(m*K)] thermal conductivity of insulation
 {{loopDN}} = {{loopDia}}*1000 ! [mm] nominal diameter (taken as inner diameter)

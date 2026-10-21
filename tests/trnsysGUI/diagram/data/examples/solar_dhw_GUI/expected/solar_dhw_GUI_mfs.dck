@@ -234,12 +234,12 @@ EQUATIONS 28
 ** loop2
 loop2NPipes = 3
 loop2Len = 2.0 ! [m]
-** Pipe sizing: diameter flow rate correlation D [mm] = 0.92 * Q^0.45, Q in [l/h]
+** Pipe sizing: economic optimum diameter (Peters & Timmerhaus) D = 0.343 * q^0.45 * rho^0.13, D in [m], q in [m^3/s], rho in [kg/m^3]
 loop2PNom = 10.0 ! [kW] nominal power
 loop2dTNom = 10.0 ! [K] nominal temperature difference
 loop2MfrNom = loop2PNom/(Lloop2Cp*loop2dTNom)*3600 ! [kg/h] nominal mass flow rate
-loop2VfrNom = loop2MfrNom/Lloop2Rho*1000 ! [l/h] nominal volume flow rate
-loop2Dia = 0.92*loop2VfrNom^0.45/1000 ! [m]
+loop2VfrNom = loop2MfrNom/Lloop2Rho/3600 ! [m^3/s] nominal volume flow rate
+loop2Dia = 0.343*loop2VfrNom^0.45*Lloop2Rho^0.13 ! [m]
 ** Pipe insulation: minimum thickness by DN and thermal conductivity (<= 0.03 or <= 0.05 W/(m*K))
 loop2LamIns = 0.035 ! [W/(m*K)] thermal conductivity of insulation
 loop2DN = loop2Dia*1000 ! [mm] nominal diameter (taken as inner diameter)
@@ -252,12 +252,12 @@ Lloop2Cp = FbrineCp
 ** loop4
 loop4NPipes = 7
 loop4Len = 2.0 ! [m]
-** Pipe sizing: diameter flow rate correlation D [mm] = 0.92 * Q^0.45, Q in [l/h]
+** Pipe sizing: economic optimum diameter (Peters & Timmerhaus) D = 0.343 * q^0.45 * rho^0.13, D in [m], q in [m^3/s], rho in [kg/m^3]
 loop4PNom = 10.0 ! [kW] nominal power
 loop4dTNom = 10.0 ! [K] nominal temperature difference
 loop4MfrNom = loop4PNom/(Lloop4Cp*loop4dTNom)*3600 ! [kg/h] nominal mass flow rate
-loop4VfrNom = loop4MfrNom/Lloop4Rho*1000 ! [l/h] nominal volume flow rate
-loop4Dia = 0.92*loop4VfrNom^0.45/1000 ! [m]
+loop4VfrNom = loop4MfrNom/Lloop4Rho/3600 ! [m^3/s] nominal volume flow rate
+loop4Dia = 0.343*loop4VfrNom^0.45*Lloop4Rho^0.13 ! [m]
 ** Pipe insulation: minimum thickness by DN and thermal conductivity (<= 0.03 or <= 0.05 W/(m*K))
 loop4LamIns = 0.035 ! [W/(m*K)] thermal conductivity of insulation
 loop4DN = loop4Dia*1000 ! [mm] nominal diameter (taken as inner diameter)
