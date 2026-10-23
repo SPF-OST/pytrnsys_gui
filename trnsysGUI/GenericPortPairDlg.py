@@ -13,6 +13,15 @@ from PyQt5.QtWidgets import (
     QListWidget,
 )
 
+import trnsysGUI.sideNrs as _snrs
+
+_SIDE_NAMES = {
+    _snrs.SideNrs.LEFT: "Left",
+    _snrs.SideNrs.TOP: "Top",
+    _snrs.SideNrs.RIGHT: "Right",
+    _snrs.SideNrs.BOTTOM: "Bottom",
+}
+
 
 class GenericPortPairDlg(QDialog):
     def __init__(self, block, parent=None):
@@ -72,28 +81,28 @@ class GenericPortPairDlg(QDialog):
 
     def loadList(self):
         print("Loading ports")
-        stringDct = {"0": "Left", "1": "Top", "2": "Right", "3": "Bottom"}
-        for i in self.block.inputs:
-            self.listW.addItem("Port pair at " + stringDct[str(i.side)])
+        for side in self.block.portPairSides:
+            self.listW.addItem("Port pair at " + _SIDE_NAMES[side])
 
     def addPortPair(self):
         if self.getSide() is not None:
             print("Adding a port")
             self.block.addPortPair(self.getSide())
+            self.listW.addItem("Port pair at " + _SIDE_NAMES[self.getSide()])
 
     def removePortPair(self):
         if self.getSide() is not None:
-            self.block.removePortPair(self.getSide())
+            self.block.removePortPairOnSide(self.getSide())
 
     def getSide(self):
         if self.rButtonLeft.isChecked():
-            return 0
+            return _snrs.SideNrs.LEFT
         elif self.rButtonTop.isChecked():
-            return 1
+            return _snrs.SideNrs.TOP
         elif self.rButtonRight.isChecked():
-            return 2
+            return _snrs.SideNrs.RIGHT
         elif self.rButtonBottom.isChecked():
-            return 3
+            return _snrs.SideNrs.BOTTOM
         else:
             return None
 
