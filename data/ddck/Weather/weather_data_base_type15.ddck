@@ -1,0 +1,261 @@
+*******************************
+**BEGIN WeatherData_Type15.ddck
+*******************************
+
+*********************************************************************
+** Based on weather_data_base.ddck (Type 109) by Daniel Carbonell (DC)
+** Last changes   : 10.2026 : Type 109 replaced by Type 15. Type 33 and
+**                  Type 69 removed (psychrometrics and sky temperature
+**                  are calculated by Type 15). Same output names as the
+**                  Type 109 version, so other ddcks ($weatherX) are unchanged.
+**********************************************************************
+
+****************************************************
+** Description:
+** Weather data and calculation on inclined surfaces (Type 15)
+**
+** IMPORTANT: Type 15 only reads standard formats (TMY, TMY2, TMY3, EPW,
+** IWEC, CWEC, Meteonorm TM2, German TRY). User-format files (*.99, i.e.
+** formatWeatherData = 1 in the city ddck) can NOT be read by Type 15:
+** use weather_data_base.ddck (Type 109) for those.
+****************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+************************************
+** inputs from other ddck
+************************************
+
+** TambAvg and unitWeatherData come from the city ddck,
+** which has to be included with the same component name ("as weather").
+** formatWeatherData of the city ddck follows the Type 109 convention
+** (1 = user, 2 = TMY2) and is therefore NOT used here.
+CONSTANTS #
+myUnitWeatherData = unitWeatherData     !from the specific weatherFile
+myFileTypeWeather = 6                   ! Type 15 file type: 1 = TMY, 2 = TMY2, 3 = EnergyPlus (EPW), 4 = IWEC, 5 = CWEC, 6 = Meteonorm TM2, 7 = TMY3, 8 = TRY 2004, 9 = TRY 2010, 10 = TRY 2017
+
+CONSTANTS #    ! Turn the North,South,East and West orientations with "TURN"
+TURN = 0.0
+AA_N = 180.0 + TURN
+AA_S = TURN
+AA_E = 270.0 + TURN
+AA_W = 90.0 + TURN
+groundRef = 0.2
+groundRefSnow = groundRef     ! Type 109 has no snow albedo: same value keeps results comparable
+slope90 = 90.0
+
+*************************************
+** outputs to other ddck
+*************************************
+
+CONSTANTS 1
+TcwAvg = TambAvg
+
+** Type 15 outputs for 8 surfaces (ns = 8):
+**   1..23  : general outputs (temperatures, humidity, wind, horizontal radiation)
+**   23+j   : total tilted radiation of surface j       (24..31)
+**   31+j   : beam radiation of surface j               (32..39)
+**   39+j   : sky diffuse radiation of surface j        (40..47)
+**   47+j   : ground diffuse radiation of surface j     (48..55)
+**   55+j   : total diffuse radiation of surface j      (56..63)
+**   63+j   : angle of incidence of surface j           (64..71)
+**   88..99 : latitude, longitude, ..., monthly/annual temperatures
+** If the number of surfaces changes, ALL indices from 24 on shift.
+EQUATIONS #
+tAmbDry = [30,1]      !Ambient temperature °C
+relHum  = [30,7]      ! Relative humidity
+vWind   = [30,8]      ! Wind velocity [m/s]
+dirWind = [30,9]      ! Wind direction, north = 0, east = 90°, etc. [°]
+pAmb_Pa = [30,10]*101325 ! ambient pressure [Pa] (Type 15 gives atm)
+AISZ = [30,16]        ! Solar zenith angle
+AISA = [30,17]        ! Solar azimuth angle
+IT_H = Max([30,18],0) ! total irradiation on the horizontal, kJ/hm2
+IB_H = Max([30,19],0) ! beam radiation on horizontal, kJ/hm2
+ID_H = [30,20]        ! sky diffuse radiation on horizontal, kJ/hm2
+AI_H = [30,23]        ! angle of incidence on the horizontal, °
+
+EQUATIONS #
+**surface-1
+IT_N = [30,24]     !NORTH 90°
+AI_N = [30,64]
+IB_N = [30,32] * LT(AI_N,90)
+**surface-2
+IT_S = [30,25]     !SOUTH 90°
+IB_S = [30,33]
+ID_S = [30,57]
+AI_S = [30,65]
+**surface-3
+IT_E = [30,26]    !EAST 90°
+IB_E = [30,34]
+ID_E = [30,58]
+AI_E = [30,66]
+**surface-4
+IT_W = [30,27]    !WEST 90°
+IB_W = [30,35]
+ID_W = [30,59]
+AI_W = [30,67]
+**surface-5
+IT_surfUser_1 = [30,28]
+IB_surfUser_1 = [30,36]
+ID_surfUser_1 = [30,60]
+IDS_surfUser_1 = [30,44]
+IDG_surfUser_1 = [30,52]
+AI_surfUser_1 = [30,68]
+**surface-6
+IT_surfUser_2 = [30,29]
+IB_surfUser_2 = [30,37]
+ID_surfUser_2 = [30,61]
+IDS_surfUser_2 = [30,45]
+IDG_surfUser_2 = [30,53]
+AI_surfUser_2 = [30,69]
+**surface-7
+IT_surfUser_3 = [30,30]
+IB_surfUser_3 = [30,38]
+ID_surfUser_3 = [30,62]
+IDS_surfUser_3 = [30,46]
+IDG_surfUser_3 = [30,54]
+AI_surfUser_3 = [30,70]
+**surface-8
+IT_surfUser_4 = [30,31]
+IB_surfUser_4 = [30,39]
+ID_surfUser_4 = [30,63]
+IDS_surfUser_4 = [30,47]
+IDG_surfUser_4 = [30,55]
+AI_surfUser_4 = [30,71]
+
+EQUATIONS #
+IT_surfUser_4_Wm2 = IT_surfUser_4/3.6
+IT_surfUser_3_Wm2 = IT_surfUser_3/3.6
+IT_surfUser_2_Wm2 = IT_surfUser_2/3.6
+IT_surfUser_1_Wm2 = IT_surfUser_1/3.6
+
+IT_S_Wm2 = IT_S/3.6
+IT_N_Wm2 = IT_N/3.6
+IT_W_Wm2 = IT_W/3.6
+IT_E_Wm2 = IT_E/3.6
+
+EQUATIONS #
+IT_H_kW = IT_H/3600
+IB_H_kW = IB_H/3600
+IT_S_kW = IT_S/3600     ! Irradiation on south plane in kW/m2
+IB_S_kW = IB_S/3600     ! Direct Irradiation on south plane in kW/m3
+
+EQUATIONS #
+IT_H_Wm2 = IT_H_kW*100
+IB_H_Wm2 = IB_H_KW*100
+
+EQUATIONS #    ! pressure conversions
+pamb_kPa = pamb_Pa/1000     ! ambient pressure [kPa]
+pamb_atm = pamb_kPa/101.325 ! Ambient pressure [atm]
+pamb_bar = pamb_kPa/100     ! Ambient pressure [bar]
+
+EQUATIONS #    ! psychrometrics (formerly Type 33)
+tAmb_Met = [30,1]
+tAmbDewPoint = [30,2]     ! dew point temp. [°C]
+RHamb_100 = [30,7]      ! Relative humidity [0..100]
+tAmb = Tamb_Met     ! Dry bulb temperature
+RHamb_1 = RHamb_100/100
+tMains = [30,5]     ! Mains water temperature calculated by Type 15 [°C]
+
+EQUATIONS #    ! sky temperature (formerly Type 69)
+Tsky = [30,4]     ! effective sky temperature (°C)
+dTsky = Tsky - Tamb     ! delta-T from sky to ambient (K)
+
+******************************************************************************************
+** outputs to energy balance in kWh
+******************************************************************************************
+
+
+**************************************************************
+** Definition of surfaces
+** These values are expected to be changed by the run.config
+**************************************************************
+
+CONSTANTS #
+slopeSurfUser_1 = 45. ! Slope of surface-5. By default used in solar thermal colelctors
+aziSurfUser_1   = 0.  ! Azimuth of surface-5.
+slopeSurfUser_2 = 10. ! Slope of surface-6. By default used in PV panels
+aziSurfUser_2   = 110.! Azimuth of surface-6
+slopeSurfUser_3 = 10. ! Slope of surface-7
+aziSurfUser_3   = 70. ! Azimuth of surface-7
+slopeSurfUser_4 = 10. ! Slope of surface-8
+aziSurfUser_4   = 70. ! Azimuth of surface-8
+
+ModeTracking = 1     ! Tracking of the user surfaces (5..8). Surfaces 1..4 (facades) are always fixed
+
+***************************************
+** TYPE 15 TRNSYS
+**************************************
+
+UNIT 30 TYPE 15 ! Weather data for collectors
+PARAMETERS 30
+myFileTypeWeather ! 1 File type (see myFileTypeWeather)
+myUnitWeatherData ! 2 Logical unit
+4                 ! 3 Sky model for diffuse radiation: 1: Isotropic; 2: Hay and Davies; 3: Reindl; 4: Perez 1988; 5: Perez 1999
+groundRef         ! 4 Ground reflectance - no snow
+groundRefSnow     ! 5 Ground reflectance - snow cover
+8                 ! 6 Number of surfaces
+** per surface: tracking mode (1: fixed; 2: single-axis, vertical axis; 3: single-axis in the plane of the surface; 4: two-axis), slope, azimuth
+1               slope90         AA_N            ! surface-1
+1               slope90         AA_S            ! surface-2
+1               slope90         AA_E            ! surface-3
+1               slope90         AA_W            ! surface-4
+ModeTracking    slopeSurfUser_1 aziSurfUser_1   ! surface-5
+ModeTracking    slopeSurfUser_2 aziSurfUser_2   ! surface-6
+ModeTracking    slopeSurfUser_3 aziSurfUser_3   ! surface-7
+ModeTracking    slopeSurfUser_4 aziSurfUser_4   ! surface-8
+
+***************************************
+** HOURLY PRINTER
+**************************************
+
+CONSTANTS 1
+unitPrinterWeatherHr=46
+
+ASSIGN    temp\WEATHER_BASE_HR.dat    unitPrinterWeatherHr
+!
+UNIT 46 Type 46     ! Printegrator Hourly Values for Weather data
+PARAMETERS 5
+unitPrinterWeatherHr    ! 1: Logical unit number, -
+-1     ! 2: Logical unit for monthly summaries, -
+1     ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals
+1     ! 4: Printing & integrating interval, h. -1 for monthly integration
+0     ! 5: Number of inputs to avoid integration, -
+INPUTS 19
+tAmb relHum tAmbDewPoint vWind dirWind pamb_atm Tsky tMains IT_H IB_H ID_H IT_N IT_S IT_E IT_W IT_surfUser_1 IT_surfUser_2 IT_surfUser_3 IT_surfUser_4
+*****
+tAmb relHum tAmbDewPoint vWind dirWind pamb_atm Tsky tMains IT_H IB_H ID_H IT_N IT_S IT_E IT_W IT_surfUser_1 IT_surfUser_2 IT_surfUser_3 IT_surfUser_4
+
+***************************************
+** MONTHLY PRINTER
+**************************************
+
+CONSTANTS 1
+unitPrinterWeather=45
+
+ASSIGN    temp\WEATHER_BASE_MO.dat    unitPrinterWeather
+!
+UNIT 45 Type 46     ! Printegrator Monthly Values for Weather data
+PARAMETERS 6
+unitPrinterWeather    ! 1: Logical unit number, -
+-1     ! 2: Logical unit for monthly summaries, -
+1     ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1     ! 4: Printing & integrating interval, h. -1 for monthly integration
+1     ! 5: Number of inputs to avoid integration, -
+1     ! 6: Output number to avoid integration
+INPUTS 4
+$TIME IT_H IB_H ID_H
+*****
+$TIME IT_H IB_H ID_H
+
+
+
+*******************************
+**END WeatherData_Type15.ddck
+*******************************
