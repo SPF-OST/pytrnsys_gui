@@ -13,6 +13,7 @@ import trnsysGUI.connection.names as _cnames
 import trnsysGUI.connection.singlePipeConnection as _spc
 import trnsysGUI.connection.singlePipeDefaultValues as _spdValues
 import trnsysGUI.globalNames as _gnames
+import trnsysGUI.hydraulicLoops.insulation as _lins
 import trnsysGUI.hydraulicLoops.model as _hlm
 import trnsysGUI.hydraulicLoops.names as _lnames
 import trnsysGUI.internalPiping as _ip
@@ -712,6 +713,17 @@ F{{fluid.name}}Cp = {{cp}} ! [kJ/(kg*K)]
         )
 
     def exportHydraulicLoops(self) -> str:
+        # For loops using loop-wide defaults the pipe diameter is sized with
+        # the economic optimum pipe diameter for turbulent flow,
+        #   D_opt [in] = 3.9 * q_f[ft^3/s]^0.45 * rho[lb/ft^3]^0.13,
+        # see M. S. Peters, K. D. Timmerhaus: "Plant Design and Economics
+        # for Chemical Engineers", McGraw-Hill (based on R. P. Genereaux,
+        # "Fluid-flow design methods", Ind. Eng. Chem. 29(4), 1937).
+        # Converted to SI units this reads
+        #   D_opt [m] = 0.343 * q_f[m^3/s]^0.45 * rho[kg/m^3]^0.13.
+        # The U-value of the pipes then follows from the minimum insulation
+        # thickness for the pipe's nominal diameter, see the `insulation`
+        # module.
         template = """\
 ** Hydraulic loops
 EQUATIONS {{nEquations}}
@@ -724,12 +736,30 @@ EQUATIONS {{nEquations}}
 {% set loopDia = names.getDefaultDiameterName(loopName) -%}
 {% set loopUVal = names.getDefaultUValueName(loopName) -%}
 {% set loopNPipes = names.getNumberOfPipesName(loopName) -%}
+{% set loopPNom = names.getNominalPowerName(loopName) -%}
+{% set loopDTNom = names.getNominalTemperatureDifferenceName(loopName) -%}
+{% set loopMfrNom = names.getNominalMassFlowRateName(loopName) -%}
+{% set loopVfrNom = names.getNominalVolumeFlowRateName(loopName) -%}
+{% set loopDN = names.getNominalDiameterName(loopName) -%}
+{% set loopLamIns = names.getInsulationThermalConductivityName(loopName) -%}
+{% set loopSIns = names.getInsulationThicknessName(loopName) -%}
+{% set loopULin = names.getLinearHeatLossCoefficientName(loopName) -%}
 ** {{loopName}}
 {% if hydraulicLoop.connectionsDefinitionMode.useLoopWideDefaults() -%}
 {{loopNPipes}} = {{hydraulicLoop.connections | length}}
 {{loopLen}} = {{values.DEFAULT_LENGTH_IN_M}} ! [m]
-{{loopDia}} = {{values.DEFAULT_DIAMETER_IN_CM / 100}} ! [m]
-{{loopUVal}} = {{values.DEFAULT_U_VALUE_IN_W_PER_M2_K * 60*60/1000}} ! [kJ/(h*m^2*K)] (= {{values.DEFAULT_U_VALUE_IN_W_PER_M2_K}} W/(m^2*K))
+** Pipe sizing: economic optimum diameter (Peters & Timmerhaus) D = 0.343 * q^0.45 * rho^0.13, D in [m], q in [m^3/s], rho in [kg/m^3]
+{{loopPNom}} = {{values.DEFAULT_NOMINAL_POWER_IN_KW}} ! [kW] nominal power
+{{loopDTNom}} = {{values.DEFAULT_NOMINAL_TEMPERATURE_DIFFERENCE_IN_K}} ! [K] nominal temperature difference
+{{loopMfrNom}} = {{loopPNom}}/({{loopCp}}*{{loopDTNom}})*3600 ! [kg/h] nominal mass flow rate
+{{loopVfrNom}} = {{loopMfrNom}}/{{loopRho}}/3600 ! [m^3/s] nominal volume flow rate
+{{loopDia}} = 0.343*{{loopVfrNom}}^0.45*{{loopRho}}^0.13 ! [m]
+** Pipe insulation: minimum thickness by DN and thermal conductivity (<= 0.03 or <= 0.05 W/(m*K))
+{{loopLamIns}} = {{values.DEFAULT_INSULATION_THERMAL_CONDUCTIVITY_IN_W_PER_M_K}} ! [W/(m*K)] thermal conductivity of insulation
+{{loopDN}} = {{loopDia}}*1000 ! [mm] nominal diameter (taken as inner diameter)
+{{loopSIns}} = {{insulation.getMinimumInsulationThicknessInMmExpression(loopDN, loopLamIns)}} ! [mm] insulation thickness
+{{loopULin}} = 2*PI*{{loopLamIns}}/LN(({{loopDia}}+2*{{loopSIns}}/1000)/{{loopDia}}) ! [W/(m*K)] heat loss coefficient per pipe length
+{{loopUVal}} = {{loopULin}}/(PI*{{loopDia}})*3.6 ! [kJ/(h*m^2*K)] U-value w.r.t. inner pipe surface
 {% endif -%}
 {{loopRho}} = F{{fluid.name}}Rho
 {{loopCp}} = F{{fluid.name}}Cp
@@ -739,7 +769,7 @@ EQUATIONS {{nEquations}}
         loops = self._hydraulicLoops
 
         nEquations = sum(
-            6 if l.connectionsDefinitionMode.useLoopWideDefaults() else 2
+            14 if l.connectionsDefinitionMode.useLoopWideDefaults() else 2
             for l in loops
         )
 
@@ -749,6 +779,7 @@ EQUATIONS {{nEquations}}
             nEquations=nEquations,
             names=_lnames,
             values=_spdValues,
+            insulation=_lins,
         )
 
     @staticmethod
