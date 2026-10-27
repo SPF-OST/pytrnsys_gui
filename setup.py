@@ -16,6 +16,7 @@ class _DestDirSourceFilePath:
     sourceFilePath: str
 
 
+# Files read here must be listed in `tool.uv.cache-keys` in `pyproject.toml`.
 def _getDataFilePairs():
     dataDirPath = _pl.Path(__file__).parent / "data"
 
@@ -42,6 +43,7 @@ def _getDataFilePairs():
     return dataFilePairs
 
 
+# Files read here must be listed in `tool.uv.cache-keys` in `pyproject.toml`.
 def _getInstallRequirements():
     requirementsFile = (
         _pl.Path(__file__).parent / "requirements" / "release-3rd-party.in"
