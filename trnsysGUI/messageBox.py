@@ -12,7 +12,7 @@ from trnsysGUI.constants import (
 class MessageBox:
 
     @classmethod
-    def create(
+    def create(  # pylint: disable=too-many-positional-arguments
         cls,
         messageBoxTitle: str = DEFAULT_MESSAGE_BOX_TITLE,
         messageText: str = DEFAULT_MESSAGE_BOX_MESSAGE,

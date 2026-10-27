@@ -106,12 +106,12 @@ class TestGetBlockItem:
     @_pt.mark.parametrize(
         "componentTypeName, componentType, displayName", _BLOCK_ITEM_CASES
     )
-    def testGetNewBlockItem(
+    def testGetNewBlockItem(  # pylint: disable=too-many-positional-arguments
         self,
         componentTypeName,
         componentType,
         displayName,
-        tmp_path,  # pylint: disable=invalid-name  # /NOSONAR
+        tmp_path,  # pylint: disable=invalid-name  # NOSONAR
         qtbot,
     ) -> None:
         editorMock = self._testHelper(tmp_path, qtbot)
@@ -123,7 +123,7 @@ class TestGetBlockItem:
         assert blockItem.displayName == displayName
 
     def testGetNewStorageTank(
-        self, tmp_path, qtbot  # pylint: disable=invalid-name  # /NOSONAR
+        self, tmp_path, qtbot  # pylint: disable=invalid-name  # NOSONAR
     ) -> None:
         editorMock = self._testHelper(tmp_path, qtbot)
         namesManagerMock = self._createNamesManager()
@@ -137,7 +137,7 @@ class TestGetBlockItem:
         assert blockItem.displayName == displayName
 
     def testGetNewGraphicalItem(
-        self, tmp_path, qtbot  # pylint: disable=invalid-name  # /NOSONAR
+        self, tmp_path, qtbot  # pylint: disable=invalid-name  # NOSONAR
     ) -> None:
         editorMock = self._testHelper(tmp_path, qtbot)
         namesManagerMock = self._createNamesManager()
@@ -148,7 +148,7 @@ class TestGetBlockItem:
         assert isinstance(blockItem, GraphicalItem)
 
     def testGetNewUnknownBlockItemRaises(
-        self, tmp_path, qtbot  # pylint: disable=invalid-name  # /NOSONAR
+        self, tmp_path, qtbot  # pylint: disable=invalid-name  # NOSONAR
     ) -> None:
         editorMock = self._testHelper(tmp_path, qtbot)
 
@@ -164,7 +164,7 @@ class TestGetBlockItem:
         self,
         componentTypeName,
         componentType,
-        tmp_path,  # pylint: disable=invalid-name  # /NOSONAR
+        tmp_path,  # pylint: disable=invalid-name  # NOSONAR
         qtbot,
     ) -> None:
         editorMock = self._testHelper(tmp_path, qtbot)
@@ -179,7 +179,7 @@ class TestGetBlockItem:
         assert blockItem.displayName == displayName
 
     def testGetLoadedStorageTank(
-        self, tmp_path, qtbot  # pylint: disable=invalid-name  # /NOSONAR
+        self, tmp_path, qtbot  # pylint: disable=invalid-name  # NOSONAR
     ) -> None:
         editorMock = self._testHelper(tmp_path, qtbot)
         namesManagerMock = self._createNamesManager()
@@ -194,7 +194,7 @@ class TestGetBlockItem:
 
     def _testHelper(
         self, tmp_path, bot
-    ):  # pylint: disable=invalid-name  # /NOSONAR
+    ):  # pylint: disable=invalid-name  # NOSONAR
         logger = _log.getLogger("root")
         (
             editorMock,

@@ -5,5 +5,3 @@ pip-compile-multi
 pre-commit
 
 sphinx
-
-reloadium

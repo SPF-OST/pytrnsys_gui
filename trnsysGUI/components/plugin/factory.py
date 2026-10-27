@@ -195,7 +195,7 @@ class InternalPipingFactory(_plugin.AbstractInternalPipingFactory):
 
         return createdInternalPiping
 
-    def _createAndAddNodesAndPortItemsForTeePiece(
+    def _createAndAddNodesAndPortItemsForTeePiece(  # pylint: disable=too-many-positional-arguments
         self,
         blockItem: _bi.BlockItem,
         teePiece: _smodel.TeePiece,

@@ -74,7 +74,7 @@ class EnergyBalanceVariablesFactory:
             ),
         ]
 
-    def _createVariable(
+    def _createVariable(  # pylint: disable=too-many-positional-arguments
         self,
         variable: _ebv.EnergyBalanceVariables,
         portItemType: _tp.Optional[_mfn.PortItemType],

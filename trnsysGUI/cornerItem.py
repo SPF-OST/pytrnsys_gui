@@ -13,7 +13,7 @@ if _tp.TYPE_CHECKING:
 
 
 class CornerItem(_qtw.QGraphicsEllipseItem):
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(  # pylint: disable=too-many-arguments, too-many-positional-arguments
         self,
         x: float,
         y: float,

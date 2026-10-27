@@ -24,7 +24,7 @@ class HydraulicLoopsData:
 class DeleteSinglePipeConnectionCommand(
     _qtw.QUndoCommand
 ):  # pylint: disable=too-many-instance-attributes
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         connection: _spc.SinglePipeConnection,
         undoNamingHelper: _un.UndoNamingHelper,

@@ -15,9 +15,9 @@ class QtConsoleWidget(
 
     def __init__(self) -> None:
         super().__init__()
-        # pylint: disable=invalid-name # /NOSONAR
+        # pylint: disable=invalid-name # NOSONAR
         self.kernel_manager: _tp.Optional[_qtcm.KernelManager] = None
-        # pylint: disable=invalid-name # /NOSONAR
+        # pylint: disable=invalid-name # NOSONAR
         self.kernel_client: _tp.Optional[_qtcc.QtKernelClient] = None
 
     def isRunning(self) -> bool:

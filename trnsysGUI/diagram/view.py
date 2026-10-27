@@ -49,7 +49,7 @@ class View(_qtw.QGraphicsView):
         componentType = str(
             event.mimeData().data("component/name"), encoding="utf-8"
         )
-        self.logger.debug("name is " + componentType)
+        self.logger.debug("name is %s", componentType)
 
         blockItem = _gbi.createBlockItem(
             componentType, self._editor, self._editor.namesManager

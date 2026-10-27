@@ -23,3 +23,10 @@ pydantic
 pyyaml
 
 xmlschema
+
+pytrnsys-process
+
+spyder
+
+# version from pytrnsys
+pluggy==1.6.0

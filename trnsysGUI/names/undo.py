@@ -25,7 +25,7 @@ class UndoNamingHelper:
         createNamingHelper = _nc.CreateNamingHelper(namesManager)
         return UndoNamingHelper(namesManager, createNamingHelper)
 
-    def addOrGenerateAndAddAnNonCollidingNameForAdd(
+    def addOrGenerateAndAddAnNonCollidingNameForAdd(  # pylint: disable=too-many-positional-arguments
         self,
         oldName: str,
         targetType: DeleteCommandTargetType,

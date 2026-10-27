@@ -28,7 +28,7 @@ class SplitLoopDialog(_qtw.QDialog, _uigen.Ui_splitHydraulicLoopDialog):
         dialog.exec()
         return dialog.splitSummary
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         loop: _model.HydraulicLoop,
         occupiedNames: _tp.Set[str],

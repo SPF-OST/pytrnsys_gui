@@ -1,6 +1,3 @@
-# pylint: skip-file
-# type: ignore
-
 import trace as _trc
 import typing as _tp
 import abc as _abc

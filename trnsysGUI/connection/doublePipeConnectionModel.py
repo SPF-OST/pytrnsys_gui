@@ -127,8 +127,8 @@ class DoublePipeConnectionModel(
         cls,
         data: _dcj.JsonDict,  # pylint: disable=duplicate-code  # 1
         validate=True,
-        validate_enums: bool = True,  # /NOSONAR
-        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
+        validate_enums: bool = True,  # NOSONAR
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # NOSONAR
     ) -> "DoublePipeConnectionModel":
         doublePipeConnectionModel = super().from_dict(
             data, validate, validate_enums, schema_type
@@ -137,10 +137,10 @@ class DoublePipeConnectionModel(
 
     def to_dict(
         self,
-        omit_none: bool = True,  # /NOSONAR
+        omit_none: bool = True,  # NOSONAR
         validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code # 1 # /NOSONAR
-        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
+        validate_enums: bool = True,  # pylint: disable=duplicate-code # 1 # NOSONAR
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # NOSONAR
     ) -> _dcj.JsonDict:
         data = super().to_dict(
             omit_none, validate, validate_enums, schema_type

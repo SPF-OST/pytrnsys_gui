@@ -204,12 +204,13 @@ class TVentil(
             lines += "5 !Nb.of iterations before fixing the value \n"
             lines += "INPUTS 4 \n"
 
-            if (
+            assert (
                 self.outputs[0].pos().y() == self.inputs[0].pos().y()
                 or self.outputs[0].pos().x() == self.inputs[0].pos().x()
-            ):
-                first = self.outputs[0]
-                second = self.outputs[1]
+            )
+
+            first = self.outputs[0]
+            second = self.outputs[1]
 
             lines += "T" + first.connectionList[0].displayName + "\n"
             lines += "T" + second.connectionList[0].displayName + "\n"

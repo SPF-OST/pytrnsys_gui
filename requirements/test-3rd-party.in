@@ -8,6 +8,7 @@ pytest-html
 mypy
 pylint
 black
+uv
 
 PyQT5-stubs
 pytest-qt

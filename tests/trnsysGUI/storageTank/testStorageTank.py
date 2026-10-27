@@ -33,7 +33,7 @@ class TestStorageTank:
     LEGACY_JSON_PATH = DATA_DIR_PATH / "storageTankOldestFormat.json"
 
     def testDeserializeJsonFromLegacyFormatAndSerialize(
-        self, tmp_path, qtbot  # pylint: disable=invalid-name  # /NOSONAR
+        self, tmp_path, qtbot  # pylint: disable=invalid-name  # NOSONAR
     ):
         expectedPath = self.EXPECTED_DIR_PATH / "storageTankNewestFormat.json"
         expectedStorageTankJson = expectedPath.read_text()
@@ -162,7 +162,7 @@ class TestStorageTank:
             )
 
     @classmethod
-    def _addLoop(
+    def _addLoop(  # pylint: disable=too-many-positional-arguments, too-many-arguments
         cls,
         externalFromPortConnection,
         externalToPortConnection,

@@ -697,10 +697,6 @@ class MainWindow(_qtw.QMainWindow):
             RecentProjectsHandler.save()
             e.accept()
 
-    def ensureSettingsExist(self):
-        if not _settings.Settings.tryLoadOrNone():
-            self.askUserForSettingsValuesAndSave()
-
     def askUserForSettingsValuesAndSave(self):
         newSettings = _sdlg.SettingsDlg.showDialogAndGetSettings(parent=self)
         while newSettings == _sdlg.CANCELLED:
