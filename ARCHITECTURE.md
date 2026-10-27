@@ -18,3 +18,8 @@
    `pytrnsys/utils/serialization.py`.
 5. Models forbid additional properties. Don't extend one by subclassing its dataclass; see the docstring of
    `UpgradableJsonSchemaMixinVersion0` in `pytrnsys/utils/serialization.py` for why.
+6. Annotate model fields with `typing.Optional` and `typing.Union`, not `X | Y`: `dataclasses_jsonschema` doesn't
+   support PEP 604 unions, so such a field gets an empty schema (no validation) and every load warns. SonarCloud
+   flags the old style (rule `S6546`): suppress it with `# NOSONAR` on the line that holds the annotation, using a
+   type alias if black would otherwise wrap that line (see `trnsysGUI/valveModel.py`). For replacing the library,
+   see #646.
