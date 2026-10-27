@@ -130,3 +130,15 @@ python .\dev-tools\devTools.py -s -u
 The unit tests leave untracked output files under `tests\**\data\`. To list them, run `git clean -nd -- tests`.
 Remove them before rerunning the tests: some tests fail if they're still there (e.g.
 `testHydraulicModesGui.py::testRunModesInvalidDckUnmodifiedDlls`).
+
+## SonarCloud
+
+SonarCloud analyses every PR and every push to `master`, and its quality gate shows up as a GitHub check.
+
+1. On a PR, the gate only looks at the code the PR changes. On `master`, it looks at all code changed since a
+   baseline set in the SonarCloud project settings.
+2. Sonar adds and changes rules without notice, and you'll only see them in the next analysis after a push. So a
+   push to `master` can fail the gate on code it didn't touch: check the gate's issue list for what it found.
+3. To suppress an issue, put `# NOSONAR` at the end of the line Sonar reports it on. If black would wrap that line,
+   shorten it, e.g. with a type alias.
+4. Don't write the word NOSONAR anywhere else in a comment: Sonar reads it as a malformed suppression (`S7632`).

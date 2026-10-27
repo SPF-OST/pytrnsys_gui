@@ -6,9 +6,10 @@ import pytrnsys.utils.serialization as _ser
 import trnsysGUI.blockItemModel as _bim
 import trnsysGUI.serialization as _gser
 
-# dataclasses_jsonschema doesn't support `X | Y`, hence the NOSONARs (see #646).
-# The alias keeps the field lines short enough for black not to wrap them,
-# which would move the NOSONAR off the line Sonar reports the issue on.
+# dataclasses_jsonschema doesn't support `X | Y` (see #646), hence the
+# suppressions of Sonar's S6546. The alias keeps the field lines short enough
+# for black not to wrap them, which would move the suppression off the line
+# Sonar reports the issue on.
 _OptionalStrOrFloat = _tp.Optional[_tp.Union[str, float]]  # NOSONAR
 
 
