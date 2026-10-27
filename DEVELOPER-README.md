@@ -28,6 +28,8 @@
 
 ##### Recommended
 * [PyCharm Community IDE](https://www.jetbrains.com/pycharm/download)
+* [Ghostscript](https://ghostscript.com/releases/gsdnld.html): without it, the unit test `testMplInstallation` fails,
+  as matplotlib can only compare PDF images with Ghostscript installed.
 
 #### Getting started
 
@@ -116,3 +118,5 @@ python .\dev-tools\devTools.py --black=""
 ```commandline
 python .\dev-tools\devTools.py -s -u
 ```
+
+The unit tests leave untracked output files under `tests\**\data\`. To list them, run `git clean -nd -- tests`.
