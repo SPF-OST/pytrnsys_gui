@@ -4,3 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [tool.uv]
 config-settings = { editable_mode = "compat" }
+# Rebuild whenever one of the files the build reads changes (see `setup.py`): by default, uv
+# only considers `pyproject.toml`, `setup.py` and `setup.cfg`.
+cache-keys = [
+    { file = "pyproject.toml" },
+    { file = "setup.py" },
+    { file = "requirements/release-3rd-party.in" },
+    { file = "data/**/*" },
+]

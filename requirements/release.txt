@@ -6,6 +6,12 @@
 #    pip-compile-multi
 #
 -r release-3rd-party.txt
+coverage==7.13.3
+iniconfig==2.3.0
+pytest==9.0.2
+pytest-cov==7.0.0
+pytest-html==4.2.0
+pytest-metadata==3.1.1
 pytrnsys @ git+https://github.com/SPF-OST/pytrnsys.git
 pytrnsys-gui @ file:.
 shortpath83==0.12
