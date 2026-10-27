@@ -1,3 +1,5 @@
+For how the code is organized, see [ARCHITECTURE.md](ARCHITECTURE.md).
+
 ## Installation from source / Developer installation
 
 #### Prerequisites
