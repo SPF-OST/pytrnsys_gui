@@ -80,6 +80,9 @@ to activate the environment (step 2. above).
 
 ## Managing requirements
 
+Write editable requirements in the `.in` files without an `#egg=` suffix (e.g. `-e file:.`): with the suffix,
+`pip-compile-multi` compiles them into non-editable ones.
+
 ### Adding new/removing packages and updating package versions pinned in .in files
 ```commandline
 pip-compile-multi --use-cache --backtracking --uv --no-upgrade -d .\requirements\
@@ -124,3 +127,5 @@ python .\dev-tools\devTools.py -s -u
 The unit tests leave untracked output files under `tests\**\data\`. To list them, run `git clean -nd -- tests`.
 Remove them before rerunning the tests: some tests fail if they're still there (e.g.
 `testHydraulicModesGui.py::testRunModesInvalidDckUnmodifiedDlls`).
+
+Lint with `python .\dev-tools\devTools.py -l` (the whole tree, like CI), not with `pylint` on single files.
