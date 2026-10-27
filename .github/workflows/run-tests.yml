@@ -86,6 +86,9 @@ jobs:
         run: |
           venv\Scripts\python -m uv pip install  . -r requirements\test.txt
 
+      - name: Install pytrnsys_GUI
+        run: python -m pip install --no-deps .
+
       - name: Generate UI code from Qt Creator Studio .ui files
         run: venv\Scripts\python dev-tools/generateGuiClassesFromQtCreatorStudioUiFiles.py
 
