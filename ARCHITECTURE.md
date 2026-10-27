@@ -13,11 +13,8 @@
    `Decoder` can tell them apart. It also reads `BlockName` and `BlockDisplayName` (`RequiredDecoderFieldsMixin`)
    before any model is involved. For models, the `*UpgradableJsonSchemaMixin*` classes in
    `trnsysGUI/serialization.py` add and remove the key.
-4. `UpgradableJsonSchemaMixinVersion0` is the base of a model's first versioned version. That version also
-   covers the step from unversioned dicts, so it doesn't require `__version__` (but checks it when present).
-   A new model's first version builds on it as well (`BlockItemUpgradableJsonSchemaMixinVersion0` for blocks).
-   Overriding `_doesRequireVersion` to require the version doesn't work: `from_dict` removes it before
-   validating.
-5. Models forbid additional properties. Don't extend a model by subclassing its dataclass: `dataclasses_jsonschema`
-   combines the schemas with `allOf`, and the base schema forbids the new fields. Declare the fields again
-   instead.
+4. A new model's first version builds on `BlockItemUpgradableJsonSchemaMixinVersion0` (blocks). For what
+   version 0 means and why `__version__` is optional, see `UpgradableJsonSchemaMixinVersion0` in
+   `pytrnsys/utils/serialization.py`.
+5. Models forbid additional properties. Don't extend one by subclassing its dataclass; see the docstring of
+   `UpgradableJsonSchemaMixinVersion0` in `pytrnsys/utils/serialization.py` for why.
