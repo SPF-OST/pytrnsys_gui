@@ -6,9 +6,11 @@ import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
 
+import pytrnsys.utils.serialization as _ser
 import trnsysGUI.blockItemGraphicItemMixins as _bmx
 import trnsysGUI.blockItemHasInternalPiping as _biip
 import trnsysGUI.createSinglePipePortItem as _cspi
+import trnsysGUI.genericBlockModel as _gbm
 import trnsysGUI.imageAccessor as _ia
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
@@ -23,11 +25,6 @@ _PORT_OFFSET = (
 class GenericBlock(
     _biip.BlockItemHasInternalPiping, _bmx.RasterImageBlockItemMixin
 ):
-    # Keys written by `encode` in addition to the ones of `BlockItemModel`
-    _PORT_PAIR_SIDES_KEY = "PortPairSides"
-    _PORT_PAIRS_NB_KEY = "PortPairsNb"
-    _IMAGE_SOURCE_KEY = "Imagesource"
-
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         _biip.BlockItemHasInternalPiping.__init__(
             self, trnsysType, editor, displayName
@@ -41,6 +38,7 @@ class GenericBlock(
         # coordinates of the block (i.e. before flipping and rotating)
         self.portPairSides: _tp.List[_snrs.SideNr] = [_snrs.SideNrs.RIGHT]
 
+        # One trnsys ID per port pair (same index as `inputs` and `outputs`)
         self.childIds = []
         self.childIds.append(self.trnsysId)
 
@@ -115,9 +113,6 @@ class GenericBlock(
             return along, self.h + _PORT_OFFSET
         raise ValueError(f"Unknown side: {side}")
 
-    def getPairNb(self, side: _snrs.SideNr) -> int:
-        return self.portPairSides.count(side)
-
     def addPortDlg(self):
         self.editor.showGenericPortPairDlg(self)
 
@@ -157,53 +152,51 @@ class GenericBlock(
             addPortAction.triggered.connect(self.addPortDlg)
 
     def encode(self):
-        _, dct = super().encode()
-
-        dct[self._PORT_PAIR_SIDES_KEY] = [*self.portPairSides]
-        dct[self._PORT_PAIRS_NB_KEY] = [
-            self.getPairNb(s) for s in _tp.get_args(_snrs.SideNr)
-        ]
-        dct[self._IMAGE_SOURCE_KEY] = self._imageAccessor.getResourcePath()
+        genericBlockModel = _gbm.GenericBlockModel(
+            self.name,
+            self.displayName,
+            self._encodeBaseModel(),
+            [i.id for i in self.inputs],
+            [o.id for o in self.outputs],
+            [*self.portPairSides],
+            self._imageAccessor.getResourcePath(),
+        )
 
         dictName = "Block-"
-        return dictName, dct
+        return dictName, genericBlockModel.to_dict()
 
     def decode(self, i, resBlockList):
-        portPairSides = self._getPortPairSides(i)
+        try:
+            model = _gbm.GenericBlockModel.from_dict(i)
+        except _ser.SerializationError as error:
+            # Generic blocks saved before `GenericBlockModel` could never be loaded, so their
+            # format isn't supported
+            displayName = i.get("BlockDisplayName")
+            raise _ser.SerializationError(
+                f"Generic block '{displayName}' was saved in a format that is no longer supported. "
+                "Remove it and its connections from the diagram file, or recreate it."
+            ) from error
+
+        self.setDisplayName(model.BlockDisplayName)
+
         self._removePortPairs()
-        for side in portPairSides:
+        for side in model.portPairSides:
             self.addPortPair(side)
 
+        for port, portId in zip(self.inputs, model.portsIdsIn):
+            port.id = portId
+        for port, portId in zip(self.outputs, model.portsIdsOut):
+            port.id = portId
+
         self._imageAccessor = _ia.createFromResourcePath(
-            i[self._IMAGE_SOURCE_KEY]
+            model.imageResourcePath
         )
         self.setImage()
 
-        # `BlockItemModel` doesn't know about the keys added by `encode`
-        genericBlockKeys = (
-            self._PORT_PAIR_SIDES_KEY,
-            self._PORT_PAIRS_NB_KEY,
-            self._IMAGE_SOURCE_KEY,
-        )
-        blockItemDict = {
-            k: v for k, v in i.items() if k not in genericBlockKeys
-        }
-        super().decode(blockItemDict, resBlockList)
+        self._decodeBaseModel(model.blockItemModel)
+        self.childIds[0] = self.trnsysId
 
-    def _getPortPairSides(self, i) -> _tp.List[_snrs.SideNr]:
-        if self._PORT_PAIR_SIDES_KEY in i:
-            return [*i[self._PORT_PAIR_SIDES_KEY]]
-
-        # Older files only have the number of port pairs per side (by `SideNr`), so the order of the
-        # port pairs is lost: they are created side by side
-        numberOfPortPairsBySide = i[self._PORT_PAIRS_NB_KEY]
-        return [
-            side
-            for side, number in zip(
-                _tp.get_args(_snrs.SideNr), numberOfPortPairsBySide
-            )
-            for _ in range(number)
-        ]
+        resBlockList.append(self)
 
     def _removePortPairs(self):
         assert len(self.inputs) == len(self.outputs)
@@ -221,11 +214,7 @@ class GenericBlock(
 
         self._layOutPortPairs()
 
-    def removePortPairOnSide(self, side: _snrs.SideNr) -> None:
-        if side in self.portPairSides:
-            self.removePortPair(self.portPairSides.index(side))
-
-    def removePortPair(self, n):
+    def removePortPair(self, n: int) -> None:
         for port in (self.inputs.pop(n), self.outputs.pop(n)):
             scene = port.scene()
             if scene:
@@ -233,6 +222,7 @@ class GenericBlock(
             else:
                 port.setParentItem(None)
         del self.portPairSides[n]
+        del self.childIds[n]
 
         self._layOutPortPairs()
 

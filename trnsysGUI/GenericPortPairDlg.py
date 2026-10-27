@@ -3,7 +3,6 @@
 
 from PyQt5.QtWidgets import (
     QLabel,
-    QLineEdit,
     QPushButton,
     QHBoxLayout,
     QGridLayout,
@@ -27,9 +26,6 @@ class GenericPortPairDlg(QDialog):
     def __init__(self, block, parent=None):
         super(GenericPortPairDlg, self).__init__(parent)
         self.block = block
-        nameLabel = QLabel("Name:")
-        objectLabel = QLabel("Object:" + str(self.block))
-        self.le = QLineEdit("0")
 
         positionLayout = QVBoxLayout()
         positionLabel = QLabel("Select a position")
@@ -46,53 +42,61 @@ class GenericPortPairDlg(QDialog):
         positionLayout.addWidget(self.rButtonBottom)
 
         self.addButton = QPushButton("Add port pair")
+        self.removeButton = QPushButton("Remove port pair")
         self.cancelButton = QPushButton("Close")
 
         self.addButton.clicked.connect(self.addPortPair)
+        self.removeButton.clicked.connect(self.removePortPair)
         self.cancelButton.clicked.connect(self.cancel)
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
         buttonLayout.addWidget(self.addButton)
+        buttonLayout.addWidget(self.removeButton)
         buttonLayout.addWidget(self.cancelButton)
-
-        radioButtonLayout = QHBoxLayout()
-        self.oButton = QRadioButton("Output")
-        self.iButton = QRadioButton("Input")
-        radioButtonLayout.addWidget(self.iButton)
-        radioButtonLayout.addWidget(self.oButton)
 
         listWLabel = QLabel("Ports pairs")
         self.listW = QListWidget()
+        self.listW.currentRowChanged.connect(self._updateRemoveButton)
 
         layout = QGridLayout()
-        # layout.addWidget(nameLabel, 0, 0)
-        # layout.addWidget(self.le, 0, 1)
-        # layout.addLayout(radioButtonLayout, 1, 0, 2, 0)
         layout.addWidget(listWLabel, 0, 0)
         layout.addWidget(self.listW, 1, 0)
         layout.addLayout(positionLayout, 2, 0, 2, 0)
         layout.addLayout(buttonLayout, 5, 0, 2, 0)
         self.setLayout(layout)
 
-        self.setWindowTitle("Change connection name")
+        self.setWindowTitle("Generic block port pairs")
         self.loadList()
+        self._updateRemoveButton()
         self.show()
 
     def loadList(self):
-        print("Loading ports")
         for side in self.block.portPairSides:
             self.listW.addItem("Port pair at " + _SIDE_NAMES[side])
 
     def addPortPair(self):
         if self.getSide() is not None:
-            print("Adding a port")
             self.block.addPortPair(self.getSide())
             self.listW.addItem("Port pair at " + _SIDE_NAMES[self.getSide()])
+            self._updateRemoveButton()
 
     def removePortPair(self):
-        if self.getSide() is not None:
-            self.block.removePortPairOnSide(self.getSide())
+        row = self.listW.currentRow()
+        if not self._canRemovePortPair(row):
+            return
+
+        self.block.removePortPair(row)
+        self.listW.takeItem(row)
+        self._updateRemoveButton()
+
+    def _updateRemoveButton(self):
+        row = self.listW.currentRow()
+        self.removeButton.setEnabled(self._canRemovePortPair(row))
+
+    def _canRemovePortPair(self, row):
+        # A generic block without port pairs couldn't be connected to anything
+        return row >= 0 and self.listW.count() > 1
 
     def getSide(self):
         if self.rButtonLeft.isChecked():
