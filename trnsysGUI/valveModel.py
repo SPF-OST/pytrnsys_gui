@@ -6,6 +6,11 @@ import pytrnsys.utils.serialization as _ser
 import trnsysGUI.blockItemModel as _bim
 import trnsysGUI.serialization as _gser
 
+# dataclasses_jsonschema doesn't support `X | Y`, hence the NOSONARs (see #646).
+# The alias keeps the field lines short enough for black not to wrap them,
+# which would move the NOSONAR off the line Sonar reports the issue on.
+_OptionalStrOrFloat = _tp.Optional[_tp.Union[str, float]]  # NOSONAR
+
 
 @_dc.dataclass
 class TVentilModelVersion1(
@@ -21,10 +26,10 @@ class TVentilModelVersion1(
     flippedH: bool
     flippedV: bool
     rotationN: int
-    # NOSONAR  # pylint: disable=invalid-name
-    IsTempering: _tp.Optional[bool] = None
-    # NOSONAR  # pylint: disable=invalid-name
-    PositionForMassFlowSolver: _tp.Optional[_tp.Union[str, float]] = None
+    # pylint: disable=invalid-name
+    IsTempering: _tp.Optional[bool] = None  # NOSONAR
+    # pylint: disable=invalid-name
+    PositionForMassFlowSolver: _OptionalStrOrFloat = None
 
     @classmethod
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixin]:
@@ -63,10 +68,10 @@ class ValveModel(
     blockItemModel: _bim.BlockItemBaseModel
     inputPortId: int
     outputPortIds: _tp.Tuple[int, int]
-    # NOSONAR  # pylint: disable=invalid-name
-    IsTempering: _tp.Optional[bool] = None
-    # NOSONAR  # pylint: disable=invalid-name
-    PositionForMassFlowSolver: _tp.Optional[_tp.Union[str, float]] = None
+    # pylint: disable=invalid-name
+    IsTempering: _tp.Optional[bool] = None  # NOSONAR
+    # pylint: disable=invalid-name
+    PositionForMassFlowSolver: _OptionalStrOrFloat = None
 
     @classmethod
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixin]:

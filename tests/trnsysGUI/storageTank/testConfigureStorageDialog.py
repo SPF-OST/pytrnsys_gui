@@ -38,10 +38,13 @@ class TestConfigureStorageDialog:
 
         configureStorageDialog = storageDialog
 
-        try:
-            assert len(self.storageTank.heatExchangers) == 1
-        except AssertionError as error:
-            errors.append(error)
+        heatExchangers = self.storageTank.heatExchangers
+        if len(heatExchangers) != 1:
+            errors.append(
+                AssertionError(
+                    f"Expected 1 heat exchanger before adding, got {len(heatExchangers)}."
+                )
+            )
 
         configureStorageDialog.offsetLeI.setText(hxInput)
         configureStorageDialog.offsetLeO.setText(hxOutput)
@@ -49,15 +52,19 @@ class TestConfigureStorageDialog:
         configureStorageDialog.rButton.setChecked(True)
         configureStorageDialog.addHx()
 
-        try:
-            assert len(self.storageTank.heatExchangers) == 2
-        except AssertionError as error:
-            errors.append(error)
-
-        try:
-            assert self.storageTank.heatExchangers[1].displayName == hxName
-        except AssertionError as error:
-            errors.append(error)
+        if len(heatExchangers) != 2:
+            errors.append(
+                AssertionError(
+                    f"Expected 2 heat exchangers after adding, got {len(heatExchangers)}."
+                )
+            )
+        elif heatExchangers[1].displayName != hxName:
+            errors.append(
+                AssertionError(
+                    f"Expected the new heat exchanger to be called {hxName!r}, "
+                    f"got {heatExchangers[1].displayName!r}."
+                )
+            )
 
         if errors:
             raise ExceptionGroup(f"Found {len(errors)} issues.", errors)

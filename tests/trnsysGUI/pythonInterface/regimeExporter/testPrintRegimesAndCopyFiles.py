@@ -237,21 +237,23 @@ class TestPrintRegimesAndCopyFiles:
         except AssertionError as currentError:
             errors.append(currentError)
 
-        try:
-            assert not _NEW_DIAGRAM_PATH_2.is_file()
-        except AssertionError as currentError:
-            errors.append(currentError)
+        if _NEW_DIAGRAM_PATH_2.is_file():
+            errors.append(
+                AssertionError(f"Unexpected file: {_NEW_DIAGRAM_PATH_2}")
+            )
 
-        try:
-            assert not _NEW_NAME2_PATH_2.is_file()
-        except AssertionError as currentError:
-            errors.append(currentError)
+        if _NEW_NAME2_PATH_2.is_file():
+            errors.append(
+                AssertionError(f"Unexpected file: {_NEW_NAME2_PATH_2}")
+            )
 
         # check no tempering valves show up
-        try:
-            assert 0 == len(regimeExporter.temperingValves)
-        except AssertionError as currentError:
-            errors.append(currentError)
+        if regimeExporter.temperingValves:
+            errors.append(
+                AssertionError(
+                    f"Expected no tempering valves, got {len(regimeExporter.temperingValves)}."
+                )
+            )
 
         if errors:
             raise ExceptionGroup("multiple errors", errors)
@@ -290,10 +292,10 @@ class TestPrintRegimesAndCopyFiles:
             errors.append(currentError)
 
         pathFinder2.setFileEnding("_diagram")
-        try:
-            assert not pathFinder2.newPdfPath.is_file()
-        except AssertionError as currentError:
-            errors.append(currentError)
+        if pathFinder2.newPdfPath.is_file():
+            errors.append(
+                AssertionError(f"Unexpected file: {pathFinder2.newPdfPath}")
+            )
 
         if errors:
             raise ExceptionGroup("multiple errors", errors)
@@ -399,12 +401,17 @@ class TestPrintRegimesAndCopyFiles:
                 errors.append(currentError)
 
         # check whether valves are tempering valves again
-        try:
-            assert 1 == len(regimeExporter.temperingValves)
-            valve = regimeExporter.temperingValves[0]
-            assert valve.isTempering
-        except AssertionError as currentError:
-            errors.append(currentError)
+        temperingValves = regimeExporter.temperingValves
+        if len(temperingValves) != 1:
+            errors.append(
+                AssertionError(
+                    f"Expected 1 tempering valve, got {len(temperingValves)}."
+                )
+            )
+        elif not temperingValves[0].isTempering:
+            errors.append(
+                AssertionError("The valve is no longer a tempering valve.")
+            )
 
         if errors:
             raise ExceptionGroup("multiple errors", errors)

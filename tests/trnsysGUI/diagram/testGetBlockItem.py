@@ -152,9 +152,9 @@ class TestGetBlockItem:
     ) -> None:
         editorMock = self._testHelper(tmp_path, qtbot)
 
-        with _pt.raises(ValueError):
-            namesManagerMock = self._createNamesManager()
+        namesManagerMock = self._createNamesManager()
 
+        with _pt.raises(ValueError):
             _gbi.createBlockItem("Blk", editorMock, namesManagerMock)
 
     @_pt.mark.parametrize(
