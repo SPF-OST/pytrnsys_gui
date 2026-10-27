@@ -114,9 +114,13 @@ python .\dev-tools\devTools.py --help
 python .\dev-tools\devTools.py --black=""
 ```
 
+The line length of 79 is only set in `devTools.py`: running `black` directly uses its default of 88.
+
 ### Run static checks and unit tests ###
 ```commandline
 python .\dev-tools\devTools.py -s -u
 ```
 
 The unit tests leave untracked output files under `tests\**\data\`. To list them, run `git clean -nd -- tests`.
+Remove them before rerunning the tests: some tests fail if they're still there (e.g.
+`testHydraulicModesGui.py::testRunModesInvalidDckUnmodifiedDlls`).
