@@ -109,6 +109,9 @@ python -m uv pip sync .\requirements\dev.txt
 
 ## Static checks and unit tests
 
+Run `black`, `pylint` and `mypy` only through `devTools.py`, as CI does, not directly or on single files: their
+settings, e.g. black's line length, are only set there.
+
 ### Show all `devTools` script options
 ```commandline
 python .\dev-tools\devTools.py --help
@@ -119,8 +122,6 @@ python .\dev-tools\devTools.py --help
 python .\dev-tools\devTools.py --black=""
 ```
 
-The line length of 79 is only set in `devTools.py`: running `black` directly uses its default of 88.
-
 ### Run static checks and unit tests ###
 ```commandline
 python .\dev-tools\devTools.py -s -u
@@ -129,5 +130,3 @@ python .\dev-tools\devTools.py -s -u
 The unit tests leave untracked output files under `tests\**\data\`. To list them, run `git clean -nd -- tests`.
 Remove them before rerunning the tests: some tests fail if they're still there (e.g.
 `testHydraulicModesGui.py::testRunModesInvalidDckUnmodifiedDlls`).
-
-Lint with `python .\dev-tools\devTools.py -l` (the whole tree, like CI), not with `pylint` on single files.
