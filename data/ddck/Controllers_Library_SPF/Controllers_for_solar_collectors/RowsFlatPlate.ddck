@@ -28,7 +28,7 @@ EQUATIONS #
 $IB = $weatherIB_surfUser_1/SIN($weatherAI_surfUser_1+1e-6)
 Slope = $weatherslopeSurfUser_1
 Azi = $weatheraziSurfUser_1
-SlopeField = $weatherslopeSurfUser_2
+SlopeField = $weatherslopeSurfUser_3
 
 ***********************************
 ** Begin CONSTANTS
