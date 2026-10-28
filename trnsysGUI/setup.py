@@ -1,15 +1,14 @@
 import dataclasses as _dc
-import importlib.metadata as _imeta
 import pathlib as _pl
 import re as _re
 import subprocess as _sp
 import sys as _sys
 import typing as _tp
 
-import packaging.version as _pver
-
 import pytrnsys.utils.result as _res
 
+# The directory containing the `trnsysGUI` package: the checkout in a developer
+# install, `site-packages` in a release.
 _BASE_DIRECTORY = _pl.Path(__file__).parents[1]
 
 
@@ -45,12 +44,7 @@ class _VersionedPackage:
 
 
 def setup() -> _res.Result[None]:
-    isDeveloperInstallResult = _isDeveloperInstall()
-    if _res.isError(isDeveloperInstallResult):
-        return _res.error(isDeveloperInstallResult)
-
-    isDeveloperInstall = _res.value(isDeveloperInstallResult)
-    if not isDeveloperInstall:
+    if not _isDeveloperInstall():
         return None
 
     requirementsResult = _checkRequirements()
@@ -62,30 +56,11 @@ def setup() -> _res.Result[None]:
     return None
 
 
-def _isDeveloperInstall() -> _res.Result[bool]:
-    versionResult = _getPytrnsysVersion()
-    if _res.isError(versionResult):
-        return _res.error(versionResult)
-
-    version = _res.value(versionResult)
-    localVersionPart = version.local
-
-    isDeveloperInstall = (
-        localVersionPart.endswith("dev") if localVersionPart else False
-    )
-
-    return isDeveloperInstall
-
-
-def _getPytrnsysVersion() -> _res.Result[_pver.Version]:
-    serializedVersion = _imeta.version("pytrnsys-gui")
-    try:
-        return _pver.parse(serializedVersion)
-    except _pver.InvalidVersion as invalidVersion:
-        error = _res.error(
-            f"Could not parse version of `pytrnsys-gui`:\n\t{invalidVersion}"
-        )
-        return error
+def _isDeveloperInstall() -> bool:
+    # The only use of `_BASE_DIRECTORY` outside developer installs, where it may
+    # not be on the file system (e.g. if `trnsysGUI` is loaded from a zip file):
+    # `exists()` then simply returns `False`.
+    return (_BASE_DIRECTORY / ".git").exists()
 
 
 def _checkRequirements() -> _res.Result[None]:
@@ -113,18 +88,13 @@ Probably the file {release3rdPartyTxtFilePath} was changed by
 someone else on GitHub. Consider re-running (don't forget to
 activate your virtual environment first)
 
-    `python -m pip install requirements\\dev.txt`
+    `python -m uv pip install -r requirements\\dev.txt`
 
 (or
 
-    `python -m piptools sync requirements\\dev.txt`
+    `python -m uv pip sync requirements\\dev.txt`
 
-if you're using `pip-tools` [if you don't know what that means
-use the command just above])
-
-followed by
-
-    `python setup.py egg_info -b dev`
+to also remove packages not listed in `dev.txt`).
 """
         return _res.Error(errorMessage)
 
@@ -182,7 +152,7 @@ def _getRequiredVersions(
 
 def _generateCodeFromQtCreatorUiFiles():
     uiGenerateFilePath = (
-        _pl.Path(__file__).parent.parent
+        _BASE_DIRECTORY
         / "dev-tools"
         / "generateGuiClassesFromQtCreatorStudioUiFiles.py"
     )

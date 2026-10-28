@@ -6,6 +6,7 @@ import pathlib as _pl
 import itertools as _it
 import dataclasses as _dc
 
+# Files read here must be listed in `tool.uv.cache-keys` in `pyproject.toml`.
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
@@ -53,17 +54,10 @@ def _getInstallRequirements():
     return requirements
 
 
-_MASTER_VERSION_TEMPLATE = "0.0.0+master.{sha}"
-
 setuptools.setup(
     name="pytrnsys-gui",
+    version="0.0.0",
     author="Institute for Solar Technology (SPF), OST Rapperswil",
-    setuptools_git_versioning={
-        "enabled": True,
-        "template": _MASTER_VERSION_TEMPLATE,
-        "dev_template": _MASTER_VERSION_TEMPLATE,
-        "dirty_template": f"{_MASTER_VERSION_TEMPLATE}.dirty",
-    },
     author_email="damian.birchler@ost.ch",
     description="A GUI for Trnsys",
     long_description=long_description,

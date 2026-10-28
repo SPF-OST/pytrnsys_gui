@@ -9,6 +9,8 @@ config-settings = { editable_mode = "compat" }
 cache-keys = [
     { file = "pyproject.toml" },
     { file = "setup.py" },
+    { file = "README.md" },
     { file = "requirements/release-3rd-party.in" },
+    # uv may miss deleted or locally renamed files under a glob key.
     { file = "data/**/*" },
 ]

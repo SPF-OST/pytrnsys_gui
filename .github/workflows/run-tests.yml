@@ -44,14 +44,20 @@ jobs:
           venv\Scripts\python -m pip install wheel uv
           venv\Scripts\python -m uv pip install -r requirements\dev.txt
 
+      # Runs before the UI code is generated explicitly: starting the GUI must generate it.
+      - name: Check that the GUI starts and generates everything it needs
+        run: |
+          $gui = Start-Process venv\Scripts\python -ArgumentList "trnsysGUI\gui.py" -PassThru
+          Start-Sleep 30
+          if ($gui.HasExited) { throw "The GUI exited early with code $($gui.ExitCode)." }
+          Stop-Process -Id $gui.Id
+          if (Select-String -Path pytrnsys-gui.log -Pattern "ERROR|CRITICAL" -Quiet) { Get-Content pytrnsys-gui.log; throw "The GUI logged errors." }
+          venv\Scripts\python -c "import trnsysGUI.mainWindow"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          if (git status --porcelain) { git status --porcelain; throw "Generated files not covered by .gitignore." }
+
       - name: Generate UI code from Qt Creator Studio .ui files
         run: venv\Scripts\python dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py
-
-      - name: Tag install
-        run: venv\Scripts\python setup.py egg_info -b dev
-
-      - name: Check that trnsysGUI can be imported
-        run: venv\Scripts\python -c "import trnsysGUI"
 
       - name: Run pip-compile-multi
         run: venv\Scripts\pip-compile-multi --uv -d requirements --no-upgrade
