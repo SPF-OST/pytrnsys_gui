@@ -39,7 +39,7 @@ class TapMains(_tb.TapBase):
         equations = f"""\
 ! {self.displayName}
 EQUATIONS 1
-{temperatureVariable} = Tcw
+{temperatureVariable} = weather_TcwAvg
 
 """
         return equations, startingUnit

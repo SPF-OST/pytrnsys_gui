@@ -1,0 +1,71 @@
+*******************************
+**BEGIN collectorOnOff.ddck
+*******************************
+    
+***************************************************************************
+** Contact person : Dani Carbonell    
+** Creation date  : 23.04.2018
+** Last changes   : 11.24 DC udpates for defaultVisibility "local"
+***************************************************************************
+
+**************************************************************************************
+** Description: Control of solar thermal collector on/off
+** Source: SPF model
+***************************************************************************************
+
+***********************************
+** Connectors with hydraulic solver
+***********************************
+**None
+***********************************
+** outputs to hydraulic solver
+***********************************
+**None
+
+******************************************************************************************
+** outputs to energy balance in kWh a
+******************************************************************************************
+!EQUATIONS 1
+!@energy(out, el, CtrlDemand) = PelContr_kW
+
+*******************************************
+** inputs from other ddck
+*******************************************
+
+EQUATIONS #
+tCollOut     = $tCollOut
+tTesSolarTop = $userControl_tTesSolarTop
+tTesSolarBot = $userControl_tTesSolarBot
+
+***********************************
+** outputs to other ddck
+***********************************
+EQUATIONS #
+$solarController_puColOn = puColOn
+
+***********************************
+** Begin TYPE COLLECTOR CONTROLLER
+***********************************
+
+CONSTANTS 2
+dtColOn = 10    ! Upper dead band coll. pump ON
+dtColOff = 3    ! Lower dead band coll. pump OFF
+
+UNIT 28 TYPE 2
+PARAMETERS 2
+5     ! 1 No. of oscillations
+98   ! 2 High limit cut-out
+INPUTS 6
+tCollOut     ! Upper input temperature Th
+tTesSolarBot ! Lower input temperature Tl
+tTesSolarTop ! Monitoring temperature Tin
+puColOn        ! 70,1 Input control function
+dtColOn        ! Upper dead band dT
+dtColOff       ! Lower dead band dT
+0.0 20.0 0.0 0 dtColOn dtColOff
+EQUATIONS 1
+puColOn = [28,1]
+
+*******************************
+**END collectorOnOff.ddck
+*******************************

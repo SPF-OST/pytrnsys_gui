@@ -1,0 +1,148 @@
+**************************************
+**BEGIN type3621.ddck
+**************************************
+    
+******************************************************************
+** Author : Daniel Carbonell
+** Creation date  : 30.09.2016
+** Last changes   : 18.05.2022
+**                : 10.24 DC udpates for defaultVisibility "local"
+******************************************************************
+
+************************************************************************************
+** Description: Radiator model
+** Source: SPF model
+** One-dimensional radiator model
+** TODO: this type does nto seem to work properly or some parameters are wrongly set.
+** The power provided is way larger than the water power injected from the water loop
+*************************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+
+EQUATIONS #
+TRdFl    = @temp(In)
+MfrBuiRd = @mfr(In)
+cp       = @cp(In)
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+EQUATIONS #
+@temp(Out) = [42,1]		! return temperature from space heat distribution system, °C
+TRdRt      = [42,1]
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+******************************************************************************************
+
+EQUATIONS #
+@energy(out, heat, buiDemand) = PheatBui_kW
+
+***********************************
+** inputs from other ddck
+***********************************
+
+EQUATIONS #
+Troom     = $bui_Troom
+TroomStar = $bui_TroomStar
+QPeak_kW  = $bui_QPeak_kW
+TBuiFlNom = $bui_TBuiFlNom
+TBuiRtNom = $bui_TBuiRtNom
+MfrBuiRdNom = $bui_MfrBuiNom
+TroomSet    = $bui_TroomSet
+
+***********************************
+** outputs to other ddck
+***********************************
+
+EQUATIONS #
+$heatDisSys_PHeatBui_kJh = PheatBui_kJh  ! Heat to Building from heating distribution system
+
+*******************************************************
+** Definition of radiator model
+*******************************************************
+
+CONSTANTS #
+frQRadToQd         = 1.3
+PheatRadNom        = QPeak_kW*frQRadToQd
+ftemp              = (60./((TBuiFlNom+TBuiRtNom)/2-TroomSet))**m_Rd ! ftemp: faktor Qnominal -> Qnorm,real (DT=60 - 90/70/20) Radiator (c>=0.7), -
+PRadBuidT60_kJh    = ftemp*PheatRadNom*$kWTokJh                     ! Heating Rate at 60 oC Radiator temperature, kJ/h
+CeffRad            = 1 !1*QPeak_kW*$kWhTokJ                            ! Thermal Cap. of Radiator, kWh/K -> kJ/K. We assume radiator has 1 h capacity of peak power
+m_Rd               = 1.1                                            ! radiator exponent, -
+PIDRadBui          = MfrBuiRd/MfrBuiRdNom                           ! It is controlled externally
+
+UNIT 42 TYPE 3621	! Radiator
+PARAMETERS 11     
+MfrBuiRdNom		! Nominal (maximal) mass flow rate of the radiator kg/h
+PRadBuidT60_kJh	! Nominal heating power kJ/h
+TBuiFlNom     	! Nominal flow temp
+TBuiRtNom     	! Nominal return temp
+TroomSet        ! Design ambient
+m_Rd     		! Radiator Exponent
+CeffRad         ! Lumped radiator capacity [kJ/K]
+cp              ! specific heat water [kJ/kgK]
+0     			! Pipe capacity 
+10     			! number of control volumes
+21     			! Initial radiator temperature
+INPUTS 3        ! TODO: DC We need to change the inputs to include mass flow rate
+TRdFl     		! supply Temperature
+Troom   		! Building: star node temperature TSTAR
+PIDRadBui       ! PID Controller  (0 <signal<1)
+*** INITIAL INPUT VALUES     
+45 21 0
+*     
+     
+EQUATIONS #		!
+PheatBui_kJh     = [42,3]       	      ! Heat to Building from Radiator: kJ/h
+PheatBui_kW      = PheatBui_kJh*$kJhTokW  ! Heat to Building from Radiator: kJ/h --> kW
+QAcumRadiator_kW = [42,5]*$kJhTokW        ! Total Acumulated Heat in Radiator
+PwaterIn_kW      = [42,4]*$kJhTokW        ! Power transferred to space heat distribution system, kW
+ImbRad_kW        = PwaterIn_kW-PheatBui_kW-QAcumRadiator_kW
+
+
+*******************************
+** Monthly printers
+*******************************
+CONSTANTS 1
+unitPrinterHeat = 43
+
+ASSIGN    temp\HEATING_DISTR_MO.dat     unitPrinterHeat
+
+UNIT 43 Type 46		! Printegrator Monthly Values for System
+PARAMETERS 6    
+unitPrinterHeat		! 1: Logical unit number, -
+-1             		! 2: Logical unit for monthly summaries, -
+1              		! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1             		! 4: Printing & integrating interval, h. -1 for monthly integration
+1              		! 5: Number of inputs to avoid integration, -
+1              		! 6: Output number to avoid integration
+INPUTS #
+$Time  PheatBui_kW  PwaterIn_kW  QAcumRadiator_kw
+***************
+$Time  PheatBui_kW  PwaterIn_kW  QAcumRadiator_kw
+
+*******************************
+** hourly printer
+*******************************
+CONSTANTS 1
+unitPrinterHeatHr = 44
+
+ASSIGN temp\HEATING_DISTR_HR.dat      unitPrinterHeatHr
+UNIT 44 Type 46		! Printegrator hourly Values for System
+PARAMETERS 6    
+unitPrinterHeatHr		! 1: Logical unit number, -
+-1     					! 2: Logical unit for monthly summaries, -
+1     					! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1     					! 4: Printing & integrating interval, h. -1 for monthly integration
+1     					! 5: Number of inputs to avoid integration, -
+1 						! 6: Output number to avoid integration
+INPUTS #
+$Time TRdFl TRdRt ImbRad_kW MfrBuiRd PwaterIn_kW  PheatBui_kW QAcumRadiator_kW PIDRadBui
+***
+$Time TRdFl TRdRt ImbRad_kW MfrBuiRd PwaterIn_kW  PheatBui_kW QAcumRadiator_kW PIDRadBui
+	
+*******************************
+**END type3621.ddck
+*******************************

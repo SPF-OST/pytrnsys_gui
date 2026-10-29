@@ -1,0 +1,60 @@
+**************************************
+**BEGIN plotter.ddck
+**************************************
+
+
+
+UNIT 59 TYPE 65		! Online Plotter Building (element OpB)
+PARAMETERS 12
+4					! 1: Nb. of left-axis variables
+2					! 2: Nb. of right-axis variables
+-5				! 3: Left axis minimum
+60				! 4: Left axis maximum
+-3000				! 5: Right axis minimum
+3000				! 6: Right axis maximum
+nPlotsPerSim		! 7: Number of plots per simulation
+12				! 8: X-axis gridpoints
+0					! 9: Shut off Online w/o removing
+-1				! 10: Logical unit for output file
+0					! 11: Output file units
+0					! 12: Output file delimiter
+INPUTS 6
+RadTRdFl  TRad type56Tamb  type56Troom
+MAshp_PuCond MRad_Pump
+*******
+RadTRdFl  TRad type56Tamb  type56Troom
+MAshp_PuCond MRad_Pump
+****
+LABELS  3
+Temperatures
+Massflowrates
+Building
+
+UNIT 60 TYPE 65		! Online Plotter Building (element OpB)
+PARAMETERS 12
+7					! 1: Nb. of left-axis variables
+7					! 2: Nb. of right-axis variables
+0				! 3: Left axis minimum
+6000				! 4: Left axis maximum
+0				! 5: Right axis minimum
+6000				! 6: Right axis maximum
+nPlotsPerSim		! 7: Number of plots per simulation
+12				! 8: X-axis gridpoints
+0					! 9: Shut off Online w/o removing
+-1				! 10: Logical unit for output file
+0					! 11: Output file units
+0					! 12: Output file delimiter
+INPUTS 14
+weather_IT_H weather_IT_N weather_IT_W weather_IT_E weather_IT_S weather_IT_surfUser_1 weather_IT_surfUser_3
+weather_IB_H weather_IB_N weather_IB_W weather_IB_E weather_IB_S weather_IB_surfUser_1 weather_IB_surfUser_3
+*******
+weather_IT_H weather_IT_N weather_IT_W weather_IT_E weather_IT_S weather_IT_surfUser_1 weather_IT_surfUser_3
+weather_IB_H weather_IB_N weather_IB_W weather_IB_E weather_IB_S weather_IB_surfUser_1 weather_IB_surfUser_3
+****
+LABELS  3
+Power
+Power
+Weather
+
+
+

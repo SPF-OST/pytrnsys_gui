@@ -1,0 +1,131 @@
+*******************************
+**BEGIN dhw_mfh.ddck 
+*******************************
+
+*****************************************
+** Author         : Daniel Carbonell (DC)
+** Creation date  : 30.09.2016
+** Last changes   : 23.03.2022
+**                : 10.24 DC udpates for defaultVisibility "local"
+*****************************************
+
+***************************************************************************
+** Description: Tap water model for domestic hot water demand
+** Source: no type(s) are used but the ddck is linked with hydraulic
+** Current DHW load profile derived from LoadProfileGenerator for MFB
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+EQUATIONS 3
+Tdhw = @temp(In)			! Warm water supply temperature from WW heat exchanger or mixing valve [ºC]
+MfrDhw = ABS(@mfr(In))		! Mass flow on consumption side mixed down, kg/h = MfrDHWSet
+cpDhw = @cp(In)
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+** None (open system)
+
+******************************************************************************************
+** outputs to energy balance in kWh
+******************************************************************************************
+EQUATIONS #
+@energy(out, heat, DhwDemand) = Pdhw_kW
+@energy(out, el, DHWpenalty)  = PpenDHW_kW
+
+***********************************
+** inputs from other ddck
+***********************************
+CONSTANTS #
+TAvgCold       = $weather_TcwAvg		! Standard cold water temperature (�C)   TcwAvg  from weatherData
+unitReadDhw    = $dhw_unitReadDhw
+
+***********************************
+** outputs to other ddck
+***********************************
+EQUATIONS #
+$dhw_MfrDHWset = MfrDHWset
+$dhw_TdhwSet   = TdhwSetProfile
+
+
+CONSTANTS #
+scaleDHW = 1
+dtDHWdata = 1/30.	! timestep of DHW data-file
+TAvgColdAbove0 = MAX($weather_TcwAvg,0.1)
+
+**
+UNIT 16 TYPE 9		! Data Reader Water DrawOff
+PARAMETERS #
+6     			! 1: Mode
+2     			! 2: Header Lines to Skip
+3     			! 3: No. of values to read
+dtDHWdata		! 4: Time interval of data
+-1  1  0  0		! 5: Interpolate (+) or not (-)? 6: Multuplication factor, 7: Addition factor, 8: Average (0) or instantaneous (1) value
+-1  1  0  0  	! 5: Interpolate (+) or not (-)? 6: Multuplication factor, 7: Addition factor, 8: Average (0) or instantaneous (1) value
+-1  1  0  0  	! 5: Interpolate (+) or not (-)? 6: Multuplication factor, 7: Addition factor, 8: Average (0) or instantaneous (1) value
+unitReadDhw		! 9: Logical unit for input file
+-1           	! 10: Free format mode
+     
+EQUATIONS #
+MfrDHWreal     = [16,2]*scaleDHW	! mass flow kg/h
+TdhwSetProfile = [16,3]				! Set temperature for DHW, ºC
+
+EQUATIONS #
+dtDhwCorrect = (TdhwSetProfile-TAvgCold)/(TdhwSetProfile-TAvgColdAbove0)
+MfrDHWset    = dtDhwCorrect*MfrDHWreal
+Pdhw_kW      = MfrDhw*(Tdhw-TAvgColdAbove0)*cpDhw/3600		   ! DHW-consumption power [kW]
+
+
+!penalties for not reaching DHW
+EQUATIONS #
+dTdhwFlow = GT(MfrDHWset,0)*(TdhwSetProfile-Tdhw)				! missed temperature of warm water, K
+PpenDHW_kW = 1.5*MfrDHWset*cpDhw*dTdhwFlow/3600
+
+***********************************
+** Monthly printer
+***********************************
+CONSTANTS 1
+unitPrinterDHW = 218
+
+ASSIGN    temp\DHW_MO.dat  unitPrinterDHW
+
+UNIT 218 TYPE 46		! Printegrator Monthly Values for System
+PARAMETERS 5     
+unitPrinterDHW		! 1: Logical unit number, -
+-1     				! 2: Logical unit for monthly summaries, -
+1     				! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1     				! 4: Printing & integrating interval, h. -1 for monthly integration
+0     				! 5: Number of inputs to avoid integration, -
+INPUTS 3
+$Time  Pdhw_kW  PpenDHW_kW
+**  
+$Time  Pdhw_kW  PpenDHW_kW
+
+***********************************
+** Hourly printer
+***********************************
+CONSTANTS 1
+unitHourlyDHW = 218
+
+ASSIGN    temp\DHW_HR.dat unitHourlyDHW
+
+UNIT 218 TYPE 46		! Printegrator Monthly Values for System
+PARAMETERS 6   
+unitHourlyDHW		! 1: Logical unit number, -
+-1     				! 2: Logical unit for monthly summaries, -
+1     				! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1     				! 4: Printing & integrating interval, h. -1 for monthly integration
+1     				! 5: Number of inputs to avoid integration, -
+1					! 6: Output number to avoid integration
+INPUTS 3
+Tdhw Pdhw_kW  PpenDHW_kW
+**  
+Tdhw Pdhw_kW  PpenDHW_kW
+
+
+
+*******************************
+**END DHW-MFH.ddck
+*******************************

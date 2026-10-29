@@ -521,8 +521,8 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
                 singlePipeEnergyBalanceEquations = f"""\
 EQUATIONS 2
 *** single pipes
-qSysOut_PipeLoss = {SinglePipeTotals.DISSIPATED}
-qSysOut_{SinglePipeTotals.PIPE_INTERNAL_CHANGE} = {SinglePipeTotals.PIPE_INTERNAL_CHANGE}
+@energy(out, heat, PipeLoss) = {SinglePipeTotals.DISSIPATED}
+@energy(out, heat, PipeAcum) = {SinglePipeTotals.PIPE_INTERNAL_CHANGE}
 
 """
             simulatedDoublePipes = [
@@ -579,6 +579,11 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             exportTo=exportTo
         )
 
+        fullExportText += """\
+CONSTANTS 1
+TRoomStore = 10        
+
+"""
         fullExportText += exporter.exportParametersFlowSolver(
             simulationUnit, simulationType, descConnLength
         )
@@ -600,10 +605,10 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             self.printerUnitnr + 1, 15
         )
 
+
         if exportTo == "mfs":
             fullExportText += """\
-CONSTANTS 2
-TRoomStore=1
+CONSTANTS 1            
 Tcw=1
 """
             fullExportText += "ENDS"
@@ -706,13 +711,13 @@ Tcw=1
         ddckFolder = os.path.join(self.projectFolder, "ddck")
 
         hydCtrlPath = os.path.join(
-            ddckFolder, "control", "hydraulic_control.ddck"
+            ddckFolder, "user_control", "user_control_default.ddck"
         )
         if _pl.Path(hydCtrlPath).exists():
             qmb = _qtw.QMessageBox(self)
             qmb.setText(
                 "Warning: "
-                + "The file hydraulic_control.ddck already exists in the control folder. Do you want to overwrite it or cancel?"
+                + "The file user_control_defalut.ddck already exists in the user_control folder. Do you want to overwrite it or cancel?"
             )
             qmb.setStandardButtons(
                 _qtw.QMessageBox.Save | _qtw.QMessageBox.Cancel
@@ -728,7 +733,7 @@ Tcw=1
                 return
 
         fullExportText += "*************************************\n"
-        fullExportText += "**BEGIN hydraulic_control.ddck\n"
+        fullExportText += "**BEGIN user_control_default.ddck\n"
         fullExportText += "*************************************\n"
 
         simulationUnit = 450
@@ -737,6 +742,80 @@ Tcw=1
 
         fullExportText += exporter.exportMassFlows()
         fullExportText += exporter.exportDivSetting(simulationUnit - 10)
+
+        self.logger.info(
+            "------------------------> END OF EXPORT <------------------------"
+        )
+
+        if fullExportText[:1] == "\n":
+            fullExportText = fullExportText[1:]
+        controlFolder = os.path.split(hydCtrlPath)[0]
+        if not (os.path.isdir(controlFolder)):
+            os.makedirs(controlFolder)
+        f = open(str(hydCtrlPath), "w")
+        f.truncate(0)
+        f.write(fullExportText)
+        f.close()
+
+        return hydCtrlPath
+
+    def exportPumpConsumptionFile(self):
+        self.logger.info(
+            "------------------------> START OF EXPORT <------------------------"
+        )
+
+        self.sortTrnsysObj()
+
+        fullExportText = ""
+
+        ddckFolder = os.path.join(self.projectFolder, "ddck")
+
+        hydCtrlPath = os.path.join(
+            ddckFolder, "user_control", "pump_consumption_default.ddck"
+        )
+        if _pl.Path(hydCtrlPath).exists():
+            qmb = _qtw.QMessageBox(self)
+            qmb.setText(
+                "Warning: "
+                + "The file pump_consumption_default.ddck already exists in the user_control folder. Do you want to overwrite it or cancel?"
+            )
+            qmb.setStandardButtons(
+                _qtw.QMessageBox.Save | _qtw.QMessageBox.Cancel
+            )
+            qmb.setDefaultButton(_qtw.QMessageBox.Cancel)
+            ret = qmb.exec()
+            if ret == _qtw.QMessageBox.Save:
+                self.canceled = False
+                self.logger.info("Overwriting")
+            else:
+                self.canceled = True
+                self.logger.info("Canceling")
+                return
+
+        fullExportText = """
+**************************************
+**BEGIN pump_consumption_default.ddck
+**************************************
+
+*****************************
+** Author:  exported by GUI
+************************************
+
+***************************************************************************
+** Description: electrical consumption of circulation pumps
+** Source: no type(s) used
+** The nominal mass flow rates are taken from GUI,if not precise adapt here
+****************************************************************************
+"""
+
+        exporter = self._createExporter()
+
+        fullExportText += exporter.exportPumpConsumption()
+        fullExportText += """
+**************************************
+**END pump_consumption_default.ddck
+**************************************
+"""
 
         self.logger.info(
             "------------------------> END OF EXPORT <------------------------"
@@ -865,7 +944,7 @@ Tcw=1
         blockFolderNames.append("generic")
         blockFolderNames.append("hydraulic")
         blockFolderNames.append("weather")
-        blockFolderNames.append("control")
+        blockFolderNames.append("user_control")
 
         ddckFolder = os.path.join(self.projectFolder, "ddck")
         ddckFolders = os.listdir(ddckFolder)
@@ -1093,7 +1172,7 @@ Tcw=1
 
         ddckFolder = os.path.join(projectFolder, "ddck")
         weatherFolder = os.path.join(ddckFolder, "weather")
-        controlFolder = os.path.join(ddckFolder, "control")
+        controlFolder = os.path.join(ddckFolder, "user_control")
 
         if not os.path.exists(weatherFolder):
             self.logger.info("Creating " + weatherFolder)

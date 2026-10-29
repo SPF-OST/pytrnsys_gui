@@ -1,0 +1,15 @@
+*******************************
+**BEGIN mfh.ddck
+*******************************
+
+***************************************************************************
+** Description: Domestic hot water demand definition
+***************************************************************************
+
+CONSTANTS 1
+$dhw_unitReadDhw=21
+ASSIGN PATH$\Loads_and_structures\DHW\Profiles\MFH6appartments_2min_tSet55.dat $dhw_unitReadDhw				! water draw profile
+
+*******************************
+**END mfh.ddck
+*******************************

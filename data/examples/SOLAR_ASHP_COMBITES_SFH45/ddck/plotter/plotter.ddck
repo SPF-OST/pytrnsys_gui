@@ -1,0 +1,63 @@
+**************************************
+**BEGIN plotter.ddck
+**************************************
+
+EQUATIONS 1
+dtSH = GT(MfrPuSh,1)*(RadTRdFl-type888_TRdSet)+NOT(GT(MfrPuSh,1))*0 ! if negative we will not provide the necessary heat. Heat pump might be too small
+
+UNIT 59 TYPE 65		! Online Plotter Building (element OpB)
+PARAMETERS 12
+9				! 1: Nb. of left-axis variables
+3				! 2: Nb. of right-axis variables
+-15				! 3: Left axis minimum
+80				! 4: Left axis maximum
+-1				! 5: Right axis minimum
+2				! 6: Right axis maximum
+nPlotsPerSim	! 7: Number of plots per simulation
+12				! 8: X-axis gridpoints
+0				! 9: Shut off Online w/o removing
+-1				! 10: Logical unit for output file
+0				! 11: Output file units
+0				! 12: Output file delimiter
+INPUTS 12
+userControl_TTesDhwUpAuxOn userControl_TTesDhwBotAuxOff userControl_TTesSHUpAuxOn userControl_TTesSHBotAuxOff RadTRdFl type56Troom type888_TRdSet type56Tamb  dtSH
+type888_HpForDhwIsNeeded type888_HpForShIsNeeded PID_SHD_Mfr
+*******
+TTesDhwUpAuxOn TTesDhwBotAuxOff TTesSHUpAuxOn TTesSHBotAuxOff TRdFl Troom TRdSet Tamb  dtSH
+HpForDhwIsNeeded HpForShIsNeeded PID_SHD_Mfr
+****
+LABELS  3
+Temperatures
+Massflowrates
+Custom
+
+
+
+!UNIT 60 TYPE 65		! Online Plotter Building (element OpB)
+!PARAMETERS 12
+!7					! 1: Nb. of left-axis variables
+!7					! 2: Nb. of right-axis variables
+!0				! 3: Left axis minimum
+!6000				! 4: Left axis maximum
+!0				! 5: Right axis minimum
+!6000				! 6: Right axis maximum
+!nPlotsPerSim		! 7: Number of plots per simulation
+!12				! 8: X-axis gridpoints
+!0					! 9: Shut off Online w/o removing
+!-1				! 10: Logical unit for output file
+!0					! 11: Output file units
+!0					! 12: Output file delimiter
+!INPUTS 14
+!weather_IT_H weather_IT_N weather_IT_W weather_IT_E weather_IT_S weather_IT_surfUser_1 weather_IT_surfUser_3
+!weather_IB_H weather_IB_N weather_IB_W weather_IB_E weather_IB_S weather_IB_surfUser_1 weather_IB_surfUser_3
+!*******
+!weather_IT_H weather_IT_N weather_IT_W weather_IT_E weather_IT_S weather_IT_surfUser_1 weather_IT_surfUser_3
+!weather_IB_H weather_IB_N weather_IB_W weather_IB_E weather_IB_S weather_IB_surfUser_1 weather_IB_surfUser_3
+!****
+!LABELS  3
+!Power
+!Power
+!Weather
+
+
+

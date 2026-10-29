@@ -1,0 +1,91 @@
+*******************************
+**BEGIN PID_HeatDisSys.ddck
+*******************************
+
+***************************************************************************
+** Contact person : Dani Carbonell
+** Creation date  : 11.24
+** Last changes   :
+***************************************************************************
+
+**************************************************************************************
+** Description: PID Control for mass flow rate in heating distribution loop
+** Source: SPF model
+***************************************************************************************
+
+
+***********************************
+** Connectors with hydraulic solver
+***********************************
+**None
+***********************************
+** outputs to hydraulic solver
+***********************************
+**None
+
+******************************************************************************************
+** outputs to energy balance in kWh a
+******************************************************************************************
+
+*******************************************
+** inputs from other ddck
+*******************************************
+
+EQUATIONS #
+TroomSet  = $bui_TroomSet
+Troom     = $bui_Troom
+
+*******************************************
+** outputs to other ddck
+*******************************************
+
+$PID_SHD_Mfr = PIDRadBui
+
+
+*******************************************************
+** PID controller for mass flow in space heating loop *
+*******************************************************
+
+CONSTANTS #
+pGainRad = 0.6
+iGainRad = 0.05
+inversionHeat = 2
+
+UNIT 41 TYPE 320	! PID Controller for Radiator mass flow (Idea: instead of thermostatic valves a PID controler is taken to reduce mass flow if the room temperature gets too high)
+PARAMETERS 7
+3				! 1: Temperature width of PID band
+pGainRad		! 2: Proportional gain PID band
+iGainRad		! 3: Integral gain PID band
+0				! 4: Differential gain PID band
+0.5				! 5: Proportional gain P-band
+0     			! 6: Saturation mode
+0				! 7: Minimum value controller action in saturation mode
+INPUTS 3
+TroomSet		! Set temperature
+TroomRc		    ! Building: 1- (air temperature of zone)  TAIR   1 ->Feedback room temperature
+0,0     		! Control inversion option 1: increasing, 2: decreasing action
+*** INITIAL INPUT VALUES
+22 18 inversionHeat
+
+EQUATIONS #
+PIDRadBuiMin = 0.15																		! 0.05		!0.01
+PIDBuiOut =  [41,1]
+PIDRadBui  = MIN(GT(PIDBuiOut,PIDRadBuiMin)*PIDBuiOut,1)
+
+
+***************************************************************
+** recall values for control
+***************************************************************
+
+UNIT 18 TYPE 993
+PARAMETERS 1
+1   ! 1: number of variables to be remembered
+INPUTS 1
+Troom
+0.0
+EQUATIONS #   ! outputs of Input Value Recall
+TroomRc = [18,1]
+
+***************************
+**END PID_HeatDisSys.ddck
+***************************

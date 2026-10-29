@@ -1,0 +1,56 @@
+{
+    "Ashp": {
+        "In": {
+            "@cp": "Lloop1Cp",
+            "@mfr": "MAshp_A",
+            "@rho": "Lloop1Rho",
+            "@temp": "TTeeAuxRt_Ashp"
+        },
+        "Out": {
+            "@revtemp": "TAshp_PuAux",
+            "@temp": "TAshp"
+        }
+    },
+    "HxDhw": {
+        "Side1In": {
+            "@cp": "Lloop2Cp",
+            "@mfr": "MHxDhwSide1_A",
+            "@rho": "Lloop2Rho",
+            "@temp": "TDivDhwOut_HxDhw"
+        },
+        "Side1Out": {
+            "@revtemp": "THxDhw_PuDhw",
+            "@temp": "THxDhwSide1"
+        },
+        "Side2In": {
+            "@cp": "Lloop6Cp",
+            "@mfr": "MHxDhwSide2_A",
+            "@rho": "Lloop6Rho",
+            "@temp": "TTeeCirc2_HxDhw"
+        },
+        "Side2Out": {
+            "@revtemp": "THxDhw_TeeCirc1",
+            "@temp": "THxDhwSide2"
+        }
+    },
+    "RadFloor": {
+        "In": {
+            "@cp": "Lloop3Cp",
+            "@mfr": "MRadFloor_A",
+            "@rho": "Lloop3Rho",
+            "@temp": "TMixSh_RadFloor"
+        },
+        "Out": {
+            "@revtemp": "TRadFloor_PuSh",
+            "@temp": "TRadFloor"
+        }
+    },
+    "WtTp": {
+        "In": {
+            "@cp": "Lloop6Cp",
+            "@mfr": "MWtTp_A",
+            "@rho": "Lloop6Rho",
+            "@temp": "TTeeCirc1_WtTp"
+        }
+    }
+}

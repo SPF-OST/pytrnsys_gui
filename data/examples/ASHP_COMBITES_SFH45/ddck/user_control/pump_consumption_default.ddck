@@ -1,0 +1,54 @@
+**************************************
+**BEGIN pump_consumption_default.ddck
+**************************************
+
+*****************************
+** Author:  exported by GUI
+************************************
+
+***************************************************************************
+** Description: electrical consumption of circulation pumps
+** Source: no type(s) used
+** The nominal mass flow rates are taken from GUI,if not precise adapt here
+****************************************************************************
+
+*******************************************
+*** Energy Balance
+*******************************************
+EQUATIONS 1
+@energy(out, el, PuElTotal) = PelMfrPuCond + PelMfrPuSh
+
+*******************************************
+*** Calculation of pump consumption
+*******************************************
+CONSTANTS 2
+dpmin_bar = 0.1 ! minimal pressure-drop of loop at nominal mass flow, bar
+dpmax_bar = 15  ! maximum pressure-drop of loop at nominal mass flow, bar
+***********************************************
+*** Pump Consumption of MfrPuCond ***
+***********************************************
+EQUATIONS #
+MfrPuCond=$MfrPuCond ! Comment this is the file is global
+MfrPuCondNom = 1000.0  ! Nominal mass flow rate, kg/h.
+dpPuMfrPuCondNom_bar = MIN(dpmax_bar,MAX(dpmin_bar, $Lloop3Rho * 0.1)) ! Pressure-drop of loop at nominal mass flow, bar 
+frMfrPuCond = MfrPuCond/MfrPuCondNom !  Flow rate fraction of nominal flow rate 
+dpPuMfrPuCond_bar = frMfrPuCond^2*dpPuMfrPuCondNom_bar ! Pressure-drop of loop at actual mass flow, bar 
+PelFlowMfrPuCond_kW = ((MfrPuCond/3600)/ $Lloop3Rho) * dpPuMfrPuCond_bar*100 !required power to drive the flow in kW 
+etaMfrPuCond = MAX(1E-3,0.85*(-0.60625*frMfrPuCond^2+1.25*frMfrPuCond)) ! pump efficiency (electric 85 %) 
+PelMfrPuCond = GT(MfrPuCond,0.1)*PelFlowMfrPuCond_kW/etaMfrPuCond !required pump electric power, kW 
+***********************************************
+*** Pump Consumption of MfrPuSh ***
+***********************************************
+EQUATIONS #
+MfrPuSh=$MfrPuSh ! Comment this is the file is global
+MfrPuShNom = 1000.0  ! Nominal mass flow rate, kg/h.
+dpPuMfrPuShNom_bar = MIN(dpmax_bar,MAX(dpmin_bar, $Lloop1Rho * 0.1)) ! Pressure-drop of loop at nominal mass flow, bar 
+frMfrPuSh = MfrPuSh/MfrPuShNom !  Flow rate fraction of nominal flow rate 
+dpPuMfrPuSh_bar = frMfrPuSh^2*dpPuMfrPuShNom_bar ! Pressure-drop of loop at actual mass flow, bar 
+PelFlowMfrPuSh_kW = ((MfrPuSh/3600)/ $Lloop1Rho) * dpPuMfrPuSh_bar*100 !required power to drive the flow in kW 
+etaMfrPuSh = MAX(1E-3,0.85*(-0.60625*frMfrPuSh^2+1.25*frMfrPuSh)) ! pump efficiency (electric 85 %) 
+PelMfrPuSh = GT(MfrPuSh,0.1)*PelFlowMfrPuSh_kW/etaMfrPuSh !required pump electric power, kW 
+
+**************************************
+**END pump_consumption_default.ddck
+**************************************
