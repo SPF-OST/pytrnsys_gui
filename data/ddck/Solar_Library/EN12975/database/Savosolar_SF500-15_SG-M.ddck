@@ -1,0 +1,46 @@
+******************************
+**BEGIN Savosolar_SF500-15_SG-M_Constants.ddck
+*******************************
+
+*****************************************
+** Contact person : Ignasi Gurruchaga
+** Creation date  : 18.11.2026
+** Last changes   : 18.11.2026, IG: values from the Solar Keymark factsheet
+*****************************************
+
+***************************************************************************
+** Description:
+** Savosolar SF500-15 SG-M flat-plate collector.
+** Source: SPF Solar Collector Factsheet C1786, Solar Keymark 011-7S2889 F, ISO 9806:2017, 10.2018.
+** All coefficients are referred to the GROSS area (15.955 m2).
+** Steady-state test: no wind (c3), sky (c4) or c6 coefficients, they are set to 0.
+** Solar field (NbModTot, NbModSr, flows) is not defined here: defaults in the collector Type ddck, values in the run config.
+***************************************************************************
+
+CONSTANTS #
+!Parameters
+AMod          = 15.955      ! 1: Collector Module Area [m^2], gross area (factsheet; aperture 14.830, absorber 14.641)
+NbTrsvAng     = 9           ! 6: Number of Transverse Angles [-] ([1,100])
+NbLgtdAng     = 9           ! 7: Number of Longitudinal Angles [-] ([1,100])
+LgwRadMode    = 2           ! 8: Long wave Radiation Mode [-] ([1,4])
+c0            = 0.831       ! 9:  eta0, gross [-] (factsheet)
+c1            = 3.08*3.6    ! 10: a1, gross [kJ/hr.m^2.K] (3.08 W/m2K, factsheet)
+c2            = 0.0100*3.6  ! 11: a2, gross [kJ/hr.m^2.K^2] (0.0100 W/m2K2, factsheet)
+c3            = 0           ! 12: wind dependence [kJ/m^3.K] (not given, steady-state test)
+c4            = 0           ! 13: sky temperature dependence [-] (not given)
+c5            = 11.47       ! 14: effective heat capacity [kJ/m^2.K]: (76.3 kJ/K dry + 28 l x 1.03 kg/l x 3.7 kJ/kgK glycol) / 15.955 m2
+c6            = 0           ! 15: wind dependence of eta0 [s/m] (not given)
+Kd            = 0.90        ! 16: diffuse IAM [-], hemispherical integral of the IAM curves of the factsheet
+InitArrayTemp = 20          ! 17: Initial Array Temperature [C] ([-Inf,+Inf])
+NbNodes       = 50          ! 18: Number of Nodes per Collector [-] ([1,1000])
+
+! Bi-axial incidence angle modifier (IAM) data file for this collector:
+! IAMT x IAML read from the factsheet curves (K50 = 0.96 both directions), +-0.02 reading accuracy
+CONSTANTS 1
+unitReadIAM = 26
+ASSIGN PATH$\Solar_Library\EN12975\database\Savosolar_SF500-15_SG-M_IAM.txt unitReadIAM
+
+
+*******************************
+**END Savosolar_SF500-15_SG-M_Constants.ddck
+*******************************

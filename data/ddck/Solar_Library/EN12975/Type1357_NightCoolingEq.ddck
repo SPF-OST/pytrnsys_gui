@@ -5,7 +5,8 @@
 *****************************************
 ** Contact person : Mikel Arenas
 ** Creation date  : 24.09.2026
-** Last changes   :
+** Last changes   : 18.11.2026, IG: solar field parameters (NbModTot, NbModSr) defined here, not in the
+**                  collector database ddcks
 *****************************************
 
 ************************************************************************************************************************
@@ -14,6 +15,9 @@
 ** Variant of Type1357.ddck: during night cooling ($SolarControlNightCooling = 1) Type1357 gets no flow and the
 ** outlet temperature is computed with the analytical EN12975 loss equation (see "Night cooling model"), which
 ** additionally includes the longwave sky term with c4_night. Type1357.ddck does night cooling with the Type itself.
+** Needs a collector database ddck (Solar_Library/EN12975/database/...) included with the same "as <Name>": it holds
+** only the collector data (AMod, c0..c6, Kd, IAM file). The solar field (NbModTot, NbModSr, flows) is defined in
+** this ddck with neutral defaults and must be set per project with "deck <Name>NbModTot ..." in the run config.
 ************************************************************************************************************************
 
 ************************************************************************************************************************
@@ -81,6 +85,13 @@ EmSky     = 0.736 + 0.00577 * tAmbDewPoint
 IT_Wm2    = IT_Coll_kJhm2/3.6
 IT_kWm2   = IT_Coll_kJhm2/3600	             ! Incident total radiation on collector plane, kW/m2
 IT_kW     = IT_kWm2 * ACollAp
+
+***********************************
+** Solar field: set per project with "deck <Name>NbModTot ..." and "deck <Name>NbModSr ..." in the config
+***********************************
+CONSTANTS #
+NbModTot = 1      ! Total number of collector modules in the field [-] (default: one module)
+NbModSr  = 1      ! Number of modules in series per string [-] (default: one module)
 
 CONSTANTS #
 ! Parameters
