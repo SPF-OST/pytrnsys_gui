@@ -197,7 +197,7 @@ def _getTrnExePath() -> _pl.PureWindowsPath:
     isRunDuringCi = _os.environ.get("CI") == "true"
     if isRunDuringCi:
         return _pl.PureWindowsPath(
-            r"C:\CI-Progams\TRNSYS18_pytrnsys\Exe\TrnEXE.exe"
+            r"C:\CI-Programs\TRNSYS18_pytrnsys\Exe\TrnEXE.exe"
         )
 
     return _pl.PureWindowsPath(

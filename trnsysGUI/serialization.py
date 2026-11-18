@@ -13,7 +13,12 @@ class RequiredDecoderFieldsMixin:
     BlockDisplayName: str  # NOSONAR  # pylint: disable=invalid-name
 
 
-class UpgradableJsonSchemaMixinBase(_ser.UpgradableJsonSchemaMixin, _abc.ABC):
+_BLOCK_DICT_KEY = ".__BlockDict__"
+
+
+# Must come before the serialization mixin in the bases, so that the key is removed
+# before the data is validated
+class DictKeyMixin(_abc.ABC):
     @classmethod
     def from_dict(  # NOSONAR  # pylint: disable=invalid-name
         cls,
@@ -52,13 +57,28 @@ class UpgradableJsonSchemaMixinBase(_ser.UpgradableJsonSchemaMixin, _abc.ABC):
         raise NotImplementedError()
 
 
+class UpgradableJsonSchemaMixinBase(
+    DictKeyMixin, _ser.UpgradableJsonSchemaMixin, _abc.ABC
+):
+    pass
+
+
+class BlockItemUpgradableJsonSchemaMixinVersion0(
+    DictKeyMixin, _ser.UpgradableJsonSchemaMixinVersion0, _abc.ABC
+):
+    @classmethod
+    @_tp.override
+    def key(cls) -> str:
+        return _BLOCK_DICT_KEY
+
+
 class BlockItemUpgradableJsonSchemaMixin(
     UpgradableJsonSchemaMixinBase, _abc.ABC
 ):
     @classmethod
     @_tp.override
     def key(cls) -> str:
-        return ".__BlockDict__"
+        return _BLOCK_DICT_KEY
 
 
 class ConnectionItemUpgradableJsonSchemaMixin(

@@ -6,7 +6,6 @@ import typing as _tp
 import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.BlockItem as _bi
-import trnsysGUI.blockItemHasInternalPiping as _biip
 import trnsysGUI.common as _com
 import trnsysGUI.components.ddckFolderHelpers as _dfh
 import trnsysGUI.names.undo as _nu
@@ -22,8 +21,6 @@ class DeleteBlockCommand(_qtw.QUndoCommand):
         editor: _ed.Editor,  # type: ignore[name-defined]
         undoNamingHelper: _nu.UndoNamingHelper,
     ) -> None:
-        assert isinstance(blockItem, _biip.BlockItemHasInternalPiping)
-
         description = f"Delete {blockItem.name}"
         super().__init__(description)
 
@@ -57,7 +54,7 @@ class DeleteBlockCommand(_qtw.QUndoCommand):
         )
 
     def undo(self):
-        checkDdckFolder = self._blockItem.hasDdckDirectory()
+        checkDdckFolder = _dfh.hasComponentDdckFolder(self._blockItem)
         oldName = self._blockItem.displayName
         generatedNamePrefix = self._blockItem.name
 

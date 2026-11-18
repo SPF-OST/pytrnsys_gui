@@ -1,0 +1,8 @@
+defaultName: pitStore2P
+description: Pit Storage (two ports)
+connections:
+  - input:
+      position: [ 160, 0 ]
+    output:
+      position: [ 80, 0 ]
+size: [ 240, 160 ]

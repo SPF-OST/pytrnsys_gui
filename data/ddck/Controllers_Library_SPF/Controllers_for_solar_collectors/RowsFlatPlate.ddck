@@ -28,14 +28,14 @@ EQUATIONS #
 $IB = $weatherIB_surfUser_1/SIN($weatherAI_surfUser_1+1e-6)
 Slope = $weatherslopeSurfUser_1
 Azi = $weatheraziSurfUser_1
-SlopeField = $weatherslopeSurfUser_2
+SlopeField = $weatherslopeSurfUser_3
 
 ***********************************
 ** Begin CONSTANTS
 ***********************************
 ModeShade = 1
 HShade = 3
-RowSep = 3 !HShade*(COS(Slope)+SIN(Slope)/TAN(90-ABS($Lat)-23.5)) ! No shadows in winter solstice at 12:00
+RowSep = HShade*(COS(Slope)+SIN(Slope)/TAN(90-ABS($weatherLat)-23.5)) ! No shadows in winter solstice at 12:00
 LRow = 10
 NRow = 10
 
