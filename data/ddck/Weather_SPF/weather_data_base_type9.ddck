@@ -8,6 +8,7 @@
 ** Last changes   : 18.11.2026, IG: first version (replaces Type 109 / Type 15 for the pytrnsys standard weather file)
 **                  19.11.2026, IG: tracking surfaces (second Type 16 unit), per-surface switch TrackSurfUser_k,
 **                  actual slope and azimuth of the user surfaces (slopeActSurfUser_k, aziActSurfUser_k)
+**                  19.11.2026, IG: azimuth convention in the southern hemisphere documented (no change of the model)
 *****************************************
 
 ***************************************************************************
@@ -37,7 +38,12 @@
 ** TrackSurfUser_k (k = 1..4) selects per user surface which Type 16 gives its outputs (0 fixed, 1 tracked). Default:
 **   all user surfaces tracked when ModeTracking > 1 (like weather_data_base_type15.ddck, facades always fixed).
 **   Example: PTC field on surface 1 (tracked) and PV on surface 2 (fixed): ModeTracking 3, TrackSurfUser_2 0.
-** Meaning of slopeSurfUser_k / aziSurfUser_k (azimuth: 0 = south, west +, east -), from the Type 16 source:
+** Azimuth convention of Type 16 (surfaces and solar azimuth AISA): 0 = facing the EQUATOR, east -, west +, in both
+**   hemispheres. Northern hemisphere: 0 south, 180 north. Southern hemisphere (Lat < 0): 0 NORTH, 180 south, west
+**   still +90. So in the south "AA_S" (azimuth 0) is the facade facing north and "AA_N" the one facing south, and a
+**   collector facing the equator keeps azimuth 0. Checked against ERA5 / Open-Meteo for Zurich, Sevilla, Santiago
+**   and Melbourne (DigiSolar Simulations/weather_check/era5_hemispheres).
+** Meaning of slopeSurfUser_k / aziSurfUser_k (azimuth: 0 = equator, west +, east -), from the Type 16 source:
 **   ModeTracking 1 fixed:            slope and azimuth of the surface.
 **   ModeTracking 2 vertical axis:    the surface keeps slopeSurfUser_k and turns about a vertical axis to face the
 **                                    sun (azimuth = solar azimuth); aziSurfUser_k is not used.
@@ -86,7 +92,7 @@ TcwAvg = TambAvg
 
 CONSTANTS #
 slopeSurfUser_1 = 45. ! Slope of surface-5. By default used in solar thermal collectors
-aziSurfUser_1   = 0.  ! Azimuth of surface-5 (0 = south, west +)
+aziSurfUser_1   = 0.  ! Azimuth of surface-5 (0 = equator: south in the north, north in the south; west +)
 slopeSurfUser_2 = 10. ! Slope of surface-6. By default used in PV panels
 aziSurfUser_2   = 110.! Azimuth of surface-6
 slopeSurfUser_3 = 10. ! Slope of surface-7

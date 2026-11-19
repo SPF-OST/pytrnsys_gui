@@ -75,7 +75,7 @@ Radiation of the primary source (`--radiation`) and how the missing components a
 | `ghi_dni` | DHI = GHI - DNI cos(zenith) |
 | `dni_dhi` | GHI = DHI + DNI cos(zenith) |
 | `ghi` | DHI with Erbs et al. (1982), then DNI |
-| `poa` | GHI found by bisection so that Erbs decomposition + Perez (1990) transposition give the measured plane-of-array irradiance; `--poa-orientation fixed` (with `--poa-slope`, `--poa-azimuth`, 0 = south, west +), `tracking_2axis` or `tracking_1axis_ns`. Below 3 W/m2 or sun elevation < 5 deg: isotropic diffuse. The measured value is kept in `GPOAmeas`. |
+| `poa` | GHI found by bisection so that Erbs decomposition + Perez (1990) transposition give the measured plane-of-array irradiance; `--poa-orientation fixed` (with `--poa-slope`, `--poa-azimuth` in the TRNSYS convention: 0 = facing the equator, east -, west +), `tracking_2axis` or `tracking_1axis_ns`. Below 3 W/m2 or sun elevation < 5 deg: isotropic diffuse. The measured value is kept in `GPOAmeas`. |
 
 `--fill-era5 <file>` adds a secondary source for the variables the primary source does not have (humidity, wind,
 pressure) and for its gaps (flag 1 or 2). Without a secondary source, humidity, wind and pressure get constant
@@ -132,8 +132,9 @@ deck weatherusePOAmeas 0    # 1: measured plane-of-array irradiance on surface 1
 ## Equations used by the converters (`weather_standard.py`)
 
 All radiation values are interval averages; the sun position is taken at the middle of the interval.
-Angles: zenith θz, solar azimuth γs (0 = south, west +), declination δ, hour angle ω, latitude φ, surface slope β
-and azimuth γ.
+Angles: zenith θz, solar azimuth γs (0 = south, west +, geographic, both hemispheres), declination δ, hour angle ω
+(wrapped to ±180°), latitude φ, surface slope β and azimuth γ. The `--poa-azimuth` of the command line is in the
+TRNSYS convention and converted (southern hemisphere: γ = 180° − γTRNSYS), see below.
 
 | Quantity | Equation | Reference |
 |---|---|---|
@@ -185,6 +186,21 @@ See the description block of `Weather_SPF/weather_data_base_type9.ddck`: the 4 u
 tracked (`TrackSurfUser_k`), with one tracking mode (`ModeTracking`) for the tracked ones; in mode 3 the slope and
 azimuth of a user surface are those of the tracking AXIS (troughs with a horizontal N-S axis: slope 0, azimuth 0).
 The actual aperture orientation is given by `slopeActSurfUser_k` and `aziActSurfUser_k`.
+
+## Hemispheres and azimuth convention
+
+TRNSYS (Type 16, solar azimuth and surface azimuth) measures the azimuth from the EQUATOR, east negative, west
+positive, in both hemispheres: in the southern hemisphere 0 = north and 180 = south. A collector facing the
+equator has azimuth 0 everywhere; the facades `AA_S` / `AA_N` of the weather ddck face north / south in the south.
+The converter computes the sun position geographically (0 = south) and converts the `--poa-azimuth` given in the
+TRNSYS convention.
+
+Checked with ERA5 2023 for Zurich, Sevilla, Santiago de Chile and Melbourne (DigiSolar
+`Simulations/weather_check/era5_hemispheres`): with the isotropic sky Type 9 + 16 reproduce the Open-Meteo tilted
+irradiance of a fixed plane (slope = latitude, facing the equator) within 0.1 % per year in both hemispheres, and an
+independent calculation of single-axis trackers with a horizontal N-S axis within 0.7-1.5 % and with a horizontal
+E-W axis within 0.3-0.6 %, without time shift. The Open-Meteo "tracker" (`tilt=nan`) is not a single-axis
+tracker: it keeps the azimuth and sets the tilt equal to the solar zenith angle.
 
 ## Data sources
 

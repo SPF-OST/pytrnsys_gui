@@ -77,6 +77,7 @@ def solar_position(t_mid_utc: pd.DatetimeIndex, site: Site) -> tuple[np.ndarray,
     )
     solar_time = hours + site.longitude / 15.0 + eot_min / 60.0
     omega = np.radians(15.0 * (solar_time - 12.0))
+    omega = (omega + np.pi) % (2 * np.pi) - np.pi  # -180..180: UTC hour + longitude/15 can leave 0..24 h
     lat = np.radians(site.latitude)
     cos_z = np.sin(lat) * np.sin(decl) + np.cos(lat) * np.cos(decl) * np.cos(omega)
     zen = np.arccos(np.clip(cos_z, -1, 1))
@@ -89,8 +90,17 @@ def solar_position(t_mid_utc: pd.DatetimeIndex, site: Site) -> tuple[np.ndarray,
     return zen, az_south_west_pos, i0n
 
 
+def trnsys_to_geographic_azimuth(azimuth_deg: float, latitude: float) -> float:
+    """TRNSYS surface azimuth (0 = facing the equator, east -, west +, both hemispheres; checked with Type 16 in
+    DigiSolar Simulations/weather_check/era5_hemispheres) -> azimuth used here (0 = south, east -, west +)."""
+    if latitude >= 0:
+        return azimuth_deg
+    return (180.0 - azimuth_deg + 180.0) % 360.0 - 180.0  # southern hemisphere: 0 = north, west +90 stays +90
+
+
 def surface_orientation(mode: str, zen: np.ndarray, az: np.ndarray, slope_deg: float, azimuth_deg: float):
-    """Slope and azimuth [rad] of the irradiance sensor plane. Azimuth TRNSYS convention: 0 = south, west +.
+    """Slope and azimuth [rad] of the irradiance sensor plane. Azimuth here: 0 = south, east -, west +
+    (geographic, both hemispheres; the CLI takes the TRNSYS azimuth, see trnsys_to_geographic_azimuth).
 
     mode: 'fixed' (slope, azimuth), 'tracking_2axis' (normal to the sun), 'tracking_1axis_ns' (horizontal N-S axis,
     east-west tracking, plane normal in the plane of the sun and the vertical E-W plane).
@@ -443,7 +453,7 @@ def build_standard(
         dhi, dni = ghi.copy(), ghi.copy()
         res = np.full(len(grid), np.nan)
         r = invert_poa(g[ok], zen[ok], az[ok], i0n[ok], poa["orientation"], poa.get("slope", 0.0),
-                       poa.get("azimuth", 0.0), albedo)
+                       trnsys_to_geographic_azimuth(poa.get("azimuth", 0.0), site.latitude), albedo)
         ghi[ok], dhi[ok], dni[ok], res[ok] = r
         prim["GHI"], prim["DHI"], prim["DNI"] = ghi, dhi, dni
         conversions.append(
@@ -567,7 +577,9 @@ def _main() -> None:
                    choices=["ghi", "ghi_dhi", "ghi_dni", "dni_dhi", "ghi_dhi_dni", "poa"])
     p.add_argument("--poa-orientation", default="fixed", choices=["fixed", "tracking_2axis", "tracking_1axis_ns"])
     p.add_argument("--poa-slope", type=float, default=0.0)
-    p.add_argument("--poa-azimuth", type=float, default=0.0, help="0 = south, west +")
+    p.add_argument("--poa-azimuth", type=float, default=0.0,
+                   help="TRNSYS convention: 0 = facing the equator (south in the north, north in the south), east -, "
+                        "west +")
     p.add_argument("--albedo", type=float, default=0.2)
     p.add_argument("--decomposition", default="erbs", choices=["erbs", "reindl"],
                    help="GHI-only data: Erbs (1982) or Reindl (1990, as TRNSYS Type 16 mode 2 / Type 109)")
