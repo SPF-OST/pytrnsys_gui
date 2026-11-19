@@ -1,0 +1,40 @@
+*******************************
+**BEGIN Chur_IDAweb_2023.ddck
+*******************************
+
+*****************************************
+** Contact person : Ignasi Gurruchaga
+** Creation date  : 19.11.2026
+** Last changes   : 19.11.2026, IG: first version
+*****************************************
+
+***************************************************************************
+** Description:
+** Site ddck of the pytrnsys standard weather file Weather/MeteoSwiss/CH/Chur/CHU_IDAweb_2023_1h.csv, converted
+** from CHU_IDAweb_2023.99 (MeteoSwiss IDAweb, Chur 2023, the file used by CityCHU.ddck with Type 109) with
+** weather_standard.py --source type109 --radiation ghi --decomposition erbs (see the .json next to the file).
+** No wind in the source: constant 2 m/s. Lines from 1 January 2023 00:00 CET: START 0, STOP 8760.
+** Include both "as weather":
+**   COMMON$ Weather_SPF/MeteoSwiss/CH/Chur_IDAweb_2023 as weather
+**   COMMON$ Weather_SPF/weather_data_base_type9 as weather
+***************************************************************************
+
+CONSTANTS #
+Lat = 46.87            ! latitude, deg
+Long = 9.53            ! longitude east +, deg
+utcOffset = 1          ! standard time CET
+shiftSolarTime = Long - 15*utcOffset   ! Type 16 shift in solar time, deg
+altid = 556            ! elevation, m
+TambD = -3.5           ! ambient design temperature (1 % hourly percentile), degC
+TambAvg = 11.73        ! average outdoor temperature, degC
+dTambAmpl = 9.7        ! amplitude of the outside temperature (first harmonic), K
+tTambShift = 508       ! offset of the outside air temperature minimum, h
+ddTcwOffset = 40       ! time shift of the minimum cold water temperature, d
+weatherDataKind = 0    ! 0 measured, 1 reanalysis, 2 typical year, 3 synthetic
+firstYearWeather = 2023
+unitWeatherData = 38
+ASSIGN PATH$\Weather\MeteoSwiss\CH\Chur\CHU_IDAweb_2023_1h.csv unitWeatherData
+
+*******************************
+**END Chur_IDAweb_2023.ddck
+*******************************

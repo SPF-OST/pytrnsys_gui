@@ -1,0 +1,53 @@
+{
+  "format": "pytrnsys standard weather file 1.0 (2026-11-18)",
+  "site": {
+    "name": "BadRappenau_ERA5",
+    "latitude": 49.2633,
+    "longitude": 9.1321,
+    "altitude": 250.0,
+    "utc_offset_standard": 1.0,
+    "trnsys_shift_deg": -5.867900000000001
+  },
+  "time": {
+    "first_line": "interval ending 2025-01-01 01:00 local standard time",
+    "convention": "interval-ending averages, local standard time (UTC+1), no daylight saving",
+    "step_h": 1.0,
+    "n_lines": 13104
+  },
+  "kind": "reanalysis",
+  "primary": {
+    "source": "ERA5 reanalysis (ECMWF) via Open-Meteo historical archive API",
+    "kind": "reanalysis",
+    "radiation_input": "GHI + DHI + DNI (hourly means of the preceding hour)",
+    "notes": "Temperature, humidity, wind (10 m) and pressure are instantaneous values at the end of the hour."
+  },
+  "secondary": null,
+  "column_sources": {
+    "Tamb": "primary",
+    "RH": "primary",
+    "GHI": "primary",
+    "DHI": "primary",
+    "DNI": "primary",
+    "vWind": "primary",
+    "dirWind": "primary",
+    "pAmb": "primary"
+  },
+  "conversions": [],
+  "flags": {
+    "0": "measured (primary)",
+    "1": "gap filled from secondary",
+    "2": "secondary only",
+    "3": "synthetic"
+  },
+  "flag_counts": {
+    "0": 13104
+  },
+  "created": "2026-11-18T20:56:08",
+  "converter": "weather_standard.py 1.0 (2026-11-18)",
+  "site_constants": {
+    "TambAvg": 10.94,
+    "dTambAmpl": 9.38,
+    "tTambShift": 277,
+    "TambD": -4.2
+  }
+}

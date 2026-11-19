@@ -7,6 +7,9 @@
 ** Creation date  : 24.09.2026
 ** Last changes   : 18.11.2026, IG: solar field parameters (NbModTot, NbModSr) defined here, not in the
 **                  collector database ddcks
+**                  19.11.2026, IG: sky emissivity limited to 0..1; C_tilt and AziAg as equations (tracked aperture
+**                  of weather_data_base_type9: deck CollC_tilt weatherslopeActSurfUser_1, deck CollAziAg
+**                  weatheraziActSurfUser_1)
 *****************************************
 
 ************************************************************************************************************************
@@ -58,9 +61,9 @@ TOut = TOutType*NOT(SolarControlNightCooling) + TOutNight*SolarControlNightCooli
 ***********************************
 ** inputs from other ddck
 ***********************************
-CONSTANTS #
+EQUATIONS #    ! equations, not constants: a tracked aperture can be passed, e.g. "deck CollC_tilt weatherslopeActSurfUser_1"
 C_tilt = $weatherslopeSurfUser_1			! Collector tilt angle / slope [deg]
-AziAg = $weatheraziSurfUser_1
+AziAg = $weatheraziSurfUser_1				! Collector azimuth [deg]
 
 EQUATIONS #
 IT_Coll_kJhm2  = $ITShaded_surfUser_1		! Incident total radiation on collector plane, kJ/hm2
@@ -81,7 +84,7 @@ SolarControlNightCooling = $SolarControlNightCooling	! 1: night cooling active, 
 ** CONSTANTS
 ***********************************
 EQUATIONS #
-EmSky     = 0.736 + 0.00577 * tAmbDewPoint
+EmSky     = MIN(MAX(0.736 + 0.00577 * tAmbDewPoint,0),1)   ! Type 1357 accepts 0..1 (a non-converged dew point can leave the range)
 IT_Wm2    = IT_Coll_kJhm2/3.6
 IT_kWm2   = IT_Coll_kJhm2/3600	             ! Incident total radiation on collector plane, kW/m2
 IT_kW     = IT_kWm2 * ACollAp

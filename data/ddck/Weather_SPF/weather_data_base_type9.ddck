@@ -1,0 +1,363 @@
+*******************************
+**BEGIN weather_data_base_type9.ddck
+*******************************
+
+*****************************************
+** Contact person : Ignasi Gurruchaga
+** Creation date  : 18.11.2026
+** Last changes   : 18.11.2026, IG: first version (replaces Type 109 / Type 15 for the pytrnsys standard weather file)
+**                  19.11.2026, IG: tracking surfaces (second Type 16 unit), per-surface switch TrackSurfUser_k,
+**                  actual slope and azimuth of the user surfaces (slopeActSurfUser_k, aziActSurfUser_k)
+*****************************************
+
+***************************************************************************
+** Description:
+** Weather data base for the pytrnsys STANDARD WEATHER FILE (see Weather/README.md), read with Type 9 and processed
+** with Type 16 (radiation on 8 surfaces, Perez sky), Type 33 (psychrometrics) and Type 69 (sky temperature).
+** Same output names as weather_data_base.ddck (Type 109), so collectors, shading, PV, ... are unchanged.
+**
+** Include LOCAL, after the site ddck, both "as weather":
+**   COMMON$ Weather_SPF/<Source>/<Country>/<Site> as weather            (or PROJECT$ weather/<Site> as weather)
+**   COMMON$ Weather_SPF/weather_data_base_type9 as weather
+** The site ddck defines: Lat, shiftSolarTime (= longitude east + - 15 x UTC offset), altid, TambAvg, dTambAmpl,
+** tTambShift, TambD, unitWeatherData and the ASSIGN of the standard file.
+** File: 2 header lines, hourly interval-ending averages in local standard time, line 1 = 1 January 00:00-01:00 of
+** the first year of the file, continuous. Type 9 mode 6 skips the lines up to $START, so START is the hour since
+** 1 January 00:00 of the FIRST YEAR OF THE FILE (e.g. 1 July of the second year = 8760 + 4344).
+** Columns: hour, Tamb, RH, GHI, DHI, DNI, vWind, dirWind, pAmb, GPOAmeas, flag.
+** usePOAmeas = 1: the measured plane-of-array irradiance (GPOAmeas) replaces the total on surface 1 (surfUser_1)
+** when it is available; beam and diffuse components are scaled by the same factor. Use it for validation with
+** plant pyranometers in the collector plane (the file then must be for the same plane as surface 1).
+**
+** SURFACES AND TRACKING
+** the FIXED Type 16 (first one): facades N, S, E, W (90 deg, turned with TURN) and the 4 user surfaces.
+** the TRACKING Type 16 (second one, mode ModeTracking): the same 4 user surfaces, TRACKING. In Type 16 the tracking mode is a
+**   parameter of the unit (one mode for all its surfaces), so tracked surfaces need their own Type 16; both read
+**   the same Type 9, so there is no second ddck and no second weather file.
+** TrackSurfUser_k (k = 1..4) selects per user surface which Type 16 gives its outputs (0 fixed, 1 tracked). Default:
+**   all user surfaces tracked when ModeTracking > 1 (like weather_data_base_type15.ddck, facades always fixed).
+**   Example: PTC field on surface 1 (tracked) and PV on surface 2 (fixed): ModeTracking 3, TrackSurfUser_2 0.
+** Meaning of slopeSurfUser_k / aziSurfUser_k (azimuth: 0 = south, west +, east -), from the Type 16 source:
+**   ModeTracking 1 fixed:            slope and azimuth of the surface.
+**   ModeTracking 2 vertical axis:    the surface keeps slopeSurfUser_k and turns about a vertical axis to face the
+**                                    sun (azimuth = solar azimuth); aziSurfUser_k is not used.
+**   ModeTracking 3 single axis:      slopeSurfUser_k / aziSurfUser_k are the SLOPE and AZIMUTH OF THE AXIS; the
+**                                    surface rotates about it to minimise the incidence angle.
+**                                    Horizontal axis (slope 0): the aperture faces aziSurfUser_k +/- 90 deg, so
+**                                    aziSurfUser_k = 0 is a N-S axis tracking east-west (usual parabolic trough
+**                                    field), aziSurfUser_k = 90 an E-W axis tracking north-south.
+**                                    An inclined axis (e.g. polar axis: slope = latitude, azimuth 0) is possible.
+**   ModeTracking 4 two axes:         normal to the sun (incidence 0); slope and azimuth are not used.
+** Number of fields: 4 user surfaces, each fixed or tracked, all tracked ones with the same ModeTracking. More
+**   surfaces or a second tracking mode (e.g. one-axis troughs and two-axis dishes): add surfaces to the INPUTS of the
+**   tracking Type 16 (up to 20 surfaces each) or a third Type 16 in this ddck with its own mode.
+** Actual orientation of the user surfaces (outputs, deg): slopeActSurfUser_k (Type 16 output) and aziActSurfUser_k
+**   (computed: = aziSurfUser_k fixed; solar azimuth for modes 2 and 4; aziSurfUser_k +/- 90 for mode 3 with a
+**   horizontal axis; for an inclined axis in mode 3 the azimuth is not exact, use the incidence angle).
+**
+** PARABOLIC TROUGH COLLECTORS (Type1357_NightCoolingEq + NEP_PolyTrough1800 / Soliterm_PTC1800 as Coll)
+**   - Weather: deck weatherModeTracking 3, deck weatherslopeSurfUser_1 0, deck weatheraziSurfUser_1 0
+**     (horizontal N-S axis; azimuth of the axis = field orientation, e.g. -10 for an axis turned 10 deg east).
+**   - The collector reads the incidence angle AI_surfUser_1 and the beam IB_surfUser_1 of the TRACKED aperture.
+**     Its biaxial IAM also needs the aperture orientation: by default the collector ddck reads slopeSurfUser_1 and
+**     aziSurfUser_1 (the axis), so set the actual aperture in the config:
+**       deck CollC_tilt weatherslopeActSurfUser_1
+**       deck CollAziAg weatheraziActSurfUser_1
+**   - Row shading of troughs: RowsParabolicTrough.ddck (needs this horizontal N-S axis on surface 1).
+**   - Concentrating collectors use only beam (and circumsolar) radiation: check in the collector database that the
+**     diffuse is weighted with the diffuse IAM Kd (small for troughs).
+***************************************************************************
+
+CONSTANTS #
+myUnitWeatherData = unitWeatherData   ! from the site ddck
+usePOAmeas = 0                        ! 1: measured plane-of-array irradiance on surface 1 (see description)
+
+CONSTANTS #    ! Turn the North, South, East and West orientations with "TURN"
+TURN = 0.0
+AA_N = 180.0 + TURN
+AA_S = TURN
+AA_E = 270.0 + TURN
+AA_W = 90.0 + TURN
+groundRef = 0.2
+slope90 = 90.0
+
+CONSTANTS 1
+TcwAvg = TambAvg
+
+CONSTANTS #
+slopeSurfUser_1 = 45. ! Slope of surface-5. By default used in solar thermal collectors
+aziSurfUser_1   = 0.  ! Azimuth of surface-5 (0 = south, west +)
+slopeSurfUser_2 = 10. ! Slope of surface-6. By default used in PV panels
+aziSurfUser_2   = 110.! Azimuth of surface-6
+slopeSurfUser_3 = 10. ! Slope of surface-7
+aziSurfUser_3   = 70. ! Azimuth of surface-7
+slopeSurfUser_4 = 10. ! Slope of surface-8
+aziSurfUser_4   = 70. ! Azimuth of surface-8
+ModeTracking = 1      ! tracking mode of the second (tracking) Type 16: 1 fixed, 2 vertical axis, 3 single axis (slope/azimuth = axis), 4 two axes
+TrackSurfUser_1 = GT(ModeTracking,1)   ! 1: surface-5 tracked (tracking Type 16), 0: fixed
+TrackSurfUser_2 = GT(ModeTracking,1)   ! surface-6
+TrackSurfUser_3 = GT(ModeTracking,1)   ! surface-7
+TrackSurfUser_4 = GT(ModeTracking,1)   ! surface-8
+SkyModel = 4          ! Type 16 tilted surface model: 1 isotropic, 2 Hay-Davies, 3 Reindl, 4 Perez
+SolarConstant = 4871  ! kJ/hm2
+startDayWeather = MOD(INT($START/24),365) + 1   ! day of the year of the simulation start
+
+***********************************
+** Data reader (standard weather file)
+***********************************
+UNIT 31 TYPE 9
+PARAMETERS 50
+6                  ! 1: mode: skip lines up to START, no initial values (interval-ending averages)
+2                  ! 2: header lines
+11                 ! 3: number of values
+1                  ! 4: time interval of the data [h]
+-1 1 0 1           ! hour: no interpolation, instantaneous
+1 1 0 0            ! Tamb: interpolated average
+-1 1 0 0           ! RH: not interpolated (interpolating averages can overshoot)
+-1 3.6 0 0         ! GHI: W/m2 -> kJ/hm2, not interpolated (Type 16 processes the interval)
+-1 3.6 0 0         ! DHI
+-1 3.6 0 0         ! DNI
+-1 1 0 0           ! vWind: not interpolated (interpolating averages can give negative speeds)
+-1 1 0 0           ! dirWind
+1 1 0 0            ! pAmb [Pa]
+-1 3.6 0 0         ! GPOAmeas: W/m2 -> kJ/hm2 (-9999 = not available)
+-1 1 0 0           ! flag
+myUnitWeatherData  ! logical unit
+-1                 ! free format
+
+EQUATIONS #
+hourWeatherFile = [31,1]
+tAmbDry = [31,2]      ! Ambient temperature [degC]
+relHum  = MIN(MAX([31,3],1),100)   ! Relative humidity [%]
+vWind   = MAX([31,7],0)            ! Wind velocity [m/s]
+dirWind = [31,8]      ! Wind direction, north = 0, east = 90 [deg]
+pAmb_Pa = [31,9]      ! ambient pressure [Pa]
+GPOAmeas = [31,10]    ! measured plane-of-array irradiance [kJ/hm2], < 0 = not available
+flagWeather = [31,11] ! 0 measured, 1 gap filled, 2 secondary source only, 3 synthetic
+GHIfile = [31,4]      ! global horizontal [kJ/hm2] (input of Type 16)
+DHIfile = [31,5]      ! diffuse horizontal [kJ/hm2] (input of Type 16)
+tLastRead = [31,99]   ! time of the last data read (input of Type 16)
+tNextRead = [31,100]  ! time of the next data read (input of Type 16)
+
+***********************************
+** Radiation processor
+***********************************
+UNIT 30 TYPE 16
+PARAMETERS 9
+5                ! 1: radiation mode 5: total and diffuse on the horizontal known
+1                ! 2: tracking mode: fixed surfaces (tracking surfaces: second Type 16)
+SkyModel         ! 3: tilted surface radiation mode
+startDayWeather  ! 4: starting day
+Lat              ! 5: latitude [deg]
+SolarConstant    ! 6: solar constant [kJ/hm2]
+shiftSolarTime   ! 7: shift in solar time [deg] (site ddck)
+2                ! 8: not used (smoothing)
+1                ! 9: 1 = data in local standard time (the shift is applied)
+INPUTS 21
+GHIfile          ! GHI [kJ/hm2]
+DHIfile          ! DHI [kJ/hm2]
+tLastRead        ! time of the last data read
+tNextRead        ! time of the next data read
+groundRef        ! ground reflectance
+slope90          ! Slope of surface-1
+AA_N             ! Azimuth of surface-1
+slope90          ! Slope of surface-2
+AA_S             ! Azimuth of surface-2
+slope90          ! Slope of surface-3
+AA_E             ! Azimuth of surface-3
+slope90          ! Slope of surface-4
+AA_W             ! Azimuth of surface-4
+slopeSurfUser_1  ! Slope of surface-5
+aziSurfUser_1    ! Azimuth of surface-5
+slopeSurfUser_2  ! Slope of surface-6
+aziSurfUser_2    ! Azimuth of surface-6
+slopeSurfUser_3  ! Slope of surface-7
+aziSurfUser_3    ! Azimuth of surface-7
+slopeSurfUser_4  ! Slope of surface-8
+aziSurfUser_4    ! Azimuth of surface-8
+*** INITIAL INPUT VALUES
+0 0 0 1 0.2 90 180 90 0 90 270 90 90 45 0 10 110 10 70 10 70
+
+EQUATIONS #
+AISZ = [30,2]          ! Solar zenith angle [deg]
+AISA = [30,3]          ! Solar azimuth angle [deg]
+IT_H = MAX([30,4],0)   ! total irradiation on the horizontal, kJ/hm2
+IB_H = MAX([30,5],0)   ! beam radiation on horizontal, kJ/hm2
+ID_H = MAX([30,6],0)   ! sky diffuse radiation on horizontal, kJ/hm2
+AI_H = AISZ            ! angle of incidence on the horizontal, deg
+
+UNIT 32 TYPE 16    ! tracking user surfaces (same data, mode ModeTracking)
+PARAMETERS 9
+5                ! 1: radiation mode 5: total and diffuse on the horizontal known
+ModeTracking     ! 2: tracking mode
+SkyModel         ! 3: tilted surface radiation mode
+startDayWeather  ! 4: starting day
+Lat              ! 5: latitude [deg]
+SolarConstant    ! 6: solar constant [kJ/hm2]
+shiftSolarTime   ! 7: shift in solar time [deg]
+2                ! 8: not used (smoothing)
+1                ! 9: data in local standard time
+INPUTS 13
+GHIfile          ! GHI [kJ/hm2]
+DHIfile          ! DHI [kJ/hm2]
+tLastRead        ! time of the last data read
+tNextRead        ! time of the next data read
+groundRef        ! ground reflectance
+slopeSurfUser_1  ! surface-5: slope (mode 3: slope of the axis)
+aziSurfUser_1    ! surface-5: azimuth (mode 3: azimuth of the axis)
+slopeSurfUser_2  ! surface-6
+aziSurfUser_2
+slopeSurfUser_3  ! surface-7
+aziSurfUser_3
+slopeSurfUser_4  ! surface-8
+aziSurfUser_4
+*** INITIAL INPUT VALUES
+0 0 0 1 0.2 45 0 10 110 10 70 10 70
+
+** Surfaces: Type 16 gives per surface total, beam, sky diffuse, angle of incidence, slope (5 outputs from 7 on)
+EQUATIONS #
+IT_N = [30,7]     !NORTH 90
+IB_N = [30,8]
+AI_N = [30,10]
+IT_S = [30,12]    !SOUTH 90
+IB_S = [30,13]
+ID_S = [30,12]-[30,13]
+AI_S = [30,15]
+IT_E = [30,17]    !EAST 90
+IB_E = [30,18]
+ID_E = [30,17]-[30,18]
+AI_E = [30,20]
+IT_W = [30,22]    !WEST 90
+IB_W = [30,23]
+ID_W = [30,22]-[30,23]
+AI_W = [30,25]
+
+** User surfaces: fixed (first Type 16, outputs 27..46) or tracked (second Type 16, outputs 7..26), switch TrackSurfUser_k
+EQUATIONS #
+IT_surfUser_1_raw = (1-TrackSurfUser_1)*[30,27] + TrackSurfUser_1*[32,7]
+IB_surfUser_1_raw = (1-TrackSurfUser_1)*[30,28] + TrackSurfUser_1*[32,8]
+IDS_surfUser_1_raw = (1-TrackSurfUser_1)*[30,29] + TrackSurfUser_1*[32,9]
+AI_surfUser_1 = (1-TrackSurfUser_1)*[30,30] + TrackSurfUser_1*[32,10]
+slopeActSurfUser_1 = (1-TrackSurfUser_1)*slopeSurfUser_1 + TrackSurfUser_1*[32,11]
+IT_surfUser_2 = (1-TrackSurfUser_2)*[30,32] + TrackSurfUser_2*[32,12]
+IB_surfUser_2 = (1-TrackSurfUser_2)*[30,33] + TrackSurfUser_2*[32,13]
+IDS_surfUser_2 = (1-TrackSurfUser_2)*[30,34] + TrackSurfUser_2*[32,14]
+AI_surfUser_2 = (1-TrackSurfUser_2)*[30,35] + TrackSurfUser_2*[32,15]
+slopeActSurfUser_2 = (1-TrackSurfUser_2)*slopeSurfUser_2 + TrackSurfUser_2*[32,16]
+IDG_surfUser_2 = IT_surfUser_2-IB_surfUser_2-IDS_surfUser_2
+ID_surfUser_2 = IT_surfUser_2-IB_surfUser_2
+IT_surfUser_3 = (1-TrackSurfUser_3)*[30,37] + TrackSurfUser_3*[32,17]
+IB_surfUser_3 = (1-TrackSurfUser_3)*[30,38] + TrackSurfUser_3*[32,18]
+IDS_surfUser_3 = (1-TrackSurfUser_3)*[30,39] + TrackSurfUser_3*[32,19]
+AI_surfUser_3 = (1-TrackSurfUser_3)*[30,40] + TrackSurfUser_3*[32,20]
+slopeActSurfUser_3 = (1-TrackSurfUser_3)*slopeSurfUser_3 + TrackSurfUser_3*[32,21]
+IDG_surfUser_3 = IT_surfUser_3-IB_surfUser_3-IDS_surfUser_3
+ID_surfUser_3 = IT_surfUser_3-IB_surfUser_3
+IT_surfUser_4 = (1-TrackSurfUser_4)*[30,42] + TrackSurfUser_4*[32,22]
+IB_surfUser_4 = (1-TrackSurfUser_4)*[30,43] + TrackSurfUser_4*[32,23]
+IDS_surfUser_4 = (1-TrackSurfUser_4)*[30,44] + TrackSurfUser_4*[32,24]
+AI_surfUser_4 = (1-TrackSurfUser_4)*[30,45] + TrackSurfUser_4*[32,25]
+slopeActSurfUser_4 = (1-TrackSurfUser_4)*slopeSurfUser_4 + TrackSurfUser_4*[32,26]
+IDG_surfUser_4 = IT_surfUser_4-IB_surfUser_4-IDS_surfUser_4
+ID_surfUser_4 = IT_surfUser_4-IB_surfUser_4
+
+** Actual azimuth of the user surfaces (see description)
+EQUATIONS #
+fTrackSunAzi = EQL(ModeTracking,2) + EQL(ModeTracking,4)   ! modes in which the surface faces the sun azimuth
+aziActSurfUser_1 = (1-TrackSurfUser_1)*aziSurfUser_1 + TrackSurfUser_1*(fTrackSunAzi*AISA + EQL(ModeTracking,3)*(aziSurfUser_1 + 90*(2*GT(AISA-aziSurfUser_1,0)-1)) + EQL(ModeTracking,1)*aziSurfUser_1)
+aziActSurfUser_2 = (1-TrackSurfUser_2)*aziSurfUser_2 + TrackSurfUser_2*(fTrackSunAzi*AISA + EQL(ModeTracking,3)*(aziSurfUser_2 + 90*(2*GT(AISA-aziSurfUser_2,0)-1)) + EQL(ModeTracking,1)*aziSurfUser_2)
+aziActSurfUser_3 = (1-TrackSurfUser_3)*aziSurfUser_3 + TrackSurfUser_3*(fTrackSunAzi*AISA + EQL(ModeTracking,3)*(aziSurfUser_3 + 90*(2*GT(AISA-aziSurfUser_3,0)-1)) + EQL(ModeTracking,1)*aziSurfUser_3)
+aziActSurfUser_4 = (1-TrackSurfUser_4)*aziSurfUser_4 + TrackSurfUser_4*(fTrackSunAzi*AISA + EQL(ModeTracking,3)*(aziSurfUser_4 + 90*(2*GT(AISA-aziSurfUser_4,0)-1)) + EQL(ModeTracking,1)*aziSurfUser_4)
+
+** Surface 1 (collectors): optionally the measured plane-of-array irradiance
+EQUATIONS #
+fPOAmeas = usePOAmeas*GE(GPOAmeas,0)*GT(IT_surfUser_1_raw,1)*MIN(GPOAmeas/MAX(IT_surfUser_1_raw,1),3) + (1-usePOAmeas*GE(GPOAmeas,0)*GT(IT_surfUser_1_raw,1))
+IT_surfUser_1 = IT_surfUser_1_raw*fPOAmeas
+IB_surfUser_1 = IB_surfUser_1_raw*fPOAmeas
+IDS_surfUser_1 = IDS_surfUser_1_raw*fPOAmeas
+IDG_surfUser_1 = (IT_surfUser_1_raw-IB_surfUser_1_raw-IDS_surfUser_1_raw)*fPOAmeas
+ID_surfUser_1 = IDS_surfUser_1 + IDG_surfUser_1
+
+EQUATIONS #
+IT_surfUser_4_Wm2 = IT_surfUser_4/3.6
+IT_surfUser_3_Wm2 = IT_surfUser_3/3.6
+IT_surfUser_2_Wm2 = IT_surfUser_2/3.6
+IT_surfUser_1_Wm2 = IT_surfUser_1/3.6
+IT_S_Wm2 = IT_S/3.6
+IT_N_Wm2 = IT_N/3.6
+IT_W_Wm2 = IT_W/3.6
+IT_E_Wm2 = IT_E/3.6
+GPOAmeas_Wm2 = GPOAmeas/3.6
+GPOAmeasPos = MAX(GPOAmeas,0)   ! kJ/hm2, 0 where not available (for printers)
+
+EQUATIONS #
+IT_H_kW = IT_H/3600
+IB_H_kW = IB_H/3600
+IT_S_kW = IT_S/3600     ! Irradiation on south plane in kW/m2
+IB_S_kW = IB_S/3600     ! Direct Irradiation on south plane in kW/m2
+
+EQUATIONS #
+IT_H_Wm2 = IT_H/3.6
+IB_H_Wm2 = IB_H/3.6
+
+EQUATIONS #    ! pressure conversions
+pamb_kPa = pamb_Pa/1000     ! ambient pressure [kPa]
+pamb_atm = pamb_kPa/101.325 ! Ambient pressure [atm]
+pamb_bar = pamb_kPa/100     ! Ambient pressure [bar]
+
+EQUATIONS #
+Tsky = [29,1]     ! effective sky temperature (degC)
+dTsky = Tsky - Tamb     ! delta-T from sky to ambient (K)
+
+UNIT 33 TYPE 33     ! Psychrometrics
+PARAMETERS 3
+2     ! 1 Psychrometrics mode 2: dry bulb and relative humidity known
+1     ! 2 Wet bulb mode 1: calculate wet bulb temperature
+1     ! 3 Error mode 1: only one warning for the whole simulation
+INPUTS 3
+tAmbDry ! Ambient dry bulb temperature [degC]
+relHum  ! Relative humidity [0..100]
+pamb_atm ! Ambient pressure [atm]
+20 50 1
+
+EQUATIONS #
+tAmb_Met = [33,7]
+tAmbDewPoint = [33,8]     ! dew point temp. [degC]
+RHamb_100 = [33,6]        ! Relative humidity [0..100]
+tAmb = Tamb_Met           ! Psychrometrics: dry bulb temperature
+RHamb_1 = RHamb_100/100
+
+UNIT 29 TYPE 69     ! Sky temperature
+PARAMETERS 2
+0      ! 1 mode for cloudiness factor
+altid  ! 2 height over sea level
+INPUTS 4
+tamb_Met       ! ambient temperature
+tambDewPoint   ! dew point temperature
+IB_H           ! beam radiation on the horizontal
+ID_H           ! diffuse radiation on the horizontal
+0 20 0 0
+
+***********************************
+** Monthly printer
+***********************************
+CONSTANTS 1
+unitPrinterWeather = 45
+ASSIGN temp\WEATHER_BASE_MO.Prt unitPrinterWeather
+
+UNIT 45 TYPE 46
+PARAMETERS 6
+unitPrinterWeather  ! 1: Logical unit number, -
+-1                  ! 2: Logical unit for monthly summaries, -
+1                   ! 3: Relative or absolute start time
+-1                  ! 4: Printing & integrating interval, h. -1 for monthly integration
+1                   ! 5: Number of inputs to avoid integration, -
+1                   ! 6: Output number to avoid integration
+INPUTS 6
+$TIME IT_H IB_H ID_H IT_surfUser_1 GPOAmeasPos
+**
+$TIME IT_H IB_H ID_H IT_surfUser_1 GPOAmeasPos
+
+*******************************
+**END weather_data_base_type9.ddck
+*******************************

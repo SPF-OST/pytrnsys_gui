@@ -1,0 +1,65 @@
+{
+  "format": "pytrnsys standard weather file 1.0 (2026-11-18)",
+  "site": {
+    "name": "Chur_IDAweb_2023",
+    "latitude": 46.87,
+    "longitude": 9.53,
+    "altitude": 556.0,
+    "utc_offset_standard": 1.0,
+    "trnsys_shift_deg": -5.470000000000001
+  },
+  "time": {
+    "first_line": "interval ending 2023-01-01 01:00 local standard time",
+    "convention": "interval-ending averages, local standard time (UTC+1), no daylight saving",
+    "step_h": 1.0,
+    "n_lines": 8760
+  },
+  "kind": "measured",
+  "primary": {
+    "source": "Type 99/109 user file CHU_IDAweb_2023.99",
+    "kind": "measured",
+    "radiation_input": "GHI",
+    "header": {
+      "<longitude>": "-09.53",
+      "<latitude>": "46.87",
+      "<gmt>": "1",
+      "<interval>": "1",
+      "<firsttime>": "0"
+    },
+    "notes": "time of line k = firsttime + k * interval; samp shifts to interval end: [1.0] h"
+  },
+  "secondary": null,
+  "column_sources": {
+    "Tamb": "primary",
+    "RH": "primary",
+    "GHI": "primary",
+    "DHI": "primary",
+    "DNI": "primary",
+    "vWind": "default constant 2.0 (no source)",
+    "dirWind": "default constant 0.0 (no source)",
+    "pAmb": "primary"
+  },
+  "conversions": [
+    {
+      "what": "radiation from ghi",
+      "method": "Erbs (1982) decomposition"
+    }
+  ],
+  "flags": {
+    "0": "measured (primary)",
+    "1": "gap filled from secondary",
+    "2": "secondary only",
+    "3": "synthetic"
+  },
+  "flag_counts": {
+    "0": 8760
+  },
+  "created": "2026-11-19T08:51:23",
+  "converter": "weather_standard.py 1.0 (2026-11-18)",
+  "site_constants": {
+    "TambAvg": 11.73,
+    "dTambAmpl": 9.7,
+    "tTambShift": 508,
+    "TambD": -3.5
+  }
+}

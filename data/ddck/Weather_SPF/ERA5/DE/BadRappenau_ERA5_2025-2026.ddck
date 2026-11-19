@@ -1,0 +1,39 @@
+*******************************
+**BEGIN BadRappenau_ERA5_2025-2026.ddck
+*******************************
+
+*****************************************
+** Contact person : Ignasi Gurruchaga
+** Creation date  : 18.11.2026
+** Last changes   : 18.11.2026, IG: first version
+*****************************************
+
+***************************************************************************
+** Description:
+** Site ddck of the pytrnsys standard weather file Weather/ERA5/DE/BadRappenau/ERA5_BadRappenau_2025-2026_1h.csv:
+** ERA5 reanalysis (ECMWF, via the Open-Meteo archive API, CC BY 4.0), grid point 49.25 N 9.25 E, hourly,
+** 01.01.2025-30.06.2026 (see the .json next to the file). Lines from 1 January 2025 00:00 CET.
+** Include both "as weather":
+**   COMMON$ Weather_SPF/ERA5/DE/BadRappenau_ERA5_2025-2026 as weather
+**   COMMON$ Weather_SPF/weather_data_base_type9 as weather
+***************************************************************************
+
+CONSTANTS #
+Lat = 49.2633          ! latitude of the site, deg
+Long = 9.1321          ! longitude east +, deg
+utcOffset = 1          ! standard time CET
+shiftSolarTime = Long - 15*utcOffset   ! Type 16 shift in solar time, deg
+altid = 250            ! elevation, m
+TambD = -4.2           ! ambient design temperature (1 % hourly percentile, 2025), degC
+TambAvg = 10.94        ! average outdoor temperature (2025), degC
+dTambAmpl = 9.38       ! amplitude of the outside temperature (first harmonic), K
+tTambShift = 277       ! offset of the outside air temperature minimum, h
+ddTcwOffset = 40       ! time shift of the minimum cold water temperature, d
+weatherDataKind = 1    ! 0 measured, 1 reanalysis, 2 typical year, 3 synthetic
+firstYearWeather = 2025
+unitWeatherData = 38
+ASSIGN PATH$\Weather\ERA5\DE\BadRappenau\ERA5_BadRappenau_2025-2026_1h.csv unitWeatherData
+
+*******************************
+**END BadRappenau_ERA5_2025-2026.ddck
+*******************************
