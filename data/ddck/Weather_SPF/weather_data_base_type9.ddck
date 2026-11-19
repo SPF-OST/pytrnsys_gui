@@ -42,7 +42,7 @@
 **   hemispheres. Northern hemisphere: 0 south, 180 north. Southern hemisphere (Lat < 0): 0 NORTH, 180 south, west
 **   still +90. So in the south "AA_S" (azimuth 0) is the facade facing north and "AA_N" the one facing south, and a
 **   collector facing the equator keeps azimuth 0. Checked against ERA5 / Open-Meteo for Zurich, Sevilla, Santiago
-**   and Melbourne (DigiSolar Simulations/weather_check/era5_hemispheres).
+**   and Melbourne (DigiSolar Simulations/weather_check/type9_type16_vs_openmeteo).
 ** Meaning of slopeSurfUser_k / aziSurfUser_k (azimuth: 0 = equator, west +, east -), from the Type 16 source:
 **   ModeTracking 1 fixed:            slope and azimuth of the surface.
 **   ModeTracking 2 vertical axis:    the surface keeps slopeSurfUser_k and turns about a vertical axis to face the

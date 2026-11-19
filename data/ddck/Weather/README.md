@@ -196,7 +196,7 @@ The converter computes the sun position geographically (0 = south) and converts 
 TRNSYS convention.
 
 Checked with ERA5 2023 for Zurich, Sevilla, Santiago de Chile and Melbourne (DigiSolar
-`Simulations/weather_check/era5_hemispheres`): with the isotropic sky Type 9 + 16 reproduce the Open-Meteo tilted
+`Simulations/weather_check/type9_type16_vs_openmeteo`): with the isotropic sky Type 9 + 16 reproduce the Open-Meteo tilted
 irradiance of a fixed plane (slope = latitude, facing the equator) within 0.1 % per year in both hemispheres, and an
 independent calculation of single-axis trackers with a horizontal N-S axis within 0.7-1.5 % and with a horizontal
 E-W axis within 0.3-0.6 %, without time shift. The Open-Meteo "tracker" (`tilt=nan`) is not a single-axis

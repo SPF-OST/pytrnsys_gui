@@ -92,7 +92,7 @@ def solar_position(t_mid_utc: pd.DatetimeIndex, site: Site) -> tuple[np.ndarray,
 
 def trnsys_to_geographic_azimuth(azimuth_deg: float, latitude: float) -> float:
     """TRNSYS surface azimuth (0 = facing the equator, east -, west +, both hemispheres; checked with Type 16 in
-    DigiSolar Simulations/weather_check/era5_hemispheres) -> azimuth used here (0 = south, east -, west +)."""
+    DigiSolar Simulations/weather_check/type9_type16_vs_openmeteo) -> azimuth used here (0 = south, east -, west +)."""
     if latitude >= 0:
         return azimuth_deg
     return (180.0 - azimuth_deg + 180.0) % 360.0 - 180.0  # southern hemisphere: 0 = north, west +90 stays +90
