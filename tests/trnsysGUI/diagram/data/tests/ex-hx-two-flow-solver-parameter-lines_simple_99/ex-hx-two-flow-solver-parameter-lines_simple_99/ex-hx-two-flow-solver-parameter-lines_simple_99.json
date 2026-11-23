@@ -347,5 +347,6 @@
             "hasUserDefinedName": false,
             "name": "loop1"
         }
-    ]
+    ],
+    "massFlowSolver": "julia"
 }

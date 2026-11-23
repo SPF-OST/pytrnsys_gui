@@ -1379,5 +1379,6 @@
             "name": "loop6",
             "useLoopWideDefaults": true
         }
-    ]
+    ],
+    "massFlowSolver": "julia"
 }
