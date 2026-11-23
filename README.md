@@ -57,5 +57,28 @@ to the respective folder of your TRNSYS installation:
 as the `.bat` file. The `.log` file might give you some hints as to what happened if something doesn't
 work or if `pytrnsys-gui.bat` has crashed.
 
+## Mass flow solver
+
+The GUI exports a project's hydraulic network as a mass flow solver unit (`UNIT 450`) into
+`ddck/hydraulic/hydraulic.ddck` and into `<project>_mfs.dck`. Which solver that unit uses is a per-project
+setting, chosen as the first entry of the **Project** menu under **Mass flow solver**:
+
+1. **Julia (Type 4750)**: a Julia script run by the julia4trnsys type 4750. Unlike Type 9352, it also solves
+   networks in which a supply's flow follows only from conservation, e.g. the cold water inlet of a DHW
+   system. This is the default for new projects. To use it, install the Julia solver into your TRNSYS
+   installation:
+   1. Unpack the julia4trnsys release zip matching your TRNSYS (32-bit or 64-bit) into the TRNSYS
+      installation's `UserLib\ReleaseDLLs` (see the
+      [julia4trnsys README](https://gitlab.com/spf-ost-private/julia4trnsys.rs)).
+   2. Copy the `MassFlowSolver` folder into `UserLib\ReleaseDLLs` as well, e.g.
+      `...\UserLib\ReleaseDLLs\MassFlowSolver\MassFlowSolver.jl` (see the
+      [Julia mass flow solver README](https://github.com/SPF-OST/fortrnsys/blob/main/types/hydraulics/julia-massFlowSolver/README.md)).
+2. **Type 9352**: the Fortran type whose DLL is shipped with `pytrnsys` (see Post-installation above).
+   Projects saved by older GUI versions use it until the setting is changed.
+
+Changing the setting marks the project as modified; if `ddck/hydraulic/hydraulic.ddck` exists, it has to be
+exported again (Project > Export hydraulic.ddck) to use the new solver. `ddck/control/hydraulic_control.ddck`
+doesn't depend on the solver and doesn't need to be exported again.
+
 ## Developers
 See [DEVELOPER-README.md](DEVELOPER-README.md).
