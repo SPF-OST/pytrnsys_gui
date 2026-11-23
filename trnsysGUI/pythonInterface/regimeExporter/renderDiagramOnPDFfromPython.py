@@ -188,7 +188,9 @@ def _exportMassFlowSolverDeckAndRunTrnsys(editor: _de.Editor) -> None:  # type: 
 
 def _exportHydraulic(editor: _de.Editor, *, formatting) -> str:  # type: ignore[name-defined]
     exportedFilePath = editor.exportHydraulics(
-        exportTo=formatting, disableFileExistMsgb=True
+        exportTo=formatting,
+        massFlowSolver=editor.massFlowSolver,
+        disableFileExistMsgb=True,
     )
     return exportedFilePath
 

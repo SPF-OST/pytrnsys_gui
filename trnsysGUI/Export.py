@@ -21,6 +21,8 @@ import trnsysGUI.massFlowSolver.export as _mfse
 import trnsysGUI.massFlowSolver.globalNetwork as _gn
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.massFlowSolver.solver as _mfsol
+import trnsysGUI.pumpsAndTaps._pumpsAndTabsBase as _ptb
 import trnsysGUI.temperatures as _temps
 import trnsysGUI.temperatures.hydraulic as _thyd
 
@@ -173,13 +175,21 @@ ddTcwOffset = 36 ! Days of minimum surface temperature
         else:
             raise ValueError("Unknown value for `exportTo`", exportTo)
 
-    def exportMassFlows(self):  # What the controller should give
+    def exportMassFlows(
+        self, forHydraulicControlDdck=False
+    ):  # What the controller should give
         f = "*** Massflowrates" + "\n"
         equationNr = 0
 
         for t in self._hasInternalPipings:
-            f += t.exportMassFlows()[0]
-            equationNr += t.exportMassFlows()[1]
+            if forHydraulicControlDdck and isinstance(
+                t, _ptb.PumpsAndTabsBase
+            ):
+                res = t.exportMassFlows(forHydraulicControlDdck=True)
+            else:
+                res = t.exportMassFlows()
+            f += res[0]
+            equationNr += res[1]
 
         if equationNr == 0:
             f = ""
@@ -214,7 +224,11 @@ ddTcwOffset = 36 ! Days of minimum surface temperature
         return f
 
     def exportParametersFlowSolver(
-        self, simulationUnit: int, simulationType: int, descConnLength: int
+        self,
+        simulationUnit: int,
+        simulationType: int,
+        descConnLength: int,
+        massFlowSolver: _mfsol.MassFlowSolver,
     ) -> str:
         hasInternalPipings = []
         for hasInternalPiping in self._hasInternalPipings:
@@ -229,7 +243,9 @@ ddTcwOffset = 36 ! Days of minimum surface temperature
 
             hasInternalPipings.append(hasInternalPiping)
 
-        serializedNodes = self._getSerializedNodes(hasInternalPipings)
+        serializedNodes = self._getSerializedNodes(
+            hasInternalPipings, massFlowSolver
+        )
 
         lines = []
         for serializedNode in serializedNodes:
@@ -246,10 +262,20 @@ ddTcwOffset = 36 ! Days of minimum surface temperature
 
         nToleranceParameters = 3
 
+        numberOfOutputsLine = ""
+        nNumberOfOutputsParameters = 0
+        if massFlowSolver == _mfsol.JULIA:
+            # Type 4750 takes the deck's parameter 1 as the number of outputs.
+            nNumberOfOutputsParameters = 1
+            nOutputs = (
+                len(serializedNodes) * _mfn.MAX_N_OUTPUT_VARIABLES_PER_NODE
+            )
+            numberOfOutputsLine = f"{nOutputs} ! number of outputs: 3*N\n"
+
         resultText = f"""\
 UNIT {simulationUnit} TYPE {simulationType}
-PARAMETERS {nToleranceParameters + 1 + len(serializedNodes) * 4}
-{_gnames.MassFlowSolver.ABSOLUTE_TOLERANCE}
+PARAMETERS {nToleranceParameters + 1 + nNumberOfOutputsParameters + len(serializedNodes) * 4}
+{numberOfOutputsLine}{_gnames.MassFlowSolver.ABSOLUTE_TOLERANCE}
 {_gnames.MassFlowSolver.RELATIVE_TOLERANCE}
 {_gnames.MassFlowSolver.SWITCHING_THRESHOLD}
 {len(serializedNodes)}
@@ -262,6 +288,7 @@ PARAMETERS {nToleranceParameters + 1 + len(serializedNodes) * 4}
     def _getSerializedNodes(
         cls,
         hasInternalPipings: _tp.Sequence[_ip.HasInternalPiping],
+        massFlowSolver: _mfsol.MassFlowSolver,
     ) -> _tp.Sequence[_SerializedNode]:
         globalNetwork = _gn.getGlobalNetwork(hasInternalPipings)
         internalPortItemToExternalRealNode = (
@@ -288,7 +315,10 @@ PARAMETERS {nToleranceParameters + 1 + len(serializedNodes) * 4}
             nodeNameOrEmpty = node.name or ""
             fullName = f"{displayName}{nodeNameOrEmpty}"
             serializedNode = _SerializedNode(
-                fullName, index, node.getNodeType(), neighborsAndUnusedIndexes
+                fullName,
+                index,
+                node.getNodeTypeForSolver(massFlowSolver),
+                neighborsAndUnusedIndexes,
             )
 
             serializedNodes.append(serializedNode)
@@ -336,7 +366,7 @@ PARAMETERS {nToleranceParameters + 1 + len(serializedNodes) * 4}
             neighborAndUnusedIndexes[2],
         )
 
-    def exportInputsFlowSolver(self):
+    def exportInputsFlowSolver(self, massFlowSolver: _mfsol.MassFlowSolver):
         f = ""
         f += "INPUTS " + str(self.lineNumOfPar) + "! for Type 9351\n"
 
@@ -344,7 +374,7 @@ PARAMETERS {nToleranceParameters + 1 + len(serializedNodes) * 4}
 
         counter = 0
         for t in self._hasInternalPipings:
-            res = _mfse.exportInputsFlowSolver(t)
+            res = _mfse.exportInputsFlowSolver(t, massFlowSolver)
             f += res[0]
             counter += res[
                 1
@@ -369,6 +399,14 @@ PARAMETERS {nToleranceParameters + 1 + len(serializedNodes) * 4}
         f += "\n\n"
 
         return f
+
+    def exportLabelsFlowSolver(
+        self, massFlowSolver: _mfsol.MassFlowSolver
+    ) -> str:
+        if massFlowSolver != _mfsol.JULIA:
+            return ""
+
+        return f"LABELS 1\n{_mfsol.JULIA_SCRIPT_LABEL}\n\n"
 
     def exportOutputsFlowSolver(self, simulationUnit):
         f = ""

@@ -24,6 +24,7 @@ import trnsysGUI.hydraulicLoops.edit as _hledit
 import trnsysGUI.hydraulicLoops.migration as _hlmig
 import trnsysGUI.hydraulicLoops.model as _hlm
 import trnsysGUI.internalPiping as _ip
+import trnsysGUI.massFlowSolver.solver as _mfsol
 import trnsysGUI.names.create as _nc
 import trnsysGUI.names.manager as _nm
 import trnsysGUI.names.rename as _rename
@@ -137,6 +138,9 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
         self.graphicalObj = []
         self.fluids = _hlm.Fluids.createDefault()
         self.hydraulicLoops = _hlm.HydraulicLoops([])
+        # New projects use the Julia solver; projects saved without the key
+        # (see `_decodeDiagram`) fall back to Type 9352.
+        self.massFlowSolver: _mfsol.MassFlowSolver = _mfsol.JULIA
 
         self.copyGroupList = _qtw.QGraphicsItemGroup()
         self.selectionGroupList = _qtw.QGraphicsItemGroup()
@@ -455,7 +459,11 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
         return relevantPortItems
 
     def exportHydraulics(
-        self, exportTo=_tp.Literal["ddck", "mfs"], disableFileExistMsgb=False
+        self,
+        exportTo=_tp.Literal["ddck", "mfs"],
+        *,
+        massFlowSolver: _mfsol.MassFlowSolver,
+        disableFileExistMsgb=False,
     ):
         assert exportTo in ["ddck", "mfs"]
 
@@ -558,8 +566,13 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             fullExportText += energyBalanceEquations
 
         simulationUnit = 450
-        simulationType = 9352
+        simulationType = _mfsol.getTrnsysTypeNumber(massFlowSolver)
         descConnLength = 15
+
+        self.logger.info(
+            f"Exporting the hydraulics with the mass flow solver "
+            f"'{massFlowSolver}' (Type {simulationType})."
+        )
 
         exporter = self._createExporter()
 
@@ -580,10 +593,11 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         )
 
         fullExportText += exporter.exportParametersFlowSolver(
-            simulationUnit, simulationType, descConnLength
+            simulationUnit, simulationType, descConnLength, massFlowSolver
         )
 
-        fullExportText += exporter.exportInputsFlowSolver()
+        fullExportText += exporter.exportInputsFlowSolver(massFlowSolver)
+        fullExportText += exporter.exportLabelsFlowSolver(massFlowSolver)
         fullExportText += exporter.exportOutputsFlowSolver(simulationUnit)
         fullExportText += exporter.exportFluids() + "\n"
         fullExportText += exporter.exportHydraulicLoops() + "\n"
@@ -735,7 +749,9 @@ Tcw=1
 
         exporter = self._createExporter()
 
-        fullExportText += exporter.exportMassFlows()
+        fullExportText += exporter.exportMassFlows(
+            forHydraulicControlDdck=True
+        )
         fullExportText += exporter.exportDivSetting(simulationUnit - 10)
 
         self.logger.info(
@@ -895,6 +911,13 @@ Tcw=1
                 self.logger.debug("tv has " + str(t.isTempering))
 
         self._decodeHydraulicLoops(blocklist)
+
+        # Projects saved before the setting existed use Type 9352, so that
+        # their exports don't change until the project is switched.
+        self.massFlowSolver = _tp.cast(
+            _mfsol.MassFlowSolver,
+            blocklist.get("massFlowSolver", _mfsol.TYPE_9352),
+        )
 
         self._setHydraulicLoopsOnStorageTanks()
 

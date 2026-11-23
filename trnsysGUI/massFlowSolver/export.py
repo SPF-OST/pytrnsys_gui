@@ -3,17 +3,19 @@ import typing as _tp
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.massFlowSolver.names as _mnames
+import trnsysGUI.massFlowSolver.solver as _solver
 
 
 def exportInputsFlowSolver(
     hasInternalPiping: _ip.HasInternalPiping,
+    massFlowSolver: _solver.MassFlowSolver,
 ) -> _tp.Tuple[str, int]:
     internalPiping = hasInternalPiping.getInternalPiping()
     nodes = internalPiping.nodes
 
     line = ""
     for node in nodes:
-        if not node.hasInput():
+        if not node.hasInputForSolver(massFlowSolver):
             line += f"{_mfn.InputVariable.UNDEFINED_INPUT_VARIABLE_VALUE} "
         else:
             inputVariableName = _mnames.getInputVariableName(

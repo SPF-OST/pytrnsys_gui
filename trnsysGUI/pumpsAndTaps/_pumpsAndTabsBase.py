@@ -52,14 +52,26 @@ class PumpsAndTabsBase(
     def _getCanonicalMassFlowRate(self) -> float:
         raise NotImplementedError()
 
-    def exportMassFlows(self) -> _tp.Tuple[str, int]:
+    def exportMassFlows(
+        self, forHydraulicControlDdck: bool = False
+    ) -> _tp.Tuple[str, int]:
         internalPiping = self.getInternalPiping()
         node = _com.getSingle(internalPiping.nodes)
         inputVariableName = _mnames.getInputVariableName(self, node)
         canonicalMassFlowRate = self._getCanonicalMassFlowRate()
-        result = f"{inputVariableName} = {canonicalMassFlowRate}\n"
+        comment = self._getExportMassFlowsComment(forHydraulicControlDdck)
+        result = f"{inputVariableName} = {canonicalMassFlowRate}{comment}\n"
         equationNr = 1
         return result, equationNr
+
+    def _getExportMassFlowsComment(
+        self,
+        forHydraulicControlDdck: bool,  # pylint: disable=unused-argument
+    ) -> str:
+        return ""
+
+    def _getMassFlowToolTip(self) -> _tp.Optional[str]:
+        return None
 
     def _createBlockItemWithPrescribedMassFlowForEncode(
         self,
@@ -97,7 +109,9 @@ class PumpsAndTabsBase(
         )
 
         maybeCancelled = _dialog.Dialog.showDialogAndGetResult(
-            dialogModel, self._renameHelper
+            dialogModel,
+            self._renameHelper,
+            massFlowToolTip=self._getMassFlowToolTip(),
         )
         if _cancel.isCancelled(maybeCancelled):
             return

@@ -20,6 +20,7 @@ class TapBase(_ptb.PumpsAndTabsBase):
     ) -> None:
         super().__init__(trnsysType, editor, displayName)
 
+        self._direction = direction
         self._modelTerminal: _mfn.TerminalWithPrescribedFlowBase
 
         if direction == _mfn.PortItemDirection.OUTPUT:
@@ -48,6 +49,25 @@ class TapBase(_ptb.PumpsAndTabsBase):
         )
 
         return internalPiping
+
+    def _getExportMassFlowsComment(self, forHydraulicControlDdck: bool) -> str:
+        if (
+            forHydraulicControlDdck
+            and self._direction == _mfn.PortItemDirection.OUTPUT
+        ):
+            return (
+                " ! only used by the Type 9352 mass flow solver; the Julia"
+                " solver (Type 4750) determines this flow from the network"
+            )
+        return ""
+
+    def _getMassFlowToolTip(self) -> _tp.Optional[str]:
+        if self._direction == _mfn.PortItemDirection.OUTPUT:
+            return (
+                "Only used by the Type 9352 mass flow solver. With the Julia"
+                " solver (Type 4750), this flow follows from the network."
+            )
+        return None
 
     def encode(self) -> _tp.Tuple[str, _dcj.JsonDict]:
         blockItemWithPrescribedMassFlowModel = (
