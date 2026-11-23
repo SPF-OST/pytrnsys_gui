@@ -2,7 +2,6 @@ __all__ = [
     "NodeType",
     "PortItem",
     "OneNeighbourBase",
-    "TerminalWithPrescribedFlow",
     "TerminalWithFreeFlow",
     "TwoNeighboursBase",
     "Pipe",
@@ -17,16 +16,19 @@ import dataclasses as _dc
 import enum as _enum
 import typing as _tp
 
+from trnsysGUI.massFlowSolver import solver as _solver
+
 
 class NodeType(_enum.IntEnum):
     PIPE = 0
     PUMP = 8
     TEE_PIECE = 2
     DIVERTER = 3
-    TERMINAL_WITH_PRESCRIBED_FLOW = 4
     TERMINAL_WITH_FREE_FLOW = 5
     TERMINAL_WITH_PRESCRIBED_POS_FLOW = 6
     TERMINAL_WITH_PRESCRIBED_NEG_FLOW = 7
+    # The Julia solver's kind 9: a terminal with free flow into the network.
+    SUPPLY = 9
 
 
 @_dc.dataclass(eq=False)
@@ -88,8 +90,20 @@ class Node(_abc.ABC):
     def getNodeType(self) -> NodeType:
         raise NotImplementedError()
 
+    def getNodeTypeForSolver(
+        self,
+        massFlowSolver: _solver.MassFlowSolver,  # pylint: disable=unused-argument
+    ) -> NodeType:
+        return self.getNodeType()
+
     def hasInput(self) -> bool:
         return False
+
+    def hasInputForSolver(
+        self,
+        massFlowSolver: _solver.MassFlowSolver,  # pylint: disable=unused-argument
+    ) -> bool:
+        return self.hasInput()
 
     def getInputVariablePrefix(self) -> str:
         raise ValueError(
@@ -116,14 +130,23 @@ class TerminalWithPrescribedFlowBase(OneNeighbourBase, _abc.ABC):
         return "Mfr"
 
 
-class TerminalWithPrescribedFlow(TerminalWithPrescribedFlowBase):
-    def getNodeType(self) -> NodeType:
-        return NodeType.TERMINAL_WITH_PRESCRIBED_FLOW
-
-
 class TerminalWithPrescribedPosFlow(TerminalWithPrescribedFlowBase):
     def getNodeType(self) -> NodeType:
         return NodeType.TERMINAL_WITH_PRESCRIBED_POS_FLOW
+
+    def getNodeTypeForSolver(
+        self, massFlowSolver: _solver.MassFlowSolver
+    ) -> NodeType:
+        if massFlowSolver == _solver.JULIA:
+            return NodeType.SUPPLY
+        return super().getNodeTypeForSolver(massFlowSolver)
+
+    def hasInputForSolver(
+        self, massFlowSolver: _solver.MassFlowSolver
+    ) -> bool:
+        if massFlowSolver == _solver.JULIA:
+            return False
+        return super().hasInputForSolver(massFlowSolver)
 
 
 class TerminalWithPrescribedNegFlow(TerminalWithPrescribedFlowBase):
