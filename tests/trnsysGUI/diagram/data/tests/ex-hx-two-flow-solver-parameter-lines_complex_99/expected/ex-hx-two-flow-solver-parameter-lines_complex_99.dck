@@ -83,8 +83,9 @@ TFloor5H=TFloor5
 TFloor6H=TFloor6
 CONSTANTS 1
 spTIni = 20
-UNIT 11 TYPE 9352 !Changed automatically
-PARAMETERS 396
+UNIT 11 TYPE 4750 !Changed automatically
+PARAMETERS 397
+294 ! number of outputs: 3*N
 mfrSolverAbsTol
 mfrSolverRelTol
 mfrTolSwitchThreshold
@@ -98,7 +99,7 @@ mfrTolSwitchThreshold
 20 73 68 3     !7 : DivAux
 98 78 69 2     !8 : TeeAuxHxRt
 19 0 0 7       !9 : tapWater
-94 0 0 6       !10 : supplyWater
+94 0 0 9       !10 : supplyWater
 18 80 0 8      !11 : PuCirc
 68 69 0 0      !12 : HxDHWSide1
 95 96 0 0      !13 : HxDHWSide2
@@ -188,7 +189,7 @@ mfrTolSwitchThreshold
 15 1 0 0       !97 : PiHP_PuAux
 8 15 0 0       !98 : PiTeeAuxHxRt_HP
 INPUTS 98! for Type 9351
-MfrPuAux 0,0 0,0 0,0 0,0 0,0 xFracDivAux 0,0 MfrtapWater MfrsupplyWater 
+MfrPuAux 0,0 0,0 0,0 0,0 0,0 xFracDivAux 0,0 MfrtapWater 0,0 
 MfrPuCirc 0,0 0,0 MfrPuAuxEvap 0,0 0,0 0,0 0,0 0,0 0,0 
 0,0 0,0 0,0 MfrPuSh1 MfrPuSh2 0,0 0,0 0,0 MfrPuSh3 0,0 
 0,0 MfrPuSh4 0,0 0,0 MfrPuSh5 0,0 0,0 MfrPUSh6 0,0 0,0 
@@ -208,6 +209,8 @@ MfrPuCirc 0,0 0,0 MfrPuAuxEvap 0,0 0,0 0,0 0,0 0,0 0,0
 0 0 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 0 0 
+LABELS 1
+MassFlowSolver\MassFlowSolver.jl
 EQUATIONS 212	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
 MPuAux_A=[11,1] !Changed automatically
 MPuAux_B=[11,2] !Changed automatically

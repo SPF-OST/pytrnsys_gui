@@ -73,8 +73,9 @@ TColH=TCol
 THPH=THP
 CONSTANTS 1
 spTIni = 20
-UNIT 11 TYPE 9352 !Changed automatically
-PARAMETERS 52
+UNIT 11 TYPE 4750 !Changed automatically
+PARAMETERS 53
+36 ! number of outputs: 3*N
 mfrSolverAbsTol
 mfrSolverRelTol
 mfrTolSwitchThreshold
@@ -96,6 +97,8 @@ INPUTS 12! for Type 9351
 0,0 0,0 
 0 0 0 0 0 0 0 0 0 0 
 0 0 
+LABELS 1
+MassFlowSolver\MassFlowSolver.jl
 EQUATIONS 24	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
 MTesInHx_A=[11,1] !Changed automatically
 MTesInHx_B=[11,2] !Changed automatically

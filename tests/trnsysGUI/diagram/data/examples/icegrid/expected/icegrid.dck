@@ -138,8 +138,9 @@ dpNrSlRad = 10  ! Number of radial soil nodes
 dpSoilThickness = 0.5  ! Thickness of soil around the gravel considered in the model in m
 dpRadNdDist = dpSoilThickness/dpNrSlRad ! Radial distance of any node in m
 dpNrSlCirc = 4  ! Number of circumferential soil nodes
-UNIT 10 TYPE 9352 !Changed automatically
-PARAMETERS 484
+UNIT 10 TYPE 4750 !Changed automatically
+PARAMETERS 485
+360 ! number of outputs: 3*N
 mfrSolverAbsTol
 mfrSolverRelTol
 mfrTolSwitchThreshold
@@ -289,6 +290,8 @@ MfrQSnkB MfrQSnkI MfrQSnkJ MfrQSnkH MfrQSnkC MfrQSnkD MfrQSnkG MfrQSnkE MfrQSnkF
 0 0 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 0 0 0 0 
+LABELS 1
+MassFlowSolver\MassFlowSolver.jl
 EQUATIONS 260	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
 MSCnr1Cold_A=[10,1] !Changed automatically
 MSCnr1Cold_B=[10,2] !Changed automatically
