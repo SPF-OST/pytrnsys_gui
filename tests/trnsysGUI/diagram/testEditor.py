@@ -1,5 +1,7 @@
+import json as _json
 import os as _os
 import pathlib as _pl
+import re as _re
 import shutil as _su
 import subprocess as _sp
 import time as _time
@@ -155,7 +157,9 @@ class TestEditor:
 
     @staticmethod
     def _exportAndTestHydraulicDdckFile(editor, helper):
-        editor.exportHydraulics(exportTo="ddck")
+        editor.exportHydraulics(
+            exportTo="ddck", massFlowSolver=editor.massFlowSolver
+        )
         hydraulicDdckRelativePath = "ddck/hydraulic/hydraulic.ddck"
         helper.ensureFilesAreEqual(hydraulicDdckRelativePath)
 
@@ -309,6 +313,282 @@ class TestEditor:
             massFlowRatesPrintFilePath, temperaturesPrintFilePath, mainWindow
         )
 
+    @staticmethod
+    def _getTestProjectByName(projectName: str) -> _th.Project:
+        return next(
+            p for p in getTestProjects() if p.projectName == projectName
+        )
+
+    @staticmethod
+    def _copyTestProjectToTmpPath(
+        testProject: _th.Project,
+        tmp_path: _pl.Path,  # pylint: disable=invalid-name
+    ) -> _pl.Path:
+        sourceProjectFolderPath = (
+            _th.DATA_DIR
+            / "tests"
+            / testProject.projectName
+            / testProject.projectName
+        )
+        targetProjectFolderPath = tmp_path / testProject.projectName
+        _su.copytree(sourceProjectFolderPath, targetProjectFolderPath)
+        return targetProjectFolderPath
+
+    @staticmethod
+    def _getProjectJsonFilePath(projectFolderPath: _pl.Path) -> _pl.Path:
+        return projectFolderPath / f"{projectFolderPath.name}.json"
+
+    def _createMainWindowInTmpPath(
+        self,
+        qtbot,
+        monkeypatch,
+        tmp_path: _pl.Path,  # pylint: disable=invalid-name
+    ) -> _mw.MainWindow:  # type: ignore[name-defined]
+        monkeypatch.setattr(
+            RecentProjectsHandler,
+            RecentProjectsHandler.addProject.__name__,
+            lambda path: None,
+        )
+        self._configureDontAskWhetherWindowShouldBeClosed(monkeypatch)
+        logger = _ulog.getOrCreateCustomLogger("root", "DEBUG")  # type: ignore[attr-defined]
+        projectFolderPath = self._copyTestProjectToTmpPath(
+            self._getTestProjectByName("storage-tank"), tmp_path
+        )
+        projectJsonFilePath = self._getProjectJsonFilePath(projectFolderPath)
+        mainWindow = _mw.MainWindow(  # type: ignore[attr-defined]
+            logger, _prj.LoadProject(projectJsonFilePath)
+        )
+        qtbot.addWidget(mainWindow)
+        return mainWindow
+
+    @staticmethod
+    def _removeMassFlowSolverKeyFromProjectJson(
+        projectJsonFilePath: _pl.Path,
+    ) -> None:
+        projectJson = _json.loads(
+            projectJsonFilePath.read_text(encoding="utf-8")
+        )
+        del projectJson["massFlowSolver"]
+        projectJsonFilePath.write_text(
+            _json.dumps(projectJson, indent=4, sort_keys=True),
+            encoding="utf-8",
+        )
+
+    def testProjectWithoutMassFlowSolverKeyLoadsAsType9352(
+        self, qtbot, monkeypatch, tmp_path  # pylint: disable=invalid-name
+    ) -> None:
+        mainWindow = self._createMainWindowInTmpPath(
+            qtbot, monkeypatch, tmp_path
+        )
+        projectJsonFilePath = self._getProjectJsonFilePath(
+            _pl.Path(mainWindow.projectFolder)
+        )
+        self._removeMassFlowSolverKeyFromProjectJson(projectJsonFilePath)
+
+        logger = _ulog.getOrCreateCustomLogger("root", "DEBUG")  # type: ignore[attr-defined]
+        mainWindow = _mw.MainWindow(  # type: ignore[attr-defined]
+            logger, _prj.LoadProject(projectJsonFilePath)
+        )
+        qtbot.addWidget(mainWindow)
+
+        assert mainWindow.editor.massFlowSolver == "type9352"
+
+    def testNewProjectUsesJuliaSolverAndKeepsItWhenSaved(
+        self, qtbot, monkeypatch, tmp_path  # pylint: disable=invalid-name
+    ) -> None:
+        monkeypatch.setattr(
+            RecentProjectsHandler,
+            RecentProjectsHandler.addProject.__name__,
+            lambda path: None,
+        )
+        self._configureDontAskWhetherWindowShouldBeClosed(monkeypatch)
+        logger = _ulog.getOrCreateCustomLogger("root", "DEBUG")  # type: ignore[attr-defined]
+
+        newProjectFolderPath = tmp_path / "new-project" / "new-project"
+        newProjectFolderPath.mkdir(parents=True)
+        newProjectJsonFilePath = self._getProjectJsonFilePath(
+            newProjectFolderPath
+        )
+
+        mainWindow = _mw.MainWindow(  # type: ignore[attr-defined]
+            logger, _prj.CreateProject(newProjectJsonFilePath)
+        )
+        qtbot.addWidget(mainWindow)
+        assert mainWindow.editor.massFlowSolver == "julia"
+
+        mainWindow.editor.saveProject(showWarning=False)
+        savedProjectJson = _json.loads(
+            newProjectJsonFilePath.read_text(encoding="utf-8")
+        )
+        assert savedProjectJson["massFlowSolver"] == "julia"
+
+        mainWindow = _mw.MainWindow(  # type: ignore[attr-defined]
+            logger, _prj.LoadProject(newProjectJsonFilePath)
+        )
+        qtbot.addWidget(mainWindow)
+        assert mainWindow.editor.massFlowSolver == "julia"
+
+    def testSaveAndReloadKeepsChangedMassFlowSolverSetting(
+        self, qtbot, monkeypatch, tmp_path  # pylint: disable=invalid-name
+    ) -> None:
+        mainWindow = self._createMainWindowInTmpPath(
+            qtbot, monkeypatch, tmp_path
+        )
+        projectJsonFilePath = self._getProjectJsonFilePath(
+            _pl.Path(mainWindow.projectFolder)
+        )
+        assert mainWindow.editor.massFlowSolver == "julia"
+
+        mainWindow.editor.massFlowSolver = "type9352"
+        mainWindow.editor.saveProject(showWarning=False)
+        savedProjectJson = _json.loads(
+            projectJsonFilePath.read_text(encoding="utf-8")
+        )
+        assert savedProjectJson["massFlowSolver"] == "type9352"
+
+        logger = _ulog.getOrCreateCustomLogger("root", "DEBUG")  # type: ignore[attr-defined]
+        mainWindow = _mw.MainWindow(  # type: ignore[attr-defined]
+            logger, _prj.LoadProject(projectJsonFilePath)
+        )
+        qtbot.addWidget(mainWindow)
+        assert mainWindow.editor.massFlowSolver == "type9352"
+
+    def testMassFlowSolverMenu(self, qtbot, monkeypatch) -> None:
+        testProject = self._getTestProjectByName("storage-tank")
+        helper = _th.Helper(testProject)
+        helper.setup()
+
+        mainWindow, _ = self._createMainWindowAndWarningHelper(
+            helper, testProject.loadDiagramWarningOrNone, qtbot, monkeypatch
+        )
+
+        editor = mainWindow.editor
+        assert editor.massFlowSolver == "julia"
+
+        projectMenuActions = mainWindow.projectMenu.actions()
+        massFlowSolverMenu = projectMenuActions[0].menu()
+        assert massFlowSolverMenu is not None
+        assert massFlowSolverMenu.title() == "Mass flow solver"
+        assert projectMenuActions[1].isSeparator()
+
+        solverActions = massFlowSolverMenu.actions()
+        assert [a.text() for a in solverActions] == [
+            "Julia (Type 4750)",
+            "Type 9352",
+        ]
+        assert solverActions[0].isChecked()
+        assert not solverActions[1].isChecked()
+
+        editor.exportHydraulics(
+            exportTo="ddck",
+            massFlowSolver=editor.massFlowSolver,
+            disableFileExistMsgb=True,
+        )
+        assert (
+            helper.actualProjectFolderPath
+            / "ddck"
+            / "hydraulic"
+            / "hydraulic.ddck"
+        ).is_file()
+
+        informationMessages = []
+
+        def dummyInformation(_parent, title, text, *_ignored, **__ignored):
+            informationMessages.append((title, text))
+            return _qtw.QMessageBox.Ok
+
+        monkeypatch.setattr(
+            _qtw.QMessageBox,
+            _qtw.QMessageBox.information.__name__,  # pylint: disable=no-member
+            dummyInformation,
+        )
+
+        solverActions[1].trigger()
+
+        assert editor.massFlowSolver == "type9352"
+        assert not solverActions[0].isChecked()
+        assert solverActions[1].isChecked()
+        assert len(informationMessages) == 1
+        assert "hydraulic.ddck" in informationMessages[0][1]
+
+        # Triggering the already selected entry again changes nothing.
+        solverActions[1].trigger()
+        assert editor.massFlowSolver == "type9352"
+        assert len(informationMessages) == 1
+
+    def testExportHydraulicsPassesSolverThrough(
+        self, qtbot, monkeypatch
+    ) -> None:
+        testProject = self._getTestProjectByName(
+            "ex-hx-two-flow-solver-parameter-lines_complex_99"
+        )
+        helper = _th.Helper(testProject)
+        helper.setup()
+
+        mainWindow, _ = self._createMainWindowAndWarningHelper(
+            helper, testProject.loadDiagramWarningOrNone, qtbot, monkeypatch
+        )
+
+        type9352Text = self._exportHydraulicsAndReadText(
+            mainWindow.editor, "type9352"
+        )
+        juliaText = self._exportHydraulicsAndReadText(
+            mainWindow.editor, "julia"
+        )
+
+        type9352Lines = self._getFlowSolverUnitText(type9352Text).splitlines()
+        juliaLines = self._getFlowSolverUnitText(juliaText).splitlines()
+
+        assert type9352Lines[0] == "UNIT 450 TYPE 9352"
+        assert juliaLines[0] == "UNIT 450 TYPE 4750"
+
+        nComponents = int(type9352Lines[5])
+        assert type9352Lines[1] == f"PARAMETERS {4 + 4 * nComponents}"
+        assert juliaLines[1] == f"PARAMETERS {5 + 4 * nComponents}"
+        assert juliaLines[2] == f"{3 * nComponents} ! number of outputs: 3*N"
+
+        type9352SourceLine = self._getComponentLine(
+            type9352Text, "supplyWater"
+        )
+        juliaSourceLine = self._getComponentLine(juliaText, "supplyWater")
+        assert _re.fullmatch(
+            r"\d+ \d+ \d+ 6\s+!\d+ : supplyWater", type9352SourceLine
+        )
+        assert _re.fullmatch(
+            r"\d+ \d+ \d+ 9\s+!\d+ : supplyWater", juliaSourceLine
+        )
+
+        assert "MfrsupplyWater" in type9352Text
+        assert "MfrsupplyWater" not in juliaText
+
+        assert "LABELS" not in type9352Text
+        assert "LABELS 1\nMassFlowSolver\\MassFlowSolver.jl" in juliaText
+
+    @staticmethod
+    def _exportHydraulicsAndReadText(
+        editor: _de.Editor, massFlowSolver  # type: ignore[name-defined]
+    ) -> str:
+        exportPath = editor.exportHydraulics(
+            exportTo="ddck",
+            massFlowSolver=massFlowSolver,
+            disableFileExistMsgb=True,
+        )
+        return _pl.Path(exportPath).read_text(encoding="utf-8")
+
+    @staticmethod
+    def _getFlowSolverUnitText(deckText: str) -> str:
+        start = deckText.index("UNIT 450 TYPE")
+        end = deckText.index("INPUTS ", start)
+        return deckText[start:end]
+
+    @staticmethod
+    def _getComponentLine(deckText: str, componentName: str) -> str:
+        return next(
+            line
+            for line in deckText.splitlines()
+            if f" : {componentName}" in line
+        )
+
     @classmethod
     def _createMainWindowAndWarningHelper(
         cls,
@@ -389,7 +669,11 @@ class TestEditor:
         assert areAllMassFlowLabelsSet and areAllValvePositionLabelsSet
 
     def _exportMassFlowSolverDeckAndRunTrnsys(self, editor: _de.Editor):  # type: ignore[name-defined]
-        exportedFilePath = self._exportHydraulic(editor, _format="mfs")
+        # Type 9352 is passed explicitly, so that the CI runner doesn't need
+        # julia4trnsys and the Type 9352 export stays covered (see #649).
+        exportedFilePath = self._exportHydraulic(
+            editor, _format="mfs", massFlowSolver="type9352"
+        )
 
         trnExePath = self._getTrnExePath()
 
@@ -406,8 +690,12 @@ class TestEditor:
         return _pl.PureWindowsPath(r"C:\TRNSYS18\Exe\TrnEXE.exe")
 
     @classmethod
-    def _exportHydraulic(cls, editor: _de.Editor, *, _format) -> str:  # type: ignore[name-defined]
-        exportedFilePath = editor.exportHydraulics(exportTo=_format)
+    def _exportHydraulic(
+        cls, editor: _de.Editor, *, _format, massFlowSolver  # type: ignore[name-defined]
+    ) -> str:  # type: ignore[name-defined]
+        exportedFilePath = editor.exportHydraulics(
+            exportTo=_format, massFlowSolver=massFlowSolver
+        )
         return exportedFilePath
 
     @_pt.mark.tool
