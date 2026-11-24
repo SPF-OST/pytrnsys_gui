@@ -21,20 +21,44 @@ import trnsysGUI.warningsAndErrors as _werrors
 
 _MAX_HEADER_LENGTH = 25
 
-# Temperature colour scale: blue (min) -> cyan -> green -> yellow -> red (max)
-_COLOR_SCALE_STOPS = [
-    (0.0, (0, 0, 200)),
-    (0.25, (0, 160, 255)),
-    (0.5, (32, 192, 64)),
-    (0.75, (255, 208, 0)),
-    (1.0, (208, 0, 0)),
-]
+# Temperature colour scales, from min (0) to max (1)
+_COLOR_SCALES = {
+    # blue -> cyan -> green -> yellow -> red
+    "Default": [
+        (0.0, (0, 0, 200)),
+        (0.25, (0, 160, 255)),
+        (0.5, (32, 192, 64)),
+        (0.75, (255, 208, 0)),
+        (1.0, (208, 0, 0)),
+    ],
+    # viridis: dark purple -> blue -> green -> yellow, readable with colour blindness and in grey
+    "Colour-blind safe": [
+        (0.0, (68, 1, 84)),
+        (0.25, (59, 82, 139)),
+        (0.5, (33, 145, 140)),
+        (0.75, (94, 201, 98)),
+        (1.0, (253, 231, 37)),
+    ],
+    # heat map: dark blue -> blue -> purple -> red -> dark red (no white middle: stays visible on white)
+    "Heat map": [
+        (0.0, (5, 30, 90)),
+        (0.25, (40, 100, 190)),
+        (0.5, (140, 80, 160)),
+        (0.75, (215, 45, 45)),
+        (1.0, (100, 0, 15)),
+    ],
+}
+_COLOR_SCALE_STOPS = _COLOR_SCALES["Default"]
 
 
 def getTemperatureColor(
-    temperature: float, minTemperature: float, maxTemperature: float
+    temperature: float,
+    minTemperature: float,
+    maxTemperature: float,
+    stops=None,
 ) -> _qtg.QColor:
     """Colour of a temperature on the scale; values outside [min, max] get the end colours."""
+    stops = stops or _COLOR_SCALE_STOPS
     if maxTemperature <= minTemperature:
         fraction = 0.5
     else:
@@ -43,7 +67,7 @@ def getTemperatureColor(
         )
     fraction = min(1.0, max(0.0, fraction))
     for (lowerStop, lowerColor), (upperStop, upperColor) in zip(
-        _COLOR_SCALE_STOPS, _COLOR_SCALE_STOPS[1:]
+        stops, stops[1:]
     ):
         if fraction <= upperStop:
             weight = (fraction - lowerStop) / (upperStop - lowerStop)
@@ -52,7 +76,7 @@ def getTemperatureColor(
                 for lower, upper in zip(lowerColor, upperColor)
             )
             return _qtg.QColor(red, green, blue)
-    return _qtg.QColor(*_COLOR_SCALE_STOPS[-1][1])
+    return _qtg.QColor(*stops[-1][1])
 
 
 class _DayMonthPicker(_qtw.QFrame):
@@ -127,6 +151,7 @@ class _ColorBar(_qtw.QWidget):
         super().__init__(parent)
         self._minTemperature = 0.0
         self._maxTemperature = 100.0
+        self._stops = _COLOR_SCALE_STOPS
         self.setMinimumHeight(42)
         self.setMinimumWidth(300)
 
@@ -135,12 +160,16 @@ class _ColorBar(_qtw.QWidget):
         self._maxTemperature = maxTemperature
         self.update()
 
+    def setStops(self, stops) -> None:
+        self._stops = stops
+        self.update()
+
     def paintEvent(self, event):  # pylint: disable=unused-argument
         painter = _qtg.QPainter(self)
         painter.setRenderHint(_qtg.QPainter.Antialiasing)
         left, right, barHeight = 10, self.width() - 40, 16
         gradient = _qtg.QLinearGradient(left, 0, right, 0)
-        for stop, color in _COLOR_SCALE_STOPS:
+        for stop, color in self._stops:
             gradient.setColorAt(stop, _qtg.QColor(*color))
         barRect = _qtc.QRectF(left, 2, right - left, barHeight)
         painter.fillRect(barRect, _qtg.QBrush(gradient))
@@ -271,8 +300,21 @@ class MassFlowVisualizer(_qtw.QDialog):
         self._colorBar = _ColorBar()
         self._colorBar.setRange(self._minTemperature, self._maxTemperature)
 
+        self._colorScaleStops = _COLOR_SCALES["Default"]
+        self._colorScaleComboBox = _qtw.QComboBox()
+        self._colorScaleComboBox.addItems(list(_COLOR_SCALES))
+        self._colorScaleComboBox.setToolTip(
+            "Default: blue - green - red\n"
+            "Colour-blind safe: purple - green - yellow (viridis)\n"
+            "Heat map: dark blue - purple - dark red"
+        )
+        self._colorScaleComboBox.currentTextChanged.connect(
+            self._onColorScaleChanged
+        )
+
         colorLayout = _qtw.QHBoxLayout()
-        colorLayout.addWidget(_qtw.QLabel("Temperature scale   Min [°C]"))
+        colorLayout.addWidget(self._colorScaleComboBox)
+        colorLayout.addWidget(_qtw.QLabel("Min [°C]"))
         colorLayout.addWidget(self._minTemperatureSpinBox)
         colorLayout.addWidget(_qtw.QLabel("Max [°C]"))
         colorLayout.addWidget(self._maxTemperatureSpinBox)
@@ -456,7 +498,10 @@ class MassFlowVisualizer(_qtw.QDialog):
                     t.setColor(thickValue, mfr="ZeroMfr")
                 else:
                     color = getTemperatureColor(
-                        temperature, self._minTemperature, self._maxTemperature
+                        temperature,
+                        self._minTemperature,
+                        self._maxTemperature,
+                        self._colorScaleStops,
                     )
                     t.setColor(thickValue, color=color)
 
@@ -726,6 +771,11 @@ class MassFlowVisualizer(_qtw.QDialog):
         self._minTemperature = self._minTemperatureSpinBox.value()
         self._maxTemperature = self._maxTemperatureSpinBox.value()
         self._colorBar.setRange(self._minTemperature, self._maxTemperature)
+        self.advance()
+
+    def _onColorScaleChanged(self, name: str) -> None:
+        self._colorScaleStops = _COLOR_SCALES[name]
+        self._colorBar.setStops(self._colorScaleStops)
         self.advance()
 
     def _onUseFileRange(self) -> None:

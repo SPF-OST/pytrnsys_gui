@@ -127,6 +127,17 @@ class MainWindow(_qtw.QMainWindow):
             lambda isFrozen: self.editor.setFrozen(isFrozen)
         )
 
+        self._pipeBridgesAction = _qtw.QAction(
+            "Show pipe crossings as bridges", self
+        )
+        self._pipeBridgesAction.setCheckable(True)
+        self._pipeBridgesAction.setChecked(True)
+        self._pipeBridgesAction.toggled.connect(
+            lambda isShown: self.editor.pipeCrossingsOverlay.setBridgesEnabled(
+                isShown
+            )
+        )
+
         runMassflowSolverAction = _qtw.QAction(
             _img.RUN_MFS_PNG.icon(), "Run the massflow solver", self
         )
@@ -209,6 +220,7 @@ class MainWindow(_qtw.QMainWindow):
         self.editMenu.addAction(toggleSnapAction)
         self.editMenu.addAction(toggleAlignModeAction)
         self.editMenu.addAction(self._freezeDiagramAction)
+        self.editMenu.addAction(self._pipeBridgesAction)
 
         runMassflowSolverActionMenu = _qtw.QAction(
             "Run mass flow solver", self
@@ -598,6 +610,11 @@ class MainWindow(_qtw.QMainWindow):
         freezeAction = getattr(self, "_freezeDiagramAction", None)
         if freezeAction and freezeAction.isChecked():
             freezeAction.setChecked(False)
+
+        # keep the bridges setting for the newly opened diagram
+        bridgesAction = getattr(self, "_pipeBridgesAction", None)
+        if bridgesAction and not bridgesAction.isChecked():
+            self.editor.pipeCrossingsOverlay.setBridgesEnabled(False)
 
     def toggleConnLabels(self):
         self.labelVisState = not self.labelVisState

@@ -61,6 +61,7 @@ from trnsysGUI.segmentDialog import SegmentDialog
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.storageTank.widget import StorageTank
+import trnsysGUI.diagram.pipeCrossings as _pcross
 from . import _sizes
 from . import fileSystemTreeView as _fst
 from ..recentProjectsHandler import RecentProjectsHandler
@@ -186,6 +187,12 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
             )
         elif loadValue == "json":
             self._decodeDiagram(jsonPath, loadValue=loadValue)
+
+        # bridges where pipes cross without being connected
+        self.pipeCrossingsOverlay = _pcross.PipeCrossingsOverlay(self)
+        self.diagramScene.addItem(self.pipeCrossingsOverlay)
+        self.diagramScene.changed.connect(self.pipeCrossingsOverlay.scheduleRecompute)
+        self.pipeCrossingsOverlay.recompute()
 
     def _setupWidgetHierarchy(self):
         libraryBrowserView = self._createLibraryBrowserView()

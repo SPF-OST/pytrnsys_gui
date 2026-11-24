@@ -108,8 +108,10 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         option: _qtw.QStyleOptionGraphicsItem,
         widget: _tp.Optional[_qtw.QWidget] = None,
     ) -> None:
-        for child in self.childItems():
-            child.paint(painter, option, widget)
+        # Nothing to draw: Qt draws the children (segments, corners, labels) itself, at their
+        # positions and only when visible. Painting them here as well drew hidden labels and a
+        # corner dot at the origin of the diagram (e.g. a stray "Pro_return_Tee3" with a dot).
+        pass
 
     def getDisplayName(self) -> str:
         return self.displayName
