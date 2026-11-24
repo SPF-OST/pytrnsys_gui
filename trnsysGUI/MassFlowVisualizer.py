@@ -15,11 +15,16 @@ import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.doublePipeConnection as _dpc
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.connection.singlePipeConnection as _spc
+import trnsysGUI.electrical.connection as _econn
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.warningsAndErrors as _werrors
 
 _MAX_HEADER_LENGTH = 25
+
+# line width of the electrical connections: from no power to the largest power of the file
+_MIN_ELECTRICAL_WIDTH = 1.5
+_MAX_ELECTRICAL_WIDTH = 8.0
 
 # Temperature colour scales, from min (0) to max (1)
 _COLOR_SCALES = {
@@ -207,7 +212,11 @@ def _getNiceTickStep(span: float) -> float:
 
 
 class MassFlowVisualizer(_qtw.QDialog):
-    def __init__(self, parent, mfrFile, tempFile):
+    def __init__(self, parent, mfrFile, tempFile, pelFile=None):
+        """`mfrFile`/`tempFile`: printers of the hydraulic.ddck (`<name>_Mfr.prt`, `<name>_T.prt`), `pelFile`:
+        printer of the electrical.ddck (`<name>_Pel.prt`). Either the hydraulic files, the electrical one or all
+        three can be given.
+        """
 
         super(MassFlowVisualizer, self).__init__(parent)
 
@@ -217,8 +226,15 @@ class MassFlowVisualizer(_qtw.QDialog):
         self.tempDatafilePath = tempFile
         self.loadedFile = False
         self.tempLoadedFile = False
-        self.loadFile()
-        self.loadTempFile()
+        self._loadElectricalFile(pelFile)
+        if mfrFile is None:
+            # only electrical results: their time column drives the visualizer
+            self.massFlowData = self._electricalData[[self._electricalData.columns[0]]].copy()
+            self.tempMassFlowData = self.massFlowData.copy()
+            self.loadedFile = self.tempLoadedFile = True
+        else:
+            self.loadFile()
+            self.loadTempFile()
         self.maxTimeStep = len(self.massFlowData.index) - 1
         self.showMass = False
 
@@ -250,7 +266,11 @@ class MassFlowVisualizer(_qtw.QDialog):
         # Playback speed (time steps shown per second)
         self._framesPerSecond = 1.0
 
-        timeStepIncreaseLabelText = "Increase time-step by ( 30 = 1 Hour ):\n              ( 720 = 1 Day )"
+        stepsPerHour = self._getStepsPerHour()
+        timeStepIncreaseLabelText = (
+            f"Increase time-step by ( {stepsPerHour} = 1 Hour ):\n"
+            f"              ( {24 * stepsPerHour} = 1 Day )"
+        )
         self._timeStepIncreaseLabel = _qtw.QLabel(timeStepIncreaseLabelText)
         self._timeStepIncrease = 1
         self._timeStepIncreaseLineEdit = _qtw.QLineEdit()
@@ -266,7 +286,9 @@ class MassFlowVisualizer(_qtw.QDialog):
         self.slider.valueChanged.connect(self.moveValues)
         self.slider.setTickInterval(24)
 
+        # one timer for the whole playback: each tick moves the slider, which updates the diagram
         self.qtm = _qtc.QTimer(parent)
+        self.qtm.timeout.connect(self.increaseValue)
         self.lines = None
         self.started = False
 
@@ -320,7 +342,14 @@ class MassFlowVisualizer(_qtw.QDialog):
         colorLayout.addWidget(self._maxTemperatureSpinBox)
         colorLayout.addWidget(useFileRangeButton)
         colorLayout.addWidget(
-            _qtw.QLabel("grey = no flow, pipe width = mass flow")
+            _qtw.QLabel(
+                "grey = no flow, pipe width = mass flow"
+                + (
+                    ", green line width = electric power (dashed = none)"
+                    if self._electricalData is not None
+                    else ""
+                )
+            )
         )
         colorLayout.addStretch()
 
@@ -434,6 +463,10 @@ class MassFlowVisualizer(_qtw.QDialog):
             if isinstance(t, _cb.ConnectionBase):
                 t.setMassFlowLabelVisible(self.showMass)
 
+        if self._electricalData is not None:
+            for connection in self.parent.editor.electricalConnections:
+                connection.powerLabel.setVisible(self.showMass)
+
         self.logger.debug(
             "temperature scale: %s ... %s"
             % (str(self._minTemperature), str(self._maxTemperature))
@@ -456,18 +489,21 @@ class MassFlowVisualizer(_qtw.QDialog):
         self.tempLoadedFile = True
 
     def start(self):
-
+        self.started = True
         self.paused = False
-        self.qtm = _qtc.QTimer(self.parent)
-        self.qtm.timeout.connect(self.advance)
-        self.qtm.timeout.connect(self.increaseValue)
         self.qtm.start(self._getTimerIntervalInMs())
 
-    def advance(self):
-        if self.timeStep >= self._endRow:
-            self.logger.debug("reached end of data, returning")
-            self.qtm.stop()
+    def _getStepsPerHour(self) -> int:
+        """Rows of the printers per hour of simulation (e.g. 30 for dtSim = 2 min, 4 for 15 min)."""
+        if self.maxTimeStep < 2:
+            return 1
+        # row 0 holds the initial values: take the interval between later rows
+        timeStepInHours = float(self.getTime(2)) - float(self.getTime(1))
+        if timeStepInHours <= 0:
+            return 1
+        return max(1, round(1 / timeStepInHours))
 
+    def advance(self):
         if not self.loadedFile:
             return
 
@@ -575,6 +611,57 @@ class MassFlowVisualizer(_qtw.QDialog):
                 t.setPositionForMassFlowSolver(valvePosition)
                 t.posLabel.setPlainText(valvePosition)
 
+        self._advanceElectrical()
+
+    # --- electrical connections -----------------------------------------------------------
+    def _loadElectricalFile(self, pelFile) -> None:
+        self._electricalData = None
+        self._maxElectricalPower = 0.0
+        if pelFile is None:
+            return
+        data = _pd.read_csv(pelFile, sep="	").rename(
+            columns=lambda x: x.strip()
+        )
+        data = data.loc[:, ~data.columns.str.startswith("Unnamed")]
+        _truncateColumnNames(data)
+        self._electricalData = data
+        powers = data.iloc[:, 1:].abs().to_numpy(dtype=float)
+        if powers.size:
+            self._maxElectricalPower = float(_np.nanmax(powers))
+
+    def _getElectricalWidth(self, power: float) -> float:
+        if self._maxElectricalPower <= 0:
+            return _MIN_ELECTRICAL_WIDTH
+        fraction = min(abs(power) / self._maxElectricalPower, 1.0)
+        return _MIN_ELECTRICAL_WIDTH + fraction * (
+            _MAX_ELECTRICAL_WIDTH - _MIN_ELECTRICAL_WIDTH
+        )
+
+    def _advanceElectrical(self) -> None:
+        if self._electricalData is None:
+            return
+
+        # same printing interval as the hydraulic printers, but match the time to be safe
+        timeColumn = self._electricalData[
+            self._electricalData.columns[0]
+        ].to_numpy(dtype=float)
+        time = float(self.getTime(self.timeStep))
+        row = int(_np.searchsorted(timeColumn, time - 1e-9, side="left"))
+        rowExists = row < len(timeColumn) and abs(timeColumn[row] - time) < 1e-6
+
+        for connection in self.parent.editor.electricalConnections:
+            columnName = _truncateName(connection.variableName)
+            if not rowExists or columnName not in self._electricalData.columns:
+                connection.clearPower()
+                continue
+            power = float(self._electricalData[columnName].iloc[row])
+            connection.setPower(power, self._getElectricalWidth(power))
+            connection.powerLabel.setVisible(self.showMass)
+
+    def _clearElectrical(self) -> None:
+        for connection in self.parent.editor.electricalConnections:
+            connection.clearPower()
+
     def _getMassFlow(self, mfrVariableName: str, timeStep: int) -> float:
         truncatedMfrVariableName = _truncateName(mfrVariableName)
         mass = self.massFlowData[truncatedMfrVariableName].iloc[timeStep]
@@ -595,11 +682,7 @@ class MassFlowVisualizer(_qtw.QDialog):
         self.qtm.stop()
 
     def continueVis(self):
-        if self.started:
-            self.paused = False
-            self.qtm.start(self._getTimerIntervalInMs())
-        else:
-            self.start()
+        self.start()
 
     def setSlider(self):
         self.slider.setOrientation(1)
@@ -715,6 +798,8 @@ class MassFlowVisualizer(_qtw.QDialog):
             round(abs(num)) for num in cleanedData
         ]  # get absolute value and round off
         noDuplicateData = list(dict.fromkeys(cleanedData))
+        if not noDuplicateData:  # no mass flows (only electrical results)
+            noDuplicateData = [0]
 
         self.medianValueMfr = _np.percentile(
             noDuplicateData, 50
@@ -793,7 +878,7 @@ class MassFlowVisualizer(_qtw.QDialog):
 
     def _onSpeedChanged(self, framesPerSecond: float) -> None:
         self._framesPerSecond = framesPerSecond
-        if self.started and not self.paused:
+        if not self.paused:
             self.qtm.setInterval(self._getTimerIntervalInMs())
 
     # Simulation hours are counted from 1 January of the first simulated year (8760 h per year).
@@ -900,6 +985,7 @@ class MassFlowVisualizer(_qtw.QDialog):
 
     def closeEvent(self, a0):
         self.pauseVis()
+        self._clearElectrical()
         super().closeEvent(a0)
 
     def keyPressEvent(self, e):

@@ -1,0 +1,43 @@
+defaultName: ebNode
+description: "Electrical balancing node: sources PV(+BAT), BAT, GRID and demands D1..D10"
+electrical-terminals:
+  - name: PvBat
+    position: [0, 40]
+    direction: in
+  - name: Bat
+    position: [0, 100]
+    direction: bi
+  - name: Grid
+    position: [0, 160]
+    direction: bi
+  - name: D1
+    position: [120, 20]
+    direction: out
+  - name: D2
+    position: [120, 40]
+    direction: out
+  - name: D3
+    position: [120, 60]
+    direction: out
+  - name: D4
+    position: [120, 80]
+    direction: out
+  - name: D5
+    position: [120, 100]
+    direction: out
+  - name: D6
+    position: [120, 120]
+    direction: out
+  - name: D7
+    position: [120, 140]
+    direction: out
+  - name: D8
+    position: [120, 160]
+    direction: out
+  - name: D9
+    position: [120, 180]
+    direction: out
+  - name: D10
+    position: [120, 200]
+    direction: out
+size: [120, 220]

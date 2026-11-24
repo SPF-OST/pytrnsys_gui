@@ -237,6 +237,11 @@ class MainWindow(_qtw.QMainWindow):
         )
         exportHydraulicsActionMenu.triggered.connect(self.exportHydraulicsDdck)
 
+        exportElectricalActionMenu = _qtw.QAction(
+            "Export electrical.ddck", self
+        )
+        exportElectricalActionMenu.triggered.connect(self.exportElectricalDdck)
+
         exportHydCtrlActionMenu = _qtw.QAction(
             "Export user_control_default.ddck and pump_consumption_default.ddck",
             self,
@@ -271,6 +276,7 @@ class MainWindow(_qtw.QMainWindow):
         self.projectMenu.addAction(runMassflowSolverActionMenu)
         self.projectMenu.addAction(openVisualizerActionMenu)
         self.projectMenu.addAction(exportHydraulicsActionMenu)
+        self.projectMenu.addAction(exportElectricalActionMenu)
         self.projectMenu.addAction(exportHydCtrlActionMenu)
         self.projectMenu.addAction(
             exportDdckPlaceHolderValuesJsonFileActionMenu
@@ -542,21 +548,35 @@ class MainWindow(_qtw.QMainWindow):
     def visualizeMf(self):
         qmb = _qtw.QMessageBox()
         qmb.setText(
-            "Please select the mass flow rate prt-file that you want to visualize."
+            "Please select the mass flow rate prt-file (<name>_Mfr.prt) or, for a project "
+            "without pipes, the electrical prt-file (<name>_Pel.prt) that you want to visualize. "
+            "The temperatures (<name>_T.prt) and electrical powers (<name>_Pel.prt) "
+            "next to it are shown too."
         )
         qmb.setStandardButtons(_qtw.QMessageBox.Ok)
         qmb.setDefaultButton(_qtw.QMessageBox.Ok)
         qmb.exec()
 
-        mfrFile = _qtw.QFileDialog.getOpenFileName(
-            self, "Open diagram", filter="*Mfr.prt"
+        selectedFile = _qtw.QFileDialog.getOpenFileName(
+            self, "Open diagram", filter="Results (*Mfr.prt *Pel.prt)"
         )[0].replace("/", "\\")
-        tempFile = mfrFile.replace("Mfr", "T")
+        if not selectedFile:
+            return
+        mfrFile, tempFile, pelFile = _getVisualizerFiles(selectedFile)
         self.calledByVisualizeMf = True
-        if os.path.isfile(mfrFile) and os.path.isfile(tempFile):
-            MassFlowVisualizer(self, mfrFile, tempFile)
+        hasHydraulicFiles = os.path.isfile(mfrFile) and os.path.isfile(
+            tempFile
+        )
+        hasElectricalFile = os.path.isfile(pelFile)
+        if hasHydraulicFiles or hasElectricalFile:
+            MassFlowVisualizer(
+                self,
+                mfrFile if hasHydraulicFiles else None,
+                tempFile if hasHydraulicFiles else None,
+                pelFile if hasElectricalFile else None,
+            )
         else:
-            self.logger.info("No mfrFile or tempFile found!")
+            self.logger.info("No mfrFile, tempFile or pelFile found!")
 
     def openFile(self):
         self.logger.info("Opening diagram")
@@ -622,6 +642,9 @@ class MainWindow(_qtw.QMainWindow):
 
     def exportHydraulicsDdck(self):
         self.editor.exportHydraulics(exportTo="ddck")
+
+    def exportElectricalDdck(self):
+        self.editor.exportElectrical()
 
     def exportHydraulicControl(self):
         self.editor.exportHydraulicControl()
@@ -845,3 +868,14 @@ class MainWindow(_qtw.QMainWindow):
                 )
                 recentProjectAction.setData(recentProject)
                 self.recentProjectsMenu.addAction(recentProjectAction)
+
+
+def _getVisualizerFiles(selectedFile: str) -> tuple[str, str, str]:
+    """Mass flow, temperature and electrical printers of the run of the selected `*Mfr.prt` or `*Pel.prt`."""
+    for suffix in ("Mfr.prt", "Pel.prt"):
+        if selectedFile.lower().endswith(suffix.lower()):
+            base = selectedFile[: -len(suffix)]
+            return base + "Mfr.prt", base + "T.prt", base + "Pel.prt"
+    raise ValueError(
+        f"Not a mass flow or electrical printer file: {selectedFile}"
+    )

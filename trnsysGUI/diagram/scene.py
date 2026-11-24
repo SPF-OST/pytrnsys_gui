@@ -5,6 +5,7 @@ import numpy as _np
 
 import trnsysGUI.BlockItem as _bi
 import trnsysGUI.GraphicalItem as _gi
+import trnsysGUI.electrical.connection as _econn
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.storageTank.widget as _widget
 
@@ -60,6 +61,10 @@ class Scene(_qtw.QGraphicsScene):
             return
 
         if event.key() == _qtc.Qt.Key_Delete:
+            for item in self.selectedItems():
+                if isinstance(item, _econn.ElectricalConnection):
+                    item.delete()
+
             selectedGraphicalItems = [
                 o for o in self._editor.graphicalObj if o.isSelected()
             ]

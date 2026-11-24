@@ -62,6 +62,8 @@ from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.storageTank.widget import StorageTank
 import trnsysGUI.diagram.pipeCrossings as _pcross
+import trnsysGUI.electrical.connection as _econn
+import trnsysGUI.electrical.export as _eexp
 from . import _sizes
 from . import fileSystemTreeView as _fst
 from ..recentProjectsHandler import RecentProjectsHandler
@@ -139,6 +141,7 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
         )
 
         self.graphicalObj = []
+        self.electricalConnections: list = []
         self.fluids = _hlm.Fluids.createDefault()
         self.hydraulicLoops = _hlm.HydraulicLoops([])
 
@@ -191,7 +194,9 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
         # bridges where pipes cross without being connected
         self.pipeCrossingsOverlay = _pcross.PipeCrossingsOverlay(self)
         self.diagramScene.addItem(self.pipeCrossingsOverlay)
-        self.diagramScene.changed.connect(self.pipeCrossingsOverlay.scheduleRecompute)
+        self.diagramScene.changed.connect(
+            self.pipeCrossingsOverlay.scheduleRecompute
+        )
         self.pipeCrossingsOverlay.recompute()
 
     def _setupWidgetHierarchy(self):
@@ -615,7 +620,6 @@ TRoomStore = 10
             self.printerUnitnr + 1, 15
         )
 
-
         if exportTo == "mfs":
             fullExportText += """\
 CONSTANTS 1            
@@ -687,6 +691,25 @@ Tcw=1
                     return False
 
         return True
+
+    def exportElectrical(self) -> _pl.Path | None:
+        """Writes `ddck/electrical/electrical.ddck` with the electrical connections and their printer."""
+        exportPath = (
+            _pl.Path(self.projectFolder)
+            / "ddck"
+            / "electrical"
+            / "electrical.ddck"
+        )
+        if self._doesFileExistAndDontOverwrite(exportPath):
+            return None
+
+        projectName = _pl.Path(self.diagramName).stem
+        content = _eexp.createElectricalDdck(self, projectName)
+
+        exportPath.parent.mkdir(parents=True, exist_ok=True)
+        exportPath.write_text(content, encoding="windows-1252")
+        self.logger.info("Exported %s", exportPath)
+        return exportPath
 
     def _doesFileExistAndDontOverwrite(self, folderPath):
         if not _pl.Path(folderPath).exists() or self.forceOverwrite:
@@ -879,6 +902,8 @@ Tcw=1
         """
         self.hydraulicLoops.clear()
 
+        _econn.deleteAll(self)
+
         while self.trnsysObj:
             trnsysObject = self.trnsysObj[0]
             if isinstance(trnsysObject, BlockItem):
@@ -955,6 +980,7 @@ Tcw=1
         blockFolderNames.append("hydraulic")
         blockFolderNames.append("weather")
         blockFolderNames.append("user_control")
+        blockFolderNames.append("electrical")
 
         ddckFolder = os.path.join(self.projectFolder, "ddck")
         ddckFolders = os.listdir(ddckFolder)
@@ -962,6 +988,11 @@ Tcw=1
 
         for folder in ddckFolders:
             if folder not in blockFolderNames and "StorageTank" not in folder:
+                folderPath = _pl.Path(ddckFolder) / folder
+                if folderPath.is_dir() and not any(folderPath.iterdir()):
+                    # empty folder of a component that was dropped but never saved: nothing to keep
+                    folderPath.rmdir()
+                    continue
                 additionalFolders.append(folder)
 
         if len(additionalFolders) > 0:
@@ -984,6 +1015,10 @@ Tcw=1
                 self.logger.debug("tv has " + str(t.isTempering))
 
         self._decodeHydraulicLoops(blocklist)
+
+        _econn.decodeConnections(
+            self, blocklist.get("electricalConnections", [])
+        )
 
         self._setHydraulicLoopsOnStorageTanks()
 
@@ -1221,7 +1256,8 @@ Tcw=1
 
     def setFrozen(self, isFrozen: bool) -> None:
         """Freeze the diagram: components and pipes can no longer be moved or reshaped.
-        Names and mass flow labels stay movable, so they can be rearranged safely."""
+        Names and mass flow labels stay movable, so they can be rearranged safely.
+        """
         self.isFrozen = isFrozen
         for item in [*self.trnsysObj, *self.graphicalObj]:
             if isinstance(item, (BlockItem, GraphicalItem)):

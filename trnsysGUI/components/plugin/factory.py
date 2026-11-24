@@ -58,6 +58,7 @@ class Factory:
             specification.defaultName,
             graphics,
             internalPipingFactory,
+            specification.electricalTerminals or (),
         )
 
         return plugin

@@ -1,0 +1,7 @@
+defaultName: elDemand
+description: "Electrical demand"
+electrical-terminals:
+  - name: El
+    position: [0, 20]
+    direction: in
+size: [40, 40]

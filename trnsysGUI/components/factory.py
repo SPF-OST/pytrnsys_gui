@@ -63,13 +63,6 @@ def _getHardCodedComponents() -> _cabc.Sequence[Component]:
         Component("GraphicalItem", _img.GENERIC_ITEM_PNG.icon()),
         Component("Weather", _img.WEATHER_SVG.icon()),
         Component("Control", _img.CONTROL_SVG.icon()),
-        Component("ElectricityGrid", _img.ELECTRICITY_GRID_SVG.icon()),
-        Component("ElectricConsumption", _img.ELECTRIC_CONSUMPTION_SVG.icon()),
-        Component("Battery", _img.BATTERY_SVG.icon()),
-        Component("EBNODE", _img.EB_NODE_SVG.icon()),
-        Component("INV", _img.INVERTER_SVG.icon()),
-        Component("PCS", _img.POWER_CONVERSION_SYSTEM_SVG.icon()),
-        Component("SelfConsumption", _img.SELF_CONSUMPTION_SVG.icon()),
     ]
 
 

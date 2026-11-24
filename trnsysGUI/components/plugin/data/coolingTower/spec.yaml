@@ -6,5 +6,8 @@ connections:
     output:
       position: [ 20, 120 ]
 
+electrical-terminals:
+  - name: El
+    position: [120, 80]
+    direction: in
 size: [ 120, 120 ]
-

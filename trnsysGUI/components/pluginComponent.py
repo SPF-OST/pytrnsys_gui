@@ -36,6 +36,8 @@ class PluginComponent(
         self.outputs.extend(createdInternalPiping.outputPorts)
         self._internalPiping = createdInternalPiping.internalPiping
 
+        self.electricalTerminalSpecs = plugin.electricalTerminals
+
         self._imageAccessor = plugin.graphics.accessor
         self.w = plugin.graphics.size.width
         self.h = plugin.graphics.size.height

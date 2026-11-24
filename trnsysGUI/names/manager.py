@@ -4,6 +4,14 @@ import typing as _tp
 
 import pytrnsys.utils.result as _res
 
+# Names Windows reserves for devices (in any casing, also with an extension):
+# a folder "aux" or a file "aux.ddck" can't be opened in the Explorer.
+_WINDOWS_RESERVED_NAMES = frozenset(
+    ["con", "prn", "aux", "nul"]
+    + [f"com{i}" for i in range(1, 10)]
+    + [f"lpt{i}" for i in range(1, 10)]
+)
+
 
 class AbstractDdckDirFileOrDirNamesProvider(_abc.ABC):
     @_abc.abstractmethod
@@ -55,6 +63,12 @@ class NamesManager:
         if self._doesNameExist(newName):
             return _res.Error(
                 "Name already exist (note: names are case insensitive)."
+            )
+
+        if newName.lower() in _WINDOWS_RESERVED_NAMES:
+            return _res.Error(
+                f'"{newName}" is a reserved device name on Windows and '
+                "can't be used as a ddck folder name. Please choose another one."
             )
 
         if (

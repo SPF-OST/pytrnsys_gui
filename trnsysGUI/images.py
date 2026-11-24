@@ -187,27 +187,6 @@ WEATHER_SVG = _ia.createForPackageResource(
 CONTROL_SVG = _ia.createForPackageResource(
     _ia.SvgImageAccessor, "images/symbols/Control.svg"
 )
-ELECTRICITY_GRID_SVG = _ia.createForPackageResource(
-    _ia.SvgImageAccessor, "images/symbols/ElectricityGrid.svg"
-)
-ELECTRIC_CONSUMPTION_SVG = _ia.createForPackageResource(
-    _ia.SvgImageAccessor, "images/symbols/ElectricConsumption.svg"
-)
-BATTERY_SVG = _ia.createForPackageResource(
-    _ia.SvgImageAccessor, "images/symbols/Battery.svg"
-)
-EB_NODE_SVG = _ia.createForPackageResource(
-    _ia.SvgImageAccessor, "images/symbols/EBNode.svg"
-)
-INVERTER_SVG = _ia.createForPackageResource(
-    _ia.SvgImageAccessor, "images/symbols/Inverter.svg"
-)
-POWER_CONVERSION_SYSTEM_SVG = _ia.createForPackageResource(
-    _ia.SvgImageAccessor, "images/symbols/PowerConversionSystem.svg"
-)
-SELF_CONSUMPTION_SVG = _ia.createForPackageResource(
-    _ia.SvgImageAccessor, "images/symbols/SelfConsumption.svg"
-)
 ZOOM_0_PNG = _ia.createForPackageResource(
     _ia.PngImageAccessor, "images/zoom-0.png"
 )

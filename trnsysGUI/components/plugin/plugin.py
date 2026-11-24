@@ -8,6 +8,7 @@ import typing as _tp
 import trnsysGUI.internalPiping as _ip
 
 from . import graphics as _graphics
+from .specification import model as _smodel
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.BlockItem as _bi
@@ -42,3 +43,4 @@ class Plugin:
     baseDisplayName: str
     graphics: _graphics.Graphics
     internalPipingFactory: AbstractInternalPipingFactory
+    electricalTerminals: _cabc.Sequence[_smodel.ElectricalTerminal] = ()

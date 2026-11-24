@@ -17,5 +17,5 @@
 <polygon points="60,100 47.6,92 47.6,108" fill="#fff" stroke="#000" stroke-width="1.1" stroke-linejoin="round"/>
 <!-- electrical -->
 <circle cx="80" cy="107.5" r="5.5" fill="url(#badge)" stroke="#8a6400" stroke-width="0.44"/><path d="M 81.10,103.10 L 77.80,108.23 L 80.00,108.23 L 78.53,112.27 L 82.57,106.77 L 80.37,106.77 L 82.20,103.10 Z" fill="#222"/>
-<circle cx="80" cy="116.4" r="3.2" fill="#fff" stroke="#1a9e3a" stroke-width="1.2"/>
+<line x1="80" y1="113" x2="80" y2="120" stroke="#1a9e3a" stroke-width="1.4"/>
 </svg>

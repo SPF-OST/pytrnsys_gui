@@ -1,0 +1,7 @@
+defaultName: selfCons
+description: "Self consumption of the system (pumps, control)"
+electrical-terminals:
+  - name: El
+    position: [60, 120]
+    direction: in
+size: [120, 120]

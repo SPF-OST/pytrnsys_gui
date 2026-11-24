@@ -1,0 +1,7 @@
+defaultName: battery
+description: "Battery (charged and discharged)"
+electrical-terminals:
+  - name: El
+    position: [120, 60]
+    direction: bi
+size: [120, 120]

@@ -8,6 +8,7 @@ import pytrnsys.utils.result as _res
 import pytrnsys.utils.warnings as _warn
 import trnsysGUI.blockItemHasInternalPiping as _biip
 import trnsysGUI.diagram.Editor as _ed
+import trnsysGUI.electrical.export as _eexp
 import trnsysGUI.hydraulicLoops.model as _hlm
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.menus.projectMenu.placeholders as _ph
@@ -89,7 +90,8 @@ def encodeDdckPlaceHolderValuesToJson(
         ddckDirNames, blockItems, hydraulicLoops
     )
 
-    ddckPlaceHolderValuesDictionary = placeHoldersWithWarnings.value
+    ddckPlaceHolderValuesDictionary = dict(placeHoldersWithWarnings.value)
+    _eexp.addPlaceholders(ddckPlaceHolderValuesDictionary, trnsysObjects)
 
     jsonContent = _json.dumps(
         ddckPlaceHolderValuesDictionary, indent=4, sort_keys=True

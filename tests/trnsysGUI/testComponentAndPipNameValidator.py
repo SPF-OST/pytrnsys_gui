@@ -36,6 +36,16 @@ _NAMES_AND_ERROR_MESSAGES = [
     ("", "Please enter a name."),
     ("SCnrA_QSnkA", _NAME_ALREADY_EXISTS_ERROR_MESSAGE),
     ("SCnra_QSnkA", _NAME_ALREADY_EXISTS_ERROR_MESSAGE),
+    (
+        "Aux",
+        '"Aux" is a reserved device name on Windows and '
+        "can't be used as a ddck folder name. Please choose another one.",
+    ),
+    (
+        "com1",
+        '"com1" is a reserved device name on Windows and '
+        "can't be used as a ddck folder name. Please choose another one.",
+    ),
 ]
 
 _INVALID_NAMES = [n for n, _ in _NAMES_AND_ERROR_MESSAGES]

@@ -52,6 +52,26 @@ class TeePiece(NodeBase):
         return _nameMustBeCapitalized(cls.__name__, name)
 
 
+ElectricalTerminalDirection = _tp.Literal["in", "out", "bi"]
+
+
+class ElectricalTerminal(_pc.BaseModel):
+    """A green terminal of the electrical layer: `in` receives power, `out` delivers it, `bi` both ways."""
+
+    name: str
+    position: tuple[int, int]
+    direction: ElectricalTerminalDirection = "bi"
+
+    @_pc.field_validator("name")
+    @classmethod
+    def nameMustStartWithCapitalLetter(cls, name: str) -> str:
+        if not (name[:1].isupper() and name.isalnum()):
+            raise ValueError(
+                f"{cls.__name__} names must start with a capital letter and contain only letters and digits."
+            )
+        return name
+
+
 class Specification(_pc.BaseModel):
     defaultName: str
     description: str
@@ -59,13 +79,20 @@ class Specification(_pc.BaseModel):
     teePieces: _cabc.Sequence[TeePiece] | None = _pc.Field(
         alias="tee-pieces", default=None
     )
+    electricalTerminals: _cabc.Sequence[ElectricalTerminal] | None = _pc.Field(
+        alias="electrical-terminals", default=None
+    )
     size: tuple[int, int]
 
     @_pc.model_validator(mode="after")
     def _oneConnectionOrTeePieceMustBeGiven(self) -> _tp.Self:
-        if not self.connections and not self.teePieces:
+        if (
+            not self.connections
+            and not self.teePieces
+            and not self.electricalTerminals
+        ):
             raise ValueError(
-                "At least one connection or T-piece must be specified."
+                "At least one connection, T-piece or electrical terminal must be specified."
             )
 
         return self

@@ -1,0 +1,7 @@
+defaultName: grid
+description: "Electricity grid (import and export)"
+electrical-terminals:
+  - name: El
+    position: [120, 100]
+    direction: bi
+size: [120, 120]

@@ -1,0 +1,13 @@
+defaultName: pcs
+description: "Power conversion system: PV in, battery charge and discharge, demand out"
+electrical-terminals:
+  - name: Pv
+    position: [0, 60]
+    direction: in
+  - name: Bat
+    position: [60, 120]
+    direction: bi
+  - name: Dem
+    position: [120, 60]
+    direction: out
+size: [120, 120]
