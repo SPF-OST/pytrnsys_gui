@@ -70,7 +70,7 @@ class HPDual(
             self.origInputsPos[0][0], self.origInputsPos[0][1]
         )  # evap
         self.inputs[1].setPos(
-            self.origInputsPos[1][0], self.origInputsPos[0][1]
+            self.origInputsPos[1][0], self.origInputsPos[1][1]
         )  # cond
 
         self.outputs[0].setPos(

@@ -14,7 +14,7 @@ import trnsysGUI.images as _img
 
 
 class GraphicalItem(QGraphicsPixmapItem):
-    def __init__(self, editor, **_):
+    def __init__(self, editor, imageAccessor=None, **_):
 
         super().__init__(None)
         self.w = 100
@@ -26,9 +26,9 @@ class GraphicalItem(QGraphicsPixmapItem):
         self.flippedH = False
         self.flippedV = False
         self.rotationN = 0
-        # Initial icon
-        self._imageAccessor = _img.GEAR_SVG
-        pixmap = _img.GEAR_SVG.pixmap(width=self.w, height=self.h)
+        # Initial icon (a gear unless a symbol from the library is given)
+        self._imageAccessor = imageAccessor or _img.GEAR_SVG
+        pixmap = self._imageAccessor.pixmap(width=self.w, height=self.h)
         self.setPixmap(pixmap)
 
         self.setFlags(self.ItemIsSelectable | self.ItemIsMovable)

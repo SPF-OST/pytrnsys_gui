@@ -180,6 +180,22 @@ WATER_SVG = _ia.createForPackageResource(
 CRYSTALIZER_SVG = _ia.createForPackageResource(
     _ia.SvgImageAccessor, "images/Crystalizer.svg"
 )
+# Symbols without hydraulic connections (placed as graphical items)
+WEATHER_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/symbols/Weather.svg"
+)
+CONTROL_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/symbols/Control.svg"
+)
+ELECTRICITY_GRID_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/symbols/ElectricityGrid.svg"
+)
+ELECTRIC_CONSUMPTION_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/symbols/ElectricConsumption.svg"
+)
+BATTERY_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/symbols/Battery.svg"
+)
 ZOOM_0_PNG = _ia.createForPackageResource(
     _ia.PngImageAccessor, "images/zoom-0.png"
 )

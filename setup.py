@@ -79,6 +79,7 @@ setuptools.setup(
         "trnsysGUI": [
             "images/*.png",
             "images/*.svg",
+            "images/symbols/*.svg",
             "templates/run.config",
             "templates/generic/*.ddck",
         ],

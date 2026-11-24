@@ -15,7 +15,7 @@ class Boiler(
 ):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
-        self.w = 80
+        self.w = 120
         self.h = 120
         self.portOffset = 5
         self.inputs.append(_cspi.createSinglePipePortItem("i", self))

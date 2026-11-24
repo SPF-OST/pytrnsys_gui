@@ -20,8 +20,8 @@ class GroundSourceHx(
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
-        self.w = 60
-        self.h = 80
+        self.w = 120
+        self.h = 120
 
         self.inputs.append(_cspi.createSinglePipePortItem("i", self))
         self.outputs.append(_cspi.createSinglePipePortItem("o", self))

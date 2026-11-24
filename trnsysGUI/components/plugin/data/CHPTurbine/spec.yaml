@@ -1,0 +1,9 @@
+defaultName: chpTurbine
+description: Combined heat and power unit (gas turbine), heat recovery circuit
+connections:
+  - name: Heat
+    input:
+      position: [120, 100]
+    output:
+      position: [120, 20]
+size: [120, 120]

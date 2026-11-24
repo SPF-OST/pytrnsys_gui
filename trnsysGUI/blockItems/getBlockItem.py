@@ -50,6 +50,7 @@ from trnsysGUI.teePieces.doublePipeTeePiece import DoublePipeTeePiece
 from trnsysGUI.teePieces.teePiece import TeePiece
 from trnsysGUI.water import Water
 
+import trnsysGUI.images as _img
 import trnsysGUI.components.pluginComponent as _pcomp
 import trnsysGUI.components.plugin.factory as _pfactory
 
@@ -125,6 +126,19 @@ def createBlockItem(
 
     if componentTypeName == "GraphicalItem":
         return GraphicalItem(editor)
+
+    # Symbols without hydraulic connections: graphical items with a preset image
+    symbolImages = {
+        "Weather": _img.WEATHER_SVG,
+        "Control": _img.CONTROL_SVG,
+        "ElectricityGrid": _img.ELECTRICITY_GRID_SVG,
+        "ElectricConsumption": _img.ELECTRIC_CONSUMPTION_SVG,
+        "Battery": _img.BATTERY_SVG,
+    }
+    if componentTypeName in symbolImages:
+        return GraphicalItem(
+            editor, imageAccessor=symbolImages[componentTypeName]
+        )
 
     if componentTypeName in blockItems:
         parts = blockItems[componentTypeName]
