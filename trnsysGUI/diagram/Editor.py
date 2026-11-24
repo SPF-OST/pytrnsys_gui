@@ -932,7 +932,7 @@ Tcw=1
                     k.updateImage()
 
                 if isinstance(k, GraphicalItem):
-                    k.setParent(self.diagramView)
+                    k.setParent(self)
                     self.diagramScene.addItem(k)
 
                 if isinstance(k, dict):

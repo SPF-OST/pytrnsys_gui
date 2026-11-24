@@ -17,7 +17,7 @@
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:dc="http://purl.org/dc/elements/1.1/">
+   xmlns:dc="http://purl.org/dc/elements/1.1/"><defs><radialGradient id="badge" cx="0.4" cy="0.35" r="0.7"><stop offset="0" stop-color="#ffe066"/><stop offset="1" stop-color="#f5b400"/></radialGradient></defs>
   <defs
      id="defs97">
     <linearGradient
@@ -175,4 +175,8 @@
        style="fill:none;fill-opacity:1;stroke:url(#linearGradient1048);stroke-width:3.48273;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 54.298122,167.65631 v 27.36045 m 80.157718,-26.20292 v 26.18974 M 118.4298,168.70465 a 8.0143003,7.791555 0 0 1 4.09839,-6.73855 8.0143003,7.791555 0 0 1 8.05119,0.12419 8.0143003,7.791555 0 0 1 3.87646,6.86153 m -16.02606,-0.24718 v 10.3619 m 0,0 a 8.0143003,7.791555 0 0 1 -4.09839,6.73855 8.0143003,7.791555 0 0 1 -8.05119,-0.12419 8.0143003,7.791555 0 0 1 -3.87646,-6.86153 M 86.377701,168.21029 a 8.0143003,7.791555 0 0 1 4.09839,-6.73854 8.0143003,7.791555 0 0 1 8.05119,0.12417 8.0143003,7.791555 0 0 1 3.876459,6.86154 m -16.053529,10.0551 a 8.0143003,7.791555 0 0 1 -4.098389,6.73854 8.0143003,7.791555 0 0 1 -8.0512,-0.12418 8.0143003,7.791555 0 0 1 -3.87646,-6.86154 m -16.02604,-10.60907 a 8.0143003,7.791555 0 0 1 4.09839,-6.73854 8.0143003,7.791555 0 0 1 8.0512,0.12417 8.0143003,7.791555 0 0 1 3.87646,6.86154 m 0,0 v 10.36191 m 16.053519,-10.0551 v 10.36189 m 16.026049,-10.11472 v 10.36191" />
   </g>
+<!-- electrical -->
+<circle cx="112" cy="66" r="5.5" fill="url(#badge)" stroke="#8a6400" stroke-width="0.44"/><path d="M 113.10,61.60 L 109.80,66.73 L 112.00,66.73 L 110.53,70.77 L 114.57,65.27 L 112.37,65.27 L 114.20,61.60 Z" fill="#222"/>
+<line x1="113.5" y1="71.3" x2="116.4" y2="76.8" stroke="#1a9e3a" stroke-width="1.4"/>
+<circle cx="116.4" cy="80" r="3.2" fill="#fff" stroke="#1a9e3a" stroke-width="1.2"/>
 </svg>

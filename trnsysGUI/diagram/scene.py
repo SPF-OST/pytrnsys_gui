@@ -60,6 +60,12 @@ class Scene(_qtw.QGraphicsScene):
             return
 
         if event.key() == _qtc.Qt.Key_Delete:
+            selectedGraphicalItems = [
+                o for o in self._editor.graphicalObj if o.isSelected()
+            ]
+            for graphicalItem in selectedGraphicalItems:
+                graphicalItem.deleteBlock()
+
             trnsysObjects = self._editor.trnsysObj
             selectedObjects = [o for o in trnsysObjects if self._isSelected(o)]
 

@@ -134,10 +134,17 @@ def createBlockItem(
         "ElectricityGrid": _img.ELECTRICITY_GRID_SVG,
         "ElectricConsumption": _img.ELECTRIC_CONSUMPTION_SVG,
         "Battery": _img.BATTERY_SVG,
+        "EBNODE": _img.EB_NODE_SVG,
+        "INV": _img.INVERTER_SVG,
+        "PCS": _img.POWER_CONVERSION_SYSTEM_SVG,
+        "SelfConsumption": _img.SELF_CONSUMPTION_SVG,
     }
     if componentTypeName in symbolImages:
+        # drawn at the size of their image, so the green terminal dots have the size of the port dots
+        sizes = {"ElectricConsumption": (40, 40), "EBNODE": (120, 220)}
+        size = sizes.get(componentTypeName, (120, 120))
         return GraphicalItem(
-            editor, imageAccessor=symbolImages[componentTypeName]
+            editor, imageAccessor=symbolImages[componentTypeName], size=size
         )
 
     if componentTypeName in blockItems:

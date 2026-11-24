@@ -8,6 +8,7 @@ import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.blockItems.getBlockItem as _gbi
+import trnsysGUI.GraphicalItem as _gi
 import trnsysGUI.deleteBlockCommand as _dbc
 import trnsysGUI.names.undo as _nu
 import trnsysGUI.components.ddckFolderHelpers as _dfh
@@ -60,7 +61,8 @@ class View(_qtw.QGraphicsView):
                 blockItem.displayName, _pl.Path(self._editor.projectFolder)
             )
 
-        self._editor.trnsysObj.append(blockItem)
+        if not isinstance(blockItem, _gi.GraphicalItem):  # symbols are kept in the editor's graphicalObj
+            self._editor.trnsysObj.append(blockItem)
 
         if componentType == "StorageTank":
             blockItem.setHydraulicLoops(self._editor.hydraulicLoops)

@@ -12,4 +12,7 @@
 <path d="M 172,82 C 190,70 200,66 214,60" fill="none" stroke="#555" stroke-width="1"/>
 <path d="M 214,40 L 204,110 M 214,40 L 224,110 M 206,58 H 222 M 205,80 H 223 M 204,110 H 224 M 200,50 H 228" fill="none" stroke="#3c3c3c" stroke-width="1.6" stroke-linejoin="round"/>
 <circle cx="172" cy="84" r="10" fill="url(#badge)" stroke="#8a6400" stroke-width="0.80"/><path d="M 174.00,76.00 L 168.00,85.33 L 172.00,85.33 L 169.33,92.67 L 176.67,82.67 L 172.67,82.67 L 176.00,76.00 Z" fill="#222"/>
+<!-- electrical -->
+<path d="M 172,94 V 146 H 180 V 153.2" fill="none" stroke="#1a9e3a" stroke-width="1.4"/>
+<circle cx="180" cy="156.4" r="3.2" fill="#fff" stroke="#1a9e3a" stroke-width="1.2"/>
 </svg>

@@ -89,7 +89,8 @@ class Decoder(_json.JSONDecoder):
                             displayName=i["BlockDisplayName"],
                         )
 
-                    self.editor.trnsysObj.append(blockItem)
+                    if componentType != "GraphicalItem":  # symbols are kept in the editor's graphicalObj
+                        self.editor.trnsysObj.append(blockItem)
 
                     blockItem.decode(i, resBlockList)
 

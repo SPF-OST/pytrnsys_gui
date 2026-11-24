@@ -1,17 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="120mm" height="120mm" viewBox="0 0 120 120">
-<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9ecfb"/><stop offset="1" stop-color="#ffffff"/></linearGradient><linearGradient id="wall" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d6d6d6"/></linearGradient><radialGradient id="glow" cx="0.5" cy="0.45" r="0.55"><stop offset="0" stop-color="#fff8c0"/><stop offset="1" stop-color="#ffc21a"/></radialGradient><radialGradient id="badge" cx="0.4" cy="0.35" r="0.7"><stop offset="0" stop-color="#ffe066"/><stop offset="1" stop-color="#f5b400"/></radialGradient></defs>
-<path d="M 0,113 H 120" stroke="#5a7a3a" stroke-width="3"/>
-<rect x="20" y="52" width="72" height="60" fill="url(#wall)" stroke="#000" stroke-width="1.5"/>
-<polygon points="12,56 56,18 100,56" fill="#b5452e" stroke="#000" stroke-width="1.5" stroke-linejoin="round"/>
-<rect x="74" y="24" width="10" height="18" fill="#8c3a26" stroke="#000" stroke-width="1"/>
-<rect x="30" y="62" width="34" height="28" rx="2" fill="#fff3b0" stroke="#000" stroke-width="1.2"/>
-<line x1="47" y1="62" x2="47" y2="68" stroke="#333" stroke-width="1"/>
-<path d="M 41,72 A 6,6 0 0 1 53,72 Z" fill="#555"/>
-<circle cx="47" cy="75" r="4" fill="url(#glow)" stroke="#c98a00" stroke-width="0.6"/>
-<rect x="70" y="88" width="14" height="14" rx="3" fill="#ffffff" stroke="#000" stroke-width="1"/>
-<path d="M 77,95 C 68,104 58,104 50,108 H 30" fill="none" stroke="#222" stroke-width="2"/>
-<rect x="73" y="91" width="8" height="8" rx="1.5" fill="#333"/>
-<circle cx="98" cy="40" r="15" fill="url(#badge)" stroke="#8a6400" stroke-width="1.2"/>
-<path d="M 101,28 L 92,42 H 98 L 94,53 L 105,38 H 99 L 104,28 Z" fill="#222"/>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="48mm" height="48mm" viewBox="-4 -4 48 48">
+<path d="M 0,20 H 13" stroke="#1a9e3a" stroke-width="3.53" stroke-linecap="butt" fill="none"/>
+<path d="M 12,15 H 26 V 9 L 38,20 L 26,31 V 25 H 12 Z" fill="#1a9e3a" stroke="#000" stroke-width="1" stroke-linejoin="round"/>
+<line x1="22" y1="2" x2="22" y2="38" stroke="#000" stroke-width="1" stroke-dasharray="3,2"/>
+<circle cx="0" cy="20" r="3.2" fill="#fff" stroke="#1a9e3a" stroke-width="1.2"/>
 </svg>
