@@ -212,6 +212,10 @@ class PortItemBase(
         return value
 
     def mousePressEvent(self, event):  # pylint: disable = unused-argument
+        if getattr(self.parent.editor, "isFrozen", False):
+            self.setFlag(self.ItemIsMovable, False)
+            return  # frozen diagram: no moving of ports and no new pipes
+
         if self.parent.editor.moveDirectPorts and hasattr(
             self.parent, "heatExchangers"
         ):

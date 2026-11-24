@@ -119,6 +119,14 @@ class MainWindow(_qtw.QMainWindow):
         toggleAlignModeAction.triggered.connect(self.toggleAlignMode)
         toggleAlignModeAction.setShortcut("q")
 
+        self._freezeDiagramAction = _qtw.QAction(
+            "Freeze diagram (only names can be moved)", self
+        )
+        self._freezeDiagramAction.setCheckable(True)
+        self._freezeDiagramAction.toggled.connect(
+            lambda isFrozen: self.editor.setFrozen(isFrozen)
+        )
+
         runMassflowSolverAction = _qtw.QAction(
             _img.RUN_MFS_PNG.icon(), "Run the massflow solver", self
         )
@@ -200,6 +208,7 @@ class MainWindow(_qtw.QMainWindow):
         self.editMenu = _qtw.QMenu("Edit")
         self.editMenu.addAction(toggleSnapAction)
         self.editMenu.addAction(toggleAlignModeAction)
+        self.editMenu.addAction(self._freezeDiagramAction)
 
         runMassflowSolverActionMenu = _qtw.QAction(
             "Run mass flow solver", self
@@ -584,6 +593,11 @@ class MainWindow(_qtw.QMainWindow):
 
         if wasRunning:
             self.editor.start()
+
+        # a newly opened diagram starts unfrozen
+        freezeAction = getattr(self, "_freezeDiagramAction", None)
+        if freezeAction and freezeAction.isChecked():
+            freezeAction.setChecked(False)
 
     def toggleConnLabels(self):
         self.labelVisState = not self.labelVisState

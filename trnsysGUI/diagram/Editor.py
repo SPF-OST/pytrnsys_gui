@@ -85,6 +85,9 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
 
         self.moveDirectPorts = False
 
+        # Frozen diagram: components, pipes and ports can't be moved (names still can)
+        self.isFrozen = False
+
         # Related to the grid blocks can snap to
         self.snapGrid = False
         self.snapSize = 20
@@ -1208,3 +1211,11 @@ Tcw=1
     def toggleSnap(self) -> None:
         self.snapGrid = not self.snapGrid
         self.diagramScene.update()
+
+    def setFrozen(self, isFrozen: bool) -> None:
+        """Freeze the diagram: components and pipes can no longer be moved or reshaped.
+        Names and mass flow labels stay movable, so they can be rearranged safely."""
+        self.isFrozen = isFrozen
+        for item in [*self.trnsysObj, *self.graphicalObj]:
+            if isinstance(item, (BlockItem, GraphicalItem)):
+                item.setFlag(item.ItemIsMovable, not isFrozen)

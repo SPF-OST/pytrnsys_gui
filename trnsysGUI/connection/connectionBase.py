@@ -30,6 +30,19 @@ def calcDist(p1, p2):  # pylint: disable = invalid-name
     return norm
 
 
+def _distancePointToSegment(
+    point: _qtc.QPointF, start: _qtc.QPointF, end: _qtc.QPointF
+) -> float:
+    dx, dy = end.x() - start.x(), end.y() - start.y()
+    lengthSquared = dx * dx + dy * dy
+    if lengthSquared == 0:
+        return calcDist(point, start)
+    t = ((point.x() - start.x()) * dx + (point.y() - start.y()) * dy) / lengthSquared
+    t = max(0.0, min(1.0, t))
+    closest = _qtc.QPointF(start.x() + t * dx, start.y() + t * dy)
+    return calcDist(point, closest)
+
+
 class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
     # pylint: disable = too-many-public-methods, too-many-instance-attributes, too-many-positional-arguments
     def __init__(
@@ -151,7 +164,10 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         return pos
 
     def setColor(self, value, **kwargs):
-        if "mfr" in kwargs:
+        if "color" in kwargs:  # direct colour, e.g. from the temperature scale of the flow visualizer
+            for s in self.segments:  # pylint: disable = invalid-name
+                s.setColorAndWidthAccordingToMassflow(kwargs["color"], value)
+        elif "mfr" in kwargs:
             if kwargs["mfr"] == "NegMfr":
                 col = _qtg.QColor(0, 0, 255)
             elif kwargs["mfr"] == "ZeroMfr":
@@ -289,12 +305,37 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         self.rotateLabel()
 
     # Label related
+    _MAX_LABEL_DISTANCE_FROM_PIPE = 60.0
+
     def setLabelVisible(self, isVisible: bool) -> None:
+        if isVisible:
+            self._keepLabelNearPipe(self._label)
         self._label.setVisible(isVisible)
 
     def toggleLabelVisible(self) -> None:
-        wasVisible = self._label.isVisible()
-        self._label.setVisible(not wasVisible)
+        self.setLabelVisible(not self._label.isVisible())
+
+    def setMassFlowLabelVisible(self, isVisible: bool) -> None:
+        if isVisible:
+            self._keepLabelNearPipe(self.massFlowLabel)
+        self.massFlowLabel.setVisible(isVisible)
+
+    def _keepLabelNearPipe(self, label: _qtw.QGraphicsTextItem) -> None:
+        """A label saved far away from its pipe (e.g. after the pipe was moved) is put back at the
+        start of the pipe when it is shown, so that it does not float alone in the diagram."""
+        if not self.segments:
+            return
+        point = label.scenePos()
+        distance = min(
+            _distancePointToSegment(
+                point,
+                segment.mapToScene(segment.line().p1()),
+                segment.mapToScene(segment.line().p2()),
+            )
+            for segment in self.segments
+        )
+        if distance > self._MAX_LABEL_DISTANCE_FROM_PIPE:
+            label.setPos(self.mapFromScene(self.getStartPoint()))
 
     def positionLabel(self):
         self._label.setPos(self.getStartPoint())
@@ -306,8 +347,7 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         self._label.setRotation(angle)
 
     def toggleMassFlowLabelVisible(self) -> None:
-        wasVisible = self.massFlowLabel.isVisible()
-        self.massFlowLabel.setVisible(not wasVisible)
+        self.setMassFlowLabelVisible(not self.massFlowLabel.isVisible())
 
     def getRadius(self):
         raise NotImplementedError()

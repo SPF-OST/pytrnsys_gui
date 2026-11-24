@@ -6,6 +6,7 @@ import itertools as _it
 import typing as _tp
 
 import PyQt5.QtCore as _qtc
+import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 import numpy as _np
 import pandas as _pd
@@ -19,6 +20,161 @@ import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.warningsAndErrors as _werrors
 
 _MAX_HEADER_LENGTH = 25
+
+# Temperature colour scale: blue (min) -> cyan -> green -> yellow -> red (max)
+_COLOR_SCALE_STOPS = [
+    (0.0, (0, 0, 200)),
+    (0.25, (0, 160, 255)),
+    (0.5, (32, 192, 64)),
+    (0.75, (255, 208, 0)),
+    (1.0, (208, 0, 0)),
+]
+
+
+def getTemperatureColor(
+    temperature: float, minTemperature: float, maxTemperature: float
+) -> _qtg.QColor:
+    """Colour of a temperature on the scale; values outside [min, max] get the end colours."""
+    if maxTemperature <= minTemperature:
+        fraction = 0.5
+    else:
+        fraction = (temperature - minTemperature) / (
+            maxTemperature - minTemperature
+        )
+    fraction = min(1.0, max(0.0, fraction))
+    for (lowerStop, lowerColor), (upperStop, upperColor) in zip(
+        _COLOR_SCALE_STOPS, _COLOR_SCALE_STOPS[1:]
+    ):
+        if fraction <= upperStop:
+            weight = (fraction - lowerStop) / (upperStop - lowerStop)
+            red, green, blue = (
+                round(lower + (upper - lower) * weight)
+                for lower, upper in zip(lowerColor, upperColor)
+            )
+            return _qtg.QColor(red, green, blue)
+    return _qtg.QColor(*_COLOR_SCALE_STOPS[-1][1])
+
+
+class _DayMonthPicker(_qtw.QFrame):
+    """Pop-up to pick a day: a month list and the day numbers 1..31.
+    No weekdays and no year, because the simulated year is not known (only the year
+    index, "year 2", when the file goes beyond the first year)."""
+
+    _MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+    def __init__(self, dateTimeEdit: _qtw.QDateTimeEdit, onPicked):
+        super().__init__(None, _qtc.Qt.Popup)
+        self.setFrameShape(_qtw.QFrame.StyledPanel)
+        self._edit = dateTimeEdit
+        self._onPicked = onPicked
+        self._first = dateTimeEdit.minimumDateTime().date()
+        self._last = dateTimeEdit.maximumDateTime().date()
+        firstYear = self._first.year()
+
+        self._months = []  # (year, month) in the range of the file
+        year, month = self._first.year(), self._first.month()
+        while (year, month) <= (self._last.year(), self._last.month()):
+            self._months.append((year, month))
+            year, month = (year + 1, 1) if month == 12 else (year, month + 1)
+
+        self._monthComboBox = _qtw.QComboBox()
+        severalYears = self._last.year() > firstYear
+        for year, month in self._months:
+            label = self._MONTH_NAMES[month - 1]
+            if severalYears:
+                label += f" (year {year - firstYear + 1})"
+            self._monthComboBox.addItem(label)
+        current = dateTimeEdit.date()
+        self._monthComboBox.setCurrentIndex(self._months.index((current.year(), current.month())))
+        self._monthComboBox.currentIndexChanged.connect(self._fillDays)
+
+        self._daysLayout = _qtw.QGridLayout()
+        self._daysLayout.setSpacing(2)
+        layout = _qtw.QVBoxLayout(self)
+        layout.addWidget(self._monthComboBox)
+        layout.addLayout(self._daysLayout)
+        self._fillDays()
+
+    def _fillDays(self) -> None:
+        while self._daysLayout.count():
+            oldButton = self._daysLayout.takeAt(0).widget()
+            oldButton.hide()
+            oldButton.deleteLater()
+        year, month = self._months[self._monthComboBox.currentIndex()]
+        current = self._edit.date()
+        for day in range(1, _qtc.QDate(year, month, 1).daysInMonth() + 1):
+            date = _qtc.QDate(year, month, day)
+            button = _qtw.QToolButton()
+            button.setText(str(day))
+            button.setFixedSize(30, 24)
+            button.setEnabled(self._first <= date <= self._last)
+            if date == current:
+                button.setStyleSheet("font-weight: bold")
+            button.clicked.connect(lambda _=False, d=date: self._pick(d))
+            self._daysLayout.addWidget(button, (day - 1) // 7, (day - 1) % 7)  # 7 per row, no weekdays
+
+    def _pick(self, date: _qtc.QDate) -> None:
+        dateTime = _qtc.QDateTime(date, self._edit.time(), _qtc.Qt.UTC)
+        self._edit.setDateTime(dateTime)  # clamped to the range of the file
+        self.close()
+        self._onPicked()
+
+
+class _ColorBar(_qtw.QWidget):
+    """Colour bar of the temperature scale with ticks in deg C."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._minTemperature = 0.0
+        self._maxTemperature = 100.0
+        self.setMinimumHeight(42)
+        self.setMinimumWidth(300)
+
+    def setRange(self, minTemperature: float, maxTemperature: float) -> None:
+        self._minTemperature = minTemperature
+        self._maxTemperature = maxTemperature
+        self.update()
+
+    def paintEvent(self, event):  # pylint: disable=unused-argument
+        painter = _qtg.QPainter(self)
+        painter.setRenderHint(_qtg.QPainter.Antialiasing)
+        left, right, barHeight = 10, self.width() - 40, 16
+        gradient = _qtg.QLinearGradient(left, 0, right, 0)
+        for stop, color in _COLOR_SCALE_STOPS:
+            gradient.setColorAt(stop, _qtg.QColor(*color))
+        barRect = _qtc.QRectF(left, 2, right - left, barHeight)
+        painter.fillRect(barRect, _qtg.QBrush(gradient))
+        painter.setPen(_qtg.QColor(80, 80, 80))
+        painter.drawRect(barRect)
+
+        span = self._maxTemperature - self._minTemperature
+        if span <= 0:
+            return
+        tickStep = _getNiceTickStep(span)
+        firstTick = _np.ceil(self._minTemperature / tickStep) * tickStep
+        tick = firstTick
+        while tick <= self._maxTemperature + 1e-9:
+            x = left + (tick - self._minTemperature) / span * (right - left)
+            painter.drawLine(_qtc.QPointF(x, 2 + barHeight), _qtc.QPointF(x, 6 + barHeight))
+            label = f"{tick:g}"
+            painter.drawText(
+                _qtc.QRectF(x - 20, 8 + barHeight, 40, 14),
+                _qtc.Qt.AlignHCenter,
+                label,
+            )
+            tick += tickStep
+        painter.drawText(
+            _qtc.QRectF(right + 6, 2, 34, barHeight), _qtc.Qt.AlignVCenter, "°C"
+        )
+
+
+def _getNiceTickStep(span: float) -> float:
+    rawStep = span / 10
+    magnitude = 10 ** _np.floor(_np.log10(rawStep))
+    for factor in (1, 2, 5, 10):
+        if rawStep <= factor * magnitude:
+            return factor * magnitude
+    return 10 * magnitude
 
 
 class MassFlowVisualizer(_qtw.QDialog):
@@ -43,13 +199,6 @@ class MassFlowVisualizer(_qtw.QDialog):
         self.timeStep = 0
         self.timeSteps = len(self.massFlowData.index) - 1  # 0 to 364
 
-        # threshold values for positive list
-        self.medianValue = 0
-        self.lowerQuarter = 0
-        self.upperQuarter = 0
-        self.minValue = 0
-        self.maxValue = 0
-
         self.medianValueMfr = 0
         self.lowerQuarterMfr = 0
         self.upperQuarterMfr = 0
@@ -57,7 +206,20 @@ class MassFlowVisualizer(_qtw.QDialog):
         self.maxValueMfr = 0
 
         self.getThresholdValues()
-        self.getTempThresholdValues()
+
+        # Temperature scale: limits read from the file every time it is loaded
+        self._fileMinTemperature, self._fileMaxTemperature = (
+            self._getFileTemperatureRange()
+        )
+        self._minTemperature = self._fileMinTemperature
+        self._maxTemperature = self._fileMaxTemperature
+
+        # Time interval to show (rows of the files), whole file by default
+        self._startRow = 0
+        self._endRow = self.maxTimeStep
+
+        # Playback speed (time steps shown per second)
+        self._framesPerSecond = 1.0
 
         timeStepIncreaseLabelText = "Increase time-step by ( 30 = 1 Hour ):\n              ( 720 = 1 Day )"
         self._timeStepIncreaseLabel = _qtw.QLabel(timeStepIncreaseLabelText)
@@ -91,44 +253,85 @@ class MassFlowVisualizer(_qtw.QDialog):
         self.togglePauseButton = _qtw.QPushButton("Pause/Continue")
         self.cancelButton = _qtw.QPushButton("Cancel")
 
-        minColorLabel = _qtw.QLabel("Min")
-        minColorLabel.setStyleSheet("color: blue")
-        maxColorLabel = _qtw.QLabel("Max")
-        maxColorLabel.setStyleSheet("color: red")
-        minToFiftyPercentile = _qtw.QLabel("Min to 50%")
-        minToFiftyPercentile.setStyleSheet("color: cyan")
-        fiftyPercentileToMax = _qtw.QLabel("50% to max")
-        fiftyPercentileToMax.setStyleSheet("color: pink")
-        arrowLabel = _qtw.QLabel("-->")
-        arrowLabel2 = _qtw.QLabel("-->")
-        arrowLabel3 = _qtw.QLabel("-->")
+        # --- temperature scale: min / max fields, reset button, colour bar
+        self._minTemperatureSpinBox = self._createTemperatureSpinBox(
+            self._minTemperature
+        )
+        self._maxTemperatureSpinBox = self._createTemperatureSpinBox(
+            self._maxTemperature
+        )
+        self._minTemperatureSpinBox.valueChanged.connect(
+            self._onTemperatureRangeChanged
+        )
+        self._maxTemperatureSpinBox.valueChanged.connect(
+            self._onTemperatureRangeChanged
+        )
+        useFileRangeButton = _qtw.QPushButton("Use range of file")
+        useFileRangeButton.clicked.connect(self._onUseFileRange)
+        self._colorBar = _ColorBar()
+        self._colorBar.setRange(self._minTemperature, self._maxTemperature)
 
         colorLayout = _qtw.QHBoxLayout()
-        colorLayout.addWidget(minColorLabel)
-        colorLayout.addWidget(arrowLabel)
-        colorLayout.addWidget(minToFiftyPercentile)
-        colorLayout.addWidget(arrowLabel2)
-        colorLayout.addWidget(fiftyPercentileToMax)
-        colorLayout.addWidget(arrowLabel3)
-        colorLayout.addWidget(maxColorLabel)
+        colorLayout.addWidget(_qtw.QLabel("Temperature scale   Min [°C]"))
+        colorLayout.addWidget(self._minTemperatureSpinBox)
+        colorLayout.addWidget(_qtw.QLabel("Max [°C]"))
+        colorLayout.addWidget(self._maxTemperatureSpinBox)
+        colorLayout.addWidget(useFileRangeButton)
+        colorLayout.addWidget(
+            _qtw.QLabel("grey = no flow, pipe width = mass flow")
+        )
         colorLayout.addStretch()
+
+        # --- time interval of the file to show
+        firstTime, lastTime = self.getTime(0), self.getTime(self.maxTimeStep)
+        fileRangeLabel = _qtw.QLabel(
+            f"File: {self._formatTime(firstTime)} to {self._formatTime(lastTime)}"
+        )
+        # date fields (day, month, hour, minute); they also work across the new year,
+        # e.g. for a simulation from October to March
+        self._fromDateTimeEdit = self._createDateTimeEdit(firstTime)
+        self._toDateTimeEdit = self._createDateTimeEdit(lastTime)
+        self._fromDateTimeEdit.editingFinished.connect(self._onTimeIntervalChanged)
+        self._toDateTimeEdit.editingFinished.connect(self._onTimeIntervalChanged)
+
+        intervalLayout = _qtw.QHBoxLayout()
+        intervalLayout.addWidget(fileRangeLabel)
+        intervalLayout.addSpacing(20)
+        intervalLayout.addWidget(_qtw.QLabel("Show from"))
+        intervalLayout.addWidget(self._fromDateTimeEdit)
+        intervalLayout.addWidget(self._createPickerButton(self._fromDateTimeEdit))
+        intervalLayout.addWidget(_qtw.QLabel("to"))
+        intervalLayout.addWidget(self._toDateTimeEdit)
+        intervalLayout.addWidget(self._createPickerButton(self._toDateTimeEdit))
+        intervalLayout.addStretch()
+
+        # --- playback speed
+        self._speedSpinBox = _qtw.QDoubleSpinBox()
+        self._speedSpinBox.setDecimals(1)
+        self._speedSpinBox.setRange(0.1, 50.0)
+        self._speedSpinBox.setSingleStep(0.5)
+        self._speedSpinBox.setValue(self._framesPerSecond)
+        self._speedSpinBox.setToolTip("Images (time steps) shown per second")
+        self._speedSpinBox.valueChanged.connect(self._onSpeedChanged)
 
         buttonLayout = _qtw.QHBoxLayout()
         buttonLayout.addStretch()
         buttonLayout.addWidget(self._timeStepIncreaseLabel)
         buttonLayout.addWidget(self._timeStepIncreaseLineEdit)
+        buttonLayout.addWidget(_qtw.QLabel("Speed [images/s]"))
+        buttonLayout.addWidget(self._speedSpinBox)
         buttonLayout.addWidget(self.showMassButton)  # comment out
         buttonLayout.addWidget(self.togglePauseButton)
         buttonLayout.addWidget(self.cancelButton)
         layout = _qtw.QGridLayout()
         layout.addWidget(nameLabel, 0, 0)
         layout.addWidget(self.le, 0, 1)
-        layout.addLayout(colorLayout, 1, 0, 1, 0)
-        layout.addLayout(buttonLayout, 2, 0, 2, 0)
-        layout.addWidget(self.currentStepLabel, 3, 0, 1, 2)
-        layout.addWidget(
-            self.slider, 4, 0, 1, 2
-        )  # Only for debug (Why do I need a 3 here instead of a 2 for int:row?)
+        layout.addLayout(colorLayout, 1, 0, 1, 2)
+        layout.addWidget(self._colorBar, 2, 0, 1, 2)
+        layout.addLayout(intervalLayout, 3, 0, 1, 2)
+        layout.addLayout(buttonLayout, 4, 0, 1, 2)
+        layout.addWidget(self.currentStepLabel, 5, 0, 1, 2)
+        layout.addWidget(self.slider, 6, 0, 1, 2)
 
         self.setLayout(layout)
 
@@ -187,11 +390,11 @@ class MassFlowVisualizer(_qtw.QDialog):
 
         for t in self.parent.editor.trnsysObj:
             if isinstance(t, _cb.ConnectionBase):
-                t.massFlowLabel.setVisible(self.showMass)
+                t.setMassFlowLabelVisible(self.showMass)
 
         self.logger.debug(
-            "%s %s %s"
-            % (str(self.minValue), str(self.medianValue), str(self.maxValue))
+            "temperature scale: %s ... %s"
+            % (str(self._minTemperature), str(self._maxTemperature))
         )
 
     def loadFile(self):
@@ -216,10 +419,10 @@ class MassFlowVisualizer(_qtw.QDialog):
         self.qtm = _qtc.QTimer(self.parent)
         self.qtm.timeout.connect(self.advance)
         self.qtm.timeout.connect(self.increaseValue)
-        self.qtm.start(1000)
+        self.qtm.start(self._getTimerIntervalInMs())
 
     def advance(self):
-        if self.timeStep == self.maxTimeStep:
+        if self.timeStep >= self._endRow:
             self.logger.debug("reached end of data, returning")
             self.qtm.stop()
 
@@ -249,36 +452,13 @@ class MassFlowVisualizer(_qtw.QDialog):
                 t.setMassFlowAndTemperature(massFlow, temperature)
                 thickValue = self.getThickness(massFlow)
                 self.logger.debug("Thickvalue: " + str(thickValue))
-                if massFlow == 0:
+                if massFlow == 0 or _pd.isna(temperature):
                     t.setColor(thickValue, mfr="ZeroMfr")
-                elif round(abs(temperature)) == self.maxValue:
-                    t.setColor(thickValue, mfr="max")
-                elif round(abs(temperature)) == self.minValue:
-                    t.setColor(thickValue, mfr="min")
-                elif (
-                    self.minValue
-                    < round(abs(temperature))
-                    <= self.lowerQuarter
-                ):
-                    t.setColor(thickValue, mfr="minTo25")
-                elif (
-                    self.lowerQuarter
-                    < round(abs(temperature))
-                    <= self.medianValue
-                ):
-                    t.setColor(thickValue, mfr="25To50")
-                elif (
-                    self.medianValue
-                    < round(abs(temperature))
-                    <= self.upperQuarter
-                ):
-                    t.setColor(thickValue, mfr="50To75")
-                elif (
-                    self.upperQuarter < round(abs(temperature)) < self.maxValue
-                ):
-                    t.setColor(thickValue, mfr="75ToMax")
                 else:
-                    t.setColor(thickValue, mfr="test")
+                    color = getTemperatureColor(
+                        temperature, self._minTemperature, self._maxTemperature
+                    )
+                    t.setColor(thickValue, color=color)
 
             if isinstance(t, _dpc.DoublePipeConnection):
                 coldMassFlowVariableName = (
@@ -372,7 +552,7 @@ class MassFlowVisualizer(_qtw.QDialog):
     def continueVis(self):
         if self.started:
             self.paused = False
-            self.qtm.start(1000)
+            self.qtm.start(self._getTimerIntervalInMs())
         else:
             self.start()
 
@@ -419,8 +599,8 @@ class MassFlowVisualizer(_qtw.QDialog):
         """
 
         self.timeStep += self._timeStepIncrease
-        if self.timeStep > self.maxTimeStep:
-            self.timeStep = 0
+        if self.timeStep > self._endRow:
+            self.timeStep = self._startRow
         self.slider.setValue(self.timeStep)
 
     def decreaseValue(self):
@@ -430,8 +610,8 @@ class MassFlowVisualizer(_qtw.QDialog):
         """
 
         self.timeStep -= self._timeStepIncrease
-        if self.timeStep < 0:
-            self.timeStep = self.maxTimeStep
+        if self.timeStep < self._startRow:
+            self.timeStep = self._endRow
         self.slider.setValue(self.timeStep)
 
     def checkTimeStep(self):
@@ -518,49 +698,137 @@ class MassFlowVisualizer(_qtw.QDialog):
         else:
             return 2
 
-    def getTempThresholdValues(self):
-        """
-        Access the data frame, convert into a nested list.
-        Merge the nested list into one single list.
-        Remove 'nan' from the list.
-        Convert the values inside the list into absolute values then round them off.
-        Split the list into two for negative and positive values.
-        Get the minimum value, the 25th percentile, the median value, the 75th percentile and
-        the max value from the lists.
-        Returns
-        -------
-        """
+    def _getFileTemperatureRange(self) -> _tp.Tuple[float, float]:
+        """Lowest and highest temperature in the temperature file (time column excluded)."""
+        temperatures = self.tempMassFlowData.iloc[:, 1:].apply(
+            _pd.to_numeric, errors="coerce"
+        )
+        values = temperatures.to_numpy(dtype=float).ravel()
+        values = values[~_np.isnan(values)]
+        if values.size == 0:
+            return 0.0, 100.0
+        minTemperature = float(_np.floor(values.min()))
+        maxTemperature = float(_np.ceil(values.max()))
+        if maxTemperature <= minTemperature:
+            maxTemperature = minTemperature + 1
+        return minTemperature, maxTemperature
 
-        data = (
-            self.tempMassFlowData.values.tolist()
-        )  # data frame converted to nested list
-        for sublist in data:  # delete the time column from the list
-            del sublist[0]
-        data = list(
-            _it.chain.from_iterable(data)
-        )  # nested list combined into one list
-        cleanedData = [
-            x for x in data if str(x) != "nan"
-        ]  # remove nan from list
-        cleanedData = [
-            round(abs(num)) for num in cleanedData
-        ]  # get absolute value and round off
-        noDuplicateData = list(dict.fromkeys(cleanedData))
+    @staticmethod
+    def _createTemperatureSpinBox(value: float) -> _qtw.QDoubleSpinBox:
+        spinBox = _qtw.QDoubleSpinBox()
+        spinBox.setDecimals(1)
+        spinBox.setRange(-100.0, 1000.0)
+        spinBox.setSingleStep(5.0)
+        spinBox.setValue(value)
+        return spinBox
 
-        self.medianValue = _np.percentile(
-            noDuplicateData, 50
-        )  # median value / 50th percentile
-        self.lowerQuarter = _np.percentile(
-            noDuplicateData, 25
-        )  # 25th percentile
-        self.upperQuarter = _np.percentile(
-            noDuplicateData, 75
-        )  # 75th percentile
-        self.minValue = _np.min(noDuplicateData)  # minimum value excluding 0
-        self.maxValue = _np.max(noDuplicateData)  # max value
+    def _onTemperatureRangeChanged(self) -> None:
+        self._minTemperature = self._minTemperatureSpinBox.value()
+        self._maxTemperature = self._maxTemperatureSpinBox.value()
+        self._colorBar.setRange(self._minTemperature, self._maxTemperature)
+        self.advance()
 
-        # print(noDuplicateData)
-        # sys.exit()
+    def _onUseFileRange(self) -> None:
+        for spinBox, value in (
+            (self._minTemperatureSpinBox, self._fileMinTemperature),
+            (self._maxTemperatureSpinBox, self._fileMaxTemperature),
+        ):
+            spinBox.blockSignals(True)
+            spinBox.setValue(value)
+            spinBox.blockSignals(False)
+        self._onTemperatureRangeChanged()
+
+    def _getTimerIntervalInMs(self) -> int:
+        return max(20, round(1000 / self._framesPerSecond))
+
+    def _onSpeedChanged(self, framesPerSecond: float) -> None:
+        self._framesPerSecond = framesPerSecond
+        if self.started and not self.paused:
+            self.qtm.setInterval(self._getTimerIntervalInMs())
+
+    # Simulation hours are counted from 1 January of the first simulated year (8760 h per year).
+    # They are shown as dates of a reference year without 29 February (2001, 2002, ...), so that
+    # hours beyond 8760 (second year, e.g. October to March) fall in January of the next year.
+    # UTC: no daylight-saving shifts (simulation time has none)
+    _REFERENCE_START = _qtc.QDateTime(
+        _qtc.QDate(2001, 1, 1), _qtc.QTime(0, 0), _qtc.Qt.UTC
+    )
+
+    @classmethod
+    def _hoursToDateTime(cls, hours: float) -> _qtc.QDateTime:
+        return cls._REFERENCE_START.addSecs(int(round(float(hours) * 3600)))
+
+    @classmethod
+    def _dateTimeToHours(cls, dateTime: _qtc.QDateTime) -> float:
+        return cls._REFERENCE_START.secsTo(dateTime) / 3600.0
+
+    def _createDateTimeEdit(self, hours: float) -> _qtw.QDateTimeEdit:
+        dateTimeEdit = _qtw.QDateTimeEdit()
+        dateTimeEdit.setTimeSpec(_qtc.Qt.UTC)
+        dateTimeEdit.setDisplayFormat("dd.MM. HH:mm")
+        dateTimeEdit.setCalendarPopup(False)  # the Qt calendar shows weekdays and a year
+        dateTimeEdit.setMinimumWidth(100)
+        dateTimeEdit.setDateTimeRange(
+            self._hoursToDateTime(self.getTime(0)),
+            self._hoursToDateTime(self.getTime(self.maxTimeStep)),
+        )
+        dateTimeEdit.setDateTime(self._hoursToDateTime(hours))
+        dateTimeEdit.setToolTip(
+            "Day, month and time of the simulation. Select the day, month or hour "
+            "with the cursor and use the arrows, or pick the day with the button next to it."
+        )
+        return dateTimeEdit
+
+    def _createPickerButton(self, dateTimeEdit: _qtw.QDateTimeEdit) -> _qtw.QToolButton:
+        button = _qtw.QToolButton()
+        button.setText("▾")
+        button.setToolTip("Pick day and month")
+
+        def openPicker():
+            picker = _DayMonthPicker(dateTimeEdit, self._onTimeIntervalChanged)
+            picker.move(dateTimeEdit.mapToGlobal(_qtc.QPoint(0, dateTimeEdit.height())))
+            picker.show()
+            self._picker = picker  # keep a reference while it is open
+
+        button.clicked.connect(openPicker)
+        return button
+
+    def _getRowOfTime(self, time: float) -> int:
+        timeColumn = self.massFlowData[self.massFlowData.columns[0]].to_numpy(
+            dtype=float
+        )
+        row = int(_np.searchsorted(timeColumn, time, side="left"))
+        return min(max(row, 0), self.maxTimeStep)
+
+    def _onTimeIntervalChanged(self) -> None:
+        fromTime = self._dateTimeToHours(self._fromDateTimeEdit.dateTime())
+        toTime = self._dateTimeToHours(self._toDateTimeEdit.dateTime())
+        if toTime < fromTime:
+            fromTime, toTime = toTime, fromTime
+        self._startRow = self._getRowOfTime(fromTime)
+        self._endRow = max(self._getRowOfTime(toTime), self._startRow)
+
+        self.slider.blockSignals(True)
+        self.slider.setRange(self._startRow, self._endRow)
+        self.slider.blockSignals(False)
+        if not self._startRow <= self.timeStep <= self._endRow:
+            self.timeStep = self._startRow
+        self.slider.setValue(self.timeStep)
+        self.currentStepLabel.setText(
+            "Time: " + str(self.convertTime(self.getTime(self.timeStep)))
+        )
+        self.advance()
+
+    @staticmethod
+    def _formatTime(hours) -> str:
+        """Hours of the simulation as day.month hour:minute (+ year if beyond the first one)."""
+        hours = float(hours)
+        year, hourOfYear = divmod(hours, 8760.0)
+        moment = _dt.datetime(2001, 1, 1) + _dt.timedelta(hours=hourOfYear)
+        text = moment.strftime("%d.%m. %H:%M")
+        if year >= 1:
+            text += f" (year {int(year) + 1})"
+        return text
 
     def getTime(self, row):
         """
@@ -573,16 +841,9 @@ class MassFlowVisualizer(_qtw.QDialog):
 
     def convertTime(self, time):
         """
-        Convert the time into YYYY--MM--DD HH:MM:SS format
+        Convert the time (hours of the simulation) into "dd.mm. HH:MM", like the interval fields
         """
-        noOfHours = 8760
-        decHour = float(time) / float(noOfHours)
-        base = _dt.datetime(_dt.MINYEAR, 1, 1)
-        result = base + _dt.timedelta(
-            seconds=(base.replace(year=base.year + 1) - base).total_seconds()
-            * decHour
-        )
-        return str(result)
+        return self._formatTime(time)
 
     def pressedSlider(self):
         self.pauseVis()

@@ -80,6 +80,8 @@ class View(_qtw.QGraphicsView):
 
         blockItem.setPos(scenePosition)
         self.scene().addItem(blockItem)
+        if self._editor.isFrozen:  # a component dropped into a frozen diagram stays where it was dropped
+            blockItem.setFlag(blockItem.ItemIsMovable, False)
 
         blockItem.oldPos = blockItem.scenePos()
 

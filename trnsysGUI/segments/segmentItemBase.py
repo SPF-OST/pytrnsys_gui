@@ -182,14 +182,26 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
 
         return selectPen
 
+    def _isDiagramFrozen(self) -> bool:
+        return bool(getattr(self.connection.parent, "isFrozen", False))
+
     @_tp.override
     def mousePressEvent(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:
+        if self._isDiagramFrozen():
+            # only select: no dragging and no new corners while the diagram is frozen
+            if event.button() == _qtc.Qt.LeftButton:
+                self.connection.selectConnection()
+            return
         self.connection.onMousePressed(self, event)
 
     @_tp.override
     def mouseMoveEvent(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:
+        if self._isDiagramFrozen():
+            return
         self.connection.onMouseMoved(event)
 
     @_tp.override
     def mouseReleaseEvent(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:
+        if self._isDiagramFrozen():
+            return
         self.connection.onMouseReleased(event)
