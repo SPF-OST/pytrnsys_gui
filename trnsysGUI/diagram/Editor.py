@@ -24,6 +24,7 @@ import trnsysGUI.hydraulicLoops.edit as _hledit
 import trnsysGUI.hydraulicLoops.migration as _hlmig
 import trnsysGUI.hydraulicLoops.model as _hlm
 import trnsysGUI.internalPiping as _ip
+import trnsysGUI.massFlowSolver.solver as _mfsol
 import trnsysGUI.names.create as _nc
 import trnsysGUI.names.manager as _nm
 import trnsysGUI.names.rename as _rename
@@ -137,6 +138,9 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
         self.graphicalObj = []
         self.fluids = _hlm.Fluids.createDefault()
         self.hydraulicLoops = _hlm.HydraulicLoops([])
+        # New projects use the Julia solver; projects saved without the key
+        # (see `_decodeDiagram`) fall back to Type 9352.
+        self.massFlowSolver = _mfsol.MassFlowSolver.JULIA
 
         self.copyGroupList = _qtw.QGraphicsItemGroup()
         self.selectionGroupList = _qtw.QGraphicsItemGroup()
@@ -455,7 +459,11 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
         return relevantPortItems
 
     def exportHydraulics(
-        self, exportTo=_tp.Literal["ddck", "mfs"], disableFileExistMsgb=False
+        self,
+        exportTo=_tp.Literal["ddck", "mfs"],
+        *,
+        massFlowSolver: _mfsol.MassFlowSolver,
+        disableFileExistMsgb=False,
     ):
         assert exportTo in ["ddck", "mfs"]
 
@@ -558,8 +566,13 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             fullExportText += energyBalanceEquations
 
         simulationUnit = 450
-        simulationType = 9352
+        simulationType = massFlowSolver.trnsysTypeNumber
         descConnLength = 15
+
+        self.logger.info(
+            f"Exporting the hydraulics with the mass flow solver "
+            f"'{massFlowSolver}' (Type {simulationType})."
+        )
 
         exporter = self._createExporter()
 
@@ -580,10 +593,11 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         )
 
         fullExportText += exporter.exportParametersFlowSolver(
-            simulationUnit, simulationType, descConnLength
+            simulationUnit, simulationType, descConnLength, massFlowSolver
         )
 
-        fullExportText += exporter.exportInputsFlowSolver()
+        fullExportText += exporter.exportInputsFlowSolver(massFlowSolver)
+        fullExportText += exporter.exportLabelsFlowSolver(massFlowSolver)
         fullExportText += exporter.exportOutputsFlowSolver(simulationUnit)
         fullExportText += exporter.exportFluids() + "\n"
         fullExportText += exporter.exportHydraulicLoops() + "\n"
@@ -829,6 +843,10 @@ Tcw=1
         with open(filename, "r") as jsonfile:
             blocklist = json.load(jsonfile, cls=Decoder, editor=self)
 
+        # Projects saved before the setting existed use Type 9352, so that
+        # their exports don't change until the project is switched.
+        self.massFlowSolver = self._decodeMassFlowSolver(blocklist, filename)
+
         blockFolderNames = []
 
         for j in blocklist["Blocks"]:
@@ -895,8 +913,25 @@ Tcw=1
                 self.logger.debug("tv has " + str(t.isTempering))
 
         self._decodeHydraulicLoops(blocklist)
-
         self._setHydraulicLoopsOnStorageTanks()
+
+    @staticmethod
+    def _decodeMassFlowSolver(
+        blocklist: _tp.Mapping[str, _tp.Any], filename: str
+    ) -> _mfsol.MassFlowSolver:
+        massFlowSolver = blocklist.get(
+            "massFlowSolver", _mfsol.MassFlowSolver.TYPE_9352
+        )
+        try:
+            return _mfsol.MassFlowSolver(massFlowSolver)
+        except ValueError as error:
+            validValues = ", ".join(
+                f"'{solver}'" for solver in _mfsol.MassFlowSolver
+            )
+            raise ValueError(
+                f"Unknown massFlowSolver value '{massFlowSolver}' in "
+                f"{filename}; valid values are {validValues}."
+            ) from error
 
     def _decodeHydraulicLoops(self, blocklist) -> None:
         singlePipeConnections = [

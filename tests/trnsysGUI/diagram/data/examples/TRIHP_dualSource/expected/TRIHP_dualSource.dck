@@ -1089,8 +1089,9 @@ THPCond1H=THPCond1
 THPCond2H=THPCond2
 CONSTANTS 1
 spTIni = 20
-UNIT 48 TYPE 9352 !Changed automatically
-PARAMETERS 356
+UNIT 48 TYPE 4750 !Changed automatically
+PARAMETERS 357
+264 ! number of outputs: 3*N
 mfrSolverAbsTol
 mfrSolverRelTol
 mfrTolSwitchThreshold
@@ -1099,7 +1100,7 @@ mfrTolSwitchThreshold
 69 41 0 8      !2 : PuSH
 71 72 40 3     !3 : DivSh
 38 0 0 7       !4 : tapWater
-63 0 0 6       !5 : supplyWater
+63 0 0 9       !5 : supplyWater
 76 80 79 3     !6 : DivHpEvap
 78 77 79 2     !7 : TeeHpEvap
 60 61 46 3     !8 : DivCondTOTesDhw
@@ -1184,7 +1185,7 @@ mfrTolSwitchThreshold
 54 31 0 0      !87 : PiHpCondOut
 29 54 0 0      !88 : PiHpCondIn
 INPUTS 88! for Type 9351
-0,0 MfrPuSH xFracDivSh MfrtapWater MfrsupplyWater xFracDivHpEvap 0,0 xFracDivCondTOTesDhw 0,0 0,0 
+0,0 MfrPuSH xFracDivSh MfrtapWater 0,0 xFracDivHpEvap 0,0 xFracDivCondTOTesDhw 0,0 0,0 
 xFracDivSHCool 0,0 0,0 0,0 MfrPuHpEvap MfrPuHpShCond 0,0 0,0 0,0 0,0 0,0 
 xFracDivDhw 0,0 xFracDivDhwOut xFracDivCool 0,0 MfrPuHpDhwCond 0,0 0,0 xFracDivTesDhwOut xFracDivHp 
 MfrPuDhw 0,0 0,0 MfrPuCirc 0,0 0,0 0,0 0,0 0,0 0,0 
@@ -1202,6 +1203,8 @@ MfrPuDhw 0,0 0,0 MfrPuCirc 0,0 0,0 0,0 0,0 0,0 0,0
 0 0 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 0 0 
+LABELS 1
+MassFlowSolver\MassFlowSolver.jl
 EQUATIONS 192	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
 MRadiatorSH_A=[48,1] !Changed automatically
 MRadiatorSH_B=[48,2] !Changed automatically

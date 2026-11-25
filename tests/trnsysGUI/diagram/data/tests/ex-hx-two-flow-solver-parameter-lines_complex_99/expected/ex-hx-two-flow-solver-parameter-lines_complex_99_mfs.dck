@@ -132,7 +132,7 @@ EQUATIONS 14
 MfrPuAux = 500.0
 xFracDivAux = 1.0
 MfrtapWater = -1000.0
-MfrsupplyWater = 1000.0
+MfrsupplyWater = 1000.0 ! only used by the Type 9352 mass flow solver; the Julia solver (Type 4750) determines this flow from the network
 MfrPuCirc = 500.0
 MfrPuAuxEvap = 500.0
 MfrPuSh1 = 500.0

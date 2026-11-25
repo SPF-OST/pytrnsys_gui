@@ -2,7 +2,6 @@ __all__ = [
     "NodeType",
     "PortItem",
     "OneNeighbourBase",
-    "TerminalWithPrescribedFlow",
     "TerminalWithFreeFlow",
     "TwoNeighboursBase",
     "Pipe",
@@ -17,16 +16,19 @@ import dataclasses as _dc
 import enum as _enum
 import typing as _tp
 
+from . import solver as _solver
+
 
 class NodeType(_enum.IntEnum):
     PIPE = 0
     PUMP = 8
     TEE_PIECE = 2
     DIVERTER = 3
-    TERMINAL_WITH_PRESCRIBED_FLOW = 4
     TERMINAL_WITH_FREE_FLOW = 5
     TERMINAL_WITH_PRESCRIBED_POS_FLOW = 6
     TERMINAL_WITH_PRESCRIBED_NEG_FLOW = 7
+    # The Julia solver's kind 9: a terminal with free flow into the network.
+    SUPPLY = 9
 
 
 @_dc.dataclass(eq=False)
@@ -85,10 +87,13 @@ class Node(_abc.ABC):
         raise NotImplementedError()
 
     @_abc.abstractmethod
-    def getNodeType(self) -> NodeType:
+    def getNodeType(self, massFlowSolver: _solver.MassFlowSolver) -> NodeType:
         raise NotImplementedError()
 
-    def hasInput(self) -> bool:
+    def hasInput(
+        self,
+        massFlowSolver: _solver.MassFlowSolver,  # pylint: disable=unused-argument
+    ) -> bool:
         return False
 
     def getInputVariablePrefix(self) -> str:
@@ -108,31 +113,45 @@ class OneNeighbourBase(Node, _abc.ABC):
         return [self.portItem]
 
 
-class TerminalWithPrescribedFlowBase(OneNeighbourBase, _abc.ABC):
-    def hasInput(self) -> bool:
+class Supply(OneNeighbourBase):
+    """A terminal through which water flows into the network.
+
+    Whether its flow is prescribed depends on the solver: Type 9352 needs
+    it prescribed (kind 6, with an input), the Julia solver determines it
+    from the network (kind 9, without input). `NodeType` holds the solvers'
+    deck codes, so a `Supply` is `TERMINAL_WITH_PRESCRIBED_POS_FLOW` with
+    Type 9352.
+    """
+
+    def getNodeType(self, massFlowSolver: _solver.MassFlowSolver) -> NodeType:
+        match massFlowSolver:
+            case _solver.MassFlowSolver.JULIA:
+                return NodeType.SUPPLY
+            case _solver.MassFlowSolver.TYPE_9352:
+                return NodeType.TERMINAL_WITH_PRESCRIBED_POS_FLOW
+            case _:
+                _tp.assert_never(massFlowSolver)
+
+    def hasInput(self, massFlowSolver: _solver.MassFlowSolver) -> bool:
+        return massFlowSolver == _solver.MassFlowSolver.TYPE_9352
+
+    def getInputVariablePrefix(self) -> str:
+        return "Mfr"
+
+
+class TerminalWithPrescribedNegFlow(OneNeighbourBase):
+    def getNodeType(self, massFlowSolver: _solver.MassFlowSolver) -> NodeType:
+        return NodeType.TERMINAL_WITH_PRESCRIBED_NEG_FLOW
+
+    def hasInput(self, massFlowSolver: _solver.MassFlowSolver) -> bool:
         return True
 
     def getInputVariablePrefix(self) -> str:
         return "Mfr"
 
 
-class TerminalWithPrescribedFlow(TerminalWithPrescribedFlowBase):
-    def getNodeType(self) -> NodeType:
-        return NodeType.TERMINAL_WITH_PRESCRIBED_FLOW
-
-
-class TerminalWithPrescribedPosFlow(TerminalWithPrescribedFlowBase):
-    def getNodeType(self) -> NodeType:
-        return NodeType.TERMINAL_WITH_PRESCRIBED_POS_FLOW
-
-
-class TerminalWithPrescribedNegFlow(TerminalWithPrescribedFlowBase):
-    def getNodeType(self) -> NodeType:
-        return NodeType.TERMINAL_WITH_PRESCRIBED_NEG_FLOW
-
-
 class TerminalWithFreeFlow(OneNeighbourBase):
-    def getNodeType(self) -> NodeType:
+    def getNodeType(self, massFlowSolver: _solver.MassFlowSolver) -> NodeType:
         return NodeType.TERMINAL_WITH_FREE_FLOW
 
 
@@ -152,15 +171,15 @@ class TwoNeighboursBase(Node, _abc.ABC):
 
 
 class Pipe(TwoNeighboursBase):
-    def getNodeType(self) -> NodeType:
+    def getNodeType(self, massFlowSolver: _solver.MassFlowSolver) -> NodeType:
         return NodeType.PIPE
 
 
 class Pump(TwoNeighboursBase):
-    def getNodeType(self) -> NodeType:
+    def getNodeType(self, massFlowSolver: _solver.MassFlowSolver) -> NodeType:
         return NodeType.PUMP
 
-    def hasInput(self) -> bool:
+    def hasInput(self, massFlowSolver: _solver.MassFlowSolver) -> bool:
         return True
 
     def getInputVariablePrefix(self) -> str:
@@ -185,10 +204,10 @@ class ThreeNeighboursBase(Node, _abc.ABC):
 
 
 class Diverter(ThreeNeighboursBase):
-    def getNodeType(self) -> NodeType:
+    def getNodeType(self, massFlowSolver: _solver.MassFlowSolver) -> NodeType:
         return NodeType.DIVERTER
 
-    def hasInput(self) -> bool:
+    def hasInput(self, massFlowSolver: _solver.MassFlowSolver) -> bool:
         return True
 
     def getInputVariablePrefix(self) -> str:
@@ -196,5 +215,5 @@ class Diverter(ThreeNeighboursBase):
 
 
 class TeePiece(ThreeNeighboursBase):
-    def getNodeType(self) -> NodeType:
+    def getNodeType(self, massFlowSolver: _solver.MassFlowSolver) -> NodeType:
         return NodeType.TEE_PIECE

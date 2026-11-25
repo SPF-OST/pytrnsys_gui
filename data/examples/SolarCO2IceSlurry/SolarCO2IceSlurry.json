@@ -2868,5 +2868,6 @@
             "name": "loop7",
             "useLoopWideDefaults": false
         }
-    ]
+    ],
+    "massFlowSolver": "julia"
 }

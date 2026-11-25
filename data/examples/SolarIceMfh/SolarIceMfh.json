@@ -3129,5 +3129,6 @@
             "name": "loopDHWTes",
             "useLoopWideDefaults": true
         }
-    ]
+    ],
+    "massFlowSolver": "julia"
 }

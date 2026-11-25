@@ -118,7 +118,7 @@ TCollectorH=1
 
 EQUATIONS 4
 *** Massflowrates
-MfrWTap_main = 1000.0
+MfrWTap_main = 1000.0 ! only used by the Type 9352 mass flow solver; the Julia solver (Type 4750) determines this flow from the network
 MfrPuCol = 1000.0
 MfrWTap = -300.0
 MfrWTap2 = -700.0

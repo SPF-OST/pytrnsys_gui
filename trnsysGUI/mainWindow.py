@@ -16,6 +16,7 @@ from PyQt5.QtWidgets import QAction
 import trnsysGUI.configFileUpdater as _cfu
 import trnsysGUI.diagram.export as _dexp
 import trnsysGUI.loggingCallback as _lgcb
+import trnsysGUI.massFlowSolver.solver as _mfsol
 import trnsysGUI.menus.projectMenu.exportPlaceholders as _eph
 from trnsysGUI import buildDck as buildDck
 from trnsysGUI import constants
@@ -242,6 +243,13 @@ class MainWindow(_qtw.QMainWindow):
         processSimulationActionMenu.triggered.connect(self.processSimulation)
 
         self.projectMenu = _qtw.QMenu("Project")
+
+        massFlowSolverMenu, self._massFlowSolverActions = (
+            self._createMassFlowSolverMenuAndActions()
+        )
+        self.projectMenu.addMenu(massFlowSolverMenu)
+        self.projectMenu.addSeparator()
+
         self.projectMenu.addAction(runMassflowSolverActionMenu)
         self.projectMenu.addAction(openVisualizerActionMenu)
         self.projectMenu.addAction(exportHydraulicsActionMenu)
@@ -577,6 +585,8 @@ class MainWindow(_qtw.QMainWindow):
         self.editor = self._createDiagramEditor(project)
         self.setCentralWidget(self.editor)
 
+        self._updateMassFlowSolverMenuActions()
+
         if wasRunning:
             self.editor.start()
 
@@ -585,7 +595,83 @@ class MainWindow(_qtw.QMainWindow):
         self.editor.setConnLabelVis(self.labelVisState)
 
     def exportHydraulicsDdck(self):
-        self.editor.exportHydraulics(exportTo="ddck")
+        self.editor.exportHydraulics(
+            exportTo="ddck", massFlowSolver=self.editor.massFlowSolver
+        )
+
+    def _createMassFlowSolverMenuAndActions(
+        self,
+    ) -> tuple[_qtw.QMenu, dict[_mfsol.MassFlowSolver, _qtw.QAction]]:
+        massFlowSolverMenu = _qtw.QMenu("Mass flow solver", self)
+        actionGroup = _qtw.QActionGroup(self)
+        actionGroup.setExclusive(True)
+
+        juliaAction = self._addMassFlowSolverAction(
+            massFlowSolverMenu,
+            actionGroup,
+            _mfsol.MassFlowSolver.JULIA,
+            "Julia (Type 4750)",
+        )
+        type9352Action = self._addMassFlowSolverAction(
+            massFlowSolverMenu,
+            actionGroup,
+            _mfsol.MassFlowSolver.TYPE_9352,
+            "Type 9352",
+        )
+
+        actions = {
+            _mfsol.MassFlowSolver.JULIA: juliaAction,
+            _mfsol.MassFlowSolver.TYPE_9352: type9352Action,
+        }
+
+        return massFlowSolverMenu, actions
+
+    def _addMassFlowSolverAction(
+        self,
+        menu: _qtw.QMenu,
+        actionGroup: _qtw.QActionGroup,
+        massFlowSolver: _mfsol.MassFlowSolver,
+        text: str,
+    ) -> _qtw.QAction:
+        action = _qtw.QAction(text, self)
+        action.setCheckable(True)
+        action.triggered.connect(
+            lambda: self._setMassFlowSolver(massFlowSolver)
+        )
+        actionGroup.addAction(action)
+        menu.addAction(action)
+        return action
+
+    def _setMassFlowSolver(
+        self, massFlowSolver: _mfsol.MassFlowSolver
+    ) -> None:
+        if self.editor.massFlowSolver == massFlowSolver:
+            return
+
+        self.editor.massFlowSolver = massFlowSolver
+        self.logger.info(f"Mass flow solver set to '{massFlowSolver}'.")
+        self._updateMassFlowSolverMenuActions()
+
+        self._showReexportMessageIfHydraulicDdckExists()
+
+    def _showReexportMessageIfHydraulicDdckExists(self) -> None:
+        hydraulicDdckPath = (
+            self._projectDirPath / "ddck" / "hydraulic" / "hydraulic.ddck"
+        )
+        if not hydraulicDdckPath.is_file():
+            return
+
+        _qtw.QMessageBox.information(
+            self,
+            "Export hydraulic.ddck again",
+            "The mass flow solver was changed. The existing "
+            "ddck/hydraulic/hydraulic.ddck has to be exported again to "
+            "use the new solver (Project > Export hydraulic.ddck).",
+        )
+
+    def _updateMassFlowSolverMenuActions(self) -> None:
+        for solver, action in self._massFlowSolverActions.items():
+            action.setChecked(self.editor.massFlowSolver == solver)
 
     def exportHydraulicControl(self):
         self.editor.exportHydraulicControl()
@@ -622,7 +708,9 @@ class MainWindow(_qtw.QMainWindow):
     def runMassflowSolver(self):
         self.logger.info("Running massflow solver...")
 
-        exportPath = self.editor.exportHydraulics(exportTo="mfs")
+        exportPath = self.editor.exportHydraulics(
+            exportTo="mfs", massFlowSolver=self.editor.massFlowSolver
+        )
         if not exportPath:
             return None
 

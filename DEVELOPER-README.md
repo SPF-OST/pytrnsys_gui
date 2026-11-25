@@ -126,6 +126,17 @@ The unit tests leave untracked output files under `tests\**\data\`. To list them
 Remove them before rerunning the tests: some tests fail if they're still there (e.g.
 `testHydraulicModesGui.py::testRunModesInvalidDckUnmodifiedDlls`).
 
+Run the tests in a checkout named `pytrnsys_gui` at a short path: the `testConfigFileUpdater` tests compare
+paths that contain the checkout's name, and TRNSYS isn't long-path aware. In a checkout about 115 characters
+deep, `testMassFlowSolver` crashed TRNSYS for the projects with long names
+(`ex-hx-two-flow-solver-parameter-lines_*_99`).
+
+The tests run TRNSYS from `C:\TRNSYS18\Exe\TrnEXE.exe`, and it must be a TRNSYS kernel compiled with a higher
+limit on the number of CONSTANTs and EQUATIONs: the pytrnsys developers provide it, get in touch at
+spf-info@ost.ch. With the stock kernel, `testMassFlowSolver` fails for
+`ex-hx-two-flow-solver-parameter-lines_complex_99`, because TRNSYS stops with error 22 ("The array which holds
+the EQUATIONs and CONSTANTs has been corruped").
+
 ## SonarCloud
 
 SonarCloud analyses every PR and every push to `master`, and its quality gate shows up as a GitHub check.

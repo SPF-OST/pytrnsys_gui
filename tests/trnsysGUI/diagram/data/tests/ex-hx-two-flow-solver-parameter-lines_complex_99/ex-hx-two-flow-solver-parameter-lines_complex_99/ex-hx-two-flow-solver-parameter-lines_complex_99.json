@@ -2666,5 +2666,6 @@
             "hasUserDefinedName": false,
             "name": "loop4"
         }
-    ]
+    ],
+    "massFlowSolver": "julia"
 }

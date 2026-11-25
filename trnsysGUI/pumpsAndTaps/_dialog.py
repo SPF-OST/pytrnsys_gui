@@ -26,10 +26,16 @@ class Model:
 
 class Dialog(_qtw.QDialog, _gen.Ui_dialog):
     def __init__(
-        self, model: Model, renameHelper: _rename.RenameHelper
+        self,
+        model: Model,
+        renameHelper: _rename.RenameHelper,
+        massFlowToolTip: str | None = None,
     ) -> None:
         super().__init__()
         self.setupUi(self)
+
+        if massFlowToolTip is not None:
+            self.massFlowLineEdit.setToolTip(massFlowToolTip)
 
         self._model = _dc.replace(model)
         self._renameHelper = renameHelper
@@ -39,9 +45,11 @@ class Dialog(_qtw.QDialog, _gen.Ui_dialog):
 
     @staticmethod
     def showDialogAndGetResult(
-        model: Model, renameHelper: _rename.RenameHelper
+        model: Model,
+        renameHelper: _rename.RenameHelper,
+        massFlowToolTip: str | None = None,
     ) -> _cancel.MaybeCancelled[Model]:
-        dialog = Dialog(model, renameHelper)
+        dialog = Dialog(model, renameHelper, massFlowToolTip)
 
         returnCode = dialog.exec()
         if returnCode == _qtw.QDialog.Rejected:

@@ -132,7 +132,7 @@ EQUATIONS 17
 MfrPuSH = 500.0
 xFracDivSh = 0.0
 MfrtapWater = -1000.0
-MfrsupplyWater = 1000.0
+MfrsupplyWater = 1000.0 ! only used by the Type 9352 mass flow solver; the Julia solver (Type 4750) determines this flow from the network
 xFracDivHpEvap = 0.0
 xFracDivCondTOTesDhw = 1.0
 xFracDivSHCool = 0.0

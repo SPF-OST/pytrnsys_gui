@@ -2266,5 +2266,6 @@
             "name": "loop12",
             "useLoopWideDefaults": false
         }
-    ]
+    ],
+    "massFlowSolver": "julia"
 }

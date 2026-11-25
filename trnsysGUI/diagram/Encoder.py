@@ -47,4 +47,6 @@ class Encoder(json.JSONEncoder):
 
         res["hydraulicLoops"] = obj.hydraulicLoops.toJson()
 
+        res["massFlowSolver"] = obj.massFlowSolver
+
         return res

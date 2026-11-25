@@ -670,5 +670,6 @@
             "name": "loop4",
             "useLoopWideDefaults": true
         }
-    ]
+    ],
+    "massFlowSolver": "julia"
 }
