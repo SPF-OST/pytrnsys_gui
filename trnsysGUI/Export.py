@@ -722,7 +722,8 @@ INPUTS {len(allVariableNames)}
             valueOrVariable: float | _hlm.Variable, factor: float = 1
         ) -> float | str:
             if isinstance(valueOrVariable, float):
-                return valueOrVariable * factor
+                # rounded: 3816 J/(kg K) * 1e-3 gives 3.816, not 3.8160000000000003
+                return round(valueOrVariable * factor, 10)
 
             if isinstance(valueOrVariable, _hlm.Variable):
                 if factor == 1:
