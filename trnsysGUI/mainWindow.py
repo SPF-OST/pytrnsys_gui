@@ -244,23 +244,9 @@ class MainWindow(_qtw.QMainWindow):
 
         self.projectMenu = _qtw.QMenu("Project")
 
-        massFlowSolverMenu = _qtw.QMenu("Mass flow solver", self)
-        massFlowSolverActionGroup = _qtw.QActionGroup(self)
-        massFlowSolverActionGroup.setExclusive(True)
-        self._massFlowSolverActions: dict[_mfsol.MassFlowSolver, QAction] = {}
-        solverTexts = (
-            (_mfsol.JULIA, "Julia (Type 4750)"),
-            (_mfsol.TYPE_9352, "Type 9352"),
+        massFlowSolverMenu, self._massFlowSolverActions = (
+            self._createMassFlowSolverMenuAndActions()
         )
-        for solver, text in solverTexts:
-            action = _qtw.QAction(text, self)
-            action.setCheckable(True)
-            action.triggered.connect(
-                lambda _checked=False, s=solver: self._setMassFlowSolver(s)
-            )
-            massFlowSolverActionGroup.addAction(action)
-            massFlowSolverMenu.addAction(action)
-            self._massFlowSolverActions[solver] = action
         self.projectMenu.addMenu(massFlowSolverMenu)
         self.projectMenu.addSeparator()
 
@@ -613,6 +599,49 @@ class MainWindow(_qtw.QMainWindow):
             exportTo="ddck", massFlowSolver=self.editor.massFlowSolver
         )
 
+    def _createMassFlowSolverMenuAndActions(
+        self,
+    ) -> tuple[_qtw.QMenu, dict[_mfsol.MassFlowSolver, _qtw.QAction]]:
+        massFlowSolverMenu = _qtw.QMenu("Mass flow solver", self)
+        actionGroup = _qtw.QActionGroup(self)
+        actionGroup.setExclusive(True)
+
+        juliaAction = self._addMassFlowSolverAction(
+            massFlowSolverMenu,
+            actionGroup,
+            _mfsol.MassFlowSolver.JULIA,
+            "Julia (Type 4750)",
+        )
+        type9352Action = self._addMassFlowSolverAction(
+            massFlowSolverMenu,
+            actionGroup,
+            _mfsol.MassFlowSolver.TYPE_9352,
+            "Type 9352",
+        )
+
+        actions = {
+            _mfsol.MassFlowSolver.JULIA: juliaAction,
+            _mfsol.MassFlowSolver.TYPE_9352: type9352Action,
+        }
+
+        return massFlowSolverMenu, actions
+
+    def _addMassFlowSolverAction(
+        self,
+        menu: _qtw.QMenu,
+        actionGroup: _qtw.QActionGroup,
+        massFlowSolver: _mfsol.MassFlowSolver,
+        text: str,
+    ) -> _qtw.QAction:
+        action = _qtw.QAction(text, self)
+        action.setCheckable(True)
+        action.triggered.connect(
+            lambda: self._setMassFlowSolver(massFlowSolver)
+        )
+        actionGroup.addAction(action)
+        menu.addAction(action)
+        return action
+
     def _setMassFlowSolver(
         self, massFlowSolver: _mfsol.MassFlowSolver
     ) -> None:
@@ -623,17 +652,22 @@ class MainWindow(_qtw.QMainWindow):
         self.logger.info(f"Mass flow solver set to '{massFlowSolver}'.")
         self._updateMassFlowSolverMenuActions()
 
+        self._showReexportMessageIfHydraulicDdckExists()
+
+    def _showReexportMessageIfHydraulicDdckExists(self) -> None:
         hydraulicDdckPath = (
             self._projectDirPath / "ddck" / "hydraulic" / "hydraulic.ddck"
         )
-        if hydraulicDdckPath.is_file():
-            _qtw.QMessageBox.information(
-                self,
-                "Export hydraulic.ddck again",
-                "The mass flow solver was changed. The existing "
-                "ddck/hydraulic/hydraulic.ddck has to be exported again to "
-                "use the new solver (Project > Export hydraulic.ddck).",
-            )
+        if not hydraulicDdckPath.is_file():
+            return
+
+        _qtw.QMessageBox.information(
+            self,
+            "Export hydraulic.ddck again",
+            "The mass flow solver was changed. The existing "
+            "ddck/hydraulic/hydraulic.ddck has to be exported again to "
+            "use the new solver (Project > Export hydraulic.ddck).",
+        )
 
     def _updateMassFlowSolverMenuActions(self) -> None:
         for solver, action in self._massFlowSolverActions.items():

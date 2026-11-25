@@ -6,6 +6,12 @@ For setup, checks and tests, see `DEVELOPER-README.md`; for how the code is orga
 
 1. When a change makes `ARCHITECTURE.md` or `DEVELOPER-README.md` wrong or outdated, update it in the same commit.
 
+## Code style
+
+1. Import modules, not names, with `import a.b.c as _c`, or relatively with `from . import c as _c` within the same
+   package; not with `from a.b import c`. This applies to third-party packages too (e.g.
+   `import PyQt5.QtWidgets as _qtw`). Many older modules still import otherwise: don't copy it.
+
 ## Pitfalls
 
 1. Don't import a test class (e.g. `TestEditor` from `tests/trnsysGUI/diagram/testEditor.py`) into another test

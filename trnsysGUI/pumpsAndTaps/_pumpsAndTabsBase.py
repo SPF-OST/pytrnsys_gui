@@ -11,10 +11,21 @@ import trnsysGUI.components.ddckFolderHelpers as _dfh
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.names as _mnames
+import trnsysGUI.massFlowSolver.solver as _mfsol
 import trnsysGUI.names.rename as _rename
 import trnsysGUI.pumpsAndTaps.defaults as _defaults
 from . import _dialog
 from . import serialization as _ser
+
+_TYPE_9352_ONLY_MASS_FLOW_COMMENT = (
+    " ! only used by the Type 9352 mass flow solver; the Julia"
+    " solver (Type 4750) determines this flow from the network"
+)
+
+_TYPE_9352_ONLY_MASS_FLOW_TOOL_TIP = (
+    "Only used by the Type 9352 mass flow solver. With the Julia"
+    " solver (Type 4750), this flow follows from the network."
+)
 
 
 class PumpsAndTabsBase(
@@ -52,26 +63,25 @@ class PumpsAndTabsBase(
     def _getCanonicalMassFlowRate(self) -> float:
         raise NotImplementedError()
 
-    def exportMassFlows(
-        self, forHydraulicControlDdck: bool = False
-    ) -> _tp.Tuple[str, int]:
+    def exportMassFlows(self) -> _tp.Tuple[str, int]:
         internalPiping = self.getInternalPiping()
         node = _com.getSingle(internalPiping.nodes)
         inputVariableName = _mnames.getInputVariableName(self, node)
         canonicalMassFlowRate = self._getCanonicalMassFlowRate()
-        comment = self._getExportMassFlowsComment(forHydraulicControlDdck)
+        comment = (
+            _TYPE_9352_ONLY_MASS_FLOW_COMMENT
+            if self._isMassFlowUsedOnlyByType9352()
+            else ""
+        )
         result = f"{inputVariableName} = {canonicalMassFlowRate}{comment}\n"
         equationNr = 1
         return result, equationNr
 
-    def _getExportMassFlowsComment(
-        self,
-        forHydraulicControlDdck: bool,  # pylint: disable=unused-argument
-    ) -> str:
-        return ""
-
-    def _getMassFlowToolTip(self) -> _tp.Optional[str]:
-        return None
+    def _isMassFlowUsedOnlyByType9352(self) -> bool:
+        node = _com.getSingle(self.getInternalPiping().nodes)
+        return node.hasInput(
+            _mfsol.MassFlowSolver.TYPE_9352
+        ) and not node.hasInput(_mfsol.MassFlowSolver.JULIA)
 
     def _createBlockItemWithPrescribedMassFlowForEncode(
         self,
@@ -111,7 +121,11 @@ class PumpsAndTabsBase(
         maybeCancelled = _dialog.Dialog.showDialogAndGetResult(
             dialogModel,
             self._renameHelper,
-            massFlowToolTip=self._getMassFlowToolTip(),
+            massFlowToolTip=(
+                _TYPE_9352_ONLY_MASS_FLOW_TOOL_TIP
+                if self._isMassFlowUsedOnlyByType9352()
+                else None
+            ),
         )
         if _cancel.isCancelled(maybeCancelled):
             return

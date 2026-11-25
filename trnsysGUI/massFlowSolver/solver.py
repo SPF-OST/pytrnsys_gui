@@ -1,25 +1,27 @@
+import enum as _enum
 import typing as _tp
 
-MassFlowSolver = _tp.Literal["julia", "type9352"]
 
-JULIA: MassFlowSolver = "julia"
-TYPE_9352: MassFlowSolver = "type9352"
+class MassFlowSolver(_enum.StrEnum):
+    """The value of the `massFlowSolver` project setting.
 
-TRNSYS_TYPE_NUMBERS: _tp.Mapping[MassFlowSolver, int] = {
-    JULIA: 4750,
-    TYPE_9352: 9352,
-}
+    A `StrEnum`, so that the project file stores the member's value.
+    """
 
-# The valid values of the `massFlowSolver` project setting: the keys of
-# TRNSYS_TYPE_NUMBERS, so that a future solver is added in one place.
-VALID_MASS_FLOW_SOLVERS: _tp.Tuple[MassFlowSolver, ...] = _tp.cast(
-    _tp.Tuple[MassFlowSolver, ...], tuple(TRNSYS_TYPE_NUMBERS)
-)
+    JULIA = "julia"
+    TYPE_9352 = "type9352"
+
+    @property
+    def trnsysTypeNumber(self) -> int:
+        match self:
+            case MassFlowSolver.JULIA:
+                return 4750
+            case MassFlowSolver.TYPE_9352:
+                return 9352
+            case _:
+                _tp.assert_never(self)
+
 
 # Label 1 of the Type 4750 unit: relative to the TRNSYS installation's
 # `UserLib\ReleaseDLLs`, so that the deck works wherever TRNSYS is installed.
 JULIA_SCRIPT_LABEL = "MassFlowSolver\\MassFlowSolver.jl"
-
-
-def getTrnsysTypeNumber(massFlowSolver: MassFlowSolver) -> int:
-    return TRNSYS_TYPE_NUMBERS[massFlowSolver]

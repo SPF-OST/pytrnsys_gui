@@ -140,7 +140,7 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
         self.hydraulicLoops = _hlm.HydraulicLoops([])
         # New projects use the Julia solver; projects saved without the key
         # (see `_decodeDiagram`) fall back to Type 9352.
-        self.massFlowSolver: _mfsol.MassFlowSolver = _mfsol.JULIA
+        self.massFlowSolver = _mfsol.MassFlowSolver.JULIA
 
         self.copyGroupList = _qtw.QGraphicsItemGroup()
         self.selectionGroupList = _qtw.QGraphicsItemGroup()
@@ -566,7 +566,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             fullExportText += energyBalanceEquations
 
         simulationUnit = 450
-        simulationType = _mfsol.getTrnsysTypeNumber(massFlowSolver)
+        simulationType = massFlowSolver.trnsysTypeNumber
         descConnLength = 15
 
         self.logger.info(
@@ -749,9 +749,7 @@ Tcw=1
 
         exporter = self._createExporter()
 
-        fullExportText += exporter.exportMassFlows(
-            forHydraulicControlDdck=True
-        )
+        fullExportText += exporter.exportMassFlows()
         fullExportText += exporter.exportDivSetting(simulationUnit - 10)
 
         self.logger.info(
@@ -845,6 +843,10 @@ Tcw=1
         with open(filename, "r") as jsonfile:
             blocklist = json.load(jsonfile, cls=Decoder, editor=self)
 
+        # Projects saved before the setting existed use Type 9352, so that
+        # their exports don't change until the project is switched.
+        self.massFlowSolver = self._decodeMassFlowSolver(blocklist, filename)
+
         blockFolderNames = []
 
         for j in blocklist["Blocks"]:
@@ -911,26 +913,25 @@ Tcw=1
                 self.logger.debug("tv has " + str(t.isTempering))
 
         self._decodeHydraulicLoops(blocklist)
-
-        # Projects saved before the setting existed use Type 9352, so that
-        # their exports don't change until the project is switched.
-        self.massFlowSolver = self._decodeMassFlowSolver(blocklist, filename)
-
         self._setHydraulicLoopsOnStorageTanks()
 
+    @staticmethod
     def _decodeMassFlowSolver(
-        self, blocklist, filename
+        blocklist: _tp.Mapping[str, _tp.Any], filename: str
     ) -> _mfsol.MassFlowSolver:
-        massFlowSolver = blocklist.get("massFlowSolver", _mfsol.TYPE_9352)
-        if massFlowSolver not in _mfsol.VALID_MASS_FLOW_SOLVERS:
+        massFlowSolver = blocklist.get(
+            "massFlowSolver", _mfsol.MassFlowSolver.TYPE_9352
+        )
+        try:
+            return _mfsol.MassFlowSolver(massFlowSolver)
+        except ValueError as error:
             validValues = ", ".join(
-                f"'{solver}'" for solver in _mfsol.VALID_MASS_FLOW_SOLVERS
+                f"'{solver}'" for solver in _mfsol.MassFlowSolver
             )
             raise ValueError(
                 f"Unknown massFlowSolver value '{massFlowSolver}' in "
                 f"{filename}; valid values are {validValues}."
-            )
-        return _tp.cast(_mfsol.MassFlowSolver, massFlowSolver)
+            ) from error
 
     def _decodeHydraulicLoops(self, blocklist) -> None:
         singlePipeConnections = [

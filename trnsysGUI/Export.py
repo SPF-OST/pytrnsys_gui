@@ -22,7 +22,6 @@ import trnsysGUI.massFlowSolver.globalNetwork as _gn
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.massFlowSolver.solver as _mfsol
-import trnsysGUI.pumpsAndTaps._pumpsAndTabsBase as _ptb
 import trnsysGUI.temperatures as _temps
 import trnsysGUI.temperatures.hydraulic as _thyd
 
@@ -175,19 +174,12 @@ ddTcwOffset = 36 ! Days of minimum surface temperature
         else:
             raise ValueError("Unknown value for `exportTo`", exportTo)
 
-    def exportMassFlows(
-        self, forHydraulicControlDdck=False
-    ):  # What the controller should give
+    def exportMassFlows(self):  # What the controller should give
         f = "*** Massflowrates" + "\n"
         equationNr = 0
 
         for t in self._hasInternalPipings:
-            if forHydraulicControlDdck and isinstance(
-                t, _ptb.PumpsAndTabsBase
-            ):
-                res = t.exportMassFlows(forHydraulicControlDdck=True)
-            else:
-                res = t.exportMassFlows()
+            res = t.exportMassFlows()
             f += res[0]
             equationNr += res[1]
 
@@ -262,19 +254,14 @@ ddTcwOffset = 36 ! Days of minimum surface temperature
 
         nToleranceParameters = 3
 
-        numberOfOutputsLine = ""
-        nNumberOfOutputsParameters = 0
-        if massFlowSolver == _mfsol.JULIA:
-            # Type 4750 takes the deck's parameter 1 as the number of outputs.
-            nNumberOfOutputsParameters = 1
-            nOutputs = (
-                len(serializedNodes) * _mfn.MAX_N_OUTPUT_VARIABLES_PER_NODE
-            )
-            numberOfOutputsLine = f"{nOutputs} ! number of outputs: 3*N\n"
+        numberOfOutputsLine = self._getNumberOfOutputsParameterLine(
+            len(serializedNodes), massFlowSolver
+        )
+        nOutputCountParameters = 1 if numberOfOutputsLine else 0
 
         resultText = f"""\
 UNIT {simulationUnit} TYPE {simulationType}
-PARAMETERS {nToleranceParameters + 1 + nNumberOfOutputsParameters + len(serializedNodes) * 4}
+PARAMETERS {nToleranceParameters + 1 + nOutputCountParameters + len(serializedNodes) * 4}
 {numberOfOutputsLine}{_gnames.MassFlowSolver.ABSOLUTE_TOLERANCE}
 {_gnames.MassFlowSolver.RELATIVE_TOLERANCE}
 {_gnames.MassFlowSolver.SWITCHING_THRESHOLD}
@@ -283,6 +270,17 @@ PARAMETERS {nToleranceParameters + 1 + nNumberOfOutputsParameters + len(serializ
 """
 
         return resultText
+
+    @staticmethod
+    def _getNumberOfOutputsParameterLine(
+        nNodes: int, massFlowSolver: _mfsol.MassFlowSolver
+    ) -> str:
+        if massFlowSolver != _mfsol.MassFlowSolver.JULIA:
+            return ""
+
+        # Type 4750 takes the deck's parameter 1 as the number of outputs.
+        nOutputs = nNodes * _mfn.MAX_N_OUTPUT_VARIABLES_PER_NODE
+        return f"{nOutputs} ! number of outputs: 3*N\n"
 
     @classmethod
     def _getSerializedNodes(
@@ -317,7 +315,7 @@ PARAMETERS {nToleranceParameters + 1 + nNumberOfOutputsParameters + len(serializ
             serializedNode = _SerializedNode(
                 fullName,
                 index,
-                node.getNodeTypeForSolver(massFlowSolver),
+                node.getNodeType(massFlowSolver),
                 neighborsAndUnusedIndexes,
             )
 
@@ -403,7 +401,7 @@ PARAMETERS {nToleranceParameters + 1 + nNumberOfOutputsParameters + len(serializ
     def exportLabelsFlowSolver(
         self, massFlowSolver: _mfsol.MassFlowSolver
     ) -> str:
-        if massFlowSolver != _mfsol.JULIA:
+        if massFlowSolver != _mfsol.MassFlowSolver.JULIA:
             return ""
 
         return f"LABELS 1\n{_mfsol.JULIA_SCRIPT_LABEL}\n\n"

@@ -15,7 +15,7 @@ def exportInputsFlowSolver(
 
     line = ""
     for node in nodes:
-        if not node.hasInputForSolver(massFlowSolver):
+        if not node.hasInput(massFlowSolver):
             line += f"{_mfn.InputVariable.UNDEFINED_INPUT_VARIABLE_VALUE} "
         else:
             inputVariableName = _mnames.getInputVariableName(
