@@ -362,13 +362,16 @@ class TestEditor:
         return mainWindow
 
     @staticmethod
-    def _removeMassFlowSolverKeyFromProjectJson(
-        projectJsonFilePath: _pl.Path,
+    def _setMassFlowSolverKeyInProjectJson(
+        projectJsonFilePath: _pl.Path, value: _tp.Optional[str]
     ) -> None:
         projectJson = _json.loads(
             projectJsonFilePath.read_text(encoding="utf-8")
         )
-        del projectJson["massFlowSolver"]
+        if value is None:
+            del projectJson["massFlowSolver"]
+        else:
+            projectJson["massFlowSolver"] = value
         projectJsonFilePath.write_text(
             _json.dumps(projectJson, indent=4, sort_keys=True),
             encoding="utf-8",
@@ -383,7 +386,7 @@ class TestEditor:
         projectJsonFilePath = self._getProjectJsonFilePath(
             _pl.Path(mainWindow.projectFolder)
         )
-        self._removeMassFlowSolverKeyFromProjectJson(projectJsonFilePath)
+        self._setMassFlowSolverKeyInProjectJson(projectJsonFilePath, None)
 
         logger = _ulog.getOrCreateCustomLogger("root", "DEBUG")  # type: ignore[attr-defined]
         mainWindow = _mw.MainWindow(  # type: ignore[attr-defined]
@@ -392,6 +395,32 @@ class TestEditor:
         qtbot.addWidget(mainWindow)
 
         assert mainWindow.editor.massFlowSolver == "type9352"
+
+    def testInvalidMassFlowSolverValueRaises(
+        self,
+        qtbot,
+        monkeypatch,
+        tmp_path,  # pylint: disable=invalid-name
+    ) -> None:
+        mainWindow = self._createMainWindowInTmpPath(
+            qtbot, monkeypatch, tmp_path
+        )
+        projectJsonFilePath = self._getProjectJsonFilePath(
+            _pl.Path(mainWindow.projectFolder)
+        )
+        self._setMassFlowSolverKeyInProjectJson(projectJsonFilePath, "Julia")
+
+        logger = _ulog.getOrCreateCustomLogger("root", "DEBUG")  # type: ignore[attr-defined]
+        with _pt.raises(ValueError) as excinfo:
+            _mw.MainWindow(  # type: ignore[attr-defined]
+                logger, _prj.LoadProject(projectJsonFilePath)
+            )
+
+        message = str(excinfo.value)
+        assert "Julia" in message
+        assert str(projectJsonFilePath) in message
+        assert "'julia'" in message
+        assert "'type9352'" in message
 
     def testNewProjectUsesJuliaSolverAndKeepsItWhenSaved(
         self, qtbot, monkeypatch, tmp_path  # pylint: disable=invalid-name
@@ -563,6 +592,19 @@ class TestEditor:
 
         assert "LABELS" not in type9352Text
         assert "LABELS 1\nMassFlowSolver\\MassFlowSolver.jl" in juliaText
+
+        controlDdckText = _pl.Path(
+            mainWindow.editor.exportHydraulicControl()
+        ).read_text(encoding="windows-1252")
+        supplyWaterEquation = next(
+            line
+            for line in controlDdckText.splitlines()
+            if line.startswith("MfrsupplyWater")
+        )
+        assert (
+            "only used by the Type 9352 mass flow solver"
+            in supplyWaterEquation
+        )
 
     @staticmethod
     def _exportHydraulicsAndReadText(

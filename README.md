@@ -65,19 +65,18 @@ setting, chosen as the first entry of the **Project** menu under **Mass flow sol
 
 1. **Julia (Type 4750)**: a Julia script run by the julia4trnsys type 4750. Unlike Type 9352, it also solves
    networks in which a supply's flow follows only from conservation, e.g. the cold water inlet of a DHW
-   system. This is the default for new projects. To use it, install the Julia solver into your TRNSYS
-   installation:
+   system. This is the default for new projects. Type 4750 (julia4trnsys, paid) and the Julia mass flow
+   solver (free) are available from the pytrnsys developers: get in touch at spf-info@ost.ch. Without
+   them, choose Type 9352. To use the Julia solver, install it into your TRNSYS installation:
    1. Unpack the julia4trnsys release zip matching your TRNSYS (32-bit or 64-bit) into the TRNSYS
-      installation's `UserLib\ReleaseDLLs` (see the
-      [julia4trnsys README](https://gitlab.com/spf-ost-private/julia4trnsys.rs)).
+      installation's `UserLib\ReleaseDLLs`.
    2. Copy the `MassFlowSolver` folder into `UserLib\ReleaseDLLs` as well, e.g.
-      `...\UserLib\ReleaseDLLs\MassFlowSolver\MassFlowSolver.jl` (see the
-      [Julia mass flow solver README](https://github.com/SPF-OST/fortrnsys/blob/main/types/hydraulics/julia-massFlowSolver/README.md)).
+      `...\UserLib\ReleaseDLLs\MassFlowSolver\MassFlowSolver.jl`.
 2. **Type 9352**: the Fortran type whose DLL is shipped with `pytrnsys` (see Post-installation above).
    Projects saved by older GUI versions use it until the setting is changed.
 
-Changing the setting marks the project as modified; if `ddck/hydraulic/hydraulic.ddck` exists, it has to be
-exported again (Project > Export hydraulic.ddck) to use the new solver. `ddck/control/hydraulic_control.ddck`
+If `ddck/hydraulic/hydraulic.ddck` exists when the setting is changed, it has to be exported again
+(Project > Export hydraulic.ddck) to use the new solver. `ddck/control/hydraulic_control.ddck`
 doesn't depend on the solver and doesn't need to be exported again.
 
 ## Developers

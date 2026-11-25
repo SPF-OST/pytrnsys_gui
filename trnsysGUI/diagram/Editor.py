@@ -914,12 +914,23 @@ Tcw=1
 
         # Projects saved before the setting existed use Type 9352, so that
         # their exports don't change until the project is switched.
-        self.massFlowSolver = _tp.cast(
-            _mfsol.MassFlowSolver,
-            blocklist.get("massFlowSolver", _mfsol.TYPE_9352),
-        )
+        self.massFlowSolver = self._decodeMassFlowSolver(blocklist, filename)
 
         self._setHydraulicLoopsOnStorageTanks()
+
+    def _decodeMassFlowSolver(
+        self, blocklist, filename
+    ) -> _mfsol.MassFlowSolver:
+        massFlowSolver = blocklist.get("massFlowSolver", _mfsol.TYPE_9352)
+        if massFlowSolver not in _mfsol.VALID_MASS_FLOW_SOLVERS:
+            validValues = ", ".join(
+                f"'{solver}'" for solver in _mfsol.VALID_MASS_FLOW_SOLVERS
+            )
+            raise ValueError(
+                f"Unknown massFlowSolver value '{massFlowSolver}' in "
+                f"{filename}; valid values are {validValues}."
+            )
+        return _tp.cast(_mfsol.MassFlowSolver, massFlowSolver)
 
     def _decodeHydraulicLoops(self, blocklist) -> None:
         singlePipeConnections = [
