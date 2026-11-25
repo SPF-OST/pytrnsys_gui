@@ -138,10 +138,10 @@ dpLambdaGap = 1.44  ! Thermal conductivity of gap material in kJ/hr.m.K (gravel)
 dpGapThick = 0  ! Gap thickness in m
 
 ****** Fluid properties ******
-dpRhoFlu = 1000.0 ! Density of fluid, kg/m^3
-dpLambdaFl = LamWat*3.6  ! Thermal conductivity of fluid in kJ/hr.m.K
-dpCpFl = 4.19 ! Specific heat of fluid, kJ/kg.K
-dpViscFl = 3.078  ! Viscosity of fluid in kg/m.hr
+dpRhoFlu = FwaterRho ! Density of fluid, kg/m^3 (water of the diagram)
+dpLambdaFl = FwaterLambdaKJh  ! Thermal conductivity of fluid in kJ/hr.m.K
+dpCpFl = FwaterCp ! Specific heat of fluid, kJ/kg.K
+dpViscFl = FwaterMuKgmh  ! Viscosity of fluid in kg/m.hr
 
 ****** Initial conditions ******
 {_gnames.DoublePipes.INITIAL_HOT_TEMPERATURE} = 15  ! Initial fluid temperature - pipe 1 in degrees celsius
@@ -735,14 +735,23 @@ INPUTS {len(allVariableNames)}
             )
 
         template = """\
-** Fluids:
-EQUATIONS {{2 * fluids|length}}
+*******************************************************************************************
+** Fluids of the diagram (pytrnsys_gui: Project -> Fluids...). Constant properties, in the
+** units the Types need: use F<fluid><property> in the ddcks, L<loop>Rho / L<loop>Cp per loop.
+*******************************************************************************************
+CONSTANTS {{7 * fluids|length}}
 {% for fluid in fluids -%}
 ** {{fluid.name}}
 {% set rho = getValueOrVariableName(fluid.densityInKgPerM3) -%}
 {% set cp = getValueOrVariableName(fluid.specificHeatCapacityInJPerKgK, 1e-3) -%}
-F{{fluid.name}}Rho = {{rho}} ! [kg/m^3]
-F{{fluid.name}}Cp = {{cp}} ! [kJ/(kg*K)]
+{% set cpSI = getValueOrVariableName(fluid.specificHeatCapacityInJPerKgK) -%}
+F{{fluid.name}}Rho = {{rho}} ! [kg/m^3] density
+F{{fluid.name}}Cp = {{cp}} ! [kJ/(kg*K)] specific heat capacity
+F{{fluid.name}}CpSI = {{cpSI}} ! [J/(kg*K)]
+F{{fluid.name}}Lambda = {{fluid.thermalConductivityInWPerMK}} ! [W/(m*K)] thermal conductivity
+F{{fluid.name}}LambdaKJh = F{{fluid.name}}Lambda*3.6 ! [kJ/(h*m*K)]
+F{{fluid.name}}Mu = {{fluid.dynamicViscosityInPaS}} ! [Pa*s] = [kg/(m*s)] dynamic viscosity
+F{{fluid.name}}MuKgmh = F{{fluid.name}}Mu*3600 ! [kg/(m*h)]
 {% endfor -%}
 """
         fluids = self._fluids

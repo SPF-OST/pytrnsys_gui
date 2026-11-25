@@ -11,6 +11,10 @@ import PyQt5.QtWidgets as _qtw
 import numpy as _np
 import pandas as _pd
 import trnsysGUI.TVentil as _tv
+import trnsysGUI.connection.connectors.connector as _conn
+import trnsysGUI.connection.connectors.doublePipeConnectorBase as _dpcb
+import trnsysGUI.pumpsAndTaps.pump as _pump
+import trnsysGUI.teePieces.teePieceBase as _tpb
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.doublePipeConnection as _dpc
 import trnsysGUI.connection.names as _cnames
@@ -21,6 +25,14 @@ import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.warningsAndErrors as _werrors
 
 _MAX_HEADER_LENGTH = 25
+
+# the diagram is redrawn at most every _MIN_TIMER_INTERVAL_MS (50 images/s); a higher speed skips time steps
+_MIN_TIMER_INTERVAL_MS = 20
+_MAX_SPEED = 100000.0  # images (time steps) per second that can be entered
+
+# blocks that only distribute the flow: with "only at main components" a pipe shows its values only if at least one
+# of its ends is another component (collector, heat exchanger, storage, boiler, heat pump, tap, ...)
+_DISTRIBUTION_BLOCKS = (_tpb.TeePieceBase, _pump.Pump, _tv.TVentil, _conn.Connector, _dpcb.DoublePipeConnectorBase)
 
 # line width of the electrical connections: from no power to the largest power of the file
 _MIN_ELECTRICAL_WIDTH = 1.5
@@ -267,14 +279,16 @@ class MassFlowVisualizer(_qtw.QDialog):
         self._framesPerSecond = 1.0
 
         stepsPerHour = self._getStepsPerHour()
-        timeStepIncreaseLabelText = (
-            f"Increase time-step by ( {stepsPerHour} = 1 Hour ):\n"
-            f"              ( {24 * stepsPerHour} = 1 Day )"
+        self._timeStepIncreaseLabel = _qtw.QLabel("Step")
+        self._timeStepIncreaseLabel.setToolTip(
+            f"Time steps per image: {stepsPerHour} = 1 hour, {24 * stepsPerHour} = 1 day"
         )
-        self._timeStepIncreaseLabel = _qtw.QLabel(timeStepIncreaseLabelText)
         self._timeStepIncrease = 1
         self._timeStepIncreaseLineEdit = _qtw.QLineEdit()
+        self._timeStepIncreaseLineEdit.setFixedWidth(55)
+        self._timeStepIncreaseLineEdit.setToolTip(self._timeStepIncreaseLabel.toolTip())
         self._timeStepIncreaseLineEdit.setText(str(self._timeStepIncrease))
+        self._stepsPerHourLabel = _qtw.QLabel(f"({stepsPerHour} = 1 h, {24 * stepsPerHour} = 1 day)")
         self._timeStepIncreaseLineEdit.editingFinished.connect(
             self._onTimeStepIncreaseLineEditEditingFinished
         )
@@ -288,7 +302,9 @@ class MassFlowVisualizer(_qtw.QDialog):
 
         # one timer for the whole playback: each tick moves the slider, which updates the diagram
         self.qtm = _qtc.QTimer(parent)
-        self.qtm.timeout.connect(self.increaseValue)
+        self.qtm.timeout.connect(self._playNextImage)
+        self._playClock = _qtc.QElapsedTimer()
+        self._dueSteps = 0.0
         self.lines = None
         self.started = False
 
@@ -300,7 +316,16 @@ class MassFlowVisualizer(_qtw.QDialog):
         )
         self.le = _qtw.QLineEdit("NONE")
 
-        self.showMassButton = _qtw.QPushButton("Show mass")  # comment out
+        self.showMassCheckBox = _qtw.QCheckBox("Show values")
+        self.showMassCheckBox.setToolTip(
+            "Mass flow and temperature on the pipes, electric power on the electrical connections"
+        )
+        self.onlyMainComponentsCheckBox = _qtw.QCheckBox("only at main components")
+        self.onlyMainComponentsCheckBox.setToolTip(
+            "Values only on the pipes at the ports of the main components (collector, heat exchanger, storage,\n"
+            "boilers, heat pumps, taps, ...), not on pipes between tee pieces, pumps and valves"
+        )
+        self.onlyMainComponentsCheckBox.setEnabled(False)
         self.togglePauseButton = _qtw.QPushButton("Pause/Continue")
         self.cancelButton = _qtw.QPushButton("Cancel")
 
@@ -379,19 +404,29 @@ class MassFlowVisualizer(_qtw.QDialog):
         # --- playback speed
         self._speedSpinBox = _qtw.QDoubleSpinBox()
         self._speedSpinBox.setDecimals(1)
-        self._speedSpinBox.setRange(0.1, 50.0)
-        self._speedSpinBox.setSingleStep(0.5)
+        self._speedSpinBox.setRange(0.1, _MAX_SPEED)
+        self._speedSpinBox.setSingleStep(1.0)
         self._speedSpinBox.setValue(self._framesPerSecond)
-        self._speedSpinBox.setToolTip("Images (time steps) shown per second")
+        self._speedSpinBox.setToolTip(
+            "Time steps shown per second (any value: above 50 the diagram is redrawn 50 times per second\n"
+            "and the steps in between are skipped). Each step moves by the value of 'Step'."
+        )
         self._speedSpinBox.valueChanged.connect(self._onSpeedChanged)
+
+        self._speedSpinBox.setFixedWidth(85)
 
         buttonLayout = _qtw.QHBoxLayout()
         buttonLayout.addStretch()
+        buttonLayout.addWidget(self.showMassCheckBox)
+        buttonLayout.addWidget(self.onlyMainComponentsCheckBox)
+        buttonLayout.addSpacing(24)
         buttonLayout.addWidget(self._timeStepIncreaseLabel)
         buttonLayout.addWidget(self._timeStepIncreaseLineEdit)
+        buttonLayout.addWidget(self._stepsPerHourLabel)
+        buttonLayout.addSpacing(24)
         buttonLayout.addWidget(_qtw.QLabel("Speed [images/s]"))
         buttonLayout.addWidget(self._speedSpinBox)
-        buttonLayout.addWidget(self.showMassButton)  # comment out
+        buttonLayout.addSpacing(24)
         buttonLayout.addWidget(self.togglePauseButton)
         buttonLayout.addWidget(self.cancelButton)
         layout = _qtw.QGridLayout()
@@ -406,9 +441,12 @@ class MassFlowVisualizer(_qtw.QDialog):
 
         self.setLayout(layout)
 
-        self.showMassButton.clicked.connect(self.showMassBtn)  # comment out
+        self.showMassCheckBox.toggled.connect(self._setShowValues)
+        self.onlyMainComponentsCheckBox.toggled.connect(self._updateValueLabels)
         self.togglePauseButton.clicked.connect(self.togglePause)
         self.cancelButton.clicked.connect(self.cancel)
+
+        self._wasFrozen = self._setDiagramFrozen(True)
 
         self.advance()
 
@@ -450,18 +488,25 @@ class MassFlowVisualizer(_qtw.QDialog):
         self.close()
         self.parent.editor.updateConnGrads()
 
-    # comment out
     def showMassBtn(self):
-        """
-        For showing the mass under the connections
-        -------
+        """Toggle the values (mass flow, temperature, electric power) on the connections."""
+        self.showMassCheckBox.setChecked(not self.showMass)
 
-        """
-        self.showMass = not self.showMass
+    def _setShowValues(self, isChecked: bool) -> None:
+        self.showMass = isChecked
+        self.onlyMainComponentsCheckBox.setEnabled(isChecked)
+        self._updateValueLabels()
 
+    def _updateValueLabels(self) -> None:
+        onlyMainComponents = self.onlyMainComponentsCheckBox.isChecked()
         for t in self.parent.editor.trnsysObj:
             if isinstance(t, _cb.ConnectionBase):
-                t.setMassFlowLabelVisible(self.showMass)
+                isShown = (
+                    self.showMass
+                    and self.dataFilePath is not None  # no pipe values with only the electrical file
+                    and (not onlyMainComponents or _isAtMainComponent(t))
+                )
+                t.setMassFlowLabelVisible(isShown)
 
         if self._electricalData is not None:
             for connection in self.parent.editor.electricalConnections:
@@ -491,6 +536,8 @@ class MassFlowVisualizer(_qtw.QDialog):
     def start(self):
         self.started = True
         self.paused = False
+        self._playClock.start()
+        self._dueSteps = 0.0
         self.qtm.start(self._getTimerIntervalInMs())
 
     def _getStepsPerHour(self) -> int:
@@ -656,7 +703,6 @@ class MassFlowVisualizer(_qtw.QDialog):
                 continue
             power = float(self._electricalData[columnName].iloc[row])
             connection.setPower(power, self._getElectricalWidth(power))
-            connection.powerLabel.setVisible(self.showMass)
 
     def _clearElectrical(self) -> None:
         for connection in self.parent.editor.electricalConnections:
@@ -720,13 +766,28 @@ class MassFlowVisualizer(_qtw.QDialog):
         self.timeStep = val
         self.advance()
 
-    def increaseValue(self):
+    def _playNextImage(self) -> None:
+        """Timer of the playback: moves by the time steps due since the last image (speed x elapsed time), so the
+        speed holds also when the timer fires late; above 50 time steps per second steps are skipped."""
+        elapsedInS = self._playClock.restart() / 1000
+        self._dueSteps += self._framesPerSecond * elapsedInS
+        nSteps = int(self._dueSteps)
+        if nSteps < 1:
+            return
+        self._dueSteps -= nSteps
+        self.increaseValue(nSteps)
+
+    def _getStepsPerImage(self) -> int:
+        intervalInS = self._getTimerIntervalInMs() / 1000
+        return max(1, round(self._framesPerSecond * intervalInS))
+
+    def increaseValue(self, nSteps: int = 1):
         """
         For automatic slider movement
 
         """
 
-        self.timeStep += self._timeStepIncrease
+        self.timeStep += self._timeStepIncrease * nSteps
         if self.timeStep > self._endRow:
             self.timeStep = self._startRow
         self.slider.setValue(self.timeStep)
@@ -874,10 +935,12 @@ class MassFlowVisualizer(_qtw.QDialog):
         self._onTemperatureRangeChanged()
 
     def _getTimerIntervalInMs(self) -> int:
-        return max(20, round(1000 / self._framesPerSecond))
+        return max(_MIN_TIMER_INTERVAL_MS, round(1000 / self._framesPerSecond))
 
     def _onSpeedChanged(self, framesPerSecond: float) -> None:
         self._framesPerSecond = framesPerSecond
+        self._playClock.restart()
+        self._dueSteps = 0.0
         if not self.paused:
             self.qtm.setInterval(self._getTimerIntervalInMs())
 
@@ -986,7 +1049,19 @@ class MassFlowVisualizer(_qtw.QDialog):
     def closeEvent(self, a0):
         self.pauseVis()
         self._clearElectrical()
+        self._setDiagramFrozen(self._wasFrozen)
         super().closeEvent(a0)
+
+    def _setDiagramFrozen(self, isFrozen: bool) -> bool:
+        """Freeze or unfreeze the diagram through the Edit menu entry (so it shows the state); returns the
+        previous state."""
+        wasFrozen = self.parent.editor.isFrozen
+        freezeAction = getattr(self.parent, "_freezeDiagramAction", None)
+        if freezeAction is not None:
+            freezeAction.setChecked(isFrozen)
+        else:
+            self.parent.editor.setFrozen(isFrozen)
+        return wasFrozen
 
     def keyPressEvent(self, e):
         if e.key() == _qtc.Qt.Key_Up:
@@ -1017,6 +1092,12 @@ class MassFlowVisualizer(_qtw.QDialog):
         truncatedName = _truncateName(variableName)
         haveColumn = truncatedName in dataFrame.columns
         return haveColumn
+
+
+def _isAtMainComponent(connection: _cb.ConnectionBase) -> bool:
+    """At least one end of the pipe is a component other than a tee piece, pump, valve or connector."""
+    blocks = (connection.fromPort.parent, connection.toPort.parent)
+    return any(not isinstance(b, _DISTRIBUTION_BLOCKS) for b in blocks)
 
 
 def _truncateColumnNames(df: _pd.DataFrame) -> None:

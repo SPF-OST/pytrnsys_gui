@@ -589,6 +589,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             fullExportText += exporter.exportMassFlows()
             fullExportText += exporter.exportDivSetting(simulationUnit - 10)
 
+        fullExportText += exporter.exportFluids() + "\n"
         fullExportText += exporter.exportSinglePipeParameters()
         fullExportText += exporter.exportDoublePipeParameters(
             exportTo=exportTo
@@ -605,7 +606,6 @@ TRoomStore = 10
 
         fullExportText += exporter.exportInputsFlowSolver()
         fullExportText += exporter.exportOutputsFlowSolver(simulationUnit)
-        fullExportText += exporter.exportFluids() + "\n"
         fullExportText += exporter.exportHydraulicLoops() + "\n"
         fullExportText += exporter.exportPipeAndTeeTypesForTemp(
             simulationUnit + 1
@@ -1014,6 +1014,8 @@ Tcw=1
             if hasattr(t, "isTempering"):
                 self.logger.debug("tv has " + str(t.isTempering))
 
+        # fluids of the diagram (older diagrams: only the built-in water and brine)
+        self.fluids = _hlm.Fluids.createFromJson(blocklist.get("fluids", []))
         self._decodeHydraulicLoops(blocklist)
 
         _econn.decodeConnections(
@@ -1030,7 +1032,7 @@ Tcw=1
         ]
         if "hydraulicLoops" not in blocklist:
             hydraulicLoops = _hlmig.createLoops(
-                singlePipeConnections, self.fluids.WATER
+                singlePipeConnections, self.fluids.getDefaultFluid()
             )
         else:
             serializedHydraulicLoops = blocklist["hydraulicLoops"]

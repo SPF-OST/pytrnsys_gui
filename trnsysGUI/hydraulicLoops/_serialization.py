@@ -22,6 +22,9 @@ class Fluid(_ser.UpgradableJsonSchemaMixinVersion0):
     name: str
     specificHeatCapacityInJPerKgK: _tp.Union[Variable, float]  # NOSONAR
     densityInKgPerM3: _tp.Union[Variable, float]  # NOSONAR
+    # None in diagrams saved before these properties existed: Fluids fills them in
+    thermalConductivityInWPerMK: _tp.Optional[float] = None
+    dynamicViscosityInPaS: _tp.Optional[float] = None
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:

@@ -354,7 +354,7 @@
                 </sizepolicy>
                </property>
                <property name="text">
-                <string>cm</string>
+                <string>mm</string>
                </property>
               </widget>
              </item>

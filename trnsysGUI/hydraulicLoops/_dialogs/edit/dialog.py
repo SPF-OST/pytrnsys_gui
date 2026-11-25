@@ -12,6 +12,7 @@ import PyQt5.QtWidgets as _qtw
 import trnsysGUI.dialogs as _dlgs
 import trnsysGUI.hydraulicLoops.model as _model
 import trnsysGUI.hydraulicLoops.connectionsDefinitionMode as _cdm
+import trnsysGUI.hydraulicLoops.fluidsDialog as _fluidsDialog
 
 from . import model as _gmodel
 
@@ -26,8 +27,10 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
         hydraulicLoop: _gmodel.HydraulicLoop,
         occupiedNames: _tp.Sequence[str],
         fluids: _model.Fluids,
+        hydraulicLoops: _tp.Sequence[_model.HydraulicLoop] = (),
     ):
         super().__init__()
+        self._hydraulicLoops = hydraulicLoops
         self.setupUi(self)
 
         self._hydraulicLoop = hydraulicLoop
@@ -126,13 +129,38 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
         return newName in self._occupiedNames
 
     def _configureFluidComboBox(self) -> None:
-        for fluid in self._fluids.fluids:
-            self.fluidComboBox.addItem(fluid.name, userData=fluid)
+        self._fillFluidComboBox()
+
+        fluidsButton = _qtw.QPushButton("Fluids...")
+        fluidsButton.setToolTip(
+            "Add fluids from the library or own fluids to the diagram"
+        )
+        fluidsButton.clicked.connect(self._editFluids)
+        self.horizontalLayout_8.addWidget(fluidsButton)
 
         def onCurrentIndexChanged(_) -> None:
             self._hydraulicLoop.fluid = self.fluidComboBox.currentData()
 
         self.fluidComboBox.currentIndexChanged.connect(onCurrentIndexChanged)
+
+    def _fillFluidComboBox(self) -> None:
+        self.fluidComboBox.blockSignals(True)
+        self.fluidComboBox.clear()
+        for fluid in self._fluids.fluids:
+            self.fluidComboBox.addItem(fluid.name, userData=fluid)
+        self.fluidComboBox.blockSignals(False)
+
+    def _editFluids(self) -> None:
+        if not _fluidsDialog.FluidsDialog.showDialog(
+            self._fluids, self._hydraulicLoops, self
+        ):
+            return
+        currentName = self._hydraulicLoop.fluid.name
+        self._fillFluidComboBox()
+        currentFluid = self._fluids.getFluid(currentName)
+        assert currentFluid
+        self._hydraulicLoop.fluid = currentFluid
+        self._setCurrentData(self.fluidComboBox, currentFluid)
 
     def _configureBulkOperations(self) -> None:
         def setTotalLoopLengthInfoToolTipVisible(_) -> None:
@@ -145,8 +173,8 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
 
         def onBulkApplyButtonPressed() -> None:
 
-            diameterText = self.bulkDiameterLineEdit.text()
-            diameterInCm = float(diameterText) if diameterText else None
+            diameterText = self.bulkDiameterLineEdit.text()  # mm
+            diameterInCm = float(diameterText) / 10 if diameterText else None
 
             uValueText = self.bulkUValueLineEdit.text()
             uValueInWPerM2K = float(uValueText) if uValueText else None
@@ -323,8 +351,11 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
         hydraulicLoop: _gmodel.HydraulicLoop,
         occupiedNames: _tp.Sequence[str],
         fluids: _model.Fluids,
+        hydraulicLoops: _tp.Sequence[_model.HydraulicLoop] = (),
     ) -> _tp.Literal["oked", "cancelled"]:
-        dialog = HydraulicLoopDialog(hydraulicLoop, occupiedNames, fluids)
+        dialog = HydraulicLoopDialog(
+            hydraulicLoop, occupiedNames, fluids, hydraulicLoops
+        )
 
         dialogCode = dialog.exec()
 
@@ -403,9 +434,10 @@ def _parsePositiveFloat(text: str) -> float:
 
 
 def _setConnectionDiameter(
-    connection: _gmodel.Connection, diameterInCmText: _tp.Any
+    connection: _gmodel.Connection, diameterInMmText: _tp.Any
 ) -> None:
-    connection.diameterInCm = _parsePositiveFloat(diameterInCmText)
+    # shown and entered in mm, stored in cm (diagram files, hydraulic.ddck)
+    connection.diameterInCm = _parsePositiveFloat(diameterInMmText) / 10
 
 
 def _setConnectionUValue(
@@ -435,7 +467,9 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
         _SHALL_SIMULATE_PROPERTY,
         _TextProperty("Name", lambda c: c.name, shallHighlightOutliers=False),
         _TextProperty(
-            "Diameter [cm]", lambda c: c.diameterInCm, _setConnectionDiameter
+            "Diameter [mm]",
+            lambda c: round(c.diameterInCm * 10, 6),
+            _setConnectionDiameter,
         ),
         _TextProperty(
             "U value [W/(m^2 K)]",

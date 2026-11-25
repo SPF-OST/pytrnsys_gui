@@ -3,6 +3,7 @@ from __future__ import annotations
 __all__ = ["Fluid", "HydraulicLoop", "HydraulicLoops", "Fluids"]
 
 import abc as _abc
+import dataclasses as _dc
 import itertools as _it
 import typing as _tp
 
@@ -10,6 +11,7 @@ import trnsysGUI.common as _com
 
 from . import _serialization as _ser
 from . import connectionsDefinitionMode as _cdm
+from . import fluidLibrary as _lib
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.connection.singlePipeConnection as _spc  # type: ignore[name-defined]
@@ -190,16 +192,9 @@ class HydraulicLoops:
 
 
 class Fluids:
-    WATER = _ser.Fluid(
-        "water",
-        specificHeatCapacityInJPerKgK=Variable("CPWAT_SI"),
-        densityInKgPerM3=Variable("RHOWAT"),
-    )
-    BRINE = _ser.Fluid(
-        "brine",
-        specificHeatCapacityInJPerKgK=Variable("CPBRI_SI"),
-        densityInKgPerM3=Variable("RHOBRI"),
-    )
+    # built in: every diagram has them (values of head.ddck, can be edited in the diagram)
+    WATER = _lib.WATER.createFluid()
+    BRINE = _lib.BRINE.createFluid()
 
     def __init__(self, fluids: _tp.Sequence[_ser.Fluid]) -> None:
         duplicateNames = _getDuplicates(f.name for f in fluids)
@@ -208,7 +203,8 @@ class Fluids:
                 f"Fluid names must be unique (the following names were duplicated: {','.join(duplicateNames)})."
             )
 
-        fluidList = [*fluids]
+        # fluids are compared by identity (eq=False): new pipes take the diagram's own water (getDefaultFluid)
+        fluidList = [_withAllProperties(f) for f in fluids]
 
         haveWater = any(f.name == self.WATER.name for f in fluidList)
         if not haveWater:
@@ -233,9 +229,36 @@ class Fluids:
         result = [f.to_dict() for f in self.fluids]
         return result
 
+    def getDefaultFluid(self) -> _ser.Fluid:
+        """Fluid of new pipes and of loops of old diagrams: the water of this diagram."""
+        water = self.getFluid(self.WATER.name)
+        assert water
+        return water
+
     def getFluid(self, name: str) -> _tp.Optional[_ser.Fluid]:
         fluid = _getSingleOrNone(f for f in self.fluids if f.name == name)
         return fluid
+
+
+def _withAllProperties(fluid: _ser.Fluid) -> _ser.Fluid:
+    """Conductivity and viscosity missing (diagram saved before they existed): values of the built-in fluid of
+    the same name, otherwise of water."""
+    if (
+        fluid.thermalConductivityInWPerMK is not None
+        and fluid.dynamicViscosityInPaS is not None
+    ):
+        return fluid
+    reference = {_lib.BRINE.name: _lib.BRINE}.get(fluid.name, _lib.WATER)
+    return _dc.replace(
+        fluid,
+        thermalConductivityInWPerMK=(
+            fluid.thermalConductivityInWPerMK
+            or reference.thermalConductivityInWPerMK
+        ),
+        dynamicViscosityInPaS=(
+            fluid.dynamicViscosityInPaS or reference.dynamicViscosityInPaS
+        ),
+    )
 
 
 _TValue_co = _tp.TypeVar("_TValue_co", covariant=True)

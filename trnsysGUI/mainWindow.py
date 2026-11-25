@@ -6,6 +6,7 @@ import pathlib as _pl
 import shutil
 import subprocess
 
+import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 import pytrnsys.utils.log as _ulog
@@ -26,6 +27,7 @@ from trnsysGUI import settingsDlg as _sdlg
 from trnsysGUI import warningsAndErrors as _werrors
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
+import trnsysGUI.hydraulicLoops.fluidsDialog as _fluidsDialog
 from trnsysGUI.ProcessMain import ProcessMain
 from trnsysGUI.RunMain import RunMain
 from trnsysGUI.common import cancelled as _ccl
@@ -54,52 +56,60 @@ class MainWindow(_qtw.QMainWindow):
         self.showBoxOnClose = True
 
         # Toolbar actions
-        saveDiaAction = _qtw.QAction(_img.INBOX_PNG.icon(), "Save", self)
+        saveDiaAction = _qtw.QAction(
+            _img.TOOLBAR_SAVE_SVG.icon(), "Save", self
+        )
         saveDiaAction.triggered.connect(self.saveDia)
 
-        loadDiaAction = _qtw.QAction(_img.OUTBOX_PNG.icon(), "Open", self)
+        loadDiaAction = _qtw.QAction(
+            _img.TOOLBAR_OPEN_SVG.icon(), "Open", self
+        )
         loadDiaAction.triggered.connect(self.loadDia)
 
         updateConfigAction = _qtw.QAction(
-            _img.UPDATE_CONFIG_PNG.icon(), "Update run.config", self
+            _img.TOOLBAR_UPDATE_CONFIG_SVG.icon(), "Update run.config", self
         )
         updateConfigAction.triggered.connect(self.updateRun)
 
         runSimulationAction = _qtw.QAction(
-            _img.RUN_SIMULATION_PNG.icon(), "Run simulation", self
+            _img.TOOLBAR_RUN_SIMULATION_SVG.icon(), "Run simulation", self
         )
         runSimulationAction.triggered.connect(self.runSimulation)
 
         processSimulationAction = _qtw.QAction(
-            _img.PROCESS_SIMULATION_PNG.icon(), "Process data", self
+            _img.TOOLBAR_PROCESS_SVG.icon(), "Process data", self
         )
         processSimulationAction.triggered.connect(self.processSimulation)
 
         deleteDiaAction = _qtw.QAction(
-            _img.TRASH_PNG.icon(), "Delete diagram", self
+            _img.TOOLBAR_DELETE_SVG.icon(), "Delete diagram", self
         )
         deleteDiaAction.triggered.connect(self.deleteDia)
 
-        zoomInAction = _qtw.QAction(_img.ZOOM_IN_PNG.icon(), "Zoom in", self)
+        zoomInAction = _qtw.QAction(
+            _img.TOOLBAR_ZOOM_IN_SVG.icon(), "Zoom in", self
+        )
         zoomInAction.triggered.connect(self.setZoomIn)
 
         zoomOutAction = _qtw.QAction(
-            _img.ZOOM_OUT_PNG.icon(), "Zoom out", self
+            _img.TOOLBAR_ZOOM_OUT_SVG.icon(), "Zoom out", self
         )
         zoomOutAction.triggered.connect(self.setZoomOut)
 
         toggleConnLabels = _qtw.QAction(
-            _img.LABEL_TOGGLE_PNG.icon(), "Toggle labels", self
+            _img.TOOLBAR_LABELS_SVG.icon(), "Toggle names", self
         )
         toggleConnLabels.triggered.connect(self.toggleConnLabels)
 
         exportHydraulicsAction = _qtw.QAction(
-            _img.EXPORT_HYDRAULICS_PNG.icon(), "Export hydraulic.ddck", self
+            _img.TOOLBAR_EXPORT_HYDRAULIC_SVG.icon(),
+            "Export hydraulic.ddck",
+            self,
         )
         exportHydraulicsAction.triggered.connect(self.exportHydraulicsDdck)
 
         exportHydCtrlAction = _qtw.QAction(
-            _img.EXPORT_HYDRAULIC_CONTROL_PNG.icon(),
+            _img.TOOLBAR_EXPORT_CONTROL_SVG.icon(),
             "Export user_control_default.ddck and pump_consumption_file.ddck",
             self,
         )
@@ -107,7 +117,7 @@ class MainWindow(_qtw.QMainWindow):
         exportHydCtrlAction.triggered.connect(self.exportPumpConsumptionFile)
 
         exportDckAction = _qtw.QAction(
-            _img.EXPORT_DCK_PNG.icon(), "Export dck", self
+            _img.TOOLBAR_EXPORT_DCK_SVG.icon(), "Export dck", self
         )
         exportDckAction.triggered.connect(self.exportDck)
 
@@ -120,7 +130,9 @@ class MainWindow(_qtw.QMainWindow):
         toggleAlignModeAction.setShortcut("q")
 
         self._freezeDiagramAction = _qtw.QAction(
-            "Freeze diagram (only names can be moved)", self
+            _img.TOOLBAR_FREEZE_SVG.icon(),
+            "Freeze diagram (only names can be moved)",
+            self,
         )
         self._freezeDiagramAction.setCheckable(True)
         self._freezeDiagramAction.toggled.connect(
@@ -139,32 +151,74 @@ class MainWindow(_qtw.QMainWindow):
         )
 
         runMassflowSolverAction = _qtw.QAction(
-            _img.RUN_MFS_PNG.icon(), "Run the massflow solver", self
+            _img.TOOLBAR_MASS_FLOW_SOLVER_SVG.icon(),
+            "Run the mass flow solver and show its results",
+            self,
         )
         runMassflowSolverAction.triggered.connect(self.runAndVisMf)
 
         openVisualizerAction = _qtw.QAction(
-            _img.VIS_MFS_PNG.icon(), "Start visualization of mass flows", self
+            _img.TOOLBAR_VISUALIZER_SVG.icon(),
+            "Flow visualizer: mass flows, temperatures and electric power of a run",
+            self,
         )
         openVisualizerAction.triggered.connect(self.visualizeMf)
 
-        # Tool bar
+        fitDiagramAction = _qtw.QAction(
+            _img.TOOLBAR_FIT_SVG.icon(), "Fit the diagram to the window", self
+        )
+        fitDiagramAction.triggered.connect(self.fitDiagram)
+
+        fluidsAction = _qtw.QAction(
+            _img.TOOLBAR_FLUIDS_SVG.icon(), "Fluids of the diagram", self
+        )
+        fluidsAction.triggered.connect(self.editFluids)
+
+        exportElectricalAction = _qtw.QAction(
+            _img.TOOLBAR_EXPORT_ELECTRICAL_SVG.icon(),
+            "Export electrical.ddck",
+            self,
+        )
+        exportElectricalAction.triggered.connect(self.exportElectricalDdck)
+
+        exportPlaceholdersAction = _qtw.QAction(
+            _img.TOOLBAR_EXPORT_PLACEHOLDERS_SVG.icon(),
+            "Export ddck placeholder values JSON file",
+            self,
+        )
+        exportPlaceholdersAction.triggered.connect(
+            self.exportDdckPlaceHolderValuesJson
+        )
+
+        # Tool bar: groups file | view | hydraulics | exports | simulation | delete
         tb = self.addToolBar("Main Toolbar...")
         tb.setObjectName("Toolbar")
-        tb.addAction(saveDiaAction)
-        tb.addAction(loadDiaAction)
-        tb.addAction(zoomInAction)
-        tb.addAction(zoomOutAction)
-        tb.addAction(toggleConnLabels)
-        tb.addAction(runMassflowSolverAction)
-        tb.addAction(openVisualizerAction)
-        tb.addAction(exportHydraulicsAction)
-        tb.addAction(exportHydCtrlAction)
-        tb.addAction(updateConfigAction)
-        tb.addAction(exportDckAction)
-        tb.addAction(runSimulationAction)
-        tb.addAction(processSimulationAction)
-        tb.addAction(deleteDiaAction)
+        toolbarGroups = [
+            [loadDiaAction, saveDiaAction],
+            [
+                zoomInAction,
+                zoomOutAction,
+                fitDiagramAction,
+                toggleConnLabels,
+                self._freezeDiagramAction,
+            ],
+            [fluidsAction, runMassflowSolverAction, openVisualizerAction],
+            [
+                exportHydraulicsAction,
+                exportElectricalAction,
+                exportHydCtrlAction,
+                exportPlaceholdersAction,
+                updateConfigAction,
+                exportDckAction,
+            ],
+            [runSimulationAction, processSimulationAction],
+            [deleteDiaAction],
+        ]
+        for i, group in enumerate(toolbarGroups):
+            if i:
+                tb.addSeparator()
+            for action in group:
+                tb.addAction(action)
 
         # Menu bar actions
         self.fileMenu = _qtw.QMenu("File")
@@ -277,6 +331,9 @@ class MainWindow(_qtw.QMainWindow):
         self.projectMenu.addAction(openVisualizerActionMenu)
         self.projectMenu.addAction(exportHydraulicsActionMenu)
         self.projectMenu.addAction(exportElectricalActionMenu)
+        fluidsActionMenu = _qtw.QAction("Fluids...", self)
+        fluidsActionMenu.triggered.connect(self.editFluids)
+        self.projectMenu.addAction(fluidsActionMenu)
         self.projectMenu.addAction(exportHydCtrlActionMenu)
         self.projectMenu.addAction(
             exportDdckPlaceHolderValuesJsonFileActionMenu
@@ -527,6 +584,14 @@ class MainWindow(_qtw.QMainWindow):
         self.logger.info("Setting zoom out")
         self.editor.diagramView.scale(0.8, 0.8)
 
+    def fitDiagram(self):
+        view = self.editor.diagramView
+        rect = self.editor.diagramScene.itemsBoundingRect()
+        if not rect.isEmpty():
+            view.fitInView(
+                rect.adjusted(-20, -20, 20, 20), _qtc.Qt.KeepAspectRatio
+            )
+
     def setZoom0(self):
         self.logger.info("Setting zoom 0")
         self.editor.diagramView.resetTransform()
@@ -642,6 +707,11 @@ class MainWindow(_qtw.QMainWindow):
 
     def exportHydraulicsDdck(self):
         self.editor.exportHydraulics(exportTo="ddck")
+
+    def editFluids(self):
+        _fluidsDialog.FluidsDialog.showDialog(
+            self.editor.fluids, self.editor.hydraulicLoops.hydraulicLoops, self
+        )
 
     def exportElectricalDdck(self):
         self.editor.exportElectrical()

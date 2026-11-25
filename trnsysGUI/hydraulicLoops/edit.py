@@ -25,7 +25,7 @@ def edit(
     _common.setConnectionsSelected(hydraulicLoop.connections, True)
 
     okedOrCancelled = _gui.HydraulicLoopDialog.showDialog(
-        guiHydraulicLoop, occupiedNames, fluids
+        guiHydraulicLoop, occupiedNames, fluids, hydraulicLoops.hydraulicLoops
     )
 
     _common.setConnectionsSelected(hydraulicLoop.connections, False)

@@ -13,6 +13,9 @@ import trnsysGUI.BlockItem as _bi
 import trnsysGUI.electrical.terminals as _et
 
 _STUB_LENGTH = 12
+_NO_POWER_TEXT = (
+    "-- kW"  # power label before the flow visualizer has loaded results
+)
 _NO_POWER_KW = (
     1e-4  # below this the flow visualizer shows a connection without power
 )
@@ -49,7 +52,7 @@ class ElectricalConnection(
         self.label.setVisible(False)
 
         # power shown by the flow visualizer (None: normal drawing)
-        self.powerLabel = _qtw.QGraphicsSimpleTextItem("", self)
+        self.powerLabel = _qtw.QGraphicsSimpleTextItem(_NO_POWER_TEXT, self)
         self.powerLabel.setBrush(_qtg.QBrush(_et.GREEN.darker(150)))
         self.powerLabel.setFont(font)
         self.powerLabel.setVisible(False)
@@ -156,7 +159,9 @@ class ElectricalConnection(
 
     def clearPower(self) -> None:
         self._power = None
+        self.powerLabel.setText(_NO_POWER_TEXT)
         self.powerLabel.setVisible(False)
+        self._placePowerLabel()
         self.update()
 
     def paint(
@@ -187,16 +192,23 @@ class ElectricalConnection(
         self.askForNewName()
 
     def contextMenuEvent(self, event):  # pylint: disable=invalid-name
+        # same entries as the context menu of the pipes
         menu = _qtw.QMenu()
         menu.addAction("Rename...").triggered.connect(self.askForNewName)
+        menu.addAction("Delete this connection").triggered.connect(self.delete)
         menu.addAction("Reverse direction").triggered.connect(self.reverse)
-        menu.addAction(
-            "Hide name" if self.label.isVisible() else "Show name"
-        ).triggered.connect(
-            lambda: self.label.setVisible(not self.label.isVisible())
+        menu.addAction("Toggle name").triggered.connect(self.toggleName)
+        menu.addAction("Toggle electric power").triggered.connect(
+            self.togglePower
         )
-        menu.addAction("Delete").triggered.connect(self.delete)
         menu.exec_(event.screenPos())
+
+    def toggleName(self) -> None:
+        self.label.setVisible(not self.label.isVisible())
+
+    def togglePower(self) -> None:
+        """Show or hide the power of the time step shown by the flow visualizer ("-- kW" without results)."""
+        self.powerLabel.setVisible(not self.powerLabel.isVisible())
 
     def askForNewName(self) -> None:
         newName, ok = _qtw.QInputDialog.getText(

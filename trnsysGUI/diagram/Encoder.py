@@ -46,6 +46,7 @@ class Encoder(json.JSONEncoder):
         res["Blocks"] = blockDct
 
         res["hydraulicLoops"] = obj.hydraulicLoops.toJson()
+        res["fluids"] = obj.fluids.toJson()
 
         res["electricalConnections"] = [
             c.toDict() for c in obj.electricalConnections

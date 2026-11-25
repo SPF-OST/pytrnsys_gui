@@ -97,7 +97,7 @@ class SinglePipeConnection(
         hydraulicLoopsData = _dspc.HydraulicLoopsData(
             self._editor.hydraulicLoops,
             self._editor.fluids.fluids,
-            self._editor.fluids.WATER,
+            self._editor.fluids.getDefaultFluid(),
         )
 
         undoCommand = _dspc.DeleteSinglePipeConnectionCommand(

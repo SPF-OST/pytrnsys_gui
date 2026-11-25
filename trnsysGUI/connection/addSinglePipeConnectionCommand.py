@@ -39,7 +39,7 @@ class AddSinglePipeConnectionCommand(_qtw.QUndoCommand):
             self._connection,
             self._editor.hydraulicLoops,
             self._editor.fluids.fluids,
-            self._editor.fluids.WATER,
+            self._editor.fluids.getDefaultFluid(),
             mergedLoopSummary,
         )
         if cancellable == "cancelled" or _res.isError(cancellable):

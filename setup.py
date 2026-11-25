@@ -80,6 +80,7 @@ setuptools.setup(
             "images/*.png",
             "images/*.svg",
             "images/symbols/*.svg",
+            "images/toolbar/*.svg",
             "templates/run.config",
             "templates/generic/*.ddck",
         ],

@@ -196,3 +196,62 @@ ZOOM_IN_PNG = _ia.createForPackageResource(
 ZOOM_OUT_PNG = _ia.createForPackageResource(
     _ia.PngImageAccessor, "images/zoom-out.png"
 )
+
+# toolbar (one line style, grouped by topic)
+TOOLBAR_OPEN_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/toolbar/open.svg"
+)
+TOOLBAR_SAVE_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/toolbar/save.svg"
+)
+TOOLBAR_ZOOM_IN_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/toolbar/zoomIn.svg"
+)
+TOOLBAR_ZOOM_OUT_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/toolbar/zoomOut.svg"
+)
+TOOLBAR_FIT_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/toolbar/fit.svg"
+)
+TOOLBAR_LABELS_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/toolbar/labels.svg"
+)
+TOOLBAR_FREEZE_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/toolbar/freeze.svg"
+)
+TOOLBAR_FLUIDS_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/toolbar/fluids.svg"
+)
+TOOLBAR_MASS_FLOW_SOLVER_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/toolbar/massFlowSolver.svg"
+)
+TOOLBAR_VISUALIZER_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/toolbar/visualizer.svg"
+)
+TOOLBAR_EXPORT_HYDRAULIC_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/toolbar/exportHydraulic.svg"
+)
+TOOLBAR_EXPORT_ELECTRICAL_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/toolbar/exportElectrical.svg"
+)
+TOOLBAR_EXPORT_CONTROL_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/toolbar/exportControl.svg"
+)
+TOOLBAR_EXPORT_PLACEHOLDERS_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/toolbar/exportPlaceholders.svg"
+)
+TOOLBAR_UPDATE_CONFIG_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/toolbar/updateConfig.svg"
+)
+TOOLBAR_EXPORT_DCK_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/toolbar/exportDck.svg"
+)
+TOOLBAR_RUN_SIMULATION_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/toolbar/runSimulation.svg"
+)
+TOOLBAR_PROCESS_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/toolbar/process.svg"
+)
+TOOLBAR_DELETE_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/toolbar/delete.svg"
+)

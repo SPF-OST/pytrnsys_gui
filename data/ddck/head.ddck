@@ -94,6 +94,9 @@ NPlotsPerSim = 18
 
 ************************************** 
 ***Constant fluid properties    ******
+** Superseded by the fluids of the diagram in hydraulic.ddck (pytrnsys_gui: F<fluid>Rho, F<fluid>Cp,
+** F<fluid>Lambda, F<fluid>Mu, ...). Kept for the ddcks that still use them; new ddcks use the
+** hydraulic.ddck names.
 **************************************
 
 CONSTANTS #
