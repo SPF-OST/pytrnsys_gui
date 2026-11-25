@@ -126,6 +126,11 @@ The unit tests leave untracked output files under `tests\**\data\`. To list them
 Remove them before rerunning the tests: some tests fail if they're still there (e.g.
 `testHydraulicModesGui.py::testRunModesInvalidDckUnmodifiedDlls`).
 
+Run the tests in a checkout named `pytrnsys_gui` at a short path: the `testConfigFileUpdater` tests compare
+paths that contain the checkout's name, and TRNSYS isn't long-path aware. In a checkout about 115 characters
+deep, `testMassFlowSolver` crashed TRNSYS for the projects with long names
+(`ex-hx-two-flow-solver-parameter-lines_*_99`).
+
 ## SonarCloud
 
 SonarCloud analyses every PR and every push to `master`, and its quality gate shows up as a GitHub check.
