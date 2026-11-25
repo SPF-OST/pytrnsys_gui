@@ -8,23 +8,93 @@ collectors, shading and PV ddcks do not depend on the source of the data.
 | Old readers (kept until all projects are moved) | |
 |---|---|
 | `Weather_SPF/weather_data_base.ddck` | Type 109, SPF user format `*.99` or TMY2 |
-| `Weather/weather_data_base_type15.ddck` | Type 15, TMY/TMY2/TMY3/EPW/TM2 |
+| `Weather_SPF/weather_data_base_type15.ddck` | Type 15, TMY/TMY2/TMY3/EPW/TM2 |
 
 ## Folders
 
 ```
-Weather/                                    data only (no parentheses in paths: the ddck grammar rejects them)
+Weather/                                    ORIGINAL data files of TRNSYS / TESS only (unchanged copies of the
+  Meteonorm/Europe/CH-Zuerich-Kloten-66700.tm2   TRNSYS 18 weather library, C:\Trnsys18\Weather\...)
+Weather_SPF/                                everything made by SPF / the projects: ddcks, converters, converted data
+  README.md                                 this file
+  converters/weather_standard.py            converter to the standard file (one reader per source)
+  weather_data_base_type9.ddck              reader + processing of the standard file (Type 9 + Type 16)
+  weather_data_base.ddck, ..._type15.ddck   old readers (Type 109, Type 15)
+  <Source>/<Country>/<Site>.ddck            site ddck: location, statistics, ASSIGN of the file
   <Source>/<Country>/<Station>/<Station>_<period>_<step>.csv   standard file
   <Source>/<Country>/<Station>/<Station>_<period>_<step>.json  metadata (source, conversions, flags)
   <Source>/raw/                             original downloads, unchanged
-  converters/weather_standard.py            converters (one reader per source)
-Weather_SPF/                                ddcks
-  weather_data_base_type9.ddck              reader + processing of the standard file
-  <Source>/<Country>/<Site>.ddck            site ddck: location, statistics, ASSIGN of the file
 ```
 
-`<Source>`: `ERA5`, `Meteonorm`, `MeteoSwiss`, `DWD`, ... Measured data of a plant that may not be shared stays in
-the project (`<project>/ddck/weather/`), with its site ddck and the converter spec next to it.
+`<Source>`: `ERA5`, `Meteonorm`, `MeteoSwiss`, `DWD`, ... No parentheses in folder names: the ddck grammar rejects
+them in `ASSIGN` paths. In `ASSIGN`, `PATH$` is the root of the ddck library, so a file next to its site ddck is
+`ASSIGN PATH$\Weather_SPF\<Source>\<Country>\<Station>\<file> unitWeatherData`.
+
+Measured data of a plant that may not be shared stays in the project (`<project>/ddck/weather/`), with its site
+ddck and the converter spec next to it; there `PATH$` is the project ddck folder (e.g. DigiSolar
+`Simulations/Bad_Rappenau/ddck/weather/`).
+
+## New weather data, step by step
+
+Whatever the source (TMY2 / Meteonorm `.tm2`, EPW, TMY3, IDAweb `.99`, ERA5, plant monitoring), it is converted
+once to the standard file and then always read the same way. Commands from `data/ddck/Weather_SPF` with the
+pytrnsys_gui venv (`..\..\..\venv\Scripts\python`).
+
+**Step 1 - collect the input and the site data.** Put the original file unchanged in
+`Weather_SPF/<Source>/raw/` (measured plant data: in the project, `<project>/ddck/weather/`). Note latitude,
+longitude (east +), altitude, the standard-time UTC offset of the time stamps (CET = 1; TMY2/EPW/TMY3 headers give it),
+the year(s) the simulation should count from, and which radiation components the file has.
+
+| Input | `--source` | `--radiation` | Notes |
+|---|---|---|---|
+| TMY2, Meteonorm `.tm2` | `tmy2` | `ghi_dhi_dni` | typical year: `--synthetic`, `--first-year` free (e.g. 2005), `--hours 8760` |
+| EnergyPlus `.epw` | `epw` | `ghi_dhi_dni` | idem |
+| TMY3 CSV | `tmy3` | `ghi_dhi_dni` | idem |
+| SPF / IDAweb `.99` (Type 109 user format) | `type109` | `ghi` (or `ghi_dhi` if the file has DHI) | `--decomposition reindl` gives the same split as Type 109 |
+| ERA5 from Open-Meteo | `era5-openmeteo` | `ghi_dhi_dni` | download: archive API, `models=era5`, `timezone=GMT`, `wind_speed_unit=ms`, variables temperature_2m, relative_humidity_2m, shortwave_radiation, diffuse_radiation, direct_normal_irradiance, wind_speed_10m, wind_direction_10m, surface_pressure |
+| plant / station CSV | `measured` + `--spec spec.json` | what was measured, `poa` for a pyranometer in the collector plane (`--poa-slope`, `--poa-azimuth`) | fill missing variables and gaps with `--fill-era5 <ERA5 CSV of the site>` |
+
+A file that Type 15 reads directly (TMY2, EPW, ...) can also be used without conversion through the old reader
+`weather_data_base_type15.ddck`, but then the outputs differ from the other projects (Type 15 own processing, no
+`weatherDataKind`, no measured plane irradiance); prefer the conversion.
+
+**Step 2 - convert.** Example for a Meteonorm TMY2 file:
+
+```
+..\..\..\venv\Scripts\python converters\weather_standard.py --name Zuerich-Kloten --lat 47.483 --lon 8.533 ^
+  --alt 436 --utc-offset 1 --first-year 2005 --hours 8760 --source tmy2 ^
+  --file ..\Weather\Meteonorm\Europe\CH-Zuerich-Kloten-66700.tm2 --synthetic ^
+  --out Meteonorm\CH\Zuerich-Kloten\Zuerich-Kloten_tmy_1h.csv
+```
+
+The converter writes the CSV and its JSON sidecar and prints the kind of data, the flag counts, the radiation
+conversions and the site constants (`TambAvg`, `dTambAmpl`, `tTambShift`, `TambD`). Check them: annual mean
+temperature and GHI [kWh/m²] against a known value of the site, flag counts (how much was filled), no conversion you
+did not expect.
+
+**Step 3 - site ddck.** Copy a site ddck (e.g. `Weather_SPF/ERA5/DE/BadRappenau_ERA5_2025-2026.ddck`) next to the
+data folder and set `Lat`, `Long`, `utcOffset`, `altid`, the four site constants printed in step 2,
+`weatherDataKind` (0 measured, 1 reanalysis, 2 typical year, 3 synthetic), `firstYearWeather` (= `--first-year`) and
+the `ASSIGN` of the new file. Fill in the header (contact, date, source and licence of the data). See
+[Site ddck](#site-ddck).
+
+**Step 4 - include it in the run config.** Both ddcks `as weather`, site first:
+
+```
+COMMON$ Weather_SPF/Meteonorm/CH/Zuerich-Kloten_tmy as weather
+COMMON$ Weather_SPF/weather_data_base_type9 as weather
+deck START 0          # hours from 1 January 00:00 of --first-year (second year: + 8760)
+deck STOP 8760
+deck weatherslopeSurfUser_1 45
+deck weatheraziSurfUser_1 0
+```
+
+Collectors, shading and PV read `$weatherTamb`, `$weatherIT_surfUser_1`, ... whatever the source.
+
+**Step 5 - check the run.** Run a few days, then the year: `Success: No fatal errors`, last line of the `_T.prt` at
+`STOP`, and the monthly weather printer `temp/WEATHER_BASE_MO.Prt` (Tamb, GHI and plane irradiance per month)
+against the input file. Keep the CSV, the JSON and the raw file in the repository (large measured data: in the
+project, not in pytrnsys_gui).
 
 ## File format
 
@@ -61,6 +131,7 @@ the project (`<project>/ddck/weather/`), with its site ddck and the converter sp
 |---|---|
 | `era5-openmeteo` | Open-Meteo historical archive CSV (`models=era5`, `timezone=GMT`, `wind_speed_unit=ms`) |
 | `epw` | EnergyPlus weather file |
+| `tmy2` | TMY2 (NREL), also Meteonorm `*.tm2` |
 | `tmy3` | TMY3 CSV (NREL, Meteonorm export) |
 | `type109` | SPF user format `*.99` (e.g. MeteoSwiss IDAweb) |
 | `measured` | any CSV of a plant or station, described by a JSON spec (below) |

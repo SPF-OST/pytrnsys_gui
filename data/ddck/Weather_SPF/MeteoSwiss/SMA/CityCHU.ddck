@@ -21,7 +21,7 @@ altid = 556     ! elevation, meters above sealevel
 formatWeatherData = 1 ! 1 = user format, 2 = Standard weather file in the TMY2 format
 unitWeatherData = 38
 
-ASSIGN PATH$\Weather\MeteoSwiss\SMA\CHU_IDAweb_2023.99 unitWeatherData
+ASSIGN PATH$\Weather_SPF\MeteoSwiss\SMA\CHU_IDAweb_2023.99 unitWeatherData
 
 
 *******************************

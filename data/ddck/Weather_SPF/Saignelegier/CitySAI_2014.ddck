@@ -27,7 +27,7 @@ altid      = 991      ! elevation [m asl]
 formatWeatherData = 1
 unitWeatherData   = 38
 
-ASSIGN PATH$\Weather\Saignelegier\Saignelegier_2014.99 unitWeatherData
+ASSIGN PATH$\Weather_SPF\Saignelegier\Saignelegier_2014.99 unitWeatherData
 
 *******************************
 **END CitySAI_2014.ddck

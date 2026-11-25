@@ -322,6 +322,38 @@ def read_epw(path: _pl.Path, site: Site, year: int | None = None) -> tuple[pd.Da
     return out, {"source": f"EPW file {path.name}", "kind": "tmy", "radiation_input": "GHI + DNI + DHI"}
 
 
+def read_tmy2(path: _pl.Path, site: Site, year: int | None = None) -> tuple[pd.DataFrame, dict]:
+    """TMY2 (NREL 1995, also Meteonorm *.tm2): fixed columns, local standard time, hour 1-24 = interval end.
+
+    Columns (1-based, NREL TMY2 user's manual): 2-3 year, 4-5 month, 6-7 day, 8-9 hour, 18-21 GHI, 24-27 DNI,
+    30-33 DHI [Wh/m2 in the hour = W/m2], 68-71 dry bulb [0.1 degC], 80-82 RH [%], 85-88 pressure [mbar],
+    91-93 wind direction [deg], 96-98 wind speed [0.1 m/s]; 9999 / 999 = missing.
+    """
+    lines = path.read_text(errors="replace").splitlines()[1:]
+    lines = [ln for ln in lines if len(ln) >= 98]
+
+    def field(a: int, b: int) -> np.ndarray:
+        return np.array([float(ln[a - 1:b]) for ln in lines])
+
+    def missing(x: np.ndarray, code: float) -> np.ndarray:
+        return np.where(x == code, np.nan, x)
+
+    yy, mm, dd, hh = (field(2, 3), field(4, 5), field(6, 7), field(8, 9))
+    y = year or int(1900 + yy[0] if yy[0] > 50 else 2000 + yy[0])
+    t = pd.to_datetime(dict(year=np.full(len(lines), y), month=mm.astype(int), day=dd.astype(int)))         + pd.to_timedelta(hh, unit="h")
+    out = pd.DataFrame(
+        {
+            "GHI": missing(field(18, 21), 9999), "DNI": missing(field(24, 27), 9999),
+            "DHI": missing(field(30, 33), 9999),
+            "Tamb": missing(field(68, 71), 9999) / 10, "RH": missing(field(80, 82), 999),
+            "pAmb": missing(field(85, 88), 9999) * 100, "dirWind": missing(field(91, 93), 999),
+            "vWind": missing(field(96, 98), 999) / 10,
+        },
+        index=pd.DatetimeIndex(t),
+    )
+    return out, {"source": f"TMY2 file {path.name}", "kind": "tmy", "radiation_input": "GHI + DNI + DHI"}
+
+
 def read_tmy3(path: _pl.Path, site: Site, year: int | None = None) -> tuple[pd.DataFrame, dict]:
     """TMY3 CSV (NREL / Meteonorm export): local standard time, 'HH:MM' = interval end."""
     df = pd.read_csv(path, skiprows=1)
@@ -570,7 +602,7 @@ def _main() -> None:
     p.add_argument("--utc-offset", type=float, required=True, help="standard time of the site, CET = 1")
     p.add_argument("--first-year", type=int, required=True)
     p.add_argument("--hours", type=int, required=True, help="number of lines (8760 for one year)")
-    p.add_argument("--source", required=True, choices=["era5-openmeteo", "epw", "tmy3", "type109", "measured"])
+    p.add_argument("--source", required=True, choices=["era5-openmeteo", "epw", "tmy2", "tmy3", "type109", "measured"])
     p.add_argument("--file", type=_pl.Path, required=True)
     p.add_argument("--spec", type=_pl.Path, help="JSON spec for --source measured")
     p.add_argument("--radiation", default="ghi_dhi_dni",
@@ -593,6 +625,8 @@ def _main() -> None:
         prim, pm = read_openmeteo_era5(a.file, site)
     elif a.source == "epw":
         prim, pm = read_epw(a.file, site, a.first_year)
+    elif a.source == "tmy2":
+        prim, pm = read_tmy2(a.file, site, a.first_year)
     elif a.source == "tmy3":
         prim, pm = read_tmy3(a.file, site, a.first_year)
     elif a.source == "type109":

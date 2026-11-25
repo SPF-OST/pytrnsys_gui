@@ -10,7 +10,7 @@
 
 ***************************************************************************
 ** Description:
-** Site ddck of the pytrnsys standard weather file Weather/MeteoSwiss/CH/Chur/CHU_IDAweb_2023_1h.csv, converted
+** Site ddck of the pytrnsys standard weather file Weather_SPF/MeteoSwiss/CH/Chur/CHU_IDAweb_2023_1h.csv, converted
 ** from CHU_IDAweb_2023.99 (MeteoSwiss IDAweb, Chur 2023, the file used by CityCHU.ddck with Type 109) with
 ** weather_standard.py --source type109 --radiation ghi --decomposition erbs (see the .json next to the file).
 ** No wind in the source: constant 2 m/s. Lines from 1 January 2023 00:00 CET: START 0, STOP 8760.
@@ -33,7 +33,7 @@ ddTcwOffset = 40       ! time shift of the minimum cold water temperature, d
 weatherDataKind = 0    ! 0 measured, 1 reanalysis, 2 typical year, 3 synthetic
 firstYearWeather = 2023
 unitWeatherData = 38
-ASSIGN PATH$\Weather\MeteoSwiss\CH\Chur\CHU_IDAweb_2023_1h.csv unitWeatherData
+ASSIGN PATH$\Weather_SPF\MeteoSwiss\CH\Chur\CHU_IDAweb_2023_1h.csv unitWeatherData
 
 *******************************
 **END Chur_IDAweb_2023.ddck

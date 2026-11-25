@@ -13,7 +13,7 @@
 
 ***************************************************************************
 ** Description:
-** Weather data base for the pytrnsys STANDARD WEATHER FILE (see Weather/README.md), read with Type 9 and processed
+** Weather data base for the pytrnsys STANDARD WEATHER FILE (see Weather_SPF/README.md), read with Type 9 and processed
 ** with Type 16 (radiation on 8 surfaces, Perez sky), Type 33 (psychrometrics) and Type 69 (sky temperature).
 ** Same output names as weather_data_base.ddck (Type 109), so collectors, shading, PV, ... are unchanged.
 **
