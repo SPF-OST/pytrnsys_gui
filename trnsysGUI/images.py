@@ -201,6 +201,15 @@ CRYSTALIZER_SVG = _ia.createForPackageResource(
 ZOOM_0_PNG = _ia.createForPackageResource(
     _ia.PngImageAccessor, "images/zoom-0.png"
 )
+TAB_DIAGRAM_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/tabDiagram.svg"
+)
+TAB_PLOTS_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/tabPlots.svg"
+)
+TAB_DDCK_EDITOR_SVG = _ia.createForPackageResource(
+    _ia.SvgImageAccessor, "images/tabDdckEditor.svg"
+)
 ZOOM_FIT_SVG = _ia.createForPackageResource(
     _ia.SvgImageAccessor, "images/zoom-fit.svg"
 )

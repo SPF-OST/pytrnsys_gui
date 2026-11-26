@@ -6,6 +6,7 @@ import pathlib as _pl
 import shutil
 import subprocess
 
+import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 import pytrnsys.utils.log as _ulog
@@ -13,8 +14,12 @@ import pytrnsys.utils.result as _res
 import pytrnsys.utils.warnings as _warn
 from PyQt5.QtWidgets import QAction
 
+import trnsysGUI.blockItemHasInternalPiping as _biip
 import trnsysGUI.configFileUpdater as _cfu
+import trnsysGUI.ddckEditor as _dde
+import trnsysGUI.ddckEditor.placeholders as _dph
 import trnsysGUI.diagram.export as _dexp
+import trnsysGUI.menus.projectMenu.placeholders as _phv
 import trnsysGUI.loggingCallback as _lgcb
 import trnsysGUI.menus.projectMenu.exportPlaceholders as _eph
 from trnsysGUI import buildDck as buildDck
@@ -36,12 +41,39 @@ from trnsysGUI.recentProjectsHandler import RecentProjectsHandler
 from trnsysGUI.storageTank.widget import StorageTank
 from trnsysGUI.variablePlot import VariablePlotTab
 
+# Only applied to the main tab bar (Diagram / Plots / ddck Editor).
+_MAIN_TAB_BAR_STYLE_SHEET = """
+QTabBar::tab {
+    padding: 7px 18px;
+    margin-right: 2px;
+    border: 1px solid #c8c8c8;
+    border-bottom: none;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    background: #ececec;
+    color: #555555;
+}
+QTabBar::tab:hover {
+    background: #f5f5f5;
+}
+QTabBar::tab:selected {
+    background: #ffffff;
+    color: #1a1a1a;
+    font-weight: bold;
+    border-top: 3px solid #1f77b4;
+}
+"""
+
+_MAIN_TAB_ICON_SIZE = 20
+
 
 class MainWindow(_qtw.QMainWindow):
     def __init__(self, logger, project: _prj.Project, parent=None):
         super().__init__(parent)
 
         self.editor = None
+        self.ddckEditorTab: _dde.DdckEditorTab | None = None
+        self._centralTabWidget: _qtw.QTabWidget | None = None
 
         # ==================================
         # When we change to a different project the mainWindow should also be updated with that project
@@ -583,18 +615,67 @@ class MainWindow(_qtw.QMainWindow):
     def _resetEditor(self, project):
         wasRunning = self.editor and self.editor.isRunning()
 
+        # The files of the previous project are closed - give the user
+        # the chance to save them (it's too late to cancel at this point).
+        if self.ddckEditorTab:
+            self.ddckEditorTab.maybeSaveAll(allowCancel=False)
+
         self.undoStack.clear()
 
         self.editor = self._createDiagramEditor(project)
 
         tabWidget = _qtw.QTabWidget()
-        tabWidget.addTab(self.editor, "Diagram")
+        tabWidget.setIconSize(
+            _qtc.QSize(_MAIN_TAB_ICON_SIZE, _MAIN_TAB_ICON_SIZE)
+        )
+        tabWidget.tabBar().setStyleSheet(_MAIN_TAB_BAR_STYLE_SHEET)
+        tabWidget.addTab(self.editor, _img.TAB_DIAGRAM_SVG.icon(), "Diagram")
         self.variablePlotTab = VariablePlotTab(self)
-        tabWidget.addTab(self.variablePlotTab, "Variable Plot")
+        tabWidget.addTab(
+            self.variablePlotTab, _img.TAB_PLOTS_SVG.icon(), "Plots"
+        )
+        self.ddckEditorTab = _dde.DdckEditorTab(self._getPlaceholderValues)
+        tabWidget.addTab(
+            self.ddckEditorTab, _img.TAB_DDCK_EDITOR_SVG.icon(), "ddck Editor"
+        )
         self.setCentralWidget(tabWidget)
+        self._centralTabWidget = tabWidget
+
+        self.editor.fileSystemTreeView.openTextFileRequested.connect(
+            self._openFileInDdckEditor
+        )
 
         if wasRunning:
             self.editor.start()
+
+    def _openFileInDdckEditor(self, filePath: _pl.Path) -> None:
+        assert self.ddckEditorTab and self._centralTabWidget
+        if self.ddckEditorTab.openFile(filePath):
+            self._centralTabWidget.setCurrentWidget(self.ddckEditorTab)
+
+    def _getPlaceholderValues(self) -> _dph.ValuesByComponent | None:
+        """The placeholder values as the current diagram defines them, i.e.
+        what "Export placeholders" would write to `DdckPlaceHolderValues.json`.
+        """
+        if not self.editor or not self.editor.isHydraulicConnected():
+            return None
+
+        ddckDirPath = _pl.Path(self.editor.projectFolder) / "ddck"
+        ddckDirNames = (
+            [p.name for p in ddckDirPath.iterdir() if p.is_dir()]
+            if ddckDirPath.is_dir()
+            else []
+        )
+        blockItems = [
+            o
+            for o in self.editor.trnsysObj
+            if isinstance(o, _biip.BlockItemHasInternalPiping)
+        ]
+
+        valuesWithWarnings = _phv.getPlaceholderValues(
+            ddckDirNames, blockItems, self.editor.hydraulicLoops
+        )
+        return valuesWithWarnings.value
 
     def toggleConnLabels(self):
         self.labelVisState = not self.labelVisState
@@ -694,6 +775,10 @@ class MainWindow(_qtw.QMainWindow):
         _dexp.export(self.editor.diagramScene, fileName)
 
     def closeEvent(self, e):
+        if self.ddckEditorTab and not self.ddckEditorTab.maybeSaveAll():
+            e.ignore()
+            return
+
         if self.showBoxOnClose:
             ret = MessageBox.create(
                 messageText=constants.SAVE_BEFORE_CLOSE,

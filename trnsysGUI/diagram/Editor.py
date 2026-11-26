@@ -108,10 +108,12 @@ class Editor(_qtw.QWidget, _ip.HasInternalPipingsProvider):
         self.pathLayout.addWidget(self.projectPathLabel)
         self.pathLayout.addWidget(self.PPL)
 
-        treeView = _fst.FileSystemTreeView(_pl.Path(self.projectFolder), self)
+        self.fileSystemTreeView = _fst.FileSystemTreeView(
+            _pl.Path(self.projectFolder), self
+        )
 
         self.fileBrowserLayout.addLayout(self.pathLayout)
-        self.fileBrowserLayout.addWidget(treeView)
+        self.fileBrowserLayout.addWidget(self.fileSystemTreeView)
 
         if loadValue == "new" or loadValue == "json":
             self.copyGenericFolder(self.projectFolder)
