@@ -1,37 +1,32 @@
 # pylint: skip-file
 # type: ignore
 
-import sys
+import os
+import pathlib as _pl
 
-sys.path.append("C:\\Users\\parad\\OneDrive\\Desktop\\pytrnsys\\pytrnsys")
 import pytrnsys.rsim.runParallelTrnsys as runTrnsys
 
-import os
+import trnsysGUI.runConfig.sync as _sync
 
 
 class RunMain:
-    def runAction(self, logger, path):
-        """
-        It uses the self-lines readed by readConfig and change the lines from source to end.
-        This is used to change a ddck file readed for another. A typical example is the weather data file
-        Parameters
-        ----------
-        source : str
-            string to be replaced in the config file in the self.lines field
-        end : str
-            str to replace the source in the config file in the self.lines field
+    def runAction(self, logger, path, configFile="run.config"):
+        """Runs the simulations of the run config `configFile` in the project
+        directory `path`.
+
+        pytrnsys is run from the project directory, so relative paths in the
+        config (e.g. `string PROJECT$ "ddck"`) are relative to the project.
 
         Returns
         -------
-        bool
+        (bool, str)
+            Whether the execution failed, and the error message.
         """
-
-        pathConfig = path
-        configFile = "run.config"
         fullPath = os.path.join(path, configFile)
         logger.info("Starting RunParallelTrnsys with " + fullPath)
         try:
-            runTrnsys.RunParallelTrnsys(pathConfig, configFile=configFile)
+            with _sync.workingDirectory(_pl.Path(path)):
+                runTrnsys.RunParallelTrnsys(path, configFile=configFile)
             return False, ""
         except Exception as e:
             logger.error(

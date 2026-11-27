@@ -102,7 +102,11 @@ def encodeDdckPlaceHolderValuesToJson(
 def _getDdckDirNames(projectFolder) -> _tp.Sequence[str]:
     ddckDirPath = _pl.Path(projectFolder) / "ddck"
 
-    componentDdckDirPaths = list(ddckDirPath.iterdir())
+    # Hidden folders, e.g. `.deleted` with deleted components' ddcks, aren't
+    # components.
+    componentDdckDirPaths = [
+        p for p in ddckDirPath.iterdir() if not p.name.startswith(".")
+    ]
 
     ddckDirNames = []
     for componentDirPath in componentDdckDirPaths:

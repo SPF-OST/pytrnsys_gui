@@ -15,6 +15,7 @@ import PyQt5.QtWidgets as _qtw
 import pytrnsys.trnsys_util.deckUtils as _du
 
 import trnsysGUI as _tgui
+import trnsysGUI.componentWindow as _cw
 import trnsysGUI.components.factory as _cfactory
 import trnsysGUI.connection.connectors.doublePipeConnectorBase as _dctor
 import trnsysGUI.connection.names as _cnames
@@ -1017,6 +1018,11 @@ Tcw=1
                 t.updateSegmentGradients()
 
     # Dialog calls
+    def showComponentWindow(self, item) -> None:
+        """The window for any component (or heat exchanger of a tank):
+        name, flips, its own settings and its ddcks."""
+        _cw.showComponentWindow(item, self, self._createRenameHelper())
+
     def showBlockDlg(self, blockItem: BlockItem) -> None:
         renameHelper = self._createRenameHelper()
         dialog = BlockDlg(blockItem, renameHelper, self.projectFolder)

@@ -128,6 +128,39 @@ class View(_qtw.QGraphicsView):
 
         blockItem.oldPos = blockItem.scenePos()
 
+    def mouseDoubleClickEvent(self, event: _qtg.QMouseEvent) -> None:
+        """Components (and the heat exchangers of tanks) open the component
+        window; everything else (pipes, ...) its usual dialog."""
+        componentItem = self._getComponentItemAt(event.pos())
+        if componentItem:
+            event.accept()
+            self._editor.showComponentWindow(componentItem)
+            return
+
+        if self.itemAt(event.pos()) is None:
+            # An empty area of the diagram: the project's ddcks.
+            event.accept()
+            self._editor.mainWindow.showProjectDdckWindow()
+            return
+
+        super().mouseDoubleClickEvent(event)
+
+    def _getComponentItemAt(self, position: _qtc.QPoint) -> _tp.Any:
+        # Avoid import cycles (these import the editor's modules).
+        # pylint: disable=import-outside-toplevel
+        import trnsysGUI.BlockItem as _bi
+        import trnsysGUI.PortItemBase as _pib
+        import trnsysGUI.heatExchanger as _hx
+
+        item = self.itemAt(position)
+        while item is not None:
+            if isinstance(item, _pib.PortItemBase):
+                return None
+            if isinstance(item, (_hx.HeatExchanger, _bi.BlockItem)):
+                return item
+            item = item.parentItem()
+        return None
+
     def wheelEvent(self, event):
         super().wheelEvent(event)
         if int(event.modifiers()) == 0b100000000000000000000000000:

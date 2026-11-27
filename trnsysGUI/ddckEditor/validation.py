@@ -36,8 +36,11 @@ def validateDdck(
     componentName: str,
     valuesByPort: _ph.ValuesByPort | None,
     filePath: _pl.Path | None = None,
+    defaultVisibility: _dv.DefaultVisibility = _dv.DefaultVisibility.LOCAL,
 ) -> _tp.Sequence[Problem]:
-    """Checks the content the same way pytrnsys does when building the deck.
+    """Checks the content the same way pytrnsys does when building the deck,
+    with the component name and default visibility of its inclusion in the
+    config (`as`, `global`, the config's `defaultVisibility`).
 
     If `valuesByPort` is None (diagram not available) the placeholders are
     checked as if no `DdckPlaceHolderValues.json` were used, i.e. they must
@@ -50,7 +53,7 @@ def validateDdck(
     unresolvedProblems = _findUnresolvedPlaceholders(content, valuesByPort)
 
     pytrnsysProblems = _validateWithPytrnsys(
-        content, componentName, valuesByPort, filePath
+        content, componentName, valuesByPort, filePath, defaultVisibility
     )
 
     # Without a line number, pytrnsys' error is most probably about the
@@ -91,17 +94,18 @@ def _validateWithPytrnsys(
     componentName: str,
     valuesByPort: _ph.ValuesByPort | None,
     filePath: _pl.Path | None,
+    defaultVisibility: _dv.DefaultVisibility,
 ) -> _tp.Sequence[Problem]:
     if valuesByPort is None:
         result = _rtwph.replaceTokensWithDefaultsInString(
-            content, componentName, _dv.DefaultVisibility.LOCAL, filePath
+            content, componentName, defaultVisibility, filePath
         )
     else:
         result = _rtph.replaceTokensInString(
             content,
             componentName,
             valuesByPort,
-            _dv.DefaultVisibility.LOCAL,
+            defaultVisibility,
             filePath,
         )
 

@@ -13,10 +13,13 @@ logger = _log.getLogger("root")
 
 
 class DckBuilder(_rcm.GetConfigMixin):  # type: ignore[name-defined]
-    def __init__(self, projectDirPath: _pl.Path) -> None:
+    def __init__(
+        self, projectDirPath: _pl.Path, configFileName: str = "run.config"
+    ) -> None:
         super().__init__()
 
         self._projectDirPath = projectDirPath
+        self._configFileName = configFileName
         self._outputDirPath = projectDirPath
 
         self.inputs = dict[str, _tp.Any]()
@@ -117,7 +120,7 @@ class DckBuilder(_rcm.GetConfigMixin):  # type: ignore[name-defined]
     def _readConfig(self) -> _res.Result[None]:
         tool = _rc.ReadConfigTrnsys()  # type: ignore[attr-defined]
 
-        configFileName = "run.config"
+        configFileName = self._configFileName
 
         configFilePath = self._projectDirPath / configFileName
         if not configFilePath.is_file():

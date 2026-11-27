@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import (
 
 
 class GenericPortPairDlg(QDialog):
-    def __init__(self, block, parent=None):
+    def __init__(self, block, parent=None, embedded=False):
         super(GenericPortPairDlg, self).__init__(parent)
         self.block = block
         nameLabel = QLabel("Name:")
@@ -45,7 +45,8 @@ class GenericPortPairDlg(QDialog):
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
         buttonLayout.addWidget(self.addButton)
-        buttonLayout.addWidget(self.cancelButton)
+        if not embedded:
+            buttonLayout.addWidget(self.cancelButton)
 
         radioButtonLayout = QHBoxLayout()
         self.oButton = QRadioButton("Output")
@@ -68,7 +69,8 @@ class GenericPortPairDlg(QDialog):
 
         self.setWindowTitle("Change connection name")
         self.loadList()
-        self.show()
+        if not embedded:
+            self.show()
 
     def loadList(self):
         print("Loading ports")
@@ -80,6 +82,8 @@ class GenericPortPairDlg(QDialog):
         if self.getSide() is not None:
             print("Adding a port")
             self.block.addPortPair(self.getSide())
+            self.listW.clear()
+            self.loadList()
 
     def removePortPair(self):
         if self.getSide() is not None:

@@ -30,6 +30,7 @@ class DeleteBlockCommand(_qtw.QUndoCommand):
         self._blockItem = blockItem
         self._editor = editor
         self._undoNamingHelper = undoNamingHelper
+        self._trashedDdckDirPath: _pl.Path | None = None
 
         self._createChildDeleteConnectionUndoCommands(blockItem)
 
@@ -52,7 +53,8 @@ class DeleteBlockCommand(_qtw.QUndoCommand):
         self._blockItem.deleteBlock()
         self._undoNamingHelper.removeNameForDelete(self._blockItem.displayName)
 
-        _dfh.maybeDeleteNonEmptyComponentDdckFolder(
+        # Moved to `ddck/.deleted` (not deleted) so undo can restore it.
+        self._trashedDdckDirPath = _dfh.moveComponentDdckFolderToTrash(
             self._blockItem, _pl.Path(self._editor.projectFolder)
         )
 
@@ -71,8 +73,26 @@ class DeleteBlockCommand(_qtw.QUndoCommand):
             )
         )
         self._blockItem.setDisplayName(displayName)
+        self._restoreDdckFolder(displayName)
 
         self._editor.trnsysObj.append(self._blockItem)
         self._editor.diagramScene.addItem(self._blockItem)
 
         super().undo()
+
+    def _restoreDdckFolder(self, displayName: str) -> None:
+        if not self._trashedDdckDirPath:
+            return
+        projectDirPath = _pl.Path(self._editor.projectFolder)
+        isRestored = _dfh.restoreComponentDdckFolderFromTrash(
+            self._trashedDdckDirPath, displayName, projectDirPath
+        )
+        if isRestored:
+            self._trashedDdckDirPath = None
+            return
+        _qtw.QMessageBox.warning(
+            None,
+            "ddck folder not restored",
+            f"The ddck folder of `{displayName}` could not be restored. It's"
+            f" still in `{self._trashedDdckDirPath}`.",
+        )

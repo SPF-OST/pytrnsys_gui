@@ -54,10 +54,14 @@ class ConfigureStorageDialog(
         editor: _ed.Editor,  # type: ignore[name-defined]
         renameHelper: _rename.RenameHelper,
         projectDirPath: str,
+        embedded: bool = False,
     ) -> None:
         super().__init__(storage, renameHelper, _pl.Path(projectDirPath))
         self._editor = editor
         self.storage = storage
+        # Embedded in the component window, which has the name and the
+        # OK/Cancel buttons: changes to the tank still apply immediately.
+        self._embedded = embedded
         self.__post_init__()
 
     def __post_init__(
@@ -193,8 +197,9 @@ class ConfigureStorageDialog(
 
         layout = QVBoxLayout()
         layout.addLayout(h0)
-        layout.addWidget(tankNameLabel)
-        layout.addWidget(self._displayNameLineEdit)
+        if not self._embedded:
+            layout.addWidget(tankNameLabel)
+            layout.addWidget(self._displayNameLineEdit)
 
         t1Layout = QVBoxLayout()
         t1Layout.addLayout(qhbL)
@@ -208,8 +213,9 @@ class ConfigureStorageDialog(
 
         layout.addWidget(increaseSizeButton)
         layout.addWidget(decreaseSizeButton)
-        layout.addWidget(self.okButton)
-        layout.addWidget(self.cancelButton)
+        if not self._embedded:
+            layout.addWidget(self.okButton)
+            layout.addWidget(self.cancelButton)
 
         self.setLayout(layout)
 
@@ -245,7 +251,8 @@ class ConfigureStorageDialog(
 
         self.msgb = QMessageBox()
 
-        self.show()
+        if not self._embedded:
+            self.show()
 
     def _loadHeatExchangers(self):
         self.leftHeatExchangersItemListWidget.clear()

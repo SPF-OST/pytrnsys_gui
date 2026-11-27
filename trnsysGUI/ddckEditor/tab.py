@@ -9,7 +9,13 @@ import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
+import pytrnsys.ddck.replaceTokens.defaultVisibility as _dv
+import trnsysGUI.runConfig as _rc
+import trnsysGUI.runConfig.context as _ctx
+import trnsysGUI.runConfig.importing as _imp
+
 from . import codeEditor as _ce
+from . import configTree as _ct
 from . import highlighter as _hl
 from . import placeholders as _ph
 from . import validation as _val
@@ -19,6 +25,9 @@ _LOGGER = _log.getLogger("root")
 # Returns the placeholder values for all components as currently given by the
 # diagram, or None if they can't be determined (e.g. diagram not connected).
 PlaceholderValuesProvider = _tp.Callable[[], _ph.ValuesByComponent | None]
+
+# The active run config, or None if there's none (yet).
+ConfigContextProvider = _tp.Callable[[], _ctx.ConfigContext | None]
 
 _TEXT_FILE_SUFFIXES = {".ddck", ".dck", ".json", ".config", ".log", ".txt"}
 _DECK_FILE_SUFFIXES = {".ddck", ".dck"}
@@ -82,6 +91,12 @@ class _Document(_qtw.QWidget):  # pylint: disable=too-many-instance-attributes
         self.problems: _tp.Sequence[_val.Problem] = []
         self.valuesByPort: _ph.ValuesByPort | None = None
 
+        # How the active config includes the file (see `setInclusions`).
+        self.inclusions: _tp.Sequence[_ctx.Inclusion] = []
+        self._configDefaultVisibility = _dv.DefaultVisibility.LOCAL
+        self.isLibraryFile = False
+        self.wasUnlocked = False
+
         # What we last read from or wrote to disk, to tell our own saves
         # apart from external changes.
         self.lastKnownDiskText = content.text
@@ -99,9 +114,105 @@ class _Document(_qtw.QWidget):  # pylint: disable=too-many-instance-attributes
             self.modificationChanged
         )
 
+        self.lockBanner = _LockBanner(self)
+        self.lockBanner.hide()
+
+        self._contextLabel = _qtw.QLabel()
+        self._contextLabel.setWordWrap(True)
+        self.inclusionComboBox = _qtw.QComboBox()
+        self.inclusionComboBox.setToolTip(
+            "The file is included several times in the config: the inclusion"
+            " to validate it (and show its placeholders) for."
+        )
+        self.inclusionComboBox.hide()
+        contextLayout = _qtw.QHBoxLayout()
+        contextLayout.setContentsMargins(4, 2, 4, 2)
+        contextLayout.addWidget(self._contextLabel, 1)
+        contextLayout.addWidget(self.inclusionComboBox)
+
         layout = _qtw.QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self.lockBanner)
+        layout.addLayout(contextLayout)
         layout.addWidget(self.editor)
+
+    @property
+    def isLocked(self) -> bool:
+        return self.editor.isReadOnly()
+
+    def setLocked(self, isLocked: bool) -> None:
+        self.editor.setReadOnly(isLocked)
+        self.lockBanner.setVisible(isLocked)
+
+    @property
+    def selectedInclusion(self) -> _ctx.Inclusion | None:
+        if not self.inclusions:
+            return None
+        index = self.inclusionComboBox.currentIndex()
+        return self.inclusions[max(index, 0)]
+
+    def setInclusions(
+        self,
+        inclusions: _tp.Sequence[_ctx.Inclusion],
+        configDefaultVisibility: _dv.DefaultVisibility,
+        configName: str | None,
+    ) -> None:
+        """`configName` None: there's no active config."""
+        selected = self.selectedInclusion
+        previousLine = selected.include.toLine() if selected else None
+        self.inclusions = list(inclusions)
+        self._configDefaultVisibility = configDefaultVisibility
+
+        self.inclusionComboBox.blockSignals(True)
+        try:
+            self.inclusionComboBox.clear()
+            for inclusion in self.inclusions:
+                self.inclusionComboBox.addItem(inclusion.label)
+            lines = [i.include.toLine() for i in self.inclusions]
+            if previousLine in lines:
+                self.inclusionComboBox.setCurrentIndex(
+                    lines.index(previousLine)
+                )
+        finally:
+            self.inclusionComboBox.blockSignals(False)
+        self.inclusionComboBox.setVisible(len(self.inclusions) > 1)
+
+        self.updateContextLabel(configName)
+
+    def updateContextLabel(self, configName: str | None) -> None:
+        if not self.isDdck:
+            self._contextLabel.setText("")
+            return
+        visibility = self.defaultVisibility.name.lower()
+        componentName = self.componentName or "(none)"
+        if configName is None:
+            text = (
+                "No active config: validated as component"
+                f" <b>{componentName}</b> ({visibility})."
+            )
+        elif not self.inclusions:
+            text = (
+                f"Not included in <code>{configName}</code>: validated as"
+                f" component <b>{componentName}</b> ({visibility})."
+            )
+        elif len(self.inclusions) == 1:
+            text = (
+                f"In <code>{configName}</code> as component"
+                f" <b>{componentName}</b> ({visibility})."
+            )
+        else:
+            text = (
+                f"Included {len(self.inclusions)} times in"
+                f" <code>{configName}</code>. Validate as:"
+            )
+        self._contextLabel.setText(text)
+
+    @property
+    def defaultVisibility(self) -> _dv.DefaultVisibility:
+        inclusion = self.selectedInclusion
+        if inclusion:
+            return inclusion.defaultVisibility
+        return self._configDefaultVisibility
 
     @property
     def isModified(self) -> bool:
@@ -113,6 +224,11 @@ class _Document(_qtw.QWidget):  # pylint: disable=too-many-instance-attributes
 
     @property
     def componentName(self) -> str:
+        """As pytrnsys sees it for the selected inclusion in the active
+        config, else the name of the file's folder."""
+        inclusion = self.selectedInclusion
+        if inclusion:
+            return inclusion.componentName
         return _val.getComponentName(self.filePath)
 
     def getText(self) -> str:
@@ -155,6 +271,7 @@ class _Document(_qtw.QWidget):  # pylint: disable=too-many-instance-attributes
                 self.componentName,
                 self.valuesByPort,
                 self.filePath,
+                self.defaultVisibility,
             )
 
         problemsByLineNumber: dict[int, str] = {}
@@ -181,11 +298,18 @@ class DdckEditorTab(
         self,
         placeholderValuesProvider: PlaceholderValuesProvider,
         parent: _qtw.QWidget | None = None,
+        configContextProvider: ConfigContextProvider | None = None,
     ) -> None:
         super().__init__(parent)
 
         self._placeholderValuesProvider = placeholderValuesProvider
         self._valuesByComponent: _ph.ValuesByComponent | None = None
+        self._configContextProvider = configContextProvider
+        self._configContext: _ctx.ConfigContext | None = None
+
+        self._configTree = _ct.ConfigTree(self)
+        self._configTree.openRequested.connect(self.openFile)
+        self._configTree.refreshRequested.connect(self.refreshConfigContext)
 
         self._fileWatcher = _qtc.QFileSystemWatcher(self)
         self._fileWatcher.fileChanged.connect(self._onFileChangedOnDisk)
@@ -238,6 +362,15 @@ class DdckEditorTab(
             lambda: self._closeDocument(document)
         )
         document.editor.cursorPositionChanged.connect(self._updateStatus)
+        document.inclusionComboBox.currentIndexChanged.connect(
+            lambda _: self._onInclusionChanged(document)
+        )
+        document.lockBanner.unlockRequested.connect(
+            lambda: self._unlock(document)
+        )
+        document.lockBanner.copyRequested.connect(
+            lambda: self._copyToProject(document)
+        )
 
         index = self._documentTabs.addTab(document, filePath.name)
         self._documentTabs.setTabToolTip(index, str(filePath))
@@ -245,6 +378,7 @@ class DdckEditorTab(
 
         self._fileWatcher.addPath(str(filePath))
 
+        self._applyConfigContext(document)
         self.refreshPlaceholderValues()
         document.validate()
         self._updateForCurrentDocument()
@@ -253,6 +387,15 @@ class DdckEditorTab(
         return True
 
     def saveDocument(self, document: "_Document") -> bool:
+        if document.isLocked:
+            _showWarning(
+                self,
+                f"`{document.filePath.name}` is an original of the ddck"
+                " library and opened read-only. Unlock it or copy it into"
+                " the project first.",
+            )
+            return False
+
         content = _FileContent(
             document.getText(), document.encoding, document.newline
         )
@@ -343,6 +486,127 @@ class DdckEditorTab(
 
         self._updatePlaceholderPanel()
 
+    def refreshConfigContext(self) -> None:
+        context = None
+        if self._configContextProvider:
+            try:
+                context = self._configContextProvider()
+            except (OSError, _rc.RunConfigError) as error:
+                _LOGGER.warning("Could not read the active config: %s", error)
+        self._configContext = context
+        self._configTree.setContext(context)
+
+        for document in self._getDocuments():
+            self._applyConfigContext(document)
+            self._applyPlaceholderValues(document)
+            document.validate()
+        self._updateForCurrentDocument()
+
+    # Config context, library originals
+
+    def _applyConfigContext(self, document: "_Document") -> None:
+        context = self._configContext
+        if context is None:
+            document.setInclusions([], _dv.DefaultVisibility.LOCAL, None)
+            return
+
+        inclusions = (
+            _ctx.findInclusions(context, document.filePath)
+            if document.isDdck
+            else []
+        )
+        document.setInclusions(
+            inclusions,
+            _ctx.getDefaultVisibility(context.config),
+            context.configName,
+        )
+
+        document.isLibraryFile = context.isLibraryFile(document.filePath)
+        if document.isLibraryFile and not document.wasUnlocked:
+            document.setLocked(True)
+            document.lockBanner.setCanCopy(
+                bool(document.inclusions)
+                and context.libraryDirPath is not None
+            )
+
+    def _onInclusionChanged(self, document: "_Document") -> None:
+        document.updateContextLabel(
+            self._configContext.configName if self._configContext else None
+        )
+        self._applyPlaceholderValues(document)
+        document.validate()
+        self._updateProblemsList()
+        self._updatePlaceholderPanel()
+
+    def _unlock(self, document: "_Document") -> None:
+        answer = _qtw.QMessageBox.question(
+            self,
+            "Edit the library's original?",
+            f"`{document.filePath.name}` is part of the ddck library: changes"
+            " affect every project that uses it.\n\nEdit it anyway?",
+            _qtw.QMessageBox.Yes | _qtw.QMessageBox.No,
+            _qtw.QMessageBox.No,
+        )
+        if answer != _qtw.QMessageBox.Yes:
+            return
+        document.wasUnlocked = True
+        document.setLocked(False)
+        document.editor.setFocus()
+
+    def _copyToProject(self, document: "_Document") -> None:
+        context = self._configContext
+        inclusion = document.selectedInclusion
+        if not context or not inclusion or not context.libraryDirPath:
+            return
+
+        folderName = inclusion.blockComponentName or self._askForFolder(
+            context, document.filePath
+        )
+        if not folderName:
+            return
+
+        try:
+            newFilePath = _copyLibraryDdckIntoProject(
+                self, context, inclusion, document.filePath, folderName
+            )
+        except (OSError, _rc.RunConfigError, _imp.DdckImportError) as error:
+            _showWarning(self, f"Could not copy the ddck: {error}")
+            return
+        if not newFilePath:
+            return
+
+        self._closeDocument(document)
+        self.refreshConfigContext()
+        self.openFile(newFilePath)
+
+    def _askForFolder(
+        self, context: _ctx.ConfigContext, libraryFilePath: _pl.Path
+    ) -> str | None:
+        # pylint: disable=import-outside-toplevel  # avoid import cycle
+        import trnsysGUI.componentDdcks.projectWindow as _pw
+
+        assert context.libraryDirPath
+        relativePath = libraryFilePath.resolve().relative_to(
+            context.libraryDirPath.resolve()
+        )
+        folders = _pw.getFolderSuggestions(
+            context.projectDirPath / "ddck",
+            context.config.getComponentNames(),
+            relativePath,
+        )
+        folderName, isOk = _qtw.QInputDialog.getItem(
+            self,
+            "Copy into the project",
+            "Folder of the project's ddck folder to copy the ddck into:",
+            folders,
+            0,
+            True,
+        )
+        folderName = folderName.strip()
+        if not isOk or not _rc.isValidComponentName(folderName):
+            return None
+        return folderName
+
     # Qt overrides
 
     def showEvent(
@@ -352,7 +616,9 @@ class DdckEditorTab(
 
         _qtc.QTimer.singleShot(0, self._setInitialSplitterSizesOnce)
 
-        # The diagram might have changed while the tab was hidden.
+        # The diagram and the active config might have changed while the tab
+        # was hidden.
+        self.refreshConfigContext()
         self.refreshPlaceholderValues()
         for document in self._getDocuments():
             document.validate()
@@ -405,10 +671,12 @@ class DdckEditorTab(
         self._editorAndProblemsSplitter.setStretchFactor(1, 0)
 
         self._mainSplitter = _qtw.QSplitter(_qtc.Qt.Horizontal)
+        self._mainSplitter.addWidget(self._configTree)
         self._mainSplitter.addWidget(self._editorAndProblemsSplitter)
         self._mainSplitter.addWidget(self._placeholderPanel)
-        self._mainSplitter.setStretchFactor(0, 1)
-        self._mainSplitter.setStretchFactor(1, 0)
+        self._mainSplitter.setStretchFactor(0, 0)
+        self._mainSplitter.setStretchFactor(1, 1)
+        self._mainSplitter.setStretchFactor(2, 0)
 
         layout = _qtw.QVBoxLayout(self)
         layout.addWidget(self._mainSplitter)
@@ -420,7 +688,9 @@ class DdckEditorTab(
         self._haveSplitterSizesBeenSet = True
 
         width = self._mainSplitter.width()
-        self._mainSplitter.setSizes([width * 4 // 5, width // 5])
+        self._mainSplitter.setSizes(
+            [width * 3 // 20, width * 13 // 20, width // 5]
+        )
 
         height = self._editorAndProblemsSplitter.height()
         self._editorAndProblemsSplitter.setSizes(
@@ -889,6 +1159,103 @@ class _PlaceholderPanel(_qtw.QWidget):
         placeholder = item.data(0, _qtc.Qt.UserRole)
         if placeholder:
             self.insertRequested.emit(placeholder)
+
+
+class _LockBanner(_qtw.QFrame):
+    """Shown above originals of the ddck library, which open read-only."""
+
+    unlockRequested = _qtc.pyqtSignal()
+    copyRequested = _qtc.pyqtSignal()
+
+    def __init__(self, parent: _qtw.QWidget) -> None:
+        super().__init__(parent)
+        self.setFrameShape(_qtw.QFrame.StyledPanel)
+        self.setAutoFillBackground(True)
+        palette = self.palette()
+        palette.setColor(_qtg.QPalette.Window, _qtg.QColor("#fff8c5"))
+        self.setPalette(palette)
+
+        label = _qtw.QLabel(
+            "\U0001f512 <b>Original of the ddck library</b> (read-only):"
+            " changes would affect every project that uses it."
+        )
+        label.setWordWrap(True)
+        self._copyButton = _qtw.QPushButton("Copy to project")
+        self._copyButton.setToolTip(
+            "Copy it (and the data files it ASSIGNs) into the project and"
+            " include the copy instead (PROJECT$) in the active config."
+        )
+        self._copyButton.clicked.connect(self.copyRequested)
+        unlockButton = _qtw.QPushButton("Unlock")
+        unlockButton.setToolTip("Edit the library's original.")
+        unlockButton.clicked.connect(self.unlockRequested)
+
+        layout = _qtw.QHBoxLayout(self)
+        layout.setContentsMargins(6, 4, 6, 4)
+        layout.addWidget(label, 1)
+        layout.addWidget(self._copyButton)
+        layout.addWidget(unlockButton)
+
+    @property
+    def canCopy(self) -> bool:
+        return self._copyButton.isEnabled()
+
+    def setCanCopy(self, canCopy: bool) -> None:
+        self._copyButton.setEnabled(canCopy)
+        if not canCopy:
+            self._copyButton.setToolTip(
+                "Only possible for ddcks included in the active config."
+            )
+
+
+def _copyLibraryDdckIntoProject(
+    parent: _qtw.QWidget,
+    context: _ctx.ConfigContext,
+    inclusion: _ctx.Inclusion,
+    libraryFilePath: _pl.Path,
+    folderName: str,
+) -> _pl.Path | None:
+    """Copies the library ddck into `ddck/<folderName>/` and replaces its
+    inclusion in the config by the copy, keeping its component name and
+    visibility. None if cancelled."""
+    assert context.libraryDirPath
+    original = inclusion.include
+
+    plan = _imp.planCopy(
+        context.libraryDirPath,
+        libraryFilePath,
+        context.projectDirPath / "ddck",
+        folderName,
+        alias=None if original.isGlobal else original.componentName or None,
+    )
+    if original.isGlobal:
+        plan = _dc.replace(
+            plan, include=_dc.replace(plan.include, alias=None, isGlobal=True)
+        )
+
+    existing = plan.getExistingTargetFilePaths()
+    if existing:
+        answer = _qtw.QMessageBox.question(
+            parent,
+            "Overwrite files?",
+            "Overwrite these files of the project?\n\n"
+            + "\n".join(f"  \u2022 {p}" for p in existing),
+            _qtw.QMessageBox.Yes | _qtw.QMessageBox.No,
+            _qtw.QMessageBox.No,
+        )
+        if answer != _qtw.QMessageBox.Yes:
+            return None
+
+    _imp.executeCopy(plan, overwrite=True)
+
+    # Re-read: the config might have changed since the context was loaded.
+    config = context.config
+    if config.filePath and config.filePath.is_file():
+        config = _rc.RunConfig.read(config.filePath)
+    config.replaceIncludeLine(inclusion.lineIndex, plan.include)
+    config.write()
+
+    return plan.targetDdckFilePath
 
 
 def _showWarning(parent: _qtw.QWidget, message: str) -> None:

@@ -4,6 +4,7 @@ import typing as _tp
 import PyQt5.QtCore as _qtc
 import PyQt5.QtWidgets as _widgets
 
+import trnsysGUI.runConfig as _rc
 import trnsysGUI.settings as _settings
 
 import trnsysGUI.common.cancelled as _cancel
@@ -29,6 +30,8 @@ class SettingsDlg(_widgets.QDialog):
         layout.addWidget(self._lineEdit)
         layout.addWidget(setButton)
 
+        libraryLayout = self._createDdckLibraryLayout()
+
         self._okButton = _widgets.QPushButton("Done")
         self._okButton.setFixedWidth(50)
         self._okButton.clicked.connect(self._onOkButtonClicked)
@@ -39,6 +42,7 @@ class SettingsDlg(_widgets.QDialog):
 
         overallLayout = _widgets.QVBoxLayout()
         overallLayout.addLayout(layout)
+        overallLayout.addLayout(libraryLayout)
         overallLayout.addLayout(buttonLayout)
         self.setLayout(overallLayout)
         self.setFixedWidth(800)
@@ -48,6 +52,49 @@ class SettingsDlg(_widgets.QDialog):
         self._settings: _cancel.MaybeCancelled[_settings.Settings] = (
             _cancel.CANCELLED
         )
+
+    def _createDdckLibraryLayout(self) -> _widgets.QHBoxLayout:
+        label = _widgets.QLabel("ddck library:")
+
+        self._libraryLineEdit = _widgets.QLineEdit(
+            _rc.loadConfiguredLibraryPath()
+        )
+        autoDetectedPath = _rc.findDefaultDdckLibrary()
+        self._libraryLineEdit.setPlaceholderText(
+            f"Auto-detected: {autoDetectedPath}"
+            if autoDetectedPath
+            else "Not found: please set the path to pytrnsys_gui's data/ddck"
+        )
+        self._libraryLineEdit.setToolTip(
+            "Folder with the default ddck files (data/ddck of the pytrnsys_gui"
+            " repository, `COMMON$` in run configs). Leave empty to"
+            " auto-detect it."
+        )
+
+        browseButton = _widgets.QPushButton("Browse...")
+        browseButton.setFixedWidth(100)
+        browseButton.clicked.connect(self._onBrowseLibraryClicked)
+
+        autoButton = _widgets.QPushButton("Auto-detect")
+        autoButton.setFixedWidth(100)
+        autoButton.clicked.connect(self._libraryLineEdit.clear)
+
+        libraryLayout = _widgets.QHBoxLayout()
+        libraryLayout.addWidget(label)
+        libraryLayout.addWidget(self._libraryLineEdit)
+        libraryLayout.addWidget(browseButton)
+        libraryLayout.addWidget(autoButton)
+        return libraryLayout
+
+    def _onBrowseLibraryClicked(self) -> None:
+        startDirPath = self._libraryLineEdit.text() or str(
+            _rc.findDefaultDdckLibrary() or ""
+        )
+        dirPath = _widgets.QFileDialog.getExistingDirectory(
+            self, "Select ddck library", startDirPath
+        )
+        if dirPath:
+            self._libraryLineEdit.setText(dirPath)
 
     @staticmethod
     def showDialogAndGetSettings(
@@ -83,6 +130,8 @@ class SettingsDlg(_widgets.QDialog):
             settings = _settings.Settings.create(_pl.Path(newBinaryPath), [])
 
         self._settings = settings
+
+        _rc.saveConfiguredLibraryPath(self._libraryLineEdit.text().strip())
 
         self.close()
 

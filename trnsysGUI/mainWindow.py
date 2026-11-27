@@ -15,11 +15,17 @@ import pytrnsys.utils.warnings as _warn
 from PyQt5.QtWidgets import QAction
 
 import trnsysGUI.blockItemHasInternalPiping as _biip
-import trnsysGUI.configFileUpdater as _cfu
 import trnsysGUI.ddckEditor as _dde
 import trnsysGUI.ddckEditor.placeholders as _dph
 import trnsysGUI.diagram.export as _dexp
 import trnsysGUI.menus.projectMenu.placeholders as _phv
+import trnsysGUI.componentDdcks.projectWindow as _pdw
+import trnsysGUI.components.ddckFolderHelpers as _dfh
+import trnsysGUI.runConfig.controller as _rcc
+import trnsysGUI.runConfig.context as _rcctx
+import trnsysGUI.runConfig.library as _rclib
+import trnsysGUI.runConfig.model as _rcm
+import trnsysGUI.runConfig.sync as _rcsync
 import trnsysGUI.loggingCallback as _lgcb
 import trnsysGUI.menus.projectMenu.exportPlaceholders as _eph
 from trnsysGUI import buildDck as buildDck
@@ -93,10 +99,22 @@ class MainWindow(_qtw.QMainWindow):
         loadDiaAction = _qtw.QAction(_img.OUTBOX_PNG.icon(), "Open", self)
         loadDiaAction.triggered.connect(self.loadDia)
 
-        updateConfigAction = _qtw.QAction(
-            _img.UPDATE_CONFIG_PNG.icon(), "Update run.config", self
+        self._runConfigs = _rcc.RunConfigController(
+            self, lambda: self._projectDirPath, self.getTrnsysExePath
         )
-        updateConfigAction.triggered.connect(self.updateRun)
+        self._runConfigs.syncAction.setIcon(_img.UPDATE_CONFIG_PNG.icon())
+        # After the controller's own handler, which activates the config.
+        self._runConfigs.comboBox.activated.connect(
+            self._onActiveConfigChanged
+        )
+
+        projectDdcksAction = _qtw.QAction("Project ddcks...", self)
+        projectDdcksAction.setToolTip(
+            "The ddcks of the active config without component (head,"
+            " control, weather, ..., end) and the order of all ddcks. Also by"
+            " double-clicking an empty area of the diagram."
+        )
+        projectDdcksAction.triggered.connect(self.showProjectDdckWindow)
 
         runSimulationAction = _qtw.QAction(
             _img.RUN_SIMULATION_PNG.icon(), "Run simulation", self
@@ -180,7 +198,12 @@ class MainWindow(_qtw.QMainWindow):
         tb.addAction(openVisualizerAction)
         tb.addAction(exportHydraulicsAction)
         tb.addAction(exportHydCtrlAction)
-        tb.addAction(updateConfigAction)
+        tb.addSeparator()
+        tb.addWidget(_qtw.QLabel(" Config: "))
+        tb.addWidget(self._runConfigs.comboBox)
+        tb.addAction(projectDdcksAction)
+        tb.addAction(self._runConfigs.exportAction)
+        tb.addAction(self._runConfigs.syncAction)
         tb.addAction(exportDckAction)
         tb.addAction(runSimulationAction)
         tb.addAction(processSimulationAction)
@@ -232,7 +255,8 @@ class MainWindow(_qtw.QMainWindow):
             self.askUserForSettingsValuesAndSave()
             self.loadTrnsysPath()
 
-        setTransysPath = _qtw.QAction("Set TRNSYS path", self)
+        setTransysPath = _qtw.QAction("Settings...", self)
+        setTransysPath.setToolTip("TRNSYS path and ddck library")
         setTransysPath.triggered.connect(askForSaveAndLoadSettings)
         self.fileMenu.addAction(setTransysPath)
 
@@ -267,9 +291,6 @@ class MainWindow(_qtw.QMainWindow):
             self.exportDdckPlaceHolderValuesJson
         )
 
-        updateConfigActionMenu = _qtw.QAction("Update run.config", self)
-        updateConfigActionMenu.triggered.connect(self.updateRun)
-
         exportDckActionMenu = _qtw.QAction("Export dck", self)
         exportDckActionMenu.triggered.connect(self.exportDck)
 
@@ -289,7 +310,9 @@ class MainWindow(_qtw.QMainWindow):
         self.projectMenu.addAction(
             exportDdckPlaceHolderValuesJsonFileActionMenu
         )
-        self.projectMenu.addAction(updateConfigActionMenu)
+        self.projectMenu.addAction(projectDdcksAction)
+        self.projectMenu.addAction(self._runConfigs.syncAction)
+        self.projectMenu.addAction(self._runConfigs.exportAction)
         self.projectMenu.addAction(exportDckActionMenu)
         self.projectMenu.addAction(runSimulationActionMenu)
         self.projectMenu.addAction(processSimulationActionMenu)
@@ -421,21 +444,49 @@ class MainWindow(_qtw.QMainWindow):
         self.openFile()
 
     def updateRun(self):
-        configFilePath = self._projectDirPath / "run.config"
+        """Synchronizes the active config (formerly regenerated all
+        `PROJECT$` lines of run.config from the ddck folder)."""
+        self._runConfigs.syncConfig()
 
-        if configFilePath.is_dir():
-            _qtw.QMessageBox.information(
-                self,
-                "`run.config` is a directory",
-                f"Could not create file {configFilePath} because a directory of the same name exists. "
-                "Please remove or rename the directory before trying to update the `run.config` file.",
-            )
-            return
+    def showProjectDdckWindow(self) -> None:
+        componentNames = [
+            o.displayName
+            for o in self.editor.trnsysObj
+            if isinstance(o, BlockItem) and _dfh.hasComponentDdckFolder(o)
+        ]
+        _pdw.showProjectDdckWindow(
+            self._projectDirPath,
+            self._runConfigs.loadActiveConfig,
+            _rclib.getDdckLibraryDirPath(),
+            componentNames=componentNames,
+            openFile=self.openFileInDdckEditor,
+            parent=self,
+        )
+        self._runConfigs.refresh()
 
-        configFilePath.touch()
+    def _onActiveConfigChanged(self, _index: int = 0) -> None:
+        if self.ddckEditorTab:
+            self.ddckEditorTab.refreshConfigContext()
 
-        runConfig = _cfu.ConfigFileUpdater(configFilePath)
-        runConfig.updateConfig()
+    def _getActiveConfigContext(self) -> _rcctx.ConfigContext | None:
+        """The active config as the ddck editor sees it (None if it doesn't
+        exist yet)."""
+        configFilePath = self.activeConfigFilePath
+        if not configFilePath.is_file():
+            return None
+        return _rcctx.ConfigContext(
+            _rcm.RunConfig.read(configFilePath),
+            self._projectDirPath,
+            _rclib.getDdckLibraryDirPath(),
+        )
+
+    @property
+    def activeConfigFilePath(self) -> _pl.Path:
+        return self._runConfigs.activeConfigFilePath
+
+    def getTrnsysExePath(self) -> str:
+        settings = _settings.Settings.tryLoadOrNone()
+        return settings.trnsysBinaryPath if settings else ""
 
     @property
     def _projectDirPath(self) -> _pl.Path:
@@ -468,13 +519,16 @@ class MainWindow(_qtw.QMainWindow):
             _werrors.showMessageBox(errorMessage)
             return
 
-        #   Update run.config
-        self.updateRun()
+        #   Create the active config if needed and add missing settings
+        if not self._runConfigs.prepareForRun():
+            return
 
         #   Start simulation
         runApp = RunMain()
         executionFailed, errorStatement = runApp.runAction(
-            self.logger, self.editor.projectFolder
+            self.logger,
+            self.editor.projectFolder,
+            self._runConfigs.activeConfigFileName,
         )
 
         if executionFailed:
@@ -634,21 +688,26 @@ class MainWindow(_qtw.QMainWindow):
         tabWidget.addTab(
             self.variablePlotTab, _img.TAB_PLOTS_SVG.icon(), "Plots"
         )
-        self.ddckEditorTab = _dde.DdckEditorTab(self._getPlaceholderValues)
+        self.ddckEditorTab = _dde.DdckEditorTab(
+            self._getPlaceholderValues,
+            configContextProvider=self._getActiveConfigContext,
+        )
         tabWidget.addTab(
             self.ddckEditorTab, _img.TAB_DDCK_EDITOR_SVG.icon(), "ddck Editor"
         )
         self.setCentralWidget(tabWidget)
         self._centralTabWidget = tabWidget
 
+        self._runConfigs.refresh()
+
         self.editor.fileSystemTreeView.openTextFileRequested.connect(
-            self._openFileInDdckEditor
+            self.openFileInDdckEditor
         )
 
         if wasRunning:
             self.editor.start()
 
-    def _openFileInDdckEditor(self, filePath: _pl.Path) -> None:
+    def openFileInDdckEditor(self, filePath: _pl.Path) -> None:
         assert self.ddckEditorTab and self._centralTabWidget
         if self.ddckEditorTab.openFile(filePath):
             self._centralTabWidget.setCurrentWidget(self.ddckEditorTab)
@@ -662,7 +721,11 @@ class MainWindow(_qtw.QMainWindow):
 
         ddckDirPath = _pl.Path(self.editor.projectFolder) / "ddck"
         ddckDirNames = (
-            [p.name for p in ddckDirPath.iterdir() if p.is_dir()]
+            [
+                p.name
+                for p in ddckDirPath.iterdir()
+                if p.is_dir() and not p.name.startswith(".")
+            ]
             if ddckDirPath.is_dir()
             else []
         )
@@ -694,9 +757,13 @@ class MainWindow(_qtw.QMainWindow):
             _werrors.showMessageBox(errorMessage)
             return
 
-        builder = buildDck.DckBuilder(self._projectDirPath)
+        builder = buildDck.DckBuilder(
+            self._projectDirPath, self._runConfigs.activeConfigFileName
+        )
 
-        result = builder.buildTrnsysDeck()
+        # Relative paths in the config are relative to the project.
+        with _rcsync.workingDirectory(self._projectDirPath):
+            result = builder.buildTrnsysDeck()
         if _res.isError(result):
             errorMessage = (
                 f"The deck file could not be generated: {result.message}"

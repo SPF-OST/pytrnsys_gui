@@ -91,3 +91,61 @@ Would you like to delete the component ddck folder nonetheless? This cannot be u
             return
 
     _su.rmtree(dirPath)
+
+
+# Deleted components' ddck folders are moved here (instead of being deleted)
+# so deleting a component can be undone with its ddck files.
+DELETED_DDCK_DIR_NAME = ".deleted"
+
+
+def isDeletedDdckDir(path: _pl.Path) -> bool:
+    return path.name == DELETED_DDCK_DIR_NAME
+
+
+def moveComponentDdckFolderToTrash(
+    blockItem: _bi.BlockItem, projectFolder: _pl.Path
+) -> _pl.Path | None:
+    """Moves `ddck/<component>` to `ddck/.deleted/<component>` (with a
+    number appended if that exists). Returns where it was moved to, or None
+    if there was nothing to move."""
+    if not hasComponentDdckFolder(blockItem):
+        return None
+
+    dirPath = getComponentDdckDirPath(blockItem.displayName, projectFolder)
+    if not dirPath.is_dir():
+        return None
+
+    trashDirPath = dirPath.parent / DELETED_DDCK_DIR_NAME
+    trashDirPath.mkdir(exist_ok=True)
+
+    targetDirPath = trashDirPath / dirPath.name
+    number = 2
+    while targetDirPath.exists():
+        targetDirPath = trashDirPath / f"{dirPath.name}_{number}"
+        number += 1
+
+    _su.move(str(dirPath), str(targetDirPath))
+    return targetDirPath
+
+
+def restoreComponentDdckFolderFromTrash(
+    trashedDirPath: _pl.Path, displayName: str, projectFolder: _pl.Path
+) -> bool:
+    """Moves a folder moved to the trash by `moveComponentDdckFolderToTrash`
+    back to `ddck/<displayName>`. False if that's not possible (the trashed
+    folder is gone or the target exists and isn't empty)."""
+    if not trashedDirPath.is_dir():
+        return False
+
+    targetDirPath = getComponentDdckDirPath(displayName, projectFolder)
+    if targetDirPath.exists():
+        if not targetDirPath.is_dir() or any(targetDirPath.iterdir()):
+            return False
+        targetDirPath.rmdir()
+
+    _su.move(str(trashedDirPath), str(targetDirPath))
+
+    trashDirPath = trashedDirPath.parent
+    if trashDirPath.is_dir() and not any(trashDirPath.iterdir()):
+        trashDirPath.rmdir()
+    return True
